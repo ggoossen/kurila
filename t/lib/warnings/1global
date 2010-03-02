@@ -82,21 +82,21 @@ Use of uninitialized value $b in chop at - line 3 character 9.
 
 $^WARNING = 1;
 eval 'my $b ; chop $b ;' ;
-print $^STDOUT, $^EVAL_ERROR ;
+print: $^STDOUT, $^EVAL_ERROR ;
 EXPECT
 Use of uninitialized value $b in chop at (eval 1) line 1 character 9.
     (eval) called at - line 3 character 1.
 ########
 
 eval '$^WARNING = 1;' ;
-print $^STDOUT, $^EVAL_ERROR ;
+print: $^STDOUT, $^EVAL_ERROR ;
 my $b ; chop $b ;
 EXPECT
 Use of uninitialized value $b in chop at - line 4 character 9.
 ########
 
 try {$^WARNING = 1;} ;
-print $^STDOUT, $^EVAL_ERROR ;
+print: $^STDOUT, $^EVAL_ERROR ;
 my $b ; chop $b ;
 EXPECT
 Use of uninitialized value $b in chop at - line 4 character 9.

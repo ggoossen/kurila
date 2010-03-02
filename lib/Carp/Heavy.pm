@@ -47,12 +47,12 @@ sub  longmess_real
     # number of call levels to go back, so calls to longmess were off
     # by one.  Other code began calling longmess and expecting this
     # behaviour, so the replacement has to emulate that behaviour.
-    my $call_pack = caller()
+    my $call_pack = (caller: )
     if (%Internal{?$call_pack} or %CarpInternal{?$call_pack})
-        return longmess_heavy(< @_)
+        return longmess_heavy: < @_
     else
         local $CarpLevel = $CarpLevel + 1
-        return longmess_heavy(< @_)
+        return longmess_heavy: < @_
     
 ;
 
@@ -60,31 +60,31 @@ our @CARP_NOT
 
 sub shortmess_real
     # Icky backwards compatibility wrapper. :-(
-    local @CARP_NOT = @:  caller() 
-    shortmess_heavy(< @_)
+    local @CARP_NOT = @:  (caller: ) 
+    shortmess_heavy: < @_
 ;
 
 sub caller_info
-    my $i = shift(@_) + 1
+    my $i = (shift: @_) + 1
     package DB;
     my %call_info
     %call_info{[
         qw(pack file line sub has_args wantarray evaltext is_require)
-        ]} = @: caller($i)
+        ]} = @: caller: $i
                 
     unless (defined %call_info{?pack})
         return ()
     
 
-    my $sub_name = Carp::get_subname(\%call_info)
+    my $sub_name = Carp::get_subname: \%call_info
     if (%call_info{?has_args})
-        my @args = map { Carp::format_arg($_)}, @DB::args
+        my @args = map: { (Carp::format_arg: $_)}, @DB::args
         if ($MaxArgNums and (nelems @args) +> $MaxArgNums) # More than we want to show?
-            splice @args, $MaxArgNums
-            push @args, '...'
+            splice: @args, $MaxArgNums
+            push: @args, '...'
         
         # Push the args onto the subroutine
-        $sub_name .= '(' . join (', ', @args) . ')'
+        $sub_name .= '(' . (join: ', ', @args) . ')'
     
     %call_info{+sub_name} = $sub_name
     return %call_info
@@ -94,8 +94,8 @@ sub caller_info
 sub format_arg
     my $arg = shift
 
-    $arg = dump::view($arg)
-    $arg = str_len_trim($arg, $MaxArgLen)
+    $arg = dump::view: $arg
+    $arg = str_len_trim: $arg, $MaxArgLen
 
     return $arg
 
@@ -107,7 +107,7 @@ sub format_arg
 sub get_status
     my $cache = shift
     my $pkg = shift
-    $cache->{+$pkg} ||= \@: \(%: $pkg => $pkg), \trusts_directly($pkg)
+    $cache->{+$pkg} ||= \@: \(%: $pkg => $pkg), \trusts_directly: $pkg
     return $cache->{?$pkg}->@
 
 
@@ -115,13 +115,13 @@ sub get_status
 # the sub/require/eval
 sub get_subname
     my $info = shift
-    if (defined($info->{?evaltext}))
+    if ((defined: $info->{?evaltext}))
         my $eval = $info->{?evaltext}
         if ($info->{?is_require})
             return "require $eval"
         else
             $eval =~ s/([\\\'])/\\$1/g
-            return "eval '" . str_len_trim($eval, $MaxEvalLen) . "'"
+            return "eval '" . (str_len_trim: $eval, $MaxEvalLen) . "'"
         
     
 
@@ -134,12 +134,12 @@ sub long_error_loc
     my $i
     my $lvl = $CarpLevel
     do
-        my $pkg = caller(++$i)
-        unless(defined($pkg))
+        my $pkg = caller: ++$i
+        unless((defined: $pkg))
             # This *shouldn't* happen.
             if (%Internal)
                 local %Internal
-                $i = long_error_loc()
+                $i = (long_error_loc: )
                 last
             else
                 # OK, now I am irritated.
@@ -155,28 +155,28 @@ sub long_error_loc
 
 
 sub longmess_heavy
-    return @_ if ref(@_[0]) # don't break references as exceptions
-    my $i = long_error_loc()
-    return ret_backtrace($i, < @_)
+    return @_ if ref: @_[0] # don't break references as exceptions
+    my $i = (long_error_loc: )
+    return ret_backtrace: $i, < @_
 
 
 # Returns a full stack backtrace starting from where it is
 # told.
 sub ret_backtrace($i, @< @error)
     my $mess
-    my $err = join '', @error
+    my $err = join: '', @error
     $i++
 
     my $tid_msg = ''
     if (exists &threads::tid)
-        my $tid = threads->tid
+        my $tid = threads->tid: 
         $tid_msg = " thread $tid" if $tid
     
 
-    my %i = %:  < caller_info($i) 
+    my %i = %:  < caller_info: $i 
     $mess = "$err at %i{?file} line %i{?line}$tid_msg\n"
 
-    while (my %i = (%:  < caller_info(++$i) ))
+    while (my %i = (%:  < (caller_info: ++$i) ))
         $mess .= "\t$(%i{?sub_name}//'(unnamed sub)') called at %i{?file} line %i{?line}$tid_msg\n"
     
 
@@ -184,16 +184,16 @@ sub ret_backtrace($i, @< @error)
 
 
 sub ret_summary($i, @< @error)
-    my $err = join '', @error
+    my $err = join: '', @error
     $i++
 
     my $tid_msg = ''
     if (exists &threads::tid)
-        my $tid = threads->tid
+        my $tid = threads->tid: 
         $tid_msg = " thread $tid" if $tid
     
 
-    my %i = %:  < caller_info($i) 
+    my %i = %:  < caller_info: $i 
     return "$err at %i{?file} line %i{?line}$tid_msg\n"
 
 
@@ -206,15 +206,15 @@ sub short_error_loc
     my $i = 1
     my $lvl = $CarpLevel
     do
-        my $called = caller($i++)
-        my $caller = caller($i)
+        my $called = caller: $i++
+        my $caller = caller: $i
 
-        return 0 unless defined($caller) # What happened?
+        return 0 unless defined: $caller # What happened?
         redo if %Internal{?$caller}
         redo if %CarpInternal{?$caller}
         redo if %CarpInternal{?$called}
-        redo if trusts($called, $caller, $cache)
-        redo if trusts($caller, $called, $cache)
+        redo if trusts: $called, $caller, $cache
+        redo if trusts: $caller, $called, $cache
         redo unless 0 +> --$lvl
     
     return $i - 1
@@ -222,13 +222,13 @@ sub short_error_loc
 
 
 sub shortmess_heavy
-    return longmess_heavy(< @_) if $Verbose
-    return @_ if ref(@_[0]) # don't break references as exceptions
-    my $i = short_error_loc()
+    return (longmess_heavy: < @_) if $Verbose
+    return @_ if ref: @_[0] # don't break references as exceptions
+    my $i = (short_error_loc: )
     if ($i)
-        ret_summary($i, < @_)
+        ret_summary: $i, < @_
     else
-        longmess_heavy(< @_)
+        longmess_heavy: < @_
     
 
 
@@ -236,8 +236,8 @@ sub shortmess_heavy
 sub str_len_trim
     my $str = shift
     my $max = shift || 0
-    if (2 +< $max and $max +< length($str))
-        substr($str, $max - 3, undef, '...')
+    if (2 +< $max and $max +< (length: $str))
+        substr: $str, $max - 3, undef, '...'
     
     return $str
 
@@ -252,16 +252,16 @@ sub trusts
     my $child = shift
     my $parent = shift
     my $cache = shift
-    my (@: $known, $partial) =  get_status($cache, $child)
+    my (@: $known, $partial) =  get_status: $cache, $child
     # Figure out consequences until we have an answer
     while ((nelems $partial->@) and not exists $known->{$parent})
         my $anc = shift $partial->@
         next if exists $known->{$anc}
         $known->{+$anc}++
-        my (@: $anc_knows, $anc_partial) =  get_status($cache, $anc)
+        my (@: $anc_knows, $anc_partial) =  get_status: $cache, $anc
         my @found = keys $anc_knows->%
         $known->%{[ @found]} = $@
-        push $partial->@, < $anc_partial->@
+        push: $partial->@, < $anc_partial->@
     
     return exists $known->{$parent}
 
@@ -269,9 +269,9 @@ sub trusts
 # Takes a package and gives a list of those trusted directly
 sub trusts_directly($class)
     no warnings 'once'
-    return (nelems Symbol::fetch_glob("$class\::CARP_NOT")->*->@)
-        ?? Symbol::fetch_glob("$class\::CARP_NOT")->*->@
-        !! Symbol::fetch_glob("$class\::ISA")->*->@
+    return (nelems (Symbol::fetch_glob: "$class\::CARP_NOT")->*->@)
+        ?? (Symbol::fetch_glob: "$class\::CARP_NOT")->*->@
+        !! (Symbol::fetch_glob: "$class\::ISA")->*->@
 
 1
 

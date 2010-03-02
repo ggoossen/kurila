@@ -12,60 +12,60 @@ use TestInit
 
 use Test::More
 
-plan tests => 47
+plan: tests => 47
 
 use Pod::Man
 use charnames ':full'
 use utf8
 
-ok 1
+ok: 1
 
-my $parser = Pod::Man->new or die "Cannot create parser\n"
+my $parser = (Pod::Man->new: ) or die: "Cannot create parser\n"
 my $n = 2
-while ( ~< $^DATA) {
-    next until $_ eq "###\n";
+while ( ~< $^DATA)
+    next until $_ eq "###\n"
 
-    my $input = "";
-    while ( ~< $^DATA) {
-        no warnings 'utf8'; # No invalid unicode warnings.
-        last if $_ eq "###\n";
-        $input .= $_;
-    }
-    my $expected = '';
-    while ( ~< $^DATA) {
-        last if $_ eq "###\n";
-        $expected .= $_;
-    }
+    my $input = ""
+    while ( ~< $^DATA)
+        no warnings 'utf8' # No invalid unicode warnings.
+        last if $_ eq "###\n"
+        $input .= $_
+    
+    my $expected = ''
+    while ( ~< $^DATA)
+        last if $_ eq "###\n"
+        $expected .= $_
+    
 
-    open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
+    open: my $tmp, ">", 'tmp.pod' or die: "Cannot create tmp.pod: $^OS_ERROR\n"
 
     # We have a test in ISO 8859-1 encoding.  Make sure that nothing strange
     # happens if Perl thinks the world is Unicode.  Wrap this in eval so that
     # older versions of Perl don't croak.
     no warnings 'utf8';
-    print $tmp, $input;
-    close $tmp;
+    (print: $tmp, $input)
+    close $tmp
 
-    test_outtmp($expected, "latin1\nINPUT:\n$input");
+    (test_outtmp: $expected, "latin1\nINPUT:\n$input")
 
-    unlink('tmp.pod');
+    (unlink: 'tmp.pod')
 
-    open (my $tmp2, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
-    print $tmp2, "\N{BOM}";
-    print $tmp2, $input;
-    close $tmp2;
-    test_outtmp($expected, "UTF-8 BOM\nINPUT:\n$input");
+    open: my $tmp2, ">", 'tmp.pod' or die: "Cannot create tmp.pod: $^OS_ERROR\n"
+    print: $tmp2, "\N{BOM}"
+    (print: $tmp2, $input)
+    close $tmp2
+    (test_outtmp: $expected, "UTF-8 BOM\nINPUT:\n$input")
 
-    unlink('tmp.pod');
-}
+    (unlink: 'tmp.pod')
+
 
 sub test_outtmp
     my $expected = shift
     my $msg = shift
-    open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n"
-    $parser->parse_from_file ('tmp.pod', $out)
+    open: my $out, ">", 'out.tmp' or die: "Cannot create out.tmp: $^OS_ERROR\n"
+    $parser->parse_from_file : 'tmp.pod', $out
     close $out
-    open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n"
+    open: $out, "<", 'out.tmp' or die: "Cannot open out.tmp: $^OS_ERROR\n"
     while ( ~< $out) { last if m/^\.nh/ }
     my $output
     do 
@@ -73,8 +73,8 @@ sub test_outtmp
         $output = ~< $out
     
     close $out
-    ok($output eq $expected) 
-        or diag "$msg\nEXPECTED:\n$(dump::view($expected))\nOUTPUT:\n$(dump::view($output))\n"
+    ok: $output eq $expected 
+        or diag: "$msg\nEXPECTED:\n$((dump::view: $expected))\nOUTPUT:\n$((dump::view: $output))\n"
     
     $n++
 

@@ -11,12 +11,12 @@ __END__
 # pp_pack.c
 use warnings 'pack' ;
 use warnings 'unpack' ;
-my @a = unpack ("A,A", "22") ;
-my $a = pack ("A,A", 1,2) ;
+my @a = unpack: ("A,A", "22") ;
+my $a = pack: ("A,A", 1,2) ;
 no warnings 'pack' ;
 no warnings 'unpack' ;
-my @b = unpack ("A,A", "22") ;
-my $b = pack ("A,A", 1,2) ;
+my @b = unpack: ("A,A", "22") ;
+my $b = pack: ("A,A", 1,2) ;
 EXPECT
 Invalid type ',' in unpack at - line 4 character 9.
 Invalid type ',' in pack at - line 5 character 9.
@@ -24,36 +24,36 @@ Invalid type ',' in pack at - line 5 character 9.
 # pp_pack.c
 use warnings 'pack' ;
 sub foo { my $a = "a"; return $a . $a++ . $a++ }
-my $a = pack("p", foo() );
+my $a = pack:("p", foo() );
 no warnings 'pack' ;
-my $b = pack("p", foo() );
+my $b = pack:("p", foo() );
 EXPECT
 Attempt to pack pointer to temporary value at - line 4 character 9.
 ########
 # pp_pack.c
 use warnings 'pack' ;
-print $^STDOUT, unpack("C", pack("C",   -1)), "\n",
-        unpack("C", pack("C",    0)), "\n",
-        unpack("C", pack("C",  255)), "\n",
-        unpack("C", pack("C",  256)), "\n",
-        unpack("c", pack("c", -129)), "\n",
-        unpack("c", pack("c", -128)), "\n",
-        unpack("c", pack("c",  127)), "\n",
-        unpack("c", pack("c",  128)), "\n";
+print: $^STDOUT, (unpack: "C", pack: "C",   -1), "\n",
+        (unpack: "C", pack: "C",    0), "\n",
+        (unpack: "C", pack: "C",  255), "\n",
+        (unpack: "C", pack: "C",  256), "\n",
+        (unpack: "c", pack: "c", -129), "\n",
+        (unpack: "c", pack: "c", -128), "\n",
+        (unpack: "c", pack: "c",  127), "\n",
+        (unpack: "c", pack: "c",  128), "\n";
 no warnings 'pack' ;
-print $^STDOUT, unpack("C", pack("C",   -1)), "\n";
-print $^STDOUT, unpack("C", pack("C",    0)), "\n";
-print $^STDOUT, unpack("C", pack("C",  255)), "\n";
-print $^STDOUT, unpack("C", pack("C",  256)), "\n";
-print $^STDOUT, unpack("c", pack("c", -129)), "\n";
-print $^STDOUT, unpack("c", pack("c", -128)), "\n";
-print $^STDOUT, unpack("c", pack("c",  127)), "\n";
-print $^STDOUT, unpack("c", pack("c",  128)), "\n";
+print: $^STDOUT, (unpack: "C", pack: "C",   -1), "\n";
+print: $^STDOUT, (unpack: "C", pack: "C",    0), "\n";
+print: $^STDOUT, (unpack: "C", pack: "C",  255), "\n";
+print: $^STDOUT, (unpack: "C", pack: "C",  256), "\n";
+print: $^STDOUT, (unpack: "c", pack: "c", -129), "\n";
+print: $^STDOUT, (unpack: "c", pack: "c", -128), "\n";
+print: $^STDOUT, (unpack: "c", pack: "c",  127), "\n";
+print: $^STDOUT, (unpack: "c", pack: "c",  128), "\n";
 EXPECT
-Character in 'C' format wrapped in pack at - line 3 character 29.
-Character in 'C' format wrapped in pack at - line 6 character 21.
-Character in 'c' format wrapped in pack at - line 7 character 21.
-Character in 'c' format wrapped in pack at - line 10 character 21.
+Character in 'C' format wrapped in pack at - line 3 character 32.
+Character in 'C' format wrapped in pack at - line 6 character 23.
+Character in 'c' format wrapped in pack at - line 7 character 23.
+Character in 'c' format wrapped in pack at - line 10 character 23.
 255
 0
 255

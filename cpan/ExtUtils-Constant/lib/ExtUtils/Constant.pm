@@ -114,14 +114,15 @@ constants used internally between the generated C and XS functions.
 =cut
 
 sub constant_types
-    ExtUtils::Constant::XS->header()
+    ExtUtils::Constant::XS->header: 
 
 
 sub C_constant($package, $subname, $default_type, $what, $indent, $breakout, @< @items)
-    ExtUtils::Constant::XS->C_constant(\(%: package => $package, subname => $subname
-                                            default_type => $default_type
-                                            types => $what, indent => $indent
-                                            breakout => $breakout), < @items)
+    ExtUtils::Constant::XS->C_constant: \ %: package => $package, subname => $subname
+                                             default_type => $default_type
+                                             types => $what, indent => $indent
+                                             breakout => $breakout
+                                        < @items
 
 
 =item XS_constant PACKAGE, TYPES, XS_SUBNAME, C_SUBNAME
@@ -150,9 +151,9 @@ sub XS_constant($package, $what, $XS_subname, ?$C_subname)
 
     if (!ref $what)
         # Convert line of the form IV,UV,NV to hash
-        $what = \%:  < @+: map { @: $_ => 1}, split m/,\s*/, ($what) 
+        $what = \%:  < @+: map: { @: $_ => 1}, split: m/,\s*/, ($what) 
     
-    my $params = ExtUtils::Constant::XS->params ($what)
+    my $params = ExtUtils::Constant::XS->params : $what
 
     my $xs = <<"EOT"
 void
@@ -227,7 +228,7 @@ EOT
           break;
 EOT
 
-    foreach my $type (sort keys %XS_Constant)
+    foreach my $type ((sort: keys %XS_Constant))
         # '' marks utf8 flag needed.
         next if $type eq ''
         $xs .= "\t/* Uncomment this if you need to return $($type)s\n"
@@ -288,17 +289,17 @@ ExtUtils::Constant::WriteConstants(
 EOT
     foreach (qw (C_FILE XS_FILE))
         next unless exists %args{$_}
-        $result .= sprintf "                                   \%-12s => '\%s',\n",
-            $_, %args{?$_}
+        $result .= sprintf: "                                   \%-12s => '\%s',\n"
+                            $_, %args{?$_}
     
     $result .= <<'EOT'
                                 );
 EOT
 
     $result =~ s/^/$(' 'x$indent)/gm
-    return ExtUtils::Constant::XS->dump_names(\(%: default_type=>%args{?DEFAULT_TYPE}
-                                                   indent=>$indent,),
-        < %args{NAMES}->@)
+    return ExtUtils::Constant::XS->dump_names: \ %: default_type=>%args{?DEFAULT_TYPE}
+                                                    indent=>$indent
+                                               < %args{NAMES}->@
         . $result
 
 
@@ -384,16 +385,16 @@ sub WriteConstants
 
     %ARGS{+C_SUBNAME} ||= %ARGS{?SUBNAME} # No-one sane will have C_SUBNAME eq '0'
 
-    die "Module name not specified" unless length %ARGS{?NAME}
+    die: "Module name not specified" unless length %ARGS{?NAME}
 
     my $c_fh = %ARGS{?C_FH}
     if (!$c_fh)
-        open $c_fh, ">", "%ARGS{?C_FILE}" or die "Can't open %ARGS{?C_FILE}: $^OS_ERROR"
+        open: $c_fh, ">", "%ARGS{?C_FILE}" or die: "Can't open %ARGS{?C_FILE}: $^OS_ERROR"
     
 
     my $xs_fh = %ARGS{?XS_FH}
     if (!$xs_fh)
-        open $xs_fh, ">", "%ARGS{?XS_FILE}" or die "Can't open %ARGS{?XS_FILE}: $^OS_ERROR"
+        open: $xs_fh, ">", "%ARGS{?XS_FILE}" or die: "Can't open %ARGS{?XS_FILE}: $^OS_ERROR"
     
 
     # As this subroutine is intended to make code that isn't edited, there's no
@@ -404,13 +405,13 @@ sub WriteConstants
         require ExtUtils::Constant::ProxySubs
         %ARGS{+C_FH} = $c_fh
         %ARGS{+XS_FH} = $xs_fh
-        ExtUtils::Constant::ProxySubs->WriteConstants(< %ARGS)
+        ExtUtils::Constant::ProxySubs->WriteConstants: < %ARGS
     else
-        die "Ony ProxySubs are supported"
+        die: "Ony ProxySubs are supported"
     
 
-    close $c_fh or warn "Error closing %ARGS{?C_FILE}: $^OS_ERROR" unless %ARGS{?C_FH}
-    close $xs_fh or warn "Error closing %ARGS{?XS_FILE}: $^OS_ERROR" unless %ARGS{?XS_FH}
+    close $c_fh or warn: "Error closing %ARGS{?C_FILE}: $^OS_ERROR" unless %ARGS{?C_FH}
+    close $xs_fh or warn: "Error closing %ARGS{?XS_FILE}: $^OS_ERROR" unless %ARGS{?XS_FH}
 
 __END__
 

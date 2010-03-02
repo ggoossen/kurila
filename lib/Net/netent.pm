@@ -17,41 +17,41 @@ our ($n_name, @n_aliases, $n_addrtype, $n_net)
 # Class::Struct forbids use of @ISA
 sub import
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1
-    return Exporter::import(< @_)
+    return Exporter::import: < @_
 
 
 use Class::Struct < qw(struct)
-struct 'Net::netent' => \@: 
-       name             => '$'
-       aliases  => '@'
-       addrtype => '$'
-       net              => '$'
+struct: 'Net::netent' => \@:
+            name             => '$'
+            aliases  => '@'
+            addrtype => '$'
+            net              => '$'
        
 
 sub populate
     return unless (nelems @_)
-    my $nob = new()
+    my $nob = (new: )
     $n_name      =    $nob->[0]              = @_[0]
-    @n_aliases   = @: ( $nob->[1]->@ = split ' ', @_[1] )
+    @n_aliases   = @: ( $nob->[1]->@ = (split: ' ', @_[1]) )
     $n_addrtype  =    $nob->[2]              = @_[2]
     $n_net       =    $nob->[3]              = @_[3]
     return $nob
 
 
-sub getnetbyname ($name)  { populate(CORE::getnetbyname($name)) }
+sub getnetbyname ($name)  { (populate: (CORE::getnetbyname: $name)) }
 
 sub getnetbyaddr ($net, ?$addrtype)
     require Socket if not defined $addrtype
-    $addrtype //= Socket::AF_INET()
-    populate(CORE::getnetbyaddr($net, $addrtype))
+    $addrtype //= (Socket::AF_INET: )
+    populate: (CORE::getnetbyaddr: $net, $addrtype)
 
 
 sub getnet($name)
     if ($name =~ m/^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/)
         require Socket
-        &getnetbyaddr <: < Socket::inet_aton($name)
+        &getnetbyaddr->& <: < Socket::inet_aton: $name
     else
-        &getnetbyname <: $name
+        &getnetbyname->& <: $name
 
 1
 __END__

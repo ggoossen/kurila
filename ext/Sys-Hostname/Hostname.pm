@@ -15,7 +15,7 @@ our $host
 BEGIN 
     $VERSION = '1.11'
     use XSLoader ();
-    XSLoader::load('Sys::Hostname', $VERSION)
+    XSLoader::load: 'Sys::Hostname', $VERSION
 
 
 
@@ -25,10 +25,10 @@ sub hostname
     return $host if defined $host
 
     # try to ask the system
-    $host = ghname() if exists &ghname
+    $host = (ghname: ) if exists &ghname
     return $host if defined $host
 
-    die "Cannot get host name of local machine"
+    die: "Cannot get host name of local machine"
 
 
 1

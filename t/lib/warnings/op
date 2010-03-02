@@ -98,8 +98,8 @@ Useless use of string in void context at - line 3 character 14.
 use warnings 'void' ;
 use Config ;
 BEGIN {
-    if ( ! config_value("d_getppid")) {
-        print $^STDOUT, <<EOM ;
+    if ( ! config_value: "d_getppid") {
+        print: $^STDOUT, <<EOM ;
 SKIPPED
 # getppid not present
 EOM
@@ -116,8 +116,8 @@ Useless use of getppid in void context at - line 13 character 1.
 use warnings 'void' ;
 use Config ;
 BEGIN {
-    if ( ! config_value("d_getpgrp")) {
-        print $^STDOUT, <<EOM ;
+    if ( ! config_value: "d_getpgrp") {
+        print: $^STDOUT, <<EOM ;
 SKIPPED
 # getpgrp not present
 EOM
@@ -134,8 +134,8 @@ Useless use of getpgrp in void context at - line 13 character 1.
 use warnings 'void' ;
 use Config ;
 BEGIN {
-    if ( ! config_value("d_times")) {
-        print $^STDOUT, <<EOM ;
+    if ( ! config_value: "d_times") {
+        print: $^STDOUT, <<EOM ;
 SKIPPED
 # times not present
 EOM
@@ -152,17 +152,17 @@ Useless use of times in void context at - line 13 character 1.
 use warnings 'void' ;
 use Config ;
 BEGIN {
-    if ( ! config_value("d_getprior") or $^OS_NAME eq 'os2') { # Locks before fixpak22
-        print $^STDOUT, <<EOM ;
+    if ( ! (config_value: "d_getprior") or $^OS_NAME eq 'os2') { # Locks before fixpak22
+        print: $^STDOUT, <<EOM ;
 SKIPPED
 # getpriority not present
 EOM
         exit 
     }
 }
-getpriority 1,2;        # OP_GETPRIORITY
+getpriority: 1,2;        # OP_GETPRIORITY
 no warnings 'void' ;
-getpriority 1,2;        # OP_GETPRIORITY
+getpriority: 1,2;        # OP_GETPRIORITY
 EXPECT
 Useless use of getpriority in void context at - line 13 character 1.
 ########
@@ -170,8 +170,8 @@ Useless use of getpriority in void context at - line 13 character 1.
 use warnings 'void' ;
 use Config ;
 BEGIN {
-    if ( ! config_value("d_getlogin")) {
-        print $^STDOUT, <<EOM ;
+    if ( ! config_value: "d_getlogin") {
+        print: $^STDOUT, <<EOM ;
 SKIPPED
 # getlogin not present
 EOM
@@ -187,8 +187,8 @@ Useless use of getlogin in void context at - line 13 character 1.
 # op.c
 use warnings 'void' ;
 use Config ; BEGIN {
-if ( ! config_value("d_socket")) {
-    print $^STDOUT, <<EOM ;
+if ( ! config_value: "d_socket") {
+    print: $^STDOUT, <<EOM ;
 SKIPPED
 # getsockname not present
 # getpeername not present
@@ -207,36 +207,36 @@ SKIPPED
 EOM
     exit 
 } }
-getsockname $^STDIN ;   # OP_GETSOCKNAME
-getpeername $^STDIN ;   # OP_GETPEERNAME
-gethostbyname 1 ;       # OP_GHBYNAME
-gethostbyaddr 1,2;      # OP_GHBYADDR
-gethostent ;            # OP_GHOSTENT
-getnetbyname 1 ;        # OP_GNBYNAME
-getnetbyaddr 1,2 ;      # OP_GNBYADDR
-getnetent ;             # OP_GNETENT
-getprotobyname 1;       # OP_GPBYNAME
-getprotobynumber 1;     # OP_GPBYNUMBER
-getprotoent ;           # OP_GPROTOENT
-getservbyname 1,2;      # OP_GSBYNAME
-getservbyport 1,2;      # OP_GSBYPORT
-getservent ;            # OP_GSERVENT
+getsockname: $^STDIN ;   # OP_GETSOCKNAME
+getpeername: $^STDIN ;   # OP_GETPEERNAME
+gethostbyname: 1 ;       # OP_GHBYNAME
+gethostbyaddr: 1,2;      # OP_GHBYADDR
+gethostent: ;            # OP_GHOSTENT
+getnetbyname: 1 ;        # OP_GNBYNAME
+getnetbyaddr: 1,2 ;      # OP_GNBYADDR
+getnetent: ;             # OP_GNETENT
+getprotobyname: 1;       # OP_GPBYNAME
+getprotobynumber: 1;     # OP_GPBYNUMBER
+getprotoent: ;           # OP_GPROTOENT
+getservbyname: 1,2;      # OP_GSBYNAME
+getservbyport: 1,2;      # OP_GSBYPORT
+getservent: ;            # OP_GSERVENT
 
 no warnings 'void' ;
-getsockname $^STDIN ;   # OP_GETSOCKNAME
-getpeername $^STDIN ;   # OP_GETPEERNAME
-gethostbyname 1 ;       # OP_GHBYNAME
-gethostbyaddr 1,2;      # OP_GHBYADDR
-gethostent ;            # OP_GHOSTENT
-getnetbyname 1 ;        # OP_GNBYNAME
-getnetbyaddr 1,2 ;      # OP_GNBYADDR
-getnetent ;             # OP_GNETENT
-getprotobyname 1;       # OP_GPBYNAME
-getprotobynumber 1;     # OP_GPBYNUMBER
-getprotoent ;           # OP_GPROTOENT
-getservbyname 1,2;      # OP_GSBYNAME
-getservbyport 1,2;      # OP_GSBYPORT
-getservent ;            # OP_GSERVENT
+getsockname: $^STDIN ;   # OP_GETSOCKNAME
+getpeername: $^STDIN ;   # OP_GETPEERNAME
+gethostbyname: 1 ;       # OP_GHBYNAME
+gethostbyaddr: 1,2;      # OP_GHBYADDR
+gethostent: ;            # OP_GHOSTENT
+getnetbyname: 1 ;        # OP_GNBYNAME
+getnetbyaddr: 1,2 ;      # OP_GNBYADDR
+getnetent: ;             # OP_GNETENT
+getprotobyname: 1;       # OP_GPBYNAME
+getprotobynumber: 1;     # OP_GPBYNUMBER
+getprotoent: ;           # OP_GPROTOENT
+getservbyname: 1,2;      # OP_GSBYNAME
+getservbyport: 1,2;      # OP_GSBYPORT
+getservent: ;            # OP_GSERVENT
 INIT {
    # some functions may not be there, so we exit without running
    exit;
@@ -280,15 +280,15 @@ use warnings 'void' ;
 7 ; # OP_CONST
 "x" . "y"; # optimized to OP_CONST
 2 + 2; # optimized to OP_CONST
-use constant U => undef;
-5 || print $^STDOUT, "bad\n";   # test OPpCONST_SHORTCIRCUIT
-print $^STDOUT, "boo\n" if U;   # test OPpCONST_SHORTCIRCUIT
+use constant U => undef
+5 || print: $^STDOUT, "bad\n"   # test OPpCONST_SHORTCIRCUIT
+print: $^STDOUT, "boo\n" if U   # test OPpCONST_SHORTCIRCUIT
 
-no warnings 'void' ;
-"abc"; # OP_CONST
-7 ; # OP_CONST
-"x" . "y"; # optimized to OP_CONST
-2 + 2; # optimized to OP_CONST
+no warnings 'void' 
+"abc" # OP_CONST
+7   # OP_CONST
+"x" . "y"  # optimized to OP_CONST
+2 + 2  # optimized to OP_CONST
 EXPECT
 Useless use of a constant in void context at - line 3 character 6.
 Useless use of a constant in void context at - line 4 character 1.
@@ -300,7 +300,7 @@ Useless use of a constant in void context at - line 6 character 3.
 --FILE--
 # op.c
 use warnings 'misc' ;
-open \*FH, "<", "abc" ;
+open: \*FH, "<", "abc" ;
 our $x;
 $x = 1 if $x = ~< *FH ;
 no warnings 'misc' ;
@@ -310,14 +310,14 @@ Value of <HANDLE> construct can be "0"; test with defined() at - line 5 characte
 ########
 # op.c
 use warnings 'misc' ;
-opendir \*FH, "." ;
+opendir: \*FH, "." ;
 our $x;
-$x = 1 if $x = readdir \*FH ;
+$x = 1 if $x = readdir: \*FH ;
 no warnings 'misc' ;
-$x = 1 if $x = readdir \*FH ;
-closedir \*FH ;
+$x = 1 if $x = readdir: \*FH ;
+closedir: \*FH ;
 EXPECT
-Value of readdir() operator can be "0"; test with defined() at - line 5 character 30.
+Value of readdir() operator can be "0"; test with defined() at - line 5 character 31.
 ########
 # op.c
 use warnings 'misc' ;
@@ -339,14 +339,14 @@ Value of glob construct can be "0"; test with defined() at - line 4 character 36
 ########
 # op.c
 use warnings 'misc' ;
-opendir \*FH, "." ;
+opendir: \*FH, "." ;
 our $x;
-$x = 1 while $x = readdir \*FH and 0 ;
+$x = 1 while $x = readdir: \*FH and 0 ;
 no warnings 'misc' ;
-$x = 1 while $x = readdir \*FH and 0 ;
-closedir \*FH ;
+$x = 1 while $x = readdir: \*FH and 0 ;
+closedir: \*FH ;
 EXPECT
-Value of readdir() operator can be "0"; test with defined() at - line 5 character 39.
+Value of readdir() operator can be "0"; test with defined() at - line 5 character 40.
 ########
 # op.c
 use warnings 'redefine' ;
@@ -367,27 +367,26 @@ EXPECT
 Subroutine fred redefined at - line 4 character 5.
 ########
 # op.c
-BEGIN {
-    if ($^OS_NAME eq 'MacOS') {
-        print $^STDOUT, <<EOM;
+BEGIN
+    if ($^OS_NAME eq 'MacOS')
+        print: $^STDOUT, <<EOM
 SKIPPED
 # no exec on Mac OS
 EOM
-        exit;
-    }
-}
-use warnings 'syntax' ;
-exec "$^EXECUTABLE_NAME -e 1" ; 
+        exit
+
+use warnings 'syntax'
+exec: "$^EXECUTABLE_NAME -e 1"
 my $a
 EXPECT
-Statement unlikely to be reached at - line 12 character 1.
+Statement unlikely to be reached at - line 11 character 1.
         (Maybe you meant system() when you said exec()?)
- at - line 12 character 1.
+ at - line 11 character 1.
 ########
 # op.c
 BEGIN {
     if ($^OS_NAME eq 'MacOS') {
-        print $^STDOUT, <<EOM;
+        print: $^STDOUT, <<EOM;
 SKIPPED
 # no exec on Mac OS
 EOM
@@ -395,7 +394,7 @@ EOM
     }
 }
 no warnings 'syntax' ;
-exec "$^EXECUTABLE_NAME -e 1" ; 
+exec: "$^EXECUTABLE_NAME -e 1" ; 
 my $a
 EXPECT
 
@@ -403,11 +402,11 @@ EXPECT
 # op.c [Perl_newATTRSUB]
 --FILE-- abc.pm
 use warnings 'void' ;
-BEGIN { $^OUTPUT_AUTOFLUSH = 1; print $^STDOUT, "in begin\n"; }
-CHECK { print $^STDOUT, "in check\n"; }
-INIT { print $^STDOUT, "in init\n"; }
-END { print $^STDOUT, "in end\n"; }
-print $^STDOUT, "in mainline\n";
+BEGIN { $^OUTPUT_AUTOFLUSH = 1; print: $^STDOUT, "in begin\n"; }
+CHECK { print: $^STDOUT, "in check\n"; }
+INIT { print: $^STDOUT, "in init\n"; }
+END { print: $^STDOUT, "in end\n"; }
+print: $^STDOUT, "in mainline\n";
 1;
 --FILE--
 use abc;
@@ -420,15 +419,15 @@ in mainline
 in check
 in init
 in begin
-Too late to run CHECK block at abc.pm line 3 character 40.
+Too late to run CHECK block at abc.pm line 3 character 41.
     (require) called at - line 3 character 1.
-Too late to run INIT block at abc.pm line 4 character 38.
+Too late to run INIT block at abc.pm line 4 character 39.
     (require) called at - line 3 character 1.
 in mainline
 in begin
-Too late to run CHECK block at abc.pm line 3 character 40.
+Too late to run CHECK block at abc.pm line 3 character 41.
     (eval) called at - line 4 character 1.
-Too late to run INIT block at abc.pm line 4 character 38.
+Too late to run INIT block at abc.pm line 4 character 39.
     (eval) called at - line 4 character 1.
 in mainline
 in end
@@ -438,11 +437,11 @@ in end
 # op.c [Perl_newATTRSUB]
 --FILE-- abc.pm
 no warnings 'void' ;
-BEGIN { $^OUTPUT_AUTOFLUSH = 1; print $^STDOUT, "in begin\n"; }
-CHECK { print $^STDOUT, "in check\n"; }
-INIT { print $^STDOUT, "in init\n"; }
-END { print $^STDOUT, "in end\n"; }
-print $^STDOUT, "in mainline\n";
+BEGIN { $^OUTPUT_AUTOFLUSH = 1; print: $^STDOUT, "in begin\n"; }
+CHECK { print: $^STDOUT, "in check\n"; }
+INIT { print: $^STDOUT, "in init\n"; }
+END { print: $^STDOUT, "in end\n"; }
+print: $^STDOUT, "in mainline\n";
 1;
 --FILE--
 require abc;
@@ -470,9 +469,9 @@ Useless use of unshift with no values at - line 5 character 12.
 # op.c
 # 20020401 mjd@plover.com at suggestion of jfriedl@yahoo.com
 use warnings 'regexp';
-split m/blah/g, "blah";
+split: m/blah/g, "blah";
 no warnings 'regexp';
-split m/blah/g, "blah";
+split: m/blah/g, "blah";
 EXPECT
 Use of /g modifier is meaningless in split at - line 4 character 24.
 ########

@@ -72,7 +72,7 @@ our @EXPORT_OK = qw(
 
 our $VERSION = '0.02'
 
-I18N::Langinfo->bootstrap( $VERSION)
+I18N::Langinfo->bootstrap:  $VERSION
 
 1
 __END__

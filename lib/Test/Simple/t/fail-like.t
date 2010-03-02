@@ -1,11 +1,11 @@
 # qr// was introduced in 5.004-devel.  Skip this test if we're not
 # of high enough version.
 BEGIN 
-    if( env::var('PERL_CORE') )
+    if( (env::var: 'PERL_CORE') )
         chdir 't'
         $^INCLUDE_PATH = @: '../lib', 'lib'
     else
-        unshift $^INCLUDE_PATH, 't/lib'
+        unshift: $^INCLUDE_PATH, 't/lib'
     
 
 
@@ -20,26 +20,26 @@ package My::Test
 # This has to be a require or else the END block below runs before
 # Test::Builder's own and the ending diagnostics don't come out right.
 require Test::Builder
-my $TB = Test::Builder->create
-$TB->plan(tests => 2)
+my $TB = Test::Builder->create: 
+$TB->plan: tests => 2
 
 
 require Test::Simple::Catch
 use env
-my(@: $out, $err) =  Test::Simple::Catch::caught()
-local env::var('HARNESS_ACTIVE' ) = 0
+my(@: $out, $err) =  (Test::Simple::Catch::caught: )
+local (env::var: 'HARNESS_ACTIVE' ) = 0
 
 
 package main
 
 require Test::More
-Test::More->import(tests => 1)
+Test::More->import: tests => 1
 
 eval q{ like( "foo", qr/that/, 'is foo like that' ); }
 
 
 END 
-    $TB->is_eq($out->$, <<OUT, 'failing output')
+    $TB->is_eq: $out->$, <<OUT, 'failing output'
 1..1
 not ok 1 - is foo like that
 OUT
@@ -53,7 +53,7 @@ OUT
 ERR
 
 
-    $TB->like($err->$, qr/^$err_re$/, 'failing errors')
+    $TB->like: $err->$, qr/^$err_re$/, 'failing errors'
 
-    exit(0)
+    exit: 0
 

@@ -6,7 +6,7 @@ BEGIN
 
 
 # This calcualtion ought to be within 0.001 of the right answer.
-my $bits_in_uv = int (0.001 + log (^~^0+1) / log 2)
+my $bits_in_uv = int: 0.001 + (log: ^~^0+1) / log 2
 
 # 3**30 < 2**48, don't trust things outside that range on a Cray
 # Likewise other 3 should not overflow 48 bits if I did my sums right.
@@ -21,34 +21,34 @@ my $tests
 foreach (@pow)
     $tests += $_->[1]
 
-plan tests => 13 + $bits_in_uv + $tests
+plan: tests => 13 + $bits_in_uv + $tests
 
 # (-3)**3 gave 27 instead of -27 before change #20167.
 # Let's test the other similar edge cases, too.
-is((-3)**0, 1,   "negative ** 0 = 1")
-is((-3)**1, -3,  "negative ** 1 = self")
-is((-3)**2, 9,   "negative ** 2 = positive")
-is((-3)**3, -27, "(negative int) ** (odd power) is negative")
+is: (-3)**0, 1,   "negative ** 0 = 1"
+is: (-3)**1, -3,  "negative ** 1 = self"
+is: (-3)**2, 9,   "negative ** 2 = positive"
+is: (-3)**3, -27, "(negative int) ** (odd power) is negative"
 
 # Positives shouldn't be a problem
-is(3**0, 1,      "positive ** 0 = 1")
-is(3**1, 3,      "positive ** 1 = self")
-is(3**2, 9,      "positive ** 2 = positive")
-is(3**3, 27,     "(positive int) ** (odd power) is positive")
+is: 3**0, 1,      "positive ** 0 = 1"
+is: 3**1, 3,      "positive ** 1 = self"
+is: 3**2, 9,      "positive ** 2 = positive"
+is: 3**3, 27,     "(positive int) ** (odd power) is positive"
 
 # And test order of operations while we're at it
-is(-3**0, -1)
-is(-3**1, -3)
-is(-3**2, -9)
-is(-3**3, -27)
+is: -3**0, -1
+is: -3**1, -3
+is: -3**2, -9
+is: -3**3, -27
 
 
 # Ought to be 32, 64, 36 or something like that.
 
 my $remainder = $bits_in_uv ^&^ 3
 
-cmp_ok ($remainder, '==', 0, 'Sanity check bits in UV calculation')
-    or printf $^STDOUT, "# ~0 is \%d (0x\%d) which gives $bits_in_uv bits\n", ^~^0, ^~^0
+cmp_ok: $remainder, '==', 0, 'Sanity check bits in UV calculation'
+    or printf: $^STDOUT, "# ~0 is \%d (0x\%d) which gives $bits_in_uv bits\n", ^~^0, ^~^0
 
 # These are a lot of brute force tests to see how accurate $m ** $n is.
 # Unfortunately rather a lot of perl programs expect 2 ** $n to be integer
@@ -57,7 +57,7 @@ cmp_ok ($remainder, '==', 0, 'Sanity check bits in UV calculation')
 foreach my $n (0..$bits_in_uv - 1)
     my $pow = 2 ** $n
     my $int = 1 << $n
-    cmp_ok ($pow, '==', $int, "2 ** $n vs 1 << $n")
+    cmp_ok: $pow, '==', $int, "2 ** $n vs 1 << $n"
 
 
 foreach my $pow ( @pow)
@@ -65,7 +65,7 @@ foreach my $pow ( @pow)
     my $expect = 1
     foreach my $n (0..$max-1)
         my $got = $base ** $n
-        within ($got, $expect, $range, "$base ** $n got[$got] expect[$expect]")
+        within: $got, $expect, $range, "$base ** $n got[$got] expect[$expect]"
         $expect *= $base
     
 

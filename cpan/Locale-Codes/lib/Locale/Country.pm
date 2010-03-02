@@ -16,7 +16,7 @@ use Locale::Constants
 #	Public Global Variables
 #-----------------------------------------------------------------------
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK)
-$VERSION   = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/)
+$VERSION   = sprintf: "\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/
 @ISA       = qw(Exporter)
 @EXPORT    = qw(code2country country2code
                 all_country_codes all_country_names
@@ -37,7 +37,7 @@ my $COUNTRIES = \$@
 #=======================================================================
 sub code2country
     my $code = shift
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
+    my $codeset = (nelems @_) +> 0 ?? shift !! (LOCALE_CODE_DEFAULT: )
 
 
     return undef unless defined $code
@@ -48,11 +48,11 @@ sub code2country
     # We have to sprintf because the codes are given as 3-digits,
     # with leading 0's. Eg 052 for Barbados.
     #-------------------------------------------------------------------
-    if ($codeset == LOCALE_CODE_NUMERIC)
+    if ($codeset == (LOCALE_CODE_NUMERIC: ))
         return undef if ($code =~ m/\D/)
-        $code = sprintf("\%.3d", $code)
+        $code = sprintf: "\%.3d", $code
     else
-        $code = lc($code)
+        $code = lc: $code
     
 
     if (exists $CODES[$codeset]{$code})
@@ -73,11 +73,11 @@ sub code2country
 #=======================================================================
 sub country2code
     my $country = shift
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
+    my $codeset = (nelems @_) +> 0 ?? shift !! (LOCALE_CODE_DEFAULT: )
 
 
     return undef unless defined $country
-    $country = lc($country)
+    $country = lc: $country
     if (exists $COUNTRIES->[$codeset]{$country})
         return $COUNTRIES->[$codeset]{?$country}
     else
@@ -99,9 +99,9 @@ sub country_code2code($code, $inset, $outset)
     my $country
 
     return undef if $inset == $outset
-    $country = code2country($code, $inset)
+    $country = code2country: $code, $inset
     return undef if not defined $country
-    $outcode = country2code($country, $outset)
+    $outcode = country2code: $country, $outset
     return $outcode
 
 
@@ -112,7 +112,7 @@ sub country_code2code($code, $inset, $outset)
 #
 #=======================================================================
 sub all_country_codes
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
+    my $codeset = (nelems @_) +> 0 ?? shift !! (LOCALE_CODE_DEFAULT: )
 
     return keys  $CODES[$codeset]
 
@@ -124,7 +124,7 @@ sub all_country_codes
 #
 #=======================================================================
 sub all_country_names
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
+    my $codeset = (nelems @_) +> 0 ?? shift !! (LOCALE_CODE_DEFAULT: )
 
     return values  $CODES[$codeset]
 
@@ -143,13 +143,13 @@ sub all_country_names
 sub alias_code
     my $alias = shift
     my $real  = shift
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
+    my $codeset = (nelems @_) +> 0 ?? shift !! (LOCALE_CODE_DEFAULT: )
 
     my $country
 
 
     if (not exists $CODES[$codeset]{$real})
-        warn "attempt to alias \"$alias\" to unknown country code \"$real\"\n"
+        warn: "attempt to alias \"$alias\" to unknown country code \"$real\"\n"
         return undef
     
     $country = $CODES[$codeset]{?$real}
@@ -174,30 +174,26 @@ sub alias_code
 sub rename_country
     my $code     = shift
     my $new_name = shift
-    my $codeset = (nelems @_) +> 0 ?? shift !! _code2codeset($code)
+    my $codeset = (nelems @_) +> 0 ?? shift !! _code2codeset: $code
     my $country
     my $c
 
-
     if (not defined $codeset)
-        warn "rename_country(): unknown country code \"$code\"\n"
+        warn: "rename_country(): unknown country code \"$code\"\n"
         return 0
-    
 
     $country = $CODES[$codeset]{?$code}
 
-    foreach my $cset ((@: LOCALE_CODE_ALPHA_2
-                          LOCALE_CODE_ALPHA_3
-                          LOCALE_CODE_NUMERIC))
+    foreach my $cset (@: (LOCALE_CODE_ALPHA_2: )
+                         (LOCALE_CODE_ALPHA_3: )
+                         (LOCALE_CODE_NUMERIC: ))
         if ($cset == $codeset)
             $c = $code
         else
-            $c = country_code2code($code, $codeset, $cset)
-        
+            $c = country_code2code: $code, $codeset, $cset
 
         $CODES[$cset]{+$c} = $new_name
         $COUNTRIES->[$cset]{+lc "$new_name"} = $c
-    
 
     return 1
 
@@ -215,8 +211,8 @@ sub _code2codeset
     my $code = shift
 
 
-    foreach my $codeset (@: LOCALE_CODE_ALPHA_2, LOCALE_CODE_ALPHA_3
-                            LOCALE_CODE_NUMERIC)
+    foreach my $codeset (@: (LOCALE_CODE_ALPHA_2: ), (LOCALE_CODE_ALPHA_3: )
+                            (LOCALE_CODE_NUMERIC: ))
         return $codeset if (exists $CODES[$codeset]{$code})
 
     return undef
@@ -237,30 +233,30 @@ do
     while ( ~< $^DATA)
         next unless m/\S/
         chop
-        (@: $alpha2, $alpha3, $numeric, @< @countries) =  split(m/:/, $_)
+        (@: $alpha2, $alpha3, $numeric, @< @countries) =  split: m/:/, $_
 
-        $CODES[+LOCALE_CODE_ALPHA_2]{+$alpha2} = @countries[0]
+        $CODES[+(LOCALE_CODE_ALPHA_2: )]{+$alpha2} = @countries[0]
         foreach my $country ( @countries)
-            $COUNTRIES->[+LOCALE_CODE_ALPHA_2]{+lc "$country"} = $alpha2
+            $COUNTRIES->[+(LOCALE_CODE_ALPHA_2: )]{+lc "$country"} = $alpha2
         
 
         if ($alpha3)
-            $CODES[+LOCALE_CODE_ALPHA_3]{+$alpha3} = @countries[0]
+            $CODES[+(LOCALE_CODE_ALPHA_3: )]{+$alpha3} = @countries[0]
             foreach my $country ( @countries)
-                $COUNTRIES->[+LOCALE_CODE_ALPHA_3]{+lc "$country"} = $alpha3
+                $COUNTRIES->[+(LOCALE_CODE_ALPHA_3: )]{+lc "$country"} = $alpha3
             
         
 
         if ($numeric)
-            $CODES[+LOCALE_CODE_NUMERIC]{+$numeric} = @countries[0]
+            $CODES[+(LOCALE_CODE_NUMERIC: )]{+$numeric} = @countries[0]
             foreach my $country ( @countries)
-                $COUNTRIES->[+LOCALE_CODE_NUMERIC]{+lc "$country"} = $numeric
+                $COUNTRIES->[+(LOCALE_CODE_NUMERIC: )]{+lc "$country"} = $numeric
             
         
 
     
 
-    close($^DATA)
+    close: $^DATA
 
 
 1

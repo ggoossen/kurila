@@ -11,9 +11,9 @@ use Carp ()
 BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless exists &DEBUG }
 
 sub new($self, @< @_)
-    my $new = $self->SUPER::new(< @_)
+    my $new = $self->SUPER::new: < @_
     $new->{+'output_fh'} ||= $^STDOUT
-    $new->accept_codes('VerbatimFormatted')
+    $new->accept_codes: 'VerbatimFormatted'
     return $new
 
 
@@ -22,34 +22,34 @@ sub new($self, @< @_)
 sub _handle_element_start
     # ($self, $element_name, $attr_hash_r)
     my $fh = @_[0]->{?'output_fh'}
-    DEBUG and print $^STDOUT, "++ @_[1]\n"
+    DEBUG: and print: $^STDOUT, "++ @_[1]\n"
 
-    print $fh,   '  ' x (@_[0]->{?'indent'} || 0),  "<", @_[1]
+    print: $fh,   '  ' x (@_[0]->{?'indent'} || 0),  "<", @_[1]
 
-    foreach my $key (sort keys @_[2]->%)
+    foreach my $key ((sort: keys @_[2]->%))
         unless($key =~ m/^~/s)
             next if $key eq 'start_line' and @_[0]->{?'hide_line_numbers'}
             my $value = @_[2]->{?$key}
             if (@_[1] eq 'L' and $key =~ m/^(?:section|to)$/)
-                $value = $value->as_string
+                $value = $value->as_string: 
             
-            $value = _xml_escape($value)
-            print $fh, ' ', $key, '="', $value, '"'
+            $value = _xml_escape: $value
+            print: $fh, ' ', $key, '="', $value, '"'
         
     
 
 
-    print $fh, ">\n"
+    print: $fh, ">\n"
     @_[0]->{+'indent'}++
     return
 
 
 sub _handle_text
-    DEBUG and print $^STDOUT, "== \"@_[1]\"\n"
+    DEBUG: and print: $^STDOUT, "== \"@_[1]\"\n"
     if(length @_[1])
         my $indent = '  ' x @_[0]->{?'indent'}
         my $text = @_[1]
-        $text = _xml_escape($text)
+        $text = _xml_escape: $text
         $text =~  # A not-totally-brilliant wrapping algorithm:
             s/(
          [^\n]{55}         # Snare some characters from a line
@@ -59,15 +59,15 @@ sub _handle_text
        /$1\n$indent/gx     # => line-break here
         
 
-        print @_[0]->{?'output_fh'} ,$indent, $text, "\n"
+        print: @_[0]->{?'output_fh'} ,$indent, $text, "\n"
     
     return
 
 
 sub _handle_element_end($self, $name)
-    DEBUG and print $^STDOUT, "-- $name\n"
-    print $self->{?'output_fh'}
-        ,'  ' x --$self->{+'indent'}, "</", $name, ">\n"
+    DEBUG: and print: $^STDOUT, "-- $name\n"
+    print: $self->{?'output_fh'}
+           ,'  ' x --$self->{+'indent'}, "</", $name, ">\n"
     return
 
 
@@ -75,7 +75,7 @@ sub _handle_element_end($self, $name)
 
 sub _xml_escape($x)
     # Escape things very cautiously:
-    $x =~ s/([^-\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/$('&#'.(ord($1)).';')/g
+    $x =~ s/([^-\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/$('&#'.((ord: $1)).';')/g
     # Yes, stipulate the list without a range, so that this can work right on
     #  all charsets that this module happens to run under.
     # Altho, hmm, what about that ord?  Presumably that won't work right

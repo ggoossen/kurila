@@ -111,14 +111,14 @@ our $VERSION = "1.49"
 # needed for VMS-specific filename translation
 if( $^OS_NAME eq 'VMS' )
     require VMS::Filespec
-    VMS::Filespec->import
+    VMS::Filespec->import: 
 
 
 sub cwd2
-    my $cwd = getcwd()
+    my $cwd = (getcwd: )
     # getcwd might fail if it hasn't access to the current directory.
     # try harder.
-    defined $cwd or $cwd = cwd()
+    defined $cwd or $cwd = (cwd: )
     $cwd
 
 
@@ -129,22 +129,22 @@ sub init
     if($^PROGRAM_NAME eq '-e' || $^PROGRAM_NAME eq '-')
         # perl invoked with -e or script is on C<STDIN>
         $Script = $RealScript = $^PROGRAM_NAME
-        $Bin    = $RealBin    = cwd2()
-        $Bin = VMS::Filespec::unixify($Bin) if $^OS_NAME eq 'VMS'
+        $Bin    = $RealBin    = (cwd2: )
+        $Bin = (VMS::Filespec::unixify: $Bin) if $^OS_NAME eq 'VMS'
     else
         my $script = $^PROGRAM_NAME
 
         if ($^OS_NAME eq 'VMS')
-            (@: $Bin,$Script) = VMS::Filespec::rmsexpand($^PROGRAM_NAME) =~ m/(.*[\]>\/]+)(.*)/s
+            (@: $Bin,$Script) = (VMS::Filespec::rmsexpand: $^PROGRAM_NAME) =~ m/(.*[\]>\/]+)(.*)/s
             # C<use disk:[dev]/lib> isn't going to work, so unixify first
-            ($Bin = VMS::Filespec::unixify($Bin)) =~ s/\/\z//
+            ($Bin = (VMS::Filespec::unixify: $Bin)) =~ s/\/\z//
             (@: $RealBin,$RealScript) = @: $Bin,$Script
         else
             my $dosish = ($^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'os2')
             unless(($script =~ m#/# || ($dosish && $script =~ m#\\#))
                 && -f $script)
-                foreach my $dir ( File::Spec->path)
-                    my $scr = File::Spec->catfile($dir, $script)
+                foreach my $dir ( (File::Spec->path: ))
+                    my $scr = File::Spec->catfile: $dir, $script
 
                     # $script can been found via PATH but perl could have
                     # been invoked as 'perl file'. Do a dumb check to see
@@ -160,39 +160,39 @@ sub init
                 
             
 
-            croak("Cannot find current script '$^PROGRAM_NAME'") unless(-f $script)
+            croak: "Cannot find current script '$^PROGRAM_NAME'" unless(-f $script)
 
             # Ensure $script contains the complete path in case we C<chdir>
 
-            $script = File::Spec->catfile(cwd2(), $script)
-                unless File::Spec->file_name_is_absolute($script)
+            $script = File::Spec->catfile: (cwd2: ), $script
+                unless File::Spec->file_name_is_absolute: $script
 
-            (@: $Script,$Bin, _) =  fileparse($script)
+            (@: $Script,$Bin, _) =  fileparse: $script
 
             # Resolve $script if it is a link
             while(1)
-                my $linktext = readlink($script)
+                my $linktext = readlink: $script
 
-                (@: $RealScript,$RealBin, _) =  fileparse($script)
+                (@: $RealScript,$RealBin, _) =  fileparse: $script
                 last unless defined $linktext
 
-                $script = (File::Spec->file_name_is_absolute($linktext))
+                $script = ((File::Spec->file_name_is_absolute: $linktext))
                     ?? $linktext
-                    !! File::Spec->catfile($RealBin, $linktext)
+                    !! File::Spec->catfile: $RealBin, $linktext
             
 
             # Get absolute paths to directories
             if ($Bin)
                 my $BinOld = $Bin
-                $Bin = abs_path($Bin)
-                defined $Bin or $Bin = File::Spec->canonpath($BinOld)
+                $Bin = abs_path: $Bin
+                defined $Bin or $Bin = File::Spec->canonpath: $BinOld
             
-            $RealBin = abs_path($RealBin) if($RealBin)
+            $RealBin = (abs_path: $RealBin) if($RealBin)
         
     
 
 
-BEGIN { init }
+BEGIN { (init: )}
 
 *again = \&init
 

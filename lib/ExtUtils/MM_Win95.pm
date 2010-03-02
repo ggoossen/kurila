@@ -38,7 +38,7 @@ The && problem.
 
 sub xs_c
     my(@: $self) =@:  shift
-    return '' unless $self->needs_linking()
+    return '' unless $self->needs_linking: 
     '
 .xs.c:
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
@@ -54,7 +54,7 @@ The && problem
 
 sub xs_cpp
     my(@: $self) =@:  shift
-    return '' unless $self->needs_linking()
+    return '' unless $self->needs_linking: 
     '
 .xs.cpp:
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.cpp
@@ -69,7 +69,7 @@ The && problem.
 
 sub xs_o
     my(@: $self) =@:  shift
-    return '' unless $self->needs_linking()
+    return '' unless $self->needs_linking: 
     '
 .xs$(OBJ_EXT):
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.c
@@ -100,7 +100,7 @@ Win95 and Win98 and WinME are collectively Win9x and Win32
 
 sub os_flavor
     my $self = shift
-    return  @: $self->SUPER::os_flavor, 'Win9x'
+    return  @:( $self->SUPER::os_flavor: ), 'Win9x'
 
 =back
 

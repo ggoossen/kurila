@@ -1,9 +1,9 @@
 
 use Test::More
-BEGIN {plan tests => 2};
-ok 1
+BEGIN {(plan: tests => 2)};
+ok: 1
 require Pod::Perldoc::ToText
 $Pod::Perldoc::VERSION
-    and print $^STDOUT, "# Pod::Perldoc version $Pod::Perldoc::VERSION\n"
-ok 1
+    and print: $^STDOUT, "# Pod::Perldoc version $Pod::Perldoc::VERSION\n"
+ok: 1
 

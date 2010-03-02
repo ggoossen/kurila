@@ -1,21 +1,21 @@
 #!perl
 
 BEGIN 
-    unshift $^INCLUDE_PATH, 't'
+    unshift: $^INCLUDE_PATH, 't'
     
     require Config
-    if (!Config::config_value("useperlio"))
-        print $^STDOUT, "1..0 # Skip -- need perlio to walk the optree\n"
+    if (!(Config::config_value: "useperlio"))
+        print: $^STDOUT, "1..0 # Skip -- need perlio to walk the optree\n"
         exit 0
     
 # require q(test.pl); # now done by OptreeCheck;
 
 
-print $^STDOUT, "1..0 # Skip -- TODO for kurila\n"
+print: $^STDOUT, "1..0 # Skip -- TODO for kurila\n"
 exit 0
 
 use OptreeCheck
-plan tests => 20
+plan: tests => 20
 
 =head1 f_sort.t
 
@@ -49,10 +49,10 @@ expectations.
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{@articles = sort @files; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{@articles = sort @files; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 545 (eval 15):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -86,10 +86,10 @@ EONT_EONT
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{@articles = sort {$a cmp $b} @files; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{@articles = sort {$a cmp $b} @files; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 546 (eval 15):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -123,10 +123,10 @@ EONT_EONT
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{@articles = sort {uc($a) cmp uc($b)} @files; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{@articles = sort {uc($a) cmp uc($b)} @files; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 546 (eval 15):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -160,10 +160,10 @@ EONT_EONT
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{@articles = sort {$b cmp $a} @files; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{@articles = sort {$b cmp $a} @files; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 546 (eval 15):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -197,10 +197,10 @@ EONT_EONT
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{@articles = sort {$a <+> $b} @files; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{@articles = sort {$a <+> $b} @files; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 546 (eval 15):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -234,10 +234,10 @@ EONT_EONT
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{@articles = sort {$b <+> $a} @files; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{@articles = sort {$b <+> $a} @files; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 587 (eval 26):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -272,10 +272,10 @@ EONT_EONT
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{@eldest = sort { %age{$b} <+> %age{$a} } keys %age; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{@eldest = sort { %age{$b} <+> %age{$a} } keys %age; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 592 (eval 28):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -314,10 +314,10 @@ sub byage {
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{sub byage { %age{$a} <+> %age{$b}; } @sortedclass = sort byage @class; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{sub byage { %age{$a} <+> %age{$b}; } @sortedclass = sort byage @class; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 597 (eval 30):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -360,14 +360,14 @@ print sort @george, 'to', @harry;
 
 =cut
 
-checkOptree(name   => q{sort USERSUB LIST },
-            bcopts => q{-exec},
-            code   => q{sub backwards { $b cmp $a }
+checkOptree: name   => q{sort USERSUB LIST }
+             bcopts => q{-exec}
+             code   => q{sub backwards { $b cmp $a }
 			@harry = qw(dog cat x Cain Abel);
 			@george = qw(gone chased yz Punished Axed);
 			print sort @harry; print sort backwards @harry; 
-			print sort @george, 'to', @harry; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+			print sort @george, 'to', @harry; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 602 (eval 32):2) v
 # 2  <0> pushmark s
 # 3  <$> const[PV "dog"] s
@@ -489,12 +489,12 @@ sort { $b->[1] <=> $a->[1]
 
 =cut
 
-checkOptree(name   => q{Compound sort/map Expression },
-            bcopts => q{-exec},
-            code   => q{ @new = map { $_->[0] }
+checkOptree: name   => q{Compound sort/map Expression }
+             bcopts => q{-exec}
+             code   => q{ @new = map { $_->[0] }
 			 sort { $b->[1] <+> $a->[1] || $a->[2] cmp $b->[2] }
-			 map { \@($_, m/=(\d+)/, uc($_)) } @old; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+			 map { \@($_, m/=(\d+)/, uc($_)) } @old; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 609 (eval 34):3) v:{
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -582,11 +582,11 @@ package main;
 
 =cut
 
-checkOptree(name   => q{sort other::sub LIST },
-            bcopts => q{-exec},
-            code   => q{package other; sub backwards ($$) { @_[1] cmp @_[0]; }
-			package main; @new = sort other::backwards @old; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: name   => q{sort other::sub LIST }
+             bcopts => q{-exec}
+             code   => q{package other; sub backwards ($$) { @_[1] cmp @_[0]; }
+			package main; @new = sort other::backwards @old; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 614 (eval 36):2) v:{
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -623,10 +623,10 @@ sub other::backwards ($$) { @_[1] cmp @_[0]; }
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{sub other::backwards ($$) { @_[1] cmp @_[0]; } @new = sort other::backwards @old; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{sub other::backwards ($$) { @_[1] cmp @_[0]; } @new = sort other::backwards @old; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 619 (eval 38):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -689,10 +689,10 @@ EOT_EOT
 # b  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{use sort 'stable'; @new = sort { substr($a, 3, 5) cmp substr($b, 3, 5) } @old; },
-            expect => $expect, expect_nt => $expect_nt)
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{use sort 'stable'; @new = sort { substr($a, 3, 5) cmp substr($b, 3, 5) } @old; }
+             expect => $expect, expect_nt => $expect_nt
 
 =for gentest
 
@@ -702,10 +702,10 @@ use sort '_mergesort';
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{use sort '_mergesort'; @new = sort { substr($a, 3, 5) cmp substr($b, 3, 5) } @old; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{use sort '_mergesort'; @new = sort { substr($a, 3, 5) cmp substr($b, 3, 5) } @old; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 662 (eval 42):1) v:%,{
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -739,10 +739,10 @@ EONT_EONT
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{@articles = sort {$FooPack::b <+> $FooPack::a} @files; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{@articles = sort {$FooPack::b <+> $FooPack::a} @files; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 667 (eval 44):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -776,10 +776,10 @@ EONT_EONT
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{@result = sort { $a <+> $b } grep { $_ == $_ } @input; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{@result = sort { $a <+> $b } grep { $_ == $_ } @input; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 673 (eval 46):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -829,10 +829,10 @@ sort { $a <=> $b } @input;
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{sort { $a <+> $b } @input; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{sort { $a <+> $b } @input; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 678 (eval 48):1) v
 # 2  <0> pushmark s
 # 3  <#> gv[*input] s
@@ -856,10 +856,10 @@ sort { $a <=> $b } grep { $_ == $_ } @input;
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{sort { $a <+> $b } grep { $_ == $_ } @input; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{sort { $a <+> $b } grep { $_ == $_ } @input; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 684 (eval 50):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -899,10 +899,10 @@ $s = sort { $a <=> $b } @input;
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{$s = sort { $a <+> $b } @input; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{$s = sort { $a <+> $b } @input; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 689 (eval 52):1) v:{
 # 2  <0> pushmark s
 # 3  <#> gv[*input] s
@@ -929,10 +929,10 @@ EONT_EONT
 
 =cut
 
-checkOptree(note   => q{},
-            bcopts => q{-exec},
-            code   => q{$s = sort { $a <+> $b } grep { $_ == $_ } @input; },
-            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
+checkOptree: note   => q{}
+             bcopts => q{-exec}
+             code   => q{$s = sort { $a <+> $b } grep { $_ == $_ } @input; }
+             expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'
 # 1  <;> nextstate(main 695 (eval 54):1) v:{
 # 2  <0> pushmark s
 # 3  <0> pushmark s

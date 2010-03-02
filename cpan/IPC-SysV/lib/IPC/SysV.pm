@@ -49,10 +49,10 @@ $VERSION = eval $VERSION
     require DynaLoader
 
     # DynaLoader calls dl_load_flags as a static method.
-    *dl_load_flags = DynaLoader->can('dl_load_flags')
+    *dl_load_flags = DynaLoader->can: 'dl_load_flags'
 
-    ( __PACKAGE__->can('bootstrap') || \&DynaLoader::bootstrap )
-       ->(__PACKAGE__, $XS_VERSION)
+    ( (__PACKAGE__->can: 'bootstrap') || \&DynaLoader::bootstrap )
+       ->& <: __PACKAGE__, $XS_VERSION
 
 
 1

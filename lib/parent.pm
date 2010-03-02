@@ -1,17 +1,17 @@
-package parent;
+package parent
 
-our $VERSION = '0.221';
+our $VERSION = '0.221'
 
 sub import( $class, @< @args )
 
-    my $inheritor = caller(0);
+    my $inheritor = (caller: 0);
 
     if ( @args and @args[0] eq '-norequire' )
         shift @args;
     else
         for ( my @filename = @args )
             if ( $_ eq $inheritor )
-                warn "Class '$inheritor' tried to inherit from itself\n"
+                warn: "Class '$inheritor' tried to inherit from itself\n"
 
             s{::|'}{/}g
             require "$_.pm" # dies if the file is not found
@@ -19,7 +19,7 @@ sub import( $class, @< @args )
     do
         # This is more efficient than push for the new MRO
         # at least until the new MRO is fixed
-        my $isa_glob = Symbol::fetch_glob("$inheritor\::ISA");
+        my $isa_glob = (Symbol::fetch_glob: "$inheritor\::ISA");
         $isa_glob->*->@ = $isa_glob->*->@ +@+ @args
 
 "All your base are belong to us"

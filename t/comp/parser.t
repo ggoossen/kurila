@@ -62,7 +62,7 @@ do {
     is("$($a)\{", "A\{", "interpolation, qq//");
     is("$($a)[", "A[", "interpolation, qq//");
     my @b=@:"B";
-    is("$(join ' ', @b)\{", "B\{", "interpolation, qq//");
+    is("$(join: ' ', @b)\{", "B\{", "interpolation, qq//");
     is(''.qr/$a(?:)\{/, '(?-uxism:A(?:)\{)', "interpolation, qr//");
     my $c = "A\{";
     $c =~ m/$a(?:){/p;
@@ -72,7 +72,7 @@ do {
     $c =~ s/foo/$($a)\{/;
     is($c, 'A{', "interpolation, s//.../");
     is(<<"{$a}{", "A\{ A[ B\{\n", "interpolation, here doc");
-$($a)\{ $($a)[ $(join ' ', @b)\{
+$($a)\{ $($a)[ $(join: ' ', @b)\{
 {$a}{
 };
 
@@ -80,8 +80,8 @@ $($a)\{ $($a)[ $(join ' ', @b)\{
 # ensure that the second print statement works, by playing a bit
 # with the test output.
 my %data = %: foo => "\n"
-print $^STDOUT, "#";
-print($^STDOUT, %data{?foo});
+print: $^STDOUT, "#";
+print: $^STDOUT, %data{?foo};
 pass();
 
 # Bug #24212
@@ -176,11 +176,11 @@ for (1..10)
 is($^EVAL_ERROR, "", 'BEGIN 5' );
 
 for (1..10)
-    eval q[ BEGIN { die } ]
+    eval q[ BEGIN { die: } ]
 like($^EVAL_ERROR->stacktrace, qr/BEGIN/, 'BEGIN 6' );
 
 for (1..10)
-    eval q[ BEGIN {\&foo4; die } ]
+    eval q[ BEGIN {\&foo4; die: } ]
 like($^EVAL_ERROR->stacktrace, qr/BEGIN/, 'BEGIN 7' );
 
 # Add new tests HERE:
@@ -239,7 +239,7 @@ check(qr/^"BBFRPRAFPGHPP$/, 46, "but spaces aren't allowed without quotes");
 #line 77sevenseven
 check(qr/^"BBFRPRAFPGHPP$/, 49, "need a space after the line number");
 
-eval <<'EOSTANZA'; die $^EVAL_ERROR if $^EVAL_ERROR;
+eval <<'EOSTANZA'; die: $^EVAL_ERROR if $^EVAL_ERROR;
 #line 51 "With wonderful deathless ditties|We build up the world's great cities,|And out of a fabulous story|We fashion an empire's glory:|One man with a dream, at pleasure,|Shall go forth and conquer a crown;|And three with a new song's measure|Can trample a kingdom down."
 check(qr/^With.*down\.$/, 51, "Overflow the second small buffer check");
 EOSTANZA
@@ -250,12 +250,12 @@ $^PERLDB = 0x100;
 #line 53 "For we are afar with the dawning|And the suns that are not yet high,|And out of the infinite morning|Intrepid you hear us cry-|How, spite of your human scorning,|Once more God's future draws nigh,|And already goes forth the warning|That ye of the past must die."
 check(qr/^For we.*must die\.$/, 53, "Our long line is set up");
 
-eval <<'EOT'; die $^EVAL_ERROR if $^EVAL_ERROR;
+eval <<'EOT'; die: $^EVAL_ERROR if $^EVAL_ERROR;
 #line 59 " "
 check(qr/^ $/, 59, "Overflow the first small buffer check only");
 EOT
 
-eval <<'EOSTANZA'; die $^EVAL_ERROR if $^EVAL_ERROR;
+eval <<'EOSTANZA'; die: $^EVAL_ERROR if $^EVAL_ERROR;
 #line 61 "Great hail! we cry to the comers|From the dazzling unknown shore;|Bring us hither your sun and your summers;|And renew our world as of yore;|You shall teach us your song's new numbers,|And things that we dreamed not before:|Yea, in spite of a dreamer who slumbers,|And a singer who sings no more."
 check(qr/^Great hail!.*no more\.$/, 61, "Overflow both small buffer checks");
 EOSTANZA

@@ -29,56 +29,56 @@ sub TEST($string, ?$name)
     $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
         if ($WANT =~ m/deadbeef/)
 
-    ok(($t eq $WANT and not $^EVAL_ERROR), $name)
+    ok: ($t eq $WANT and not $^EVAL_ERROR), $name
     if ($^EVAL_ERROR)
-        diag("error: $($^EVAL_ERROR->message)")
+        diag: "error: $(($^EVAL_ERROR->message: ))"
     elsif ($t ne $WANT)
-        diag("--Expected--\n$WANT\n--Got--\n$t\n")
+        diag: "--Expected--\n$WANT\n--Got--\n$t\n"
     
 
     eval "$t"
-    ok(!$^EVAL_ERROR)
-    diag $^EVAL_ERROR if $^EVAL_ERROR
+    ok: !$^EVAL_ERROR
+    diag: $^EVAL_ERROR if $^EVAL_ERROR
 
     $t = eval $string
     $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
         if ($WANT =~ m/deadbeef/)
-    ok($t eq $WANT and not $^EVAL_ERROR)
+    ok: ($t eq $WANT and not $^EVAL_ERROR)
     if ($^EVAL_ERROR)
-        diag("error: $($^EVAL_ERROR->message)")
+        diag: "error: $(($^EVAL_ERROR->message: ))"
     elsif ($t ne $WANT)
-        diag("--Expected--\n$WANT\n--Got--\n$t\n")
+        diag: "--Expected--\n$WANT\n--Got--\n$t\n"
     
 
 
 sub SKIP_TEST
     my $reason = shift
     :SKIP do
-        skip $reason, 3
+        skip: $reason, 3
     
 
 
 $TMAX = 8; $XS = 0
 
-plan tests => $TMAX
+plan: tests => $TMAX
 
-is Data::Dumper->Dump(\(@: '123xyz{$@%'), \qw(a)), '#$a = "123xyz\{\$\@\%";' . "\n"
-is Data::Dumper->Dump(\(@: (@: 'abc', 'def')), \(@: 'a')), <<'====' 
+is: (Data::Dumper->Dump: \(@: '123xyz{$@%'), \qw(a)), '#$a = "123xyz\{\$\@\%";' . "\n"
+is: (Data::Dumper->Dump: \(@: (@: 'abc', 'def')), \(@: 'a')), <<'====' 
 #$a = @(:
 #     "abc",
 #     "def"
 #     );
 ====
 
-is Data::Dumper->Dump(\(@: undef), \(@: 'a')), '#$a = undef;' . "\n" 
+is: (Data::Dumper->Dump: \(@: undef), \(@: 'a')), '#$a = undef;' . "\n" 
 
-is Data::Dumper->Dump(\(@:  bless \(%:  aap => 'noot' ), 'version' ), \(@: 'a')), <<'===='
+is: (Data::Dumper->Dump: \(@:  (bless: \(%:  aap => 'noot' ), 'version') ), \(@: 'a')), <<'===='
 #$a = bless( \%(:
 #              "aap" => "noot"
 #            ), "version" );
 ====
 
-is Data::Dumper->Dump(\(@: (%:  aap => 'noot' )), \(@: '*mies')), <<'===='
+is: (Data::Dumper->Dump: \(@: (%:  aap => 'noot' )), \(@: '*mies')), <<'===='
 #%mies = %(:
 #        "aap" => "noot"
 #        );
@@ -114,4 +114,4 @@ $WANT = <<'EOT'
 #$6 = $a->[1]->{"c"};
 EOT
 
-TEST q(Data::Dumper->Dump(\(@: $a,$b,$c), \(@: <qw(a b), 6)))
+TEST: q(Data::Dumper->Dump: \(@: $a,$b,$c), \(@: < qw(a b), 6))

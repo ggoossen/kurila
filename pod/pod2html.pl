@@ -140,4 +140,4 @@ This program is distributed under the Artistic License.
 
 use Pod::Html
 
-pod2html @ARGV
+pod2html: @ARGV

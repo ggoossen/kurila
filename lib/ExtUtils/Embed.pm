@@ -29,14 +29,14 @@ $VERSION = '1.26_01'
 #*canon = \&ExtUtils::Miniperl::canon;
 
 $Verbose = 0
-$lib_ext = config_value("lib_ext") || '.a'
+$lib_ext = (config_value: "lib_ext") || '.a'
 
 sub is_cmd { $^PROGRAM_NAME eq '-e' }
 
 sub my_return
     my $val = shift
-    if(is_cmd)
-        print $^STDOUT, $val
+    if((is_cmd: ))
+        print: $^STDOUT, $val
     else
         return $val
     
@@ -51,7 +51,7 @@ sub xsinit
     if ((nelems @_))
         @mods = $mods->@ if $mods
     else
-        getopts('o:s:')
+        getopts: 'o:s:'
         $file = $opt_o if defined $opt_o
         $std  = $opt_s  if defined $opt_s
         @mods = @ARGV
@@ -61,19 +61,19 @@ sub xsinit
     if ($file eq "STDOUT")
         $fh = $^STDOUT
     else
-        $fh = IO::File->new("$file", ">")
+        $fh = IO::File->new: "$file", ">"
     
 
-    push(@mods, < static_ext()) if defined $std
-    @mods = grep( {!%seen{+$_}++ }, @mods)
+    push: @mods, < (static_ext: ) if defined $std
+    @mods = grep:  {!%seen{+$_}++ }, @mods
 
-    print $fh, < xsi_header()
-    print $fh, "EXTERN_C void xs_init ($xsinit_proto);\n\n"
-    print $fh, < xsi_protos(< @mods)
+    print: $fh, < (xsi_header: )
+    print: $fh, "EXTERN_C void xs_init ($xsinit_proto);\n\n"
+    print: $fh, < xsi_protos: < @mods
 
-    print $fh, "\nEXTERN_C void\nxs_init($xsinit_proto)\n\{\n"
-    print $fh, < xsi_body(< @mods)
-    print $fh, "\}\n"
+    print: $fh, "\nEXTERN_C void\nxs_init($xsinit_proto)\n\{\n"
+    print: $fh, < xsi_body: < @mods
+    print: $fh, "\}\n"
 
 
 
@@ -89,26 +89,26 @@ sub xsi_protos(@exts)
     my(@retval,%seen)
     my $boot_proto = "pTHX_ CV* cv"
     foreach my $_ ( @exts)
-        my(@: $pname) =  canon('/', $_)
+        my(@: $pname) =  canon: '/', $_
         my($mname, $cname)
         ($mname = $pname) =~ s!/!::!g
         ($cname = $pname) =~ s!/!__!g
         my(@: $ccode) = "EXTERN_C void boot_$($cname) ($boot_proto);\n"
         next if %seen{+$ccode}++
-        push(@retval, $ccode)
+        push: @retval, $ccode
     
-    return join '', @retval
+    return join: '', @retval
 
 
 sub xsi_body(@exts)
     my($pname,@retval,%seen)
-    my(@: $dl) =  canon('/','DynaLoader')
-    push(@retval, "\tchar *file = __FILE__;\n")
-    push(@retval, "\tdXSUB_SYS;\n")
-    push(@retval, "\n")
+    my(@: $dl) =  canon: '/','DynaLoader'
+    push: @retval, "\tchar *file = __FILE__;\n"
+    push: @retval, "\tdXSUB_SYS;\n"
+    push: @retval, "\n"
 
     foreach my $_ ( @exts)
-        my(@: $pname) =  canon('/', $_)
+        my(@: $pname) =  canon: '/', $_
         my($mname, $cname, $ccode)
         ($mname = $pname) =~ s!/!::!g
         ($cname = $pname) =~ s!/!__!g
@@ -116,21 +116,21 @@ sub xsi_body(@exts)
             # Must NOT install 'DynaLoader::boot_DynaLoader' as 'bootstrap'!
             # boot_DynaLoader is called directly in DynaLoader.pm
             $ccode = "\t/* DynaLoader is a special case */\n\tnewXS(\"$($mname)::boot_$($cname)\", boot_$($cname), file);\n"
-            push(@retval, $ccode) unless %seen{+$ccode}++
+            push: @retval, $ccode unless %seen{+$ccode}++
         else
             $ccode = "\tnewXS(\"$($mname)::bootstrap\", boot_$($cname), file);\n"
-            push(@retval, $ccode) unless %seen{+$ccode}++
+            push: @retval, $ccode unless %seen{+$ccode}++
         
     
-    return join '', @retval
+    return join: '', @retval
 
 
 sub static_ext
     unless (scalar nelems @Extensions)
-        my $static_ext = config_value("static_ext")
+        my $static_ext = config_value: "static_ext"
         $static_ext =~ s/^\s+//
-        @Extensions = sort split m/\s+/, $static_ext
-        unshift @Extensions, < qw(DynaLoader)
+        @Extensions = sort: split: m/\s+/, $static_ext
+        unshift: @Extensions, < qw(DynaLoader)
     
     @Extensions
 
@@ -141,20 +141,20 @@ sub _escape
 
 
 sub _ldflags
-    my $ldflags = config_value("ldflags")
-    _escape(\$ldflags)
+    my $ldflags = config_value: "ldflags"
+    _escape: \$ldflags
     return $ldflags
 
 
 sub _ccflags
-    my $ccflags = config_value("ccflags")
-    _escape(\$ccflags)
+    my $ccflags = config_value: "ccflags"
+    _escape: \$ccflags
     return $ccflags
 
 
 sub _ccdlflags
-    my $ccdlflags = config_value("ccdlflags")
-    _escape(\$ccdlflags)
+    my $ccdlflags = config_value: "ccdlflags"
+    _escape: \$ccdlflags
     return $ccdlflags
 
 
@@ -174,38 +174,38 @@ sub ldopts
             m/^-std$/  && do { $std = 1; next; }
             m/^--$/    && do { @link_args = @argv; last; }
             m/^-I(.*)/ && do { $path = $1 || shift @argv; next; }
-            push(@mods, $_)
+            push: @mods, $_
         
     
     $std = 1 unless scalar nelems @link_args
-    my $sep = config_value("path_sep") || ':'
-    @path = @:  $path ?? < split(m/\Q$sep/, $path) !! < $^INCLUDE_PATH 
+    my $sep = (config_value: "path_sep") || ':'
+    @path = @:  $path ?? < (split: m/\Q$sep/, $path) !! < $^INCLUDE_PATH 
 
-    push(@potential_libs, < @link_args)    if scalar nelems @link_args
+    push: @potential_libs, < @link_args    if scalar nelems @link_args
     # makemaker includes std libs on windows by default
-    if ($^OS_NAME ne 'MSWin32' and defined($std))
-        push(@potential_libs, config_value("perllibs"))
+    if ($^OS_NAME ne 'MSWin32' and defined: $std)
+        push: @potential_libs, (config_value: "perllibs")
     
 
-    push(@mods, < static_ext()) if $std
+    push: @mods, < (static_ext: ) if $std
 
     my(@ns,$root,$sub,$extra,$archive,@archives)
-    print $^STDERR, "Searching ($(join ' ',@path)) for archives\n" if $Verbose
+    print: $^STDERR, "Searching ($((join: ' ',@path))) for archives\n" if $Verbose
     foreach my $mod ( @mods)
-        @ns = split(m/::|\/|\\/, $mod)
+        @ns = split: m/::|\/|\\/, $mod
         $sub = @ns[-1]
-        $root = File::Spec->catdir(< @ns)
+        $root = File::Spec->catdir: < @ns
 
-        print $^STDERR, "searching for '$($sub)$($lib_ext)'\n" if $Verbose
+        print: $^STDERR, "searching for '$($sub)$($lib_ext)'\n" if $Verbose
         foreach ( @path)
-            next unless -e ($archive = File::Spec->catdir($_,"auto",$root,"$sub$lib_ext"))
-            push @archives, $archive
-            if(-e ($extra = File::Spec->catdir($_,"auto",$root,"extralibs.ld")))
-                if(open(my $fh, "<", $extra))
+            next unless -e ($archive = (File::Spec->catdir: $_,"auto",$root,"$sub$lib_ext"))
+            push: @archives, $archive
+            if(-e ($extra = (File::Spec->catdir: $_,"auto",$root,"extralibs.ld")))
+                if((open: my $fh, "<", $extra))
                     my(@: $libs) = ~< $fh->*; chomp $libs
-                    push @potential_libs, < split m/\s+/, $libs
+                    push: @potential_libs, < split: m/\s+/, $libs
                 else
-                    warn "Couldn't open '$extra'"
+                    warn: "Couldn't open '$extra'"
                 
             
             last
@@ -215,50 +215,50 @@ sub ldopts
 
     my $libperl
     if ($^OS_NAME eq 'MSWin32')
-        $libperl = config_value("libperl")
-    elsif ($^OS_NAME eq 'os390' && config_value("usedl")) {
+        $libperl = config_value: "libperl"
+    elsif ($^OS_NAME eq 'os390' && (config_value: "usedl")) {
     # Nothing for OS/390 (z/OS) dynamic.
     }else
-        $libperl = (grep( {m/^-l\w*perl\w*$/ }, @link_args))[?0]
-            || (config_value("libperl") =~ m/^lib(\w+)(\Q$lib_ext\E|\.\Q$(config_value("dlext"))\E)$/
+        $libperl = ((grep:  {m/^-l\w*perl\w*$/ }, @link_args))[?0]
+            || ((config_value: "libperl") =~ m/^lib(\w+)(\Q$lib_ext\E|\.\Q$((config_value: "dlext"))\E)$/
                 ?? "-l$1" !! '')
             || "-lperl"
     
 
-    my $lpath = File::Spec->catdir(config_value("archlibexp"), 'CORE')
+    my $lpath = File::Spec->catdir: (config_value: "archlibexp"), 'CORE'
     $lpath = qq["$lpath"] if $^OS_NAME eq 'MSWin32'
     my (@: $extralibs, $bsloadlibs, $ldloadlibs, $ld_run_path, ...) =
-        MM->ext(join ' ', (@:  "-L$lpath", $libperl, < @potential_libs))
+        MM->ext: (join: ' ', (@:  "-L$lpath", $libperl, < @potential_libs))
 
     my $ld_or_bs = $bsloadlibs || $ldloadlibs
-    print $^STDERR, "bs: $bsloadlibs ** ld: $ldloadlibs" if $Verbose
-    my $ccdlflags = _ccdlflags()
-    my $ldflags   = _ldflags()
-    my $linkage = "$ccdlflags $ldflags $(join ' ',@archives) $ld_or_bs"
-    print $^STDERR, "ldopts: '$linkage'\n" if $Verbose
+    print: $^STDERR, "bs: $bsloadlibs ** ld: $ldloadlibs" if $Verbose
+    my $ccdlflags = (_ccdlflags: )
+    my $ldflags   = (_ldflags: )
+    my $linkage = "$ccdlflags $ldflags $((join: ' ',@archives)) $ld_or_bs"
+    print: $^STDERR, "ldopts: '$linkage'\n" if $Verbose
 
     return $linkage if scalar nelems @_
-    my_return("$linkage\n")
+    my_return: "$linkage\n"
 
 
 sub ccflags
-    my $ccflags = _ccflags()
-    my_return(" $ccflags ")
+    my $ccflags = (_ccflags: )
+    my_return: " $ccflags "
 
 
 sub ccdlflags
-    my $ccdlflags = _ccdlflags()
-    my_return(" $ccdlflags ")
+    my $ccdlflags = (_ccdlflags: )
+    my_return: " $ccdlflags "
 
 
 sub perl_inc
-    my $dir = File::Spec->catdir(config_value("archlibexp"), 'CORE')
+    my $dir = File::Spec->catdir: (config_value: "archlibexp"), 'CORE'
     $dir = qq["$dir"] if $^OS_NAME eq 'MSWin32'
-    my_return(" -I$dir ")
+    my_return: " -I$dir "
 
 
-sub ccopts
-    ccflags . perl_inc
+sub ccopts()
+    (ccflags: ). (perl_inc: )
 
 
 sub canon($as, @< @ext)
@@ -268,7 +268,7 @@ sub canon($as, @< @ext)
         s:^(lib|ext)/(auto/)?::
         s:/\w+\.\w+$::
     
-    map( {s:/:$as: }, @ext) if ($as ne '/')
+    map:  {s:/:$as: }, @ext if ($as ne '/')
     @ext
 
 

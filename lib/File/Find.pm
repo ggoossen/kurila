@@ -430,15 +430,15 @@ our ($wanted_callback, $avoid_nlink, $bydepth, $no_chdir, $follow,
 
 sub contract_name($cdir,$fn)
 
-    return substr($cdir,0,rindex($cdir,'/')) if $fn eq $File::Find::current_dir
+    return (substr: $cdir,0,(rindex: $cdir,'/')) if $fn eq $File::Find::current_dir
 
-    $cdir = substr($cdir,0,rindex($cdir,'/')+1)
+    $cdir = substr: $cdir,0,(rindex: $cdir,'/')+1
 
     $fn =~ s|^\./||
 
     my $abs_name= $cdir . $fn
 
-    if (substr($fn,0,3) eq '../')
+    if ((substr: $fn,0,3) eq '../')
         1 while $abs_name =~ s!/[^/]*/\.\./!/!
     
 
@@ -451,7 +451,7 @@ sub contract_name_Mac($cdir,$fn)
 
     if ($fn =~ m/^(:+)(.*)$/) # valid pathname starting with a ':'
 
-        my $colon_count = length ($1)
+        my $colon_count = length: $1
         if ($colon_count == 1)
             $abs_name = $cdir . $2
             return $abs_name
@@ -499,17 +499,17 @@ sub PathCombine($Base,$Name)
             return undef
         
     else
-        if (substr($Name,0,1) eq '/')
+        if ((substr: $Name,0,1) eq '/')
             $AbsName= $Name
         else
-            $AbsName= contract_name($Base,$Name)
+            $AbsName= contract_name: $Base,$Name
         
 
         # (simple) check for recursion
-        my $newlen= length($AbsName)
-        if ($newlen +<= length($Base))
-            if (($newlen == length($Base) || substr($Base,$newlen,1) eq '/')
-                  && $AbsName eq substr($Base,0,$newlen))
+        my $newlen= length: $AbsName
+        if ($newlen +<= (length: $Base))
+            if (($newlen == (length: $Base) || (substr: $Base,$newlen,1) eq '/')
+                  && $AbsName eq (substr: $Base,0,$newlen))
                 return undef
             
         
@@ -525,28 +525,28 @@ sub Follow_SymLink($AbsName)
     while (-l _)
         if (%SLnkSeen{+ $DEV . "," . $INO}++)
             if ($follow_skip +< 2)
-                die "$AbsName is encountered a second time"
+                die: "$AbsName is encountered a second time"
             else
                 return undef
             
         
-        $NewName= PathCombine($AbsName, readlink($AbsName))
+        $NewName= PathCombine: $AbsName, (readlink: $AbsName)
         unless(defined $NewName)
             if ($follow_skip +< 2)
-                die "$AbsName is a recursive symbolic link"
+                die: "$AbsName is a recursive symbolic link"
             else
                 return undef
             
         else
             $AbsName= $NewName
         
-        (@: ?$DEV, ?$INO, ...) = @: lstat($AbsName)
+        (@: ?$DEV, ?$INO, ...) = @: lstat: $AbsName
         return undef unless defined $DEV  #  dangling symbolic link
     
 
     if ($full_check && defined $DEV && %SLnkSeen{+ $DEV . "," . $INO}++)
         if ( ($follow_skip +< 1) || ((-d _) && ($follow_skip +< 2)) )
-            die "$AbsName encountered a second time"
+            die: "$AbsName encountered a second time"
         else
             return undef
         
@@ -559,7 +559,7 @@ our($dir, $name, $fullname, $prune)
 
 sub _find_opt
     my $wanted = shift
-    die "invalid top directory" unless defined @_[0]
+    die: "invalid top directory" unless defined @_[0]
 
     # This function must local()ize everything because callbacks may
     # call find() or finddepth()
@@ -571,11 +571,11 @@ sub _find_opt
     local($dir, $name, $fullname, $prune)
     local $_ = undef
 
-    my $cwd            = $wanted->{?bydepth} ?? Cwd::fastcwd() !! Cwd::getcwd()
+    my $cwd            = $wanted->{?bydepth} ?? (Cwd::fastcwd: ) !! (Cwd::getcwd: )
     if ($Is_VMS)
         # VMS returns this by default in VMS format which just doesn't
         # work for the rest of this module.
-        $cwd = VMS::Filespec::unixpath($cwd)
+        $cwd = VMS::Filespec::unixpath: $cwd
 
         # Apparently this is not expected to have a trailing space.
         # To attempt to make VMS/UNIX conversions mostly reversable,
@@ -635,80 +635,80 @@ sub _find_opt
                 if ($top_item eq $File::Find::current_dir)
                     $abs_dir = $cwd
                 else
-                    $abs_dir = contract_name_Mac($cwd, $top_item)
+                    $abs_dir = contract_name_Mac: $cwd, $top_item
                     unless (defined $abs_dir)
-                        warnings::warnif "Can't determine absolute path for $top_item (No such file or directory)\n"
+                        warnings::warnif:  "Can't determine absolute path for $top_item (No such file or directory)\n"
                         next Proc_Top_Item
             else
-                if (substr($top_item,0,1) eq '/')
+                if ((substr: $top_item,0,1) eq '/')
                     $abs_dir = $top_item
                 elsif ($top_item eq $File::Find::current_dir)
                     $abs_dir = $cwd
                 else  # care about any  ../
                     $top_item =~ s/\.dir\z//i if $Is_VMS
-                    $abs_dir = contract_name("$cwd/",$top_item)
+                    $abs_dir = contract_name: "$cwd/",$top_item
 
-            $abs_dir= Follow_SymLink($abs_dir)
+            $abs_dir= Follow_SymLink: $abs_dir
             unless (defined $abs_dir)
                 if ($dangling_symlinks)
-                    if (ref::svtype($dangling_symlinks) eq 'CODE')
-                        $dangling_symlinks->($top_item, $cwd)
+                    if ((ref::svtype: $dangling_symlinks) eq 'CODE')
+                        $dangling_symlinks->& <: $top_item, $cwd
                     else
-                        warnings::warnif "$top_item is a dangling symbolic link\n"
+                        warnings::warnif:  "$top_item is a dangling symbolic link\n"
                 next Proc_Top_Item
 
             if (-d _)
                 $top_item =~ s/\.dir\z//i if $Is_VMS
-                _find_dir_symlnk($wanted, $abs_dir, $top_item)
+                _find_dir_symlnk: $wanted, $abs_dir, $top_item
                 $Is_Dir= 1
             
         else # no follow
             $topdir = $top_item
             unless (defined $topnlink)
-                warnings::warnif "Can't stat $top_item: $^OS_ERROR\n"
+                warnings::warnif:  "Can't stat $top_item: $^OS_ERROR\n"
                 next Proc_Top_Item
             
             if (-d _)
                 $top_item =~ s/\.dir\z//i if $Is_VMS
-                _find_dir($wanted, $top_item, $topnlink)
+                _find_dir: $wanted, $top_item, $topnlink
                 $Is_Dir= 1
             else
                 $abs_dir= $top_item
 
         unless ($Is_Dir)
-            unless ((@: ?$_,?$dir, _) = File::Basename::fileparse($abs_dir))
+            unless ((@: ?$_,?$dir, _) = (File::Basename::fileparse: $abs_dir))
                 if ($Is_MacOS)
                     (@: $dir,$_) = @: ':', $top_item # $File::Find::dir, $_
                 else
                     (@: $dir,$_) = @: './', $top_item
 
             $abs_dir = $dir
-            if (( $untaint ) && (is_tainted($dir) ))
+            if (( $untaint ) && ((is_tainted: $dir) ))
                 (@:  $abs_dir ) = @: $dir =~ m|$untaint_pat|
                 unless (defined $abs_dir)
                     if ($untaint_skip == 0)
-                        die "directory $dir is still tainted"
+                        die: "directory $dir is still tainted"
                     else
                         next Proc_Top_Item
 
             unless ($no_chdir || chdir $abs_dir)
-                warnings::warnif "Couldn't chdir $abs_dir: $^OS_ERROR\n"
+                warnings::warnif:  "Couldn't chdir $abs_dir: $^OS_ERROR\n"
                 next Proc_Top_Item
 
             $name = $abs_dir . $_ # $File::Find::name
             $_ = $name if $no_chdir
 
-            do { $wanted_callback->() } # protect against wild "next"
+            do {( $wanted_callback->& <: ) } # protect against wild "next"
 
         unless ( $no_chdir )
-            if ( ($check_t_cwd) && (($untaint) && (is_tainted($cwd) )) )
+            if ( ($check_t_cwd) && (($untaint) && ((is_tainted: $cwd) )) )
                 (@:  ?$cwd_untainted ) = @: $cwd =~ m|$untaint_pat|
                 unless (defined $cwd_untainted)
-                    die "insecure cwd in find(depth)"
+                    die: "insecure cwd in find(depth)"
                 $check_t_cwd = 0
             
             unless (chdir $cwd_untainted)
-                die "Can't cd to $cwd: $^OS_ERROR\n"
+                die: "Can't cd to $cwd: $^OS_ERROR\n"
 
 
 # API:
@@ -752,24 +752,24 @@ sub _find_dir($wanted, $p_dir, $nlink)
 
     unless ( $no_chdir || ($p_dir eq $File::Find::current_dir))
         my $udir = $p_dir
-        if (( $untaint ) && (is_tainted($p_dir) ))
+        if (( $untaint ) && ((is_tainted: $p_dir) ))
             (@:  ?$udir ) = @: $p_dir =~ m|$untaint_pat|
             unless (defined $udir)
                 if ($untaint_skip == 0)
-                    die "directory $p_dir is still tainted"
+                    die: "directory $p_dir is still tainted"
                 else
                     return
                 
             
         
-        unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ?? "./$udir" !! $udir))
-            warnings::warnif "Can't cd to $udir: $^OS_ERROR\n"
+        unless ((chdir: $Is_VMS && $udir !~ m/[\/\[<]+/ ?? "./$udir" !! $udir))
+            warnings::warnif:  "Can't cd to $udir: $^OS_ERROR\n"
             return
         
     
 
     # push the starting directory
-    push @Stack,\(@: $CdLvl,$p_dir,$dir_rel,-1)  if  $bydepth
+    push: @Stack,\(@: $CdLvl,$p_dir,$dir_rel,-1)  if  $bydepth
 
     if ($Is_MacOS)
         $p_dir = $dir_pref  # ensure trailing ':'
@@ -782,31 +782,31 @@ sub _find_dir($wanted, $p_dir, $nlink)
             $_= ($no_chdir ?? $dir_name !! $dir_rel ) # $_
             # prune may happen here
             $prune= 0
-            do { $wanted_callback->() };        # protect against wild "next"
+            do {( $wanted_callback->& <: ) };        # protect against wild "next"
             next if $prune
         
 
         # change to that directory
         unless ($no_chdir || ($dir_rel eq $File::Find::current_dir))
             my $udir= $dir_rel
-            if ( ($untaint) && (($tainted) || ($tainted = is_tainted($dir_rel) )) )
+            if ( ($untaint) && (($tainted) || ($tainted = (is_tainted: $dir_rel) )) )
                 (@:  ?$udir ) = @: $dir_rel =~ m|$untaint_pat|
                 unless (defined $udir)
                     if ($untaint_skip == 0)
                         if ($Is_MacOS)
-                            die "directory ($p_dir) $dir_rel is still tainted"
+                            die: "directory ($p_dir) $dir_rel is still tainted"
                         else
-                            die "directory (" . ($p_dir ne '/' ?? $p_dir !! '') . "/) $dir_rel is still tainted"
+                            die: "directory (" . ($p_dir ne '/' ?? $p_dir !! '') . "/) $dir_rel is still tainted"
                         
                     else # $untaint_skip == 1
                         next
             
-            unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ?? "./$udir" !! $udir))
+            unless ((chdir: $Is_VMS && $udir !~ m/[\/\[<]+/ ?? "./$udir" !! $udir))
                 if ($Is_MacOS)
-                    warnings::warnif "Can't cd to ($p_dir) $udir: $^OS_ERROR\n"
+                    warnings::warnif:  "Can't cd to ($p_dir) $udir: $^OS_ERROR\n"
                 else
-                    warnings::warnif "Can't cd to (" .
-                                     ($p_dir ne '/' ?? $p_dir !! '') . "/) $udir: $^OS_ERROR\n"
+                    warnings::warnif:  "Can't cd to (" .
+                                                        ($p_dir ne '/' ?? $p_dir !! '') . "/) $udir: $^OS_ERROR\n"
                 next
             
             $CdLvl++
@@ -819,14 +819,14 @@ sub _find_dir($wanted, $p_dir, $nlink)
 
         # Get the list of files in the current directory.
         my $dir
-        unless (opendir $dir, ($no_chdir ?? $dir_name !! $File::Find::current_dir))
-            warnings::warnif "Can't opendir($dir_name): $^OS_ERROR\n"
+        unless ((opendir: $dir, ($no_chdir ?? $dir_name !! $File::Find::current_dir)))
+            warnings::warnif:  "Can't opendir($dir_name): $^OS_ERROR\n"
             next
         
         @filenames = @:  readdir $dir 
-        closedir($dir)
-        @filenames = $pre_process->(< @filenames) if $pre_process
-        push @Stack,\(@: $CdLvl,$dir_name,"",-2)   if $post_process
+        closedir: $dir
+        @filenames =( $pre_process->& <: < @filenames) if $pre_process
+        push: @Stack,\(@: $CdLvl,$dir_name,"",-2)   if $post_process
 
         # default: use whatever was specifid
         # (if $nlink >= 2, and $avoid_nlink == 0, this will switch back)
@@ -849,7 +849,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
 
                 $name = $dir_pref . $FN # $File::Find::name
                 $_ = ($no_chdir ?? $name !! $FN) # $_
-                do { $wanted_callback->() }; # protect against wild "next"
+                do {( $wanted_callback->& <: ) }; # protect against wild "next"
             
 
         else
@@ -867,29 +867,29 @@ sub _find_dir($wanted, $p_dir, $nlink)
                     # Seen all the subdirs?
                     # check for directoriness.
                     # stat is faster for a file in the current directory
-                    $sub_nlink = (@: lstat ($no_chdir ?? $dir_pref . $FN !! $FN))[3]
+                    $sub_nlink = (@: (lstat: $no_chdir ?? $dir_pref . $FN !! $FN))[3]
 
                     if (-d _)
                         --$subcount
                         $FN =~ s/\.dir\z//i if $Is_VMS
                         # HACK: replace push to preserve dir traversal order
                         #push @Stack,[$CdLvl,$dir_name,$FN,$sub_nlink];
-                        splice @Stack, $stack_top, 0,
-                            \@: $CdLvl,$dir_name,$FN,$sub_nlink
+                        splice: @Stack, $stack_top, 0
+                                \@: $CdLvl,$dir_name,$FN,$sub_nlink
                     else
                         $name = $dir_pref . $FN # $File::Find::name
                         $_= ($no_chdir ?? $name !! $FN) # $_
-                        do { $wanted_callback->() }; # protect against wild "next"
+                        do {( $wanted_callback->& <: ) }; # protect against wild "next"
                     
                 else
                     $name = $dir_pref . $FN # $File::Find::name
                     $_= ($no_chdir ?? $name !! $FN) # $_
-                    do { $wanted_callback->() }; # protect against wild "next"
+                    do {( $wanted_callback->& <: ) }; # protect against wild "next"
                 
             
         
     continue
-        while ( defined ($SE = pop @Stack) )
+        while ( (defined: ($SE = pop @Stack)) )
             (@: $Level, $p_dir, $dir_rel, $nlink) = $SE->@
             if ($CdLvl +> $Level && !$no_chdir)
                 my $tmp
@@ -898,10 +898,10 @@ sub _find_dir($wanted, $p_dir, $nlink)
                 elsif ($Is_VMS)
                     $tmp = '[' . ('-' x ($CdLvl-$Level)) . ']'
                 else
-                    $tmp = join('/', (@: '..') x ($CdLvl-$Level))
+                    $tmp = join: '/', (@: '..') x ($CdLvl-$Level)
                 
-                die "Can't cd to $tmp from $dir_name"
-                    unless chdir ($tmp)
+                die: "Can't cd to $tmp from $dir_name"
+                    unless chdir: $tmp
                 $CdLvl = $Level
             
 
@@ -930,7 +930,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
             if ( $nlink == -2 )
                 $name = $dir = $p_dir # $File::Find::name / dir
                 $_ = $File::Find::current_dir
-                $post_process->()               # End-of-directory processing
+                ($post_process->& <: )               # End-of-directory processing
             elsif ( $nlink +< 0 )  # must be finddepth, report dirname now
                 $name = $dir_name
                 if ($Is_MacOS)
@@ -941,18 +941,18 @@ sub _find_dir($wanted, $p_dir, $nlink)
                     $dir = $p_dir # $File::Find::dir
                     $_ = ($no_chdir ?? $name !! $dir_rel) # $_
                 else
-                    if ( substr($name,-2) eq '/.' )
-                        substr($name, (length($name) == 2 ?? -1 !! -2), undef, '')
+                    if ( (substr: $name,-2) eq '/.' )
+                        substr: $name, ((length: $name) == 2 ?? -1 !! -2), undef, ''
                     
                     $dir = $p_dir
                     $_ = ($no_chdir ?? $dir_name !! $dir_rel )
-                    if ( substr($_,-2) eq '/.' )
-                        substr($_, (length($_) == 2 ?? -1 !! -2), undef, '')
+                    if ( (substr: $_,-2) eq '/.' )
+                        substr: $_, ((length: $_) == 2 ?? -1 !! -2), undef, ''
                     
                 
-                do { $wanted_callback->() }; # protect against wild "next"
+                do {( $wanted_callback->& <: ) }; # protect against wild "next"
             else
-                push @Stack,\(@: $CdLvl,$p_dir,$dir_rel,-1)  if  $bydepth
+                push: @Stack,\(@: $CdLvl,$p_dir,$dir_rel,-1)  if  $bydepth
                 last
 
 # API:
@@ -988,7 +988,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
 
     unless ($no_chdir)
         # untaint the topdir
-        if (( $untaint ) && (is_tainted($dir_loc) ))
+        if (( $untaint ) && ((is_tainted: $dir_loc) ))
             (@:  ?$updir_loc ) =
                 @: $dir_loc =~ m|$untaint_pat| # parent dir, now untainted
                    # once untainted, $updir_loc is pushed on the stack (as parent directory);
@@ -996,20 +996,20 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
                    # to it later
             unless (defined $updir_loc)
                 if ($untaint_skip == 0)
-                    die "directory $dir_loc is still tainted"
+                    die: "directory $dir_loc is still tainted"
                 else
                     return
                 
             
         
-        $ok = chdir($updir_loc) unless ($p_dir eq $File::Find::current_dir)
+        $ok = (chdir: $updir_loc) unless ($p_dir eq $File::Find::current_dir)
         unless ($ok)
-            warnings::warnif "Can't cd to $updir_loc: $^OS_ERROR\n"
+            warnings::warnif:  "Can't cd to $updir_loc: $^OS_ERROR\n"
             return
         
     
 
-    push @Stack,\(@: $dir_loc,$updir_loc,$p_dir,$dir_rel,-1)  if  $bydepth
+    push: @Stack,\(@: $dir_loc,$updir_loc,$p_dir,$dir_rel,-1)  if  $bydepth
 
     if ($Is_MacOS)
         $p_dir = $dir_pref # ensure trailing ':'
@@ -1021,7 +1021,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
             # change (back) to parent directory (always untainted)
             unless ($no_chdir)
                 unless (chdir $updir_loc)
-                    warnings::warnif "Can't cd to $updir_loc: $^OS_ERROR\n"
+                    warnings::warnif:  "Can't cd to $updir_loc: $^OS_ERROR\n"
                     next
                 
             
@@ -1031,27 +1031,27 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
             $fullname= $dir_loc # $File::Find::fullname
             # prune may happen here
             $prune= 0
-            lstat($_) # make sure  file tests with '_' work
-            do { $wanted_callback->() }; # protect against wild "next"
+            lstat: $_ # make sure  file tests with '_' work
+            do {( $wanted_callback->& <: ) }; # protect against wild "next"
             next if $prune
         
 
         # change to that directory
         unless ($no_chdir || ($dir_rel eq $File::Find::current_dir))
             $updir_loc = $dir_loc
-            if ( ($untaint) && (($tainted) || ($tainted = is_tainted($dir_loc) )) )
+            if ( ($untaint) && (($tainted) || ($tainted = (is_tainted: $dir_loc) )) )
                 # untaint $dir_loc, what will be pushed on the stack as (untainted) parent dir
                 (@:  $updir_loc ) = @: $dir_loc =~ m|$untaint_pat|
                 unless (defined $updir_loc)
                     if ($untaint_skip == 0)
-                        die "directory $dir_loc is still tainted"
+                        die: "directory $dir_loc is still tainted"
                     else
                         next
                     
                 
             
             unless (chdir $updir_loc)
-                warnings::warnif "Can't cd to $updir_loc: $^OS_ERROR\n"
+                warnings::warnif:  "Can't cd to $updir_loc: $^OS_ERROR\n"
                 next
             
         
@@ -1064,12 +1064,12 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
 
         # Get the list of files in the current directory.
         my $dir
-        unless (opendir $dir, ($no_chdir ?? $dir_loc !! $File::Find::current_dir))
-            warnings::warnif "Can't opendir($dir_loc): $^OS_ERROR\n"
+        unless ((opendir: $dir, ($no_chdir ?? $dir_loc !! $File::Find::current_dir)))
+            warnings::warnif:  "Can't opendir($dir_loc): $^OS_ERROR\n"
             next
         
         @filenames = @:  readdir $dir 
-        closedir($dir)
+        closedir: $dir
 
         for my $FN ( @filenames)
             if ($Is_VMS)
@@ -1083,20 +1083,20 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
             next if $FN =~ $File::Find::skip_pattern
 
             # follow symbolic links / do an lstat
-            $new_loc = Follow_SymLink($loc_pref.$FN)
+            $new_loc = Follow_SymLink: $loc_pref.$FN
 
             # ignore if invalid symlink
             unless (defined $new_loc)
                 if (!defined -l _ && $dangling_symlinks)
-                    if (ref::svtype($dangling_symlinks) eq 'CODE')
-                        $dangling_symlinks->($FN, $dir_pref)
+                    if ((ref::svtype: $dangling_symlinks) eq 'CODE')
+                        $dangling_symlinks->& <: $FN, $dir_pref
                     else
-                        warnings::warnif "$dir_pref$FN is a dangling symbolic link\n"
+                        warnings::warnif:  "$dir_pref$FN is a dangling symbolic link\n"
 
                 $fullname = undef
                 $name = $dir_pref . $FN
                 $_ = ($no_chdir ?? $name !! $FN)
-                do { $wanted_callback->() };
+                do {( $wanted_callback->& <: ) };
                 next
             
 
@@ -1107,17 +1107,17 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
                     $new_loc =~ s/\.dir\z//i
                     $new_loc =~ s#\.$## if ($new_loc ne '.')
                 
-                push @Stack,\@: $new_loc,$updir_loc,$dir_name,$FN,1
+                push: @Stack,\@: $new_loc,$updir_loc,$dir_name,$FN,1
             else
                 $fullname = $new_loc # $File::Find::fullname
                 $name = $dir_pref . $FN # $File::Find::name
                 $_ = ($no_chdir ?? $name !! $FN) # $_
-                do { $wanted_callback->() }; # protect against wild "next"
+                do {( $wanted_callback->& <: ) }; # protect against wild "next"
             
         
 
     continue
-        while (defined($SE = pop @Stack))
+        while ((defined: ($SE = pop @Stack)))
             (@: $dir_loc, $updir_loc, $p_dir, $dir_rel, $byd_flag) = $SE->@
             if ($Is_MacOS)
                 # $p_dir always has a trailing ':', except for the starting dir,
@@ -1133,7 +1133,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
             if ( $byd_flag +< 0 )  # must be finddepth, report dirname now
                 unless ($no_chdir || ($dir_rel eq $File::Find::current_dir))
                     unless (chdir $updir_loc) # $updir_loc (parent dir) is always untainted
-                        warnings::warnif "Can't cd to $updir_loc: $^OS_ERROR\n"
+                        warnings::warnif:  "Can't cd to $updir_loc: $^OS_ERROR\n"
                         next
                     
                 
@@ -1147,20 +1147,20 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
                     $dir = $p_dir # $File::Find::dir
                     $_ = ($no_chdir ?? $name !! $dir_rel) # $_
                 else
-                    if ( substr($name,-2) eq '/.' )
-                        substr($name, (length($name) == 2 ?? -1 !! -2), undef, '') # $File::Find::name
+                    if ( (substr: $name,-2) eq '/.' )
+                        substr: $name, ((length: $name) == 2 ?? -1 !! -2), undef, '' # $File::Find::name
                     
                     $dir = $p_dir # $File::Find::dir
                     $_ = ($no_chdir ?? $dir_name !! $dir_rel) # $_
-                    if ( substr($_,-2) eq '/.' )
-                        substr($_, (length($_) == 2 ?? -1 !! -2), undef, '')
+                    if ( (substr: $_,-2) eq '/.' )
+                        substr: $_, ((length: $_) == 2 ?? -1 !! -2), undef, ''
                     
                 
 
-                lstat($_) # make sure file tests with '_' work
-                do { $wanted_callback->() }; # protect against wild "next"
+                lstat: $_ # make sure file tests with '_' work
+                do {( $wanted_callback->& <: ) }; # protect against wild "next"
             else
-                push @Stack,\(@: $dir_loc, $updir_loc, $p_dir, $dir_rel,-1)  if  $bydepth
+                push: @Stack,\(@: $dir_loc, $updir_loc, $p_dir, $dir_rel,-1)  if  $bydepth
                 last
             
         
@@ -1170,7 +1170,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
 
 sub wrap_wanted
     my $wanted = shift
-    if ( ref($wanted) eq 'HASH' )
+    if ( (ref: $wanted) eq 'HASH' )
         if ( $wanted->{?follow} || $wanted->{?follow_fast})
             $wanted->{+follow_skip} = 1 unless defined $wanted->{?follow_skip}
         
@@ -1187,13 +1187,13 @@ sub wrap_wanted
 
 sub find
     my $wanted = shift
-    _find_opt( wrap_wanted($wanted), < @_)
+    _find_opt:  (wrap_wanted: $wanted), < @_
 
 
 sub finddepth
-    my $wanted = wrap_wanted(shift)
+    my $wanted = wrap_wanted: shift
     $wanted->{+bydepth} = 1
-    _find_opt($wanted, < @_)
+    _find_opt: $wanted, < @_
 
 
 # default
@@ -1213,7 +1213,7 @@ elsif ($^OS_NAME eq 'MacOS')
 
 # this _should_ work properly on all platforms
 # where File::Find can be expected to work
-$File::Find::current_dir = File::Spec->curdir || '.'
+$File::Find::current_dir = (File::Spec->curdir: ) || '.'
 
 $File::Find::dont_use_nlink = 1
     if $^OS_NAME eq 'os2' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'MSWin32' ||
@@ -1226,7 +1226,7 @@ $File::Find::dont_use_nlink = 1
 # See, e.g. hints/machten.sh for MachTen 2.2.
 unless ($File::Find::dont_use_nlink)
     require Config
-    $File::Find::dont_use_nlink = 1 if Config::config_value('dont_use_nlink')
+    $File::Find::dont_use_nlink = 1 if Config::config_value: 'dont_use_nlink'
 
 
 1

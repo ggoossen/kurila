@@ -52,11 +52,11 @@ sub test_harness
     # Because Windows doesn't do this for us and listing all the *.t files
     # out on the command line can blow over its exec limit.
     require ExtUtils::Command
-    my @argv = ExtUtils::Command::expand_wildcards(< @ARGV)
+    my @argv = ExtUtils::Command::expand_wildcards: < @ARGV
 
     local $^INCLUDE_PATH = $^INCLUDE_PATH
-    unshift $^INCLUDE_PATH, < map { File::Spec->rel2abs($_) }, @_
-    Test::Harness::runtests( <sort { lc $a cmp lc $b }, @argv)
+    unshift: $^INCLUDE_PATH, < map: { (File::Spec->rel2abs: $_) }, @_
+    Test::Harness::runtests:  <(sort: { lc $a cmp lc $b }, @argv)
 
 
 
@@ -95,13 +95,13 @@ sub pod2man
     # We will cheat and just use Getopt::Long.  We fool it by putting
     # our arguments into @ARGV.  Should be safe.
     my %options = $%
-    Getopt::Long::config ('bundling_override')
-    Getopt::Long::GetOptions (\%options,
-                              'section|s=s', 'release|r=s', 'center|c=s',
-                              'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
-                              'fixedbolditalic=s', 'official|o', 'quotes|q=s', 'lax|l',
-                              'name|n=s', 'perm_rw:i'
-                              )
+    Getopt::Long::config : 'bundling_override'
+    Getopt::Long::GetOptions : \%options
+                               'section|s=s', 'release|r=s', 'center|c=s'
+                               'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s'
+                               'fixedbolditalic=s', 'official|o', 'quotes|q=s', 'lax|l'
+                               'name|n=s', 'perm_rw:i'
+                              
 
     # If there's no files, don't bother going further.
     return 0 unless (nelems @ARGV)
@@ -116,21 +116,21 @@ sub pod2man
     delete %options{lax}
 
     do  # so 'next' works
-        my (@: $pod, $man) = @: splice(@ARGV, 0, 2)
+        my (@: $pod, $man) = @: splice: @ARGV, 0, 2
 
         next if ((-e $man) &&
                  (-M $man +< -M $pod) &&
                  (-M $man +< -M "Makefile"))
 
-        print $^STDOUT, "Manifying $man\n"
+        print: $^STDOUT, "Manifying $man\n"
 
-        my $parser = Pod::Man->new(< %options)
-        $parser->parse_from_file($pod, $man)
-            or do { warn("Could not install $man\n");  next }
+        my $parser = Pod::Man->new: < %options
+        $parser->parse_from_file: $pod, $man
+            or do { warn: "Could not install $man\n";  next }
 
         if (length %options{?perm_rw})
-            chmod(oct(%options{?perm_rw}), $man)
-                or do { warn("chmod %options{?perm_rw} $man: $^OS_ERROR\n"); next }
+            chmod: (oct: %options{?perm_rw}), $man
+                or do { warn: "chmod %options{?perm_rw} $man: $^OS_ERROR\n"; next }
         
      while (nelems @ARGV)
 
@@ -151,7 +151,7 @@ sub warn_if_old_packlist
     my $packlist = @ARGV[0]
 
     return unless -f $packlist
-    print $^STDOUT, <<"PACKLIST_WARNING"
+    print: $^STDOUT, <<"PACKLIST_WARNING"
 WARNING: I have found an old package in
     $packlist.
 Please make sure the two installations are not conflicting
@@ -187,15 +187,15 @@ Key/value pairs are extra information about the module.  Fields include:
 =cut
 
 sub perllocal_install
-    my(@: $type, $name) = @: splice(@ARGV, 0, 2)
+    my(@: $type, $name) = @: splice: @ARGV, 0, 2
 
     # VMS feeds args as a piped file on STDIN since it usually can't
     # fit all the args on a single command line.
-    my @mod_info = @:  $Is_VMS ?? < split m/\|/, ~< $^STDIN
+    my @mod_info = @:  $Is_VMS ?? < split: m/\|/, ~< $^STDIN
                            !! < @ARGV
 
     my $pod
-    $pod = sprintf <<POD, scalar localtime
+    $pod = sprintf: <<POD, scalar localtime
  =head2 \%s: C<$type> L<$name|$name>
  
  =over 4
@@ -203,7 +203,7 @@ sub perllocal_install
 POD
 
     loop
-        my(@: $key, $val) = @: splice(@mod_info, 0, 2)
+        my(@: $key, $val) = @: splice: @mod_info, 0, 2
 
         $pod .= <<POD
  =item *
@@ -216,7 +216,7 @@ POD
 
     $pod .= "=back\n\n"
     $pod =~ s/^ //mg
-    print $^STDOUT, $pod
+    print: $^STDOUT, $pod
 
     return 1
 
@@ -236,16 +236,16 @@ sub uninstall
 
     require ExtUtils::Install
 
-    print $^STDOUT, <<'WARNING'
+    print: $^STDOUT, <<'WARNING'
 
 Uninstall is unsafe and deprecated, the uninstallation was not performed.
 We will show what would have been done.
 
 WARNING
 
-    ExtUtils::Install::uninstall($packlist, 1, 1)
+    ExtUtils::Install::uninstall: $packlist, 1, 1
 
-    print $^STDOUT, <<'WARNING'
+    print: $^STDOUT, <<'WARNING'
 
 Uninstall is unsafe and deprecated, the uninstallation was not performed.
 Please check the list above carefully, there may be errors.

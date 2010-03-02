@@ -206,7 +206,7 @@ do {
     no warnings ;
     eval '
         my $b ; chop $b ;
-    '; print $^STDERR, $^EVAL_ERROR ;
+    '; print: $^STDERR, $^EVAL_ERROR ;
     my $b ; chop $b ;
 };
 EXPECT
@@ -221,7 +221,7 @@ do {
     eval q[ 
         use warnings 'uninitialized' ;
         my $b ; chop $b ;
-    ]; print $^STDERR, $^EVAL_ERROR;
+    ]; print: $^STDERR, $^EVAL_ERROR;
     my $b ; chop $b ;
 };
 EXPECT
@@ -235,7 +235,7 @@ do {
     use warnings 'uninitialized' ;
     eval '
         my $b ; chop $b ;
-    '; print $^STDERR, $^EVAL_ERROR ;
+    '; print: $^STDERR, $^EVAL_ERROR ;
     my $b ; chop $b ;
 };
 EXPECT
@@ -251,7 +251,7 @@ do {
     eval '
         no warnings ;
         my $b ; chop $b ;
-    '; print $^STDERR, $^EVAL_ERROR ;
+    '; print: $^STDERR, $^EVAL_ERROR ;
     my $b ; chop $b ;
 };
 EXPECT

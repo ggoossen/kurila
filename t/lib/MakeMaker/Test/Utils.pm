@@ -73,19 +73,19 @@ sub which_perl
     # VMS should have 'perl' aliased properly
     return $perl if $Is_VMS
 
-    $perl .= config_value("exe_ext") unless $perl =~ m/$(config_value("exe_ext"))$/i
+    $perl .= (config_value: "exe_ext") unless $perl =~ m/$((config_value: "exe_ext"))$/i
 
-    my $perlpath = 'File::Spec'->rel2abs( $perl )
+    my $perlpath = 'File::Spec'->rel2abs:  $perl 
     unless( $Is_MacOS || -x $perlpath )
         # $^X was probably 'perl'
 
         # When building in the core, *don't* go off and find
         # another perl
-        die "Can't find a perl to use (\$^X=$^EXECUTABLE_NAME), (\$perlpath=$perlpath)"
-            if env::var('PERL_CORE')
+        die: "Can't find a perl to use (\$^X=$^EXECUTABLE_NAME), (\$perlpath=$perlpath)"
+            if env::var: 'PERL_CORE'
 
-        foreach my $path ( 'File::Spec'->path)
-            $perlpath = 'File::Spec'->catfile($path, $perl)
+        foreach my $path ( ('File::Spec'->path: ))
+            $perlpath = 'File::Spec'->catfile: $path, $perl
             last if -x $perlpath
         
     
@@ -101,22 +101,22 @@ Sets up environment variables so perl can find its libraries.
 
 =cut
 
-my $old5lib = env::var('PERL5LIB')
+my $old5lib = env::var: 'PERL5LIB'
 my $had5lib = defined $old5lib
 sub perl_lib
     # perl-src/t/
-    my $lib =  env::var('PERL_CORE') ?? qq{../lib}
+    my $lib =  (env::var: 'PERL_CORE') ?? qq{../lib}
         # ExtUtils-MakeMaker/t/
         !! qq{../blib/lib}
-    $lib = 'File::Spec'->rel2abs($lib)
+    $lib = 'File::Spec'->rel2abs: $lib
     my @libs = @: $lib
-    push @libs, env::var('PERL5LIB') if defined env::var('PERL5LIB')
-    env::var('PERL5LIB' ) = join(config_value("path_sep"), @libs)
-    unshift $^INCLUDE_PATH, $lib
+    push: @libs, (env::var: 'PERL5LIB') if defined env::var: 'PERL5LIB'
+    (env::var: 'PERL5LIB' ) = join: (config_value: "path_sep"), @libs
+    unshift: $^INCLUDE_PATH, $lib
 
 
 END 
-    env::var('PERL5LIB' ) = $old5lib
+    (env::var: 'PERL5LIB' ) = $old5lib
 
 
 
@@ -143,7 +143,7 @@ Makefile.
 =cut
 
 sub makefile_backup
-    my $makefile = makefile_name
+    my $makefile = (makefile_name: )
     return $Is_VMS ?? "$makefile".'_old' !! "$makefile.old"
 
 
@@ -156,7 +156,7 @@ Returns a good guess at the make to run.
 =cut
 
 sub make
-    my $make = env::var('MAKE') // config_value("make")
+    my $make = (env::var: 'MAKE') // config_value: "make"
 
     return $make
 
@@ -170,7 +170,7 @@ Returns the make to run as with make() plus any necessary switches.
 =cut
 
 sub make_run
-    my $make = make
+    my $make = (make: )
     $make .= ' -nologo' if $make eq 'nmake'
 
     return $make
@@ -200,13 +200,11 @@ sub make_macro
 
     my $cmd = $make
     my $macros = ''
-    while( my(@: ?$key,?$val) = @: splice(@_, 0, 2) )
+    while( my(@: ?$key,?$val) = @: (splice: @_, 0, 2) )
         if( $is_mms )
             $macros .= qq{/macro="$key=$val"}
         else
             $macros .= qq{ $key=$val}
-        
-    
 
     return $is_mms ?? "$make$macros $target" !! "$make $target $macros"
 
@@ -221,12 +219,12 @@ touched.
 
 =cut
 
-sub calibrate_mtime
-    open(my $file, ">", "calibrate_mtime.tmp") || die $^OS_ERROR
-    print $file, "foo"
+sub calibrate_mtime()
+    (open: my $file, ">", "calibrate_mtime.tmp") || die: $^OS_ERROR
+    print: $file, "foo"
     close $file
-    my $mtime = (@: stat('calibrate_mtime.tmp'))[9]
-    unlink 'calibrate_mtime.tmp'
+    my $mtime = (@: (stat: 'calibrate_mtime.tmp'))[9]
+    unlink: 'calibrate_mtime.tmp'
     return $mtime
 
 
@@ -248,8 +246,8 @@ sub run
 
     # Unix can handle 2>&1 and OS/2 from 5.005_54 up.
     # This makes our failure diagnostics nicer to read.
-    if( MM->os_flavor_is('Unix') or
-        (MM->os_flavor_is('OS/2'))
+    if( MM->os_flavor_is: 'Unix' or
+        ((MM->os_flavor_is: 'OS/2'))
         )
         return `$cmd 2>&1`
     else
@@ -270,16 +268,16 @@ sub setup_mm_test_root
         # imposed by RMS.  We get around this with a rooted logical, but we
         # can't create logical names with attributes in Perl, so we do it
         # in a DCL subprocess and put it in the job table so the parent sees it.
-        open( my $mmtmp, ">", 'mmtesttmp.com' ) ||
-            die "Error creating command file; $^OS_ERROR"
-        print $mmtmp, <<'COMMAND'
+        (open:  my $mmtmp, ">", 'mmtesttmp.com' ) ||
+            die: "Error creating command file; $^OS_ERROR"
+        print: $mmtmp, <<'COMMAND'
 $ MM_TEST_ROOT = F$PARSE("SYS$DISK:[-]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"
 $ DEFINE/JOB/NOLOG/TRANSLATION=CONCEALED MM_TEST_ROOT 'MM_TEST_ROOT'
 COMMAND
         close $mmtmp
 
-        system '@mmtesttmp.com'
-        1 while unlink 'mmtesttmp.com'
+        system: '@mmtesttmp.com'
+        1 while unlink: 'mmtesttmp.com'
     
 
 
@@ -300,15 +298,15 @@ sub have_compiler
     local $^STDERR = $^STDERR
 
     my $buffer
-    open my $fh, '>', \$buffer
+    open: my $fh, '>', \$buffer
     $^STDOUT = $fh->*{IO}
     $^STDERR = $fh->*{IO}
 
     try {
         require ExtUtils::CBuilder;
-        my $cb = 'ExtUtils::CBuilder'->new;
+        my $cb = ('ExtUtils::CBuilder'->new: );
 
-        $have_compiler = $cb->have_compiler;
+        $have_compiler = ($cb->have_compiler: );
     }
 
     return $have_compiler

@@ -20,123 +20,123 @@ sub FIRST_FD () {2}
 
 sub new
     my $self = shift
-    my $type = ref($self) || $self
+    my $type = (ref: $self) || $self
 
-    my $vec = bless \(@: undef,0), $type
+    my $vec = bless: \(@: undef,0), $type
 
-    $vec->add(< @_)
+    $vec->add: < @_
         if (nelems @_)
 
     $vec
 
 
 sub add($self, @< @_)
-    $self->_update('add', < @_)
+    $self->_update: 'add', < @_
 
 
 
 sub remove($self, @< @_)
-    $self->_update('remove', < @_)
+    $self->_update: 'remove', < @_
 
 
 
 sub exists($vec, $file)
-    my $fno = $vec->_fileno($file)
+    my $fno = $vec->_fileno: $file
     return undef unless defined $fno
-    $vec->[?$fno + FIRST_FD]
+    $vec->[?$fno + (FIRST_FD: )]
 
 
 
 sub _fileno($self, $f)
     return unless defined $f
-    $f = $f->[0] if ref($f) eq 'ARRAY'
-    return fileno($f) if ref $f
-    ($f =~ m/^\d+$/) ?? $f !! fileno($f)
+    $f = $f->[0] if (ref: $f) eq 'ARRAY'
+    return (fileno: $f) if ref $f
+    ($f =~ m/^\d+$/) ?? $f !! fileno: $f
 
 
 sub _update
     my $vec = shift
     my $add = shift eq 'add'
 
-    my $bits = $vec->[VEC_BITS]
+    my $bits = $vec->[(VEC_BITS: )]
     $bits = '' unless defined $bits
 
     my $count = 0
     foreach my $f ( @_)
-        my $fn = $vec->_fileno($f)
+        my $fn = $vec->_fileno: $f
         next unless defined $fn
-        my $i = $fn + FIRST_FD
+        my $i = $fn + (FIRST_FD: )
         if ($add)
             if (defined $vec->[?$i])
                 $vec->[$i] = $f  # if array rest might be different, so we update
                 next
             
-            $vec->[FD_COUNT]++
-            vec($bits, $fn, 1, 1)
+            $vec->[(FD_COUNT: )]++
+            vec: $bits, $fn, 1, 1
             $vec->[+$i] = $f
         else      # remove
             next unless defined $vec->[?$i]
-            $vec->[FD_COUNT]--
-            vec($bits, $fn, 1, 0)
+            $vec->[(FD_COUNT: )]--
+            vec: $bits, $fn, 1, 0
             $vec->[$i] = undef
         
         $count++
     
-    $vec->[VEC_BITS] = $vec->[FD_COUNT] ?? $bits !! undef
+    $vec->[(VEC_BITS: )] = $vec->[(FD_COUNT: )] ?? $bits !! undef
     $count
 
 
 sub can_read
     my $vec = shift
     my $timeout = shift
-    my $r = $vec->[VEC_BITS]
+    my $r = $vec->[(VEC_BITS: )]
 
-    defined($r) && ((nelems (@: select($r,undef,undef,$timeout))) +> 0)
-        ?? handles($vec, $r)
+    (defined: $r) && (((nelems: @: (select: $r,undef,undef,$timeout))) +> 0)
+        ?? handles: $vec, $r
         !! ()
 
 
 sub can_write
     my $vec = shift
     my $timeout = shift
-    my $w = $vec->[VEC_BITS]
+    my $w = $vec->[(VEC_BITS: )]
 
-    defined($w) && (select(undef,$w,undef,$timeout) +> 0)
-        ?? handles($vec, $w)
+    (defined: $w) && ((select: undef,$w,undef,$timeout) +> 0)
+        ?? handles: $vec, $w
         !! ()
 
 
 sub has_exception
     my $vec = shift
     my $timeout = shift
-    my $e = $vec->[?VEC_BITS]
+    my $e = $vec->[?(VEC_BITS: )]
 
-    defined($e) && (select(undef,undef,$e,$timeout) +> 0)
-        ?? handles($vec, $e)
+    (defined: $e) && ((select: undef,undef,$e,$timeout) +> 0)
+        ?? handles: $vec, $e
         !! ()
 
 
 sub count
     my $vec = shift
-    $vec->[FD_COUNT]
+    $vec->[(FD_COUNT: )]
 
 
 sub bits
     my $vec = shift
-    $vec->[VEC_BITS]
+    $vec->[(VEC_BITS: )]
 
 
 sub as_string
     my $vec = shift
-    my $str = ref($vec) . ": "
-    my $bits = $vec->bits
-    my $count = $vec->count
-    $str .= defined($bits) ?? unpack("b*", $bits) !! "undef"
+    my $str = (ref: $vec) . ": "
+    my $bits = $vec->bits: 
+    my $count = $vec->count: 
+    $str .= (defined: $bits) ?? (unpack: "b*", $bits) !! "undef"
     $str .= " $count"
     my @handles = $vec->@
-    splice(@handles, 0, FIRST_FD)
+    splice: @handles, 0, (FIRST_FD: )
     for ( @handles)
-        $str .= " " . (defined($_) ?? "$_" !! "-")
+        $str .= " " . ((defined: $_) ?? "$_" !! "-")
     
     $str
 
@@ -153,31 +153,31 @@ sub _max($a,$b,$c)
 
 sub select
     shift
-        if defined @_[0] && !ref(@_[0])
+        if defined @_[0] && !ref: @_[0]
 
     my(@: $r,$w,$e,$t) =  @_
     my @result = $@
 
-    my $rb = defined $r ?? $r->[VEC_BITS] !! undef
-    my $wb = defined $w ?? $w->[VEC_BITS] !! undef
-    my $eb = defined $e ?? $e->[VEC_BITS] !! undef
+    my $rb = defined $r ?? $r->[(VEC_BITS: )] !! undef
+    my $wb = defined $w ?? $w->[(VEC_BITS: )] !! undef
+    my $eb = defined $e ?? $e->[(VEC_BITS: )] !! undef
 
-    if(select($rb,$wb,$eb,$t) +> 0)
+    if((select: $rb,$wb,$eb,$t) +> 0)
         my @r = $@
         my @w = $@
         my @e = $@
-        my $i = _max(defined $r ?? scalar(nelems $r->@)-1 !! 0,
-                     defined $w ?? scalar(nelems $w->@)-1 !! 0,
-                     defined $e ?? scalar(nelems $e->@)-1 !! 0)
+        my $i = _max: defined $r ?? (scalar: nelems $r->@)-1 !! 0
+                      defined $w ?? (scalar: nelems $w->@)-1 !! 0
+                      defined $e ?? (scalar: nelems $e->@)-1 !! 0
 
-        while($i +>= FIRST_FD)
-            my $j = $i - FIRST_FD
-            push(@r, $r->[$i])
-                if defined $rb && defined $r->[$i] && vec($rb, $j, 1)
-            push(@w, $w->[$i])
-                if defined $wb && defined $w->[$i] && vec($wb, $j, 1)
-            push(@e, $e->[$i])
-                if defined $eb && defined $e->[$i] && vec($eb, $j, 1)
+        while($i +>= (FIRST_FD: ))
+            my $j = $i - (FIRST_FD: )
+            push: @r, $r->[$i]
+                if defined $rb && defined $r->[$i] && vec: $rb, $j, 1
+            push: @w, $w->[$i]
+                if defined $wb && defined $w->[$i] && vec: $wb, $j, 1
+            push: @e, $e->[$i]
+                if defined $eb && defined $e->[$i] && vec: $eb, $j, 1
             $i--
         
 
@@ -191,12 +191,12 @@ sub handles
     my $vec = shift
     my $bits = shift
     my @h = $@
-    my $max = scalar(nelems $vec->@) - 1
+    my $max = (scalar: nelems $vec->@) - 1
 
-    for my $i (FIRST_FD .. $max)
+    for my $i ((FIRST_FD: ).. $max)
         next unless defined $vec->[$i]
-        push(@h, $vec->[$i])
-            if !defined($bits) || vec($bits, $i - FIRST_FD, 1)
+        push: @h, $vec->[$i]
+            if !(defined: $bits) || vec: $bits, $i - (FIRST_FD: ), 1
     
 
     @h

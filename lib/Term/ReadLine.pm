@@ -189,17 +189,17 @@ sub readline
     my $self = shift
     my (@: $in,$out,$str) =  $self->@
     my $prompt = shift
-    print $out, @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]
-    $self->register_Tk
+    print: $out, @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]
+    $self->register_Tk: 
         if not $Term::ReadLine::registered and $Term::ReadLine::toloop
       and exists &Tk::DoOneEvent
     #$str = scalar <$in>;
-    $str = $self->get_line
+    $str = $self->get_line: 
     $str =~ s/^\s*\Q$prompt\E// if ($^OS_NAME eq 'MacOS')
-    utf8::upgrade($str)
-        if ($^UNICODE ^&^ PERL_UNICODE_STDIN || defined $^ENCODING) &&
-      utf8::valid($str)
-    print $out, @rl_term_set[3]
+    utf8::upgrade: $str
+        if ($^UNICODE ^&^ (PERL_UNICODE_STDIN: )|| defined $^ENCODING) &&
+      utf8::valid: $str
+    print: $out, @rl_term_set[3]
     # bug in 5.000: chomping empty string creats length -1:
     chomp $str if defined $str
     $str
@@ -234,35 +234,35 @@ sub findConsole
     $consoleOUT = $console unless defined $consoleOUT
     $console = "&STDIN" unless defined $console
     if (!defined $consoleOUT)
-        $consoleOUT = defined fileno($^STDERR) && $^OS_NAME ne 'MSWin32' ?? "&STDERR" !! "&STDOUT"
+        $consoleOUT = defined (fileno: $^STDERR) && $^OS_NAME ne 'MSWin32' ?? "&STDERR" !! "&STDOUT"
     
     return @: $console,$consoleOUT
 
 
 sub new
-    die "method new called with wrong number of arguments"
+    die: "method new called with wrong number of arguments"
         unless (nelems @_)==2 or (nelems @_)==4
     my ($FIN, $FOUT, $ret)
     if ((nelems @_)==2)
-        my(@: $console, $consoleOUT) =  @_[0]->findConsole
+        my(@: $console, $consoleOUT) =  @_[0]->findConsole: 
 
 
         # the Windows CONIN$ needs GENERIC_WRITE mode to allow
         # a SetConsoleMode() if we end up using Term::ReadKey
-        open my $fin, ((  $^OS_NAME eq 'MSWin32' && $console eq 'CONIN$' ) ?? "+<" !! "<"), "$console"
-        open my $fout, ">","$consoleOUT"
+        open: my $fin, ((  $^OS_NAME eq 'MSWin32' && $console eq 'CONIN$' ) ?? "+<" !! "<"), "$console"
+        open: my $fout, ">","$consoleOUT"
 
-        iohandle::output_autoflush($fout, 1)
-        $ret = bless \@: \$fin->*, \$fout->*
+        iohandle::output_autoflush: $fout, 1
+        $ret = bless: \@: \$fin->*, \$fout->*
     else                        # Filehandles supplied
         $FIN = @_[2]; $FOUT = @_[3]
-        iohandle::output_autoflush($FOUT, 1)
-        $ret = bless \@: $FIN, $FOUT
+        iohandle::output_autoflush: $FOUT, 1
+        $ret = bless: \@: $FIN, $FOUT
     
-    if ($ret->Features->{?ornaments}
-          and not (env::var('PERL_RL') and env::var('PERL_RL') =~ m/\bo\w*=0/))
+    if (($ret->Features: )->{?ornaments}
+          and not: env::var: 'PERL_RL' and (env::var: 'PERL_RL') =~ m/\bo\w*=0/)
         local $Term::ReadLine::termcap_nowarn = 1
-        $ret->ornaments(1)
+        $ret->ornaments: 1
     
     return $ret
 
@@ -270,7 +270,7 @@ sub new
 sub newTTY($self, $in, $out)
     $self->[0] = $in
     $self->[1] = $out
-    iohandle::output_autoflush($out, 1)
+    iohandle::output_autoflush: $out, 1
 
 
 sub IN { shift->[0] }
@@ -283,7 +283,7 @@ sub Features { \%features }
 
 sub get_line
     my $self = shift
-    my $in = $self->IN
+    my $in = $self->IN: 
     local ($^INPUT_RECORD_SEPARATOR) = "\n"
     return scalar ~< $in
 
@@ -292,7 +292,7 @@ package Term::ReadLine         # So late to allow the above code be defined?
 
 our $VERSION = '1.03'
 
-my (@: $which) = defined env::var('PERL_RL') ?? split m/\s+/, env::var('PERL_RL') !! @: undef
+my (@: $which) = defined (env::var: 'PERL_RL') ?? (split: m/\s+/, (env::var: 'PERL_RL')) !! @: undef
 if ($which)
     if ($which =~ m/\bgnu\b/i)
         eval "use Term::ReadLine::Gnu;"
@@ -316,7 +316,7 @@ if (exists &Term::ReadLine::Gnu::readline)
     @ISA = qw(Term::ReadLine::Gnu Term::ReadLine::Stub)
 elsif (exists &Term::ReadLine::Perl::readline)
     @ISA = qw(Term::ReadLine::Perl Term::ReadLine::Stub)
-elsif (defined $which && exists Symbol::fetch_glob("Term::ReadLine::$which\::readline")->*->&)
+elsif (defined $which && exists (Symbol::fetch_glob: "Term::ReadLine::$which\::readline")->*->&)
     @ISA = @:  "Term::ReadLine::$which" 
 else
     @ISA = qw(Term::ReadLine::Stub)
@@ -335,7 +335,7 @@ sub LoadTermCap
     return if defined $terminal
 
     require Term::Cap
-    $terminal = Term::Cap->Tgetent(\(%: OSPEED => 9600)) # Avoid warning.
+    $terminal = Term::Cap->Tgetent: \(%: OSPEED => 9600) # Avoid warning.
 
 
 sub ornaments
@@ -344,14 +344,14 @@ sub ornaments
     $rl_term_set = shift
     $rl_term_set ||= ',,,'
     $rl_term_set = 'us,ue,md,me' if $rl_term_set eq '1'
-    my @ts = split m/,/, $rl_term_set, 4
-    try { LoadTermCap }
+    my @ts = split: m/,/, $rl_term_set, 4
+    try { (LoadTermCap: )}
     unless (defined $terminal)
-        warn("Cannot find termcap: $^EVAL_ERROR\n") unless $Term::ReadLine::termcap_nowarn
+        warn: "Cannot find termcap: $^EVAL_ERROR\n" unless $Term::ReadLine::termcap_nowarn
         $rl_term_set = ',,,'
         return
     
-    @rl_term_set = map {$_ ?? $terminal->Tputs($_,1) || '' !! ''}, @ts
+    @rl_term_set = map: {$_ ?? ($terminal->Tputs: $_,1) || '' !! ''}, @ts
     return $rl_term_set
 
 
@@ -366,7 +366,7 @@ sub handle {$giveup = 1; $count_handle++}
 
 sub Tk_loop
     # Tk->tkwait('variable',\$giveup);  # needs Widget
-    $count_DoOne++, Tk::DoOneEvent(0) until $giveup
+    $count_DoOne++,( Tk::DoOneEvent: 0) until $giveup
     $count_loop++
     $giveup = 0
 
@@ -374,7 +374,7 @@ sub Tk_loop
 sub register_Tk
     my $self = shift
     $Term::ReadLine::registered++
-        or Tk->fileevent( <$self->IN,'readable',\&handle)
+        or Tk->fileevent:  <($self->IN: ),'readable',\&handle
 
 
 sub tkRunning
@@ -384,14 +384,14 @@ sub tkRunning
 
 sub get_c
     my $self = shift
-    $self->Tk_loop if $Term::ReadLine::toloop && exists &Tk::DoOneEvent
-    return getc $self->IN
+    $self->Tk_loop:  if $Term::ReadLine::toloop && exists &Tk::DoOneEvent
+    return getc $self->IN: 
 
 
 sub get_line
     my $self = shift
-    $self->Tk_loop if $Term::ReadLine::toloop && exists &Tk::DoOneEvent
-    my $in = $self->IN
+    $self->Tk_loop:  if $Term::ReadLine::toloop && exists &Tk::DoOneEvent
+    my $in = $self->IN: 
     local ($^INPUT_RECORD_SEPARATOR) = "\n"
     return scalar ~< $in
 

@@ -92,12 +92,12 @@ sub openunicode($rfh, @< @path)
     unless (defined $rfh->$)
         for my $d ( $^INCLUDE_PATH)
             use File::Spec
-            $f = File::Spec->catfile($d, "unicore", < @path)
-            last if open($rfh->$, "<", $f)
+            $f = File::Spec->catfile: $d, "unicore", < @path
+            last if open: $rfh->$, "<", $f
             undef $f
         
-        croak __PACKAGE__, ": failed to find ", <
-              File::Spec->catfile(< @path), " in $(join ' ',$^INCLUDE_PATH)"
+        croak: __PACKAGE__, ": failed to find ", <
+                     (File::Spec->catfile: < @path), " in $((join: ' ',$^INCLUDE_PATH))"
             unless defined $f
     
     return $f
@@ -243,7 +243,7 @@ sub _getcode
     if ($arg =~ m/^[1-9]\d*$/)
         return $arg
     elsif ($arg =~ m/^(?:[Uu]\+|0[xX])?([[:xdigit:]]+)$/)
-        return hex($1)
+        return hex: $1
     
 
     return
@@ -255,24 +255,24 @@ sub _getcode
 try { require Lingua::KO::Hangul::Util }
 my $hasHangulUtil = ! $^EVAL_ERROR
 if ($hasHangulUtil)
-    Lingua::KO::Hangul::Util->import()
+    Lingua::KO::Hangul::Util->import: 
 
 
 sub hangul_decomp # internal: called from charinfo
     if ($hasHangulUtil)
-        my @tmp = decomposeHangul(shift)
-        return sprintf("\%04X \%04X",      < @tmp) if (nelems @tmp) == 2
-        return sprintf("\%04X \%04X \%04X", < @tmp) if (nelems @tmp) == 3
+        my @tmp = decomposeHangul: shift
+        return (sprintf: "\%04X \%04X",      < @tmp) if (nelems @tmp) == 2
+        return (sprintf: "\%04X \%04X \%04X", < @tmp) if (nelems @tmp) == 3
     
     return
 
 
 sub hangul_charname # internal: called from charinfo
-    return sprintf("HANGUL SYLLABLE-\%04X", shift)
+    return sprintf: "HANGUL SYLLABLE-\%04X", shift
 
 
 sub han_charname # internal: called from charinfo
-    return sprintf("CJK UNIFIED IDEOGRAPH-\%04X", shift)
+    return sprintf: "CJK UNIFIED IDEOGRAPH-\%04X", shift
 
 
 # Overwritten by data in file
@@ -281,26 +281,26 @@ my %first_last = %:
    'CJK Ideograph'             => @: 0x4E00,   0x9FA5
    'CJK Ideograph Extension B' => @: 0x20000,  0x2A6D6
 
-get_charinfo_ranges()
+(get_charinfo_ranges: )
 
 sub get_charinfo_ranges
    my @blocks = keys %first_last
    
    my $fh
-   openunicode( \$fh, 'UnicodeData.txt' )
+   openunicode:  \$fh, 'UnicodeData.txt' 
    if( defined $fh )
       while( my $line = ~< $fh )
          next unless $line =~ m/(?:First|Last)/
-         if( grep { $line =~ m/[^;]+;<$_\s*,\s*(?:First|Last)>/ }, @blocks )
+         if( (grep: { $line =~ m/[^;]+;<$_\s*,\s*(?:First|Last)>/ }, @blocks) )
             my ($number,$block,$type)
-            @: $number,$block, ... = split m/;/, $line
+            @: $number,$block, ... = split: m/;/, $line
             $block =~ s/<|>//g
-            @: $block,$type = split m/, /, $block
+            @: $block,$type = split: m/, /, $block
             my $index = $type eq 'First' ?? 0 !! 1
             %first_last{ $block }[$index] = hex $number
 
 
-my @CharinfoRanges = @: 
+my @CharinfoRanges = @:
   # block name
   # [ first, last, coderef to name, coderef to decompose ],
   # CJK Ideographs Extension A
@@ -326,26 +326,26 @@ my @CharinfoRanges = @:
     
 
 sub charinfo($arg)
-    my $code = _getcode($arg)
-    croak __PACKAGE__, "::charinfo: unknown code '$arg'"
+    my $code = _getcode: $arg
+    croak: __PACKAGE__, "::charinfo: unknown code '$arg'"
         unless defined $code
-    my $hexk = sprintf("\%06X", $code)
+    my $hexk = sprintf: "\%06X", $code
     my($rcode,$rname,$rdec)
     foreach my $range ( @CharinfoRanges)
         if ($range->[0] +<= $code && $code +<= $range->[1])
             $rcode = $hexk
             $rcode =~ s/^0+//
-            $rcode =  sprintf("\%04X", hex($rcode))
-            $rname = $range->[2] ?? $range->[2]->($code) !! ''
-            $rdec  = $range->[3] ?? $range->[3]->($code) !! ''
-            $hexk  = sprintf("\%06X", $range->[0]) # replace by the first
+            $rcode =  sprintf: "\%04X", (hex: $rcode)
+            $rname = $range->[2] ??( $range->[2]->& <: $code) !! ''
+            $rdec  = $range->[3] ??( $range->[3]->& <: $code) !! ''
+            $hexk  = sprintf: "\%06X", $range->[0] # replace by the first
             last
         
     
-    openunicode(\$UNICODEFH, "UnicodeData.txt")
+    openunicode: \$UNICODEFH, "UnicodeData.txt"
     if (defined $UNICODEFH)
         use Search::Dict v1.02
-        if (look($UNICODEFH, "$hexk;", \(%:  xfrm => sub ($v) { $v =~ m/^([^;]+);(.+)/; sprintf "\%06X;$2", hex($1) } ) ) +>= 0)
+        if ((look: $UNICODEFH, "$hexk;", \(%:  xfrm => sub ($v) { $v =~ m/^([^;]+);(.+)/; (sprintf: "\%06X;$2", (hex: $1)) } ) ) +>= 0)
             my $line = ~< $UNICODEFH
             return unless defined $line
             chomp $line
@@ -356,12 +356,12 @@ sub charinfo($arg)
 		     decimal digit numeric
 		     mirrored unicode10 comment
 		     upper lower title
-		    )]} =  split(m/;/, $line, -1)
+		    )]} =  split: m/;/, $line, -1
             $hexk =~ s/^0+//
-            $hexk =  sprintf("\%04X", hex($hexk))
+            $hexk =  sprintf: "\%04X", (hex: $hexk)
             if (%prop{?code} eq $hexk)
-                %prop{+block}  = charblock($code)
-                %prop{+script} = charscript($code)
+                %prop{+block}  = charblock: $code
+                %prop{+script} = charscript: $code
                 if(defined $rname)
                     %prop{+code} = $rcode
                     %prop{+name} = $rname
@@ -378,26 +378,26 @@ sub _search($table, $lo, $hi, $code)
 
     return if $lo +> $hi
 
-    my $mid = int(($lo+$hi) / 2)
+    my $mid = int: ($lo+$hi) / 2
 
     if ($table[$mid][0] +< $code)
         if ($table[$mid][1] +>= $code)
             return $table[$mid][2]
         else
-            _search($table, $mid + 1, $hi, $code)
+            _search: $table, $mid + 1, $hi, $code
         
     elsif ($table[$mid][0] +> $code)
-        _search($table, $lo, $mid - 1, $code)
+        _search: $table, $lo, $mid - 1, $code
     else
         return $table[$mid][2]
     
 
 
 sub charinrange($range, $arg)
-    my $code = _getcode($arg)
-    croak __PACKAGE__, "::charinrange: unknown code '$arg'"
+    my $code = _getcode: $arg
+    croak: __PACKAGE__, "::charinrange: unknown code '$arg'"
         unless defined $code
-    _search($range, 0, ((nelems $range)-1), $code)
+    _search: $range, 0, ((nelems $range)-1), $code
 
 
 =head2 B<charblock()>
@@ -432,17 +432,17 @@ my %BLOCKS
 
 sub _charblocks
     unless (nelems @BLOCKS)
-        if (openunicode(\$BLOCKSFH, "Blocks.txt"))
+        if ((openunicode: \$BLOCKSFH, "Blocks.txt"))
             local $_ = undef
             while ( ~< $BLOCKSFH)
                 if (m/^([0-9A-F]+)\.\.([0-9A-F]+);\s+(.+)/)
-                    my (@: $lo, $hi) = @: hex($1), hex($2)
+                    my (@: $lo, $hi) = @: (hex: $1), hex: $2
                     my $subrange = @:  $lo, $hi, $3 
-                    push @BLOCKS, $subrange
-                    push %BLOCKS{+$3}, $subrange
+                    push: @BLOCKS, $subrange
+                    push: %BLOCKS{+$3}, $subrange
                 
             
-            close($BLOCKSFH)
+            close: $BLOCKSFH
         
     
 
@@ -450,12 +450,12 @@ sub _charblocks
 sub charblock
     my $arg = shift
 
-    _charblocks() unless (nelems @BLOCKS)
+    _charblocks:  unless (nelems @BLOCKS)
 
-    my $code = _getcode($arg)
+    my $code = _getcode: $arg
 
     if (defined $code)
-        _search(@BLOCKS, 0, ((nelems @BLOCKS)-1), $code)
+        _search: @BLOCKS, 0, ((nelems @BLOCKS)-1), $code
     else
         if (exists %BLOCKS{$arg})
             return %BLOCKS{?$arg}
@@ -495,20 +495,20 @@ my %SCRIPTS
 
 sub _charscripts
     unless (nelems @SCRIPTS)
-        if (openunicode(\$SCRIPTSFH, "Scripts.txt"))
+        if ((openunicode: \$SCRIPTSFH, "Scripts.txt"))
             local $_ = undef
             while ( ~< $SCRIPTSFH)
                 if (m/^([0-9A-F]+)(?:\.\.([0-9A-F]+))?\s+;\s+(\w+)/)
-                    my (@: $lo, $hi) = @: hex($1), $2 ?? hex($2) !! hex($1)
-                    my $script = lc($3)
-                    $script =~ s/\b(\w)/$(uc($1))/g
+                    my (@: $lo, $hi) = @: (hex: $1), $2 ?? (hex: $2) !! hex: $1
+                    my $script = lc: $3
+                    $script =~ s/\b(\w)/$((uc: $1))/g
                     my $subrange = @:  $lo, $hi, $script 
-                    push @SCRIPTS, $subrange
-                    push %SCRIPTS{+$script}, $subrange
+                    push: @SCRIPTS, $subrange
+                    push: %SCRIPTS{+$script}, $subrange
                 
             
-            close($SCRIPTSFH)
-            @SCRIPTS = sort { $a[0] <+> $b[0] }, @SCRIPTS
+            close: $SCRIPTSFH
+            @SCRIPTS = sort: { $a[0] <+> $b[0] }, @SCRIPTS
         
     
 
@@ -516,12 +516,12 @@ sub _charscripts
 sub charscript
     my $arg = shift
 
-    _charscripts() unless (nelems @SCRIPTS)
+    _charscripts:  unless (nelems @SCRIPTS)
 
-    my $code = _getcode($arg)
+    my $code = _getcode: $arg
 
     if (defined $code)
-        _search(@SCRIPTS, 0, ((nelems @SCRIPTS)-1), $code)
+        _search: @SCRIPTS, 0, ((nelems @SCRIPTS)-1), $code
     else
         if (exists %SCRIPTS{$arg})
             return %SCRIPTS{$arg}
@@ -545,7 +545,7 @@ See also L</Blocks versus Scripts>.
 =cut
 
 sub charblocks
-    _charblocks() unless %BLOCKS
+    _charblocks:  unless %BLOCKS
     return %BLOCKS
 
 
@@ -564,7 +564,7 @@ See also L</Blocks versus Scripts>.
 =cut
 
 sub charscripts
-    _charscripts() unless %SCRIPTS
+    _charscripts:  unless %SCRIPTS
     return %SCRIPTS
 
 
@@ -583,7 +583,7 @@ by L</charblocks()> and L</charscripts()> by using charinrange():
 =cut
 
 my %GENERAL_CATEGORIES =
-    %: 
+    %:
     'L'  =>         'Letter'
     'LC' =>         'CasedLetter'
     'Lu' =>         'UppercaseLetter'
@@ -645,7 +645,7 @@ L</charinfo()> under the C<category> key.
 =cut
 
 my %BIDI_TYPES =
-    %: 
+    %:
     'L'   => 'Left-to-Right'
     'LRE' => 'Left-to-Right Embedding'
     'LRO' => 'Left-to-Right Override'
@@ -713,26 +713,26 @@ my %COMPEXCL
 
 sub _compexcl
     unless (%COMPEXCL)
-        if (openunicode(\$COMPEXCLFH, "CompositionExclusions.txt"))
+        if ((openunicode: \$COMPEXCLFH, "CompositionExclusions.txt"))
             local $_ = undef
             while ( ~< $COMPEXCLFH)
                 if (m/^([0-9A-F]+)\s+\#\s+/)
-                    my $code = hex($1)
+                    my $code = hex: $1
                     %COMPEXCL{+$code} = undef
                 
             
-            close($COMPEXCLFH)
+            close: $COMPEXCLFH
         
     
 
 
 sub compexcl
     my $arg  = shift
-    my $code = _getcode($arg)
-    croak __PACKAGE__, "::compexcl: unknown code '$arg'"
+    my $code = _getcode: $arg
+    croak: __PACKAGE__, "::compexcl: unknown code '$arg'"
         unless defined $code
 
-    _compexcl() unless %COMPEXCL
+    _compexcl:  unless %COMPEXCL
 
     return exists %COMPEXCL{$code}
 
@@ -864,11 +864,11 @@ my %CASEFOLD
 
 sub _casefold
     unless (%CASEFOLD)
-        if (openunicode(\$CASEFOLDFH, "CaseFolding.txt"))
+        if ((openunicode: \$CASEFOLDFH, "CaseFolding.txt"))
             local $_ = undef
             while ( ~< $CASEFOLDFH)
                 if (m/^([0-9A-F]+); ([CFIST]); ([0-9A-F]+(?: [0-9A-F]+)*);/)
-                    my $code = hex($1)
+                    my $code = hex: $1
                     %CASEFOLD{+$code}{+'code'} = $1
                     %CASEFOLD{$code}{+'turkic'} //= ""
                     if ($2 eq 'C' || $2 eq 'I')         # 'I' is only on 3.1 and
@@ -907,16 +907,16 @@ sub _casefold
                     # else can't happen because only [CIFST] are possible
                 
             
-            close($CASEFOLDFH)
+            close: $CASEFOLDFH
 
 
 sub casefold
     my $arg  = shift
-    my $code = _getcode($arg)
-    croak __PACKAGE__, "::casefold: unknown code '$arg'"
+    my $code = _getcode: $arg
+    croak: __PACKAGE__, "::casefold: unknown code '$arg'"
         unless defined $code
 
-    _casefold() unless %CASEFOLD
+    _casefold:  unless %CASEFOLD
 
     return %CASEFOLD{?$code}
 
@@ -1023,13 +1023,13 @@ my %CASESPEC
 
 sub _casespec
     unless (%CASESPEC)
-        if (openunicode(\$CASESPECFH, "SpecialCasing.txt"))
+        if ((openunicode: \$CASESPECFH, "SpecialCasing.txt"))
             local $_ = undef
             while ( ~< $CASESPECFH)
                 if (m/^([0-9A-F]+); ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; (\w+(?: \w+)*)?/)
                     my (@: $hexcode, $lower, $title, $upper, $condition) =
                         @: $1, $2, $3, $4, $5
-                    my $code = hex($hexcode)
+                    my $code = hex: $hexcode
                     if (exists %CASESPEC{$code})
                         if (exists %CASESPEC{$code}{code})
                             my (@: $oldlower
@@ -1070,18 +1070,18 @@ sub _casespec
                     
                 
             
-            close($CASESPECFH)
+            close: $CASESPECFH
         
     
 
 
 sub casespec
     my $arg  = shift
-    my $code = _getcode($arg)
-    croak __PACKAGE__, "::casespec: unknown code '$arg'"
+    my $code = _getcode: $arg
+    croak: __PACKAGE__, "::casespec: unknown code '$arg'"
         unless defined $code
 
-    _casespec() unless %CASESPEC
+    _casespec:  unless %CASESPEC
 
     return %CASESPEC{?$code}
 
@@ -1112,24 +1112,24 @@ my %NAMEDSEQ
 
 sub _namedseq
     unless (%NAMEDSEQ)
-        if (openunicode(\$NAMEDSEQFH, "NamedSequences.txt"))
-            while ( defined(my $line = ~< $NAMEDSEQFH) )
+        if ((openunicode: \$NAMEDSEQFH, "NamedSequences.txt"))
+            while ( (defined: (my $line = ~< $NAMEDSEQFH)) )
                 if ($line =~ m/^(.+)\s*;\s*([0-9A-F]+(?: [0-9A-F]+)*)$/)
                     my (@: $n, $s) = @: $1, $2
-                    my @s = map { chr(hex($_)) }, split(' ', $s)
-                    %NAMEDSEQ{+$n} = join("", @s)
+                    my @s = map: { (chr: (hex: $_)) }, split: ' ', $s
+                    %NAMEDSEQ{+$n} = join: "", @s
             
-            close($NAMEDSEQFH)
+            close: $NAMEDSEQFH
 
 
 sub namedseq
-    _namedseq() unless %NAMEDSEQ
+    _namedseq:  unless %NAMEDSEQ
     if ((nelems @_) == 0)
         return %NAMEDSEQ
     elsif ((nelems @_) == 1)
         my $s = %NAMEDSEQ{?@_[0] }
         return undef if not defined $s
-        return map { ord($_) }, split('', $s)
+        return map: { (ord: $_) }, split: '', $s
     
     return
 
@@ -1146,10 +1146,10 @@ my $UNICODEVERSION
 
 sub UnicodeVersion
     unless (defined $UNICODEVERSION)
-        openunicode(\$VERSIONFH, "version")
-        chomp($UNICODEVERSION = ~< $VERSIONFH)
-        close($VERSIONFH)
-        croak __PACKAGE__, "::VERSION: strange version '$UNICODEVERSION'"
+        openunicode: \$VERSIONFH, "version"
+        chomp: ($UNICODEVERSION = ~< $VERSIONFH)
+        close: $VERSIONFH
+        croak: __PACKAGE__, "::VERSION: strange version '$UNICODEVERSION'"
             unless $UNICODEVERSION =~ m/^\d+(?:\.\d+)+$/
     
     return $UNICODEVERSION

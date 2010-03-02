@@ -26,6 +26,6 @@ use re 'debug'
 my $var='zoo|liz|zap'
 m/($var)/ or $count++
 
-print $^STDOUT, "Count=$count\n"
+print: $^STDOUT, "Count=$count\n"
 
 

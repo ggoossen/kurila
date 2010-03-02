@@ -6,7 +6,7 @@ BEGIN
 
 use warnings
 
-our @tests = @: 
+our @tests = @:
     # /p      Pattern   PRE     MATCH   POST
     \(@:  '/p',   "456",    "123-", "456",  "-789")
     \(@:  '(?p)', "456",    "123-", "456",  "-789")
@@ -14,10 +14,10 @@ our @tests = @:
     \(@:  '',     "456",    undef,  undef,  undef )
     
 
-plan tests => 4 * (nelems @tests) + 2
+plan: tests => 4 * (nelems @tests) + 2
 my $W = ""
 
-$^WARN_HOOK = sub (@< @_) { $W.=join("", @_); }
+$^WARN_HOOK = sub (@< @_) { $W.=(join: "", @_); }
 sub _u($x, $y) { "$x is ".(defined $y ?? "'$y'" !! "undef") }
 
 $_ = '123-456-789'
@@ -30,17 +30,17 @@ foreach my $test ( @tests)
     #
     # Cannot use if/else due to the scope invalidating $^MATCH and friends.
     #
-    my $ok = ok $p eq '/p'   ?? m/$pat/p
-                !! $p eq '(?p)' ?? m/(?p)$pat/
-                !!                m/$pat/
-                => $test_name
+    my $ok = ok: $p eq '/p'   ?? m/$pat/p
+                             !! $p eq '(?p)' ?? m/(?p)$pat/
+                             !!                m/$pat/
+                 => $test_name
     :SKIP do
-        skip "/$pat/$p failed to match", 3
+        skip: "/$pat/$p failed to match", 3
             unless $ok
-        is($^PREMATCH,  $l, _u "$test_name: ^PREMATCH",$l)
-        is($^MATCH,     $m, _u "$test_name: ^MATCH",$m )
-        is($^POSTMATCH, $r, _u "$test_name: ^POSTMATCH",$r )
+        is: $^PREMATCH,  $l, (_u: "$test_name: ^PREMATCH",$l)
+        is: $^MATCH,     $m, (_u: "$test_name: ^MATCH",$m) 
+        is: $^POSTMATCH, $r, (_u: "$test_name: ^POSTMATCH",$r) 
     
 
-is($W,"","No warnings should be produced")
-ok(!defined $^MATCH, "No /p in scope so ^MATCH is undef")
+is: $W,"","No warnings should be produced"
+ok: !defined $^MATCH, "No /p in scope so ^MATCH is undef"

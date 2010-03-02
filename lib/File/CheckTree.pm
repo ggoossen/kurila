@@ -70,12 +70,12 @@ my $Warnings
 sub validate
     my ($starting_dir, $file, $test, $cwd, $oldwarnings)
 
-    $starting_dir = cwd
+    $starting_dir = (cwd: )
 
     $cwd = ""
     $Warnings = 0
 
-    foreach my $check (split m/\n/, @_[0])
+    foreach my $check ((split: m/\n/, @_[0]))
         my ($testlist, @testlist)
 
         # skip blanks/comments
@@ -93,7 +93,7 @@ sub validate
             $check =~ m/^\s*(\S+?)\s+(\S.*?)\s*$/)
             (@: $file, $test) = @: $1,$2
         else
-            die "Malformed line: '$check'"
+            die: "Malformed line: '$check'"
         ;
 
         # change a $test like "!-ug || die" to "!-Z || die",
@@ -101,7 +101,7 @@ sub validate
         if ($test =~ s/ ^ (!?-) (\w{2,}) \b /$1Z/x)
             $testlist = $2
             # split bundled tests, e.g. "ug" to 'u', 'g'
-            @testlist = split(m//, $testlist)
+            @testlist = split: m//, $testlist
         else
             # put in placeholder Z for stand-alone test
             @testlist = @: 'Z'
@@ -114,8 +114,8 @@ sub validate
             my $this = $test
 
             # expand relative $file to full pathname if preceded by cd directive
-            $file = File::Spec->catfile($cwd, $file)
-                if $cwd && !File::Spec->file_name_is_absolute($file)
+            $file = File::Spec->catfile: $cwd, $file
+                if $cwd && !File::Spec->file_name_is_absolute: $file
 
             # put filename in after the test operator
             $this =~ s/(-\w\b)/$1 "\$file"/g
@@ -126,9 +126,9 @@ sub validate
             # if it's a "cd" directive...
             if ($this =~ m/^cd\b/)
                 # add "|| die ..."
-                $this .= ' || die "cannot cd to $file\n"'
+                $this .= ' || die: "cannot cd to $file\n"'
                 # expand "cd" directive with directory name
-                $this =~ s/\bcd\b/chdir(\$cwd = '$file')/
+                $this =~ s/\bcd\b/(chdir: (\$cwd = '$file'))/
             else
                 # add "|| warn" as a default disposition
                 $this .= ' || warn' unless $this =~ m/\|\|/
@@ -137,7 +137,7 @@ sub validate
                 # to call valmess instead of die/warn directly
                 # valmess will look up the error message from %Val_Message
                 $this =~ s/ ^ ( (\S+) \s+ \S+ ) \s* \|\| \s* (die|warn) \s* $
-                          /$1 || valmess('$3', '$2', \$file)/x
+                          /$1 || (valmess: '$3', '$2', \$file)/x
             
 
             do
@@ -147,11 +147,9 @@ sub validate
                 local $^WARN_HOOK = sub (@< @_)
                     ++$Warnings
                     if ( $orig_sigwarn )
-                        $orig_sigwarn->(< @_)
+                        $orig_sigwarn->& <: < @_
                     else
-                        print $^STDERR, @_[0]->message
-                    
-                
+                        print: $^STDERR, @_[0]->message: 
 
                 # do the test
                 eval $this
@@ -159,10 +157,10 @@ sub validate
                 # re-raise an exception caused by a "... || die" test
                 if (my $err = $^EVAL_ERROR)
                     # in case of any cd directives, return from whence we came
-                    if ($starting_dir ne cwd)
-                        chdir($starting_dir) || die "$starting_dir: $^OS_ERROR"
+                    if ($starting_dir ne (cwd: ))
+                        (chdir: $starting_dir) || die: "$starting_dir: $^OS_ERROR"
                     
-                    die $err
+                    die: $err
                 
             
 
@@ -172,14 +170,14 @@ sub validate
     
 
     # in case of any cd directives, return from whence we came
-    if ($starting_dir ne cwd)
-        chdir($starting_dir) || die "chdir $starting_dir: $^OS_ERROR"
+    if ($starting_dir ne (cwd: ))
+        (chdir: $starting_dir) || die: "chdir $starting_dir: $^OS_ERROR"
     
 
     return $Warnings
 
 
-my %Val_Message = %: 
+my %Val_Message = %:
     'r' => "is not readable by uid $^UID."
     'w' => "is not writable by uid $^UID."
     'x' => "is not executable by uid $^UID."
@@ -220,10 +218,9 @@ sub valmess($disposition, $test, $file)
         
     else
         $ferror = "Can't do $test $file.\n"
-    
 
-    die "$ferror\n" if $disposition eq 'die'
-    warn "$ferror\n"
+    die: "$ferror\n" if $disposition eq 'die'
+    warn: "$ferror\n"
 
 
 1

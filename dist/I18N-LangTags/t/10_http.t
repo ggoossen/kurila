@@ -5,9 +5,9 @@ use I18N::LangTags::Detect
 use env
 
 use Test::More
-BEGIN { plan tests => 87 };
+BEGIN { (plan: tests => 87) };
 
-my @in = grep { m/\S/ }, split m/\n/, q{
+my @in = grep: { m/\S/ }, split: m/\n/, q{
 
 [ sv      ]  sv
 [ en      ]  en
@@ -60,45 +60,45 @@ my @in = grep { m/\S/ }, split m/\n/, q{
 }
 
 foreach my $in ( @in)
-    $in =~ s/^\s*\[([^\]]+)\]\s*//s or die "Bad input: $in"
+    $in =~ s/^\s*\[([^\]]+)\]\s*//s or die: "Bad input: $in"
     my @should = @:  do { my $x = $1; $x =~ m/(\S+)/g } 
 
     if($in eq 'NIX') { $in = ''; @should = $@; }
 
-    local env::var('HTTP_ACCEPT_LANGUAGE') = undef
+    local (env::var: 'HTTP_ACCEPT_LANGUAGE') = undef
 
     foreach my $modus (@: 
             sub (@< @_)
-                print $^STDOUT, "# Testing with arg...\n"
-                env::var('HTTP_ACCEPT_LANGUAGE' ) = 'PLORK'
+                print: $^STDOUT, "# Testing with arg...\n"
+                (env::var: 'HTTP_ACCEPT_LANGUAGE' ) = 'PLORK'
                 return @: @_[0]
             
             sub (@< @_)
-                print $^STDOUT, "# Testing wath HTTP_ACCEPT_LANGUAGE...\n"
-                env::var('HTTP_ACCEPT_LANGUAGE' ) = @_[0]
+                print: $^STDOUT, "# Testing wath HTTP_ACCEPT_LANGUAGE...\n"
+                (env::var: 'HTTP_ACCEPT_LANGUAGE' ) = @_[0]
                 return()
         )
-        my @args = $modus->($in)
+        my @args = $modus->& <: $in
 
         # ////////////////////////////////////////////////////
-        my @out = I18N::LangTags::Detect->http_accept_langs(< @args)
+        my @out = I18N::LangTags::Detect->http_accept_langs: < @args
         # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
         if(
               (nelems @out) == nelems @should
-            and lc( join "\e", @out || $@ ) eq lc( join "\e", @should )
+            and (lc:  (join: "\e", @out || $@) ) eq lc:  (join: "\e", @should) 
             )
-            print $^STDOUT, "# Happily got [$(join ' ',@out || $@)] from [$in]\n"
-            ok 1
+            print: $^STDOUT, "# Happily got [$((join: ' ',@out || $@))] from [$in]\n"
+            ok: 1
         else
-            ok 0
-            print $^STDOUT, "#Got:         [$(join ' ',@out)]\n",
-                "# but wanted: [$(join ' ',@should)]\n",
-                "# < \"$in\"\n#\n"
+            ok: 0
+            print: $^STDOUT, "#Got:         [$((join: ' ',@out))]\n"
+                   "# but wanted: [$((join: ' ',@should))]\n"
+                   "# < \"$in\"\n#\n"
         
     
 
 
-print $^STDOUT, "#\n#\n# Bye-bye!\n"
-ok 1
+print: $^STDOUT, "#\n#\n# Bye-bye!\n"
+ok: 1
 

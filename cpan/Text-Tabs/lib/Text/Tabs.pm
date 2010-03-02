@@ -19,10 +19,10 @@ sub expand
     my @l
     my $pad
     my $s = ''
-    for (split(m/^/m, @_[0], -1))
+    for ((split: m/^/m, @_[0], -1))
         my $offs = 0
         s{\t}{$( do {
-            $pad = $tabstop - (pos() + $offs) % $tabstop;
+            $pad = $tabstop - ((pos: ) + $offs) % $tabstop;
             $offs += $pad - 1;
             " " x $pad;
         } )}g
@@ -36,11 +36,11 @@ sub unexpand
     my @e
     my $lastbit
     my $ts_as_space = " "x$tabstop
-    my @lines = split("\n", @l[0], -1)
+    my @lines = split: "\n", @l[0], -1
     for ( @lines)
-        my $line = expand($_)
-        @e = split(m/(.{$tabstop})/,$line,-1)
-        $lastbit = pop(@e)
+        my $line = expand: $_
+        @e = split: m/(.{$tabstop})/,$line,-1
+        $lastbit = pop: @e
         $lastbit = ''
             unless defined $lastbit
         $lastbit = "\t"
@@ -49,13 +49,13 @@ sub unexpand
             if ($debug)
                 my $x = $_
                 $x =~ s/\t/^I\t/gs
-                print $^STDOUT, "sub on '$x'\n"
+                print: $^STDOUT, "sub on '$x'\n"
             
             s/  +$/\t/
         
-        $_ = join('', (@: < @e, $lastbit))
+        $_ = join: '', (@: < @e, $lastbit)
     
-    return join("\n", @lines)
+    return join: "\n", @lines
 
 
 1

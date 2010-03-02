@@ -1,6 +1,6 @@
-package feature;
+package feature
 
-our $VERSION = '1.13';
+our $VERSION = '1.13'
 
 # (feature name) => (internal name, used in %^H)
 my %feature = %:
@@ -13,7 +13,7 @@ my %feature_bundle = %:
     "5.11" => \qw(switch)
 
 # special case
-%feature_bundle{+"5.9.5"} = %feature_bundle{?"5.10"};
+%feature_bundle{+"5.9.5"} = %feature_bundle{?"5.10"}
 
 # TODO:
 # - think about versioned features (use feature switch => 2)
@@ -124,72 +124,72 @@ with the same effect.
 
 =cut
 
-sub import {
-    my $class = shift;
-    if ((nelems @_) == 0) {
-        die("No features specified");
-    }
-    while ((nelems @_)) {
-        my $name = shift(@_);
-        if (substr($name, 0, 1) eq ":") {
-            my $v = substr($name, 1);
-            if (!exists %feature_bundle{$v}) {
-                $v =~ s/^([0-9]+)\.([0-9]+).[0-9]+$/$1.$2/;
-                if (!exists %feature_bundle{$v}) {
-                    unknown_feature_bundle(substr($name, 1));
-                }
-            }
-            unshift @_, < %feature_bundle{?$v}->@;
-            next;
-        }
-        if (!exists %feature{$name}) {
-            unknown_feature($name);
-        }
-        $^HINTS{+%feature{?$name}} = 1;
-    }
-}
+sub import
+    my $class = shift
+    if ((nelems @_) == 0)
+        (die: "No features specified")
+    
+    while ((nelems @_))
+        my $name = (shift: @_)
+        if ((substr: $name, 0, 1) eq ":")
+            my $v = (substr: $name, 1)
+            if (!exists %feature_bundle{$v})
+                $v =~ s/^([0-9]+)\.([0-9]+).[0-9]+$/$1.$2/
+                if (!exists %feature_bundle{$v})
+                    (unknown_feature_bundle: (substr: $name, 1))
+                
+            
+            (unshift: @_, < %feature_bundle{?$v}->@)
+            next
+        
+        if (!exists %feature{$name})
+            (unknown_feature: $name)
+        
+        $^HINTS{+%feature{?$name}} = 1
+    
 
-sub unimport {
-    my $class = shift;
+
+sub unimport
+    my $class = shift
 
     # A bare C<no feature> should disable *all* features
-    if (!nelems @_) {
-        delete $^HINTS{[ <values(%feature) ]};
-        return;
-    }
+    if (!nelems @_)
+        delete $^HINTS{[ <(values: %feature) ]}
+        return
+    
 
-    while ((nelems @_)) {
-        my $name = shift;
-        if (substr($name, 0, 1) eq ":") {
-            my $v = substr($name, 1);
-            if (!exists %feature_bundle{$v}) {
-                $v =~ s/^([0-9]+)\.([0-9]+).[0-9]+$/$1.$2/;
-                if (!exists %feature_bundle{$v}) {
-                    unknown_feature_bundle(substr($name, 1));
-                }
-            }
-            unshift @_, < %feature_bundle{?$v}->@;
-            next;
-        }
-        if (!exists(%feature{$name})) {
-            unknown_feature($name);
-        }
-        else {
-            delete $^HINTS{%feature{?$name}};
-        }
-    }
-}
+    while ((nelems @_))
+        my $name = shift
+        if ((substr: $name, 0, 1) eq ":")
+            my $v = (substr: $name, 1)
+            if (!exists %feature_bundle{$v})
+                $v =~ s/^([0-9]+)\.([0-9]+).[0-9]+$/$1.$2/
+                if (!exists %feature_bundle{$v})
+                    (unknown_feature_bundle: (substr: $name, 1))
+                
+            
+            (unshift: @_, < %feature_bundle{?$v}->@)
+            next
+        
+        if (!(exists: %feature{$name}))
+            (unknown_feature: $name)
+        
+        else 
+            delete $^HINTS{%feature{?$name}}
+        
+    
 
-sub unknown_feature {
-    my $feature = shift;
-    die(sprintf('Feature "%s" is not supported by Perl %s',
-                $feature, $^PERL_VERSION));
-}
 
-sub unknown_feature_bundle {
-    my $feature = shift;
-    die(sprintf('Feature bundle "%s" is not supported by Perl %s',
-            $feature, $^PERL_VERSION));
-}
+sub unknown_feature
+    my $feature = shift
+    (die: (sprintf: 'Feature "%s" is not supported by Perl %s'
+                    $feature, $^PERL_VERSION))
 
-1;
+
+sub unknown_feature_bundle
+    my $feature = shift
+    (die: (sprintf: 'Feature bundle "%s" is not supported by Perl %s'
+                    $feature, $^PERL_VERSION))
+
+
+1

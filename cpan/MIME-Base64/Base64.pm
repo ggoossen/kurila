@@ -11,7 +11,7 @@ require Exporter
 $VERSION = '3.07_01'
 
 require XSLoader
-XSLoader::load('MIME::Base64', $VERSION)
+XSLoader::load: 'MIME::Base64', $VERSION
 
 *encode = \&encode_base64
 *decode = \&decode_base64

@@ -11,7 +11,7 @@
 use Test::More
 
 
-BEGIN { plan tests => 177 }
+BEGIN { (plan: tests => 177) }
 
 use Pod::LaTeX
 
@@ -21,10 +21,10 @@ my $linkver = $Pod::ParseUtils::VERSION
 
 # Set up an END block to remove the test output file
 END 
-    unlink "test.tex"
+    unlink: "test.tex"
 ;
 
-ok(1)
+ok: 1
 
 # First thing to do is to read the expected output from
 # the DATA filehandle and store it in a scalar.
@@ -32,34 +32,34 @@ ok(1)
 my @reference
 while (my $line = ~< $^DATA)
     last if $line =~ m/^=pod/
-    push(@reference,$line)
+    push: @reference,$line
 
 
 # Create a new parser
-my $parser = Pod::LaTeX->new
-ok($parser)
-$parser->Head1Level(1)
+my $parser = Pod::LaTeX->new: 
+ok: $parser
+$parser->Head1Level: 1
 # Add the preamble but remember not to compare the timestamps
-$parser->AddPreamble(1)
-$parser->AddPostamble(1)
+$parser->AddPreamble: 1
+$parser->AddPostamble: 1
 
 # For a laugh add a table of contents
-$parser->TableOfContents(1)
+$parser->TableOfContents: 1
 
 # Create an output file
-open(my $outfh, ">", "test.tex" ) or die "Unable to open test tex file: $^OS_ERROR\n"
+open: my $outfh, ">", "test.tex"  or die: "Unable to open test tex file: $^OS_ERROR\n"
 
 # Read from the DATA filehandle and write to a new output file
 # Really want to write this to a scalar
-$parser->parse_from_filehandle($^DATA,$outfh)
+$parser->parse_from_filehandle: $^DATA,$outfh
 
-close($outfh) or die "Error closing OUTFH test.tex: $^OS_ERROR\n"
+close: $outfh or die: "Error closing OUTFH test.tex: $^OS_ERROR\n"
 
 # Now read in OUTFH and compare
-open(my $infh, "<", "test.tex") or die "Unable to read test tex file: $^OS_ERROR\n"
+open: my $infh, "<", "test.tex" or die: "Unable to read test tex file: $^OS_ERROR\n"
 my @output = @:  ~< $infh 
 
-is((nelems @output), nelems @reference)
+is: (nelems @output), nelems @reference
 for my $i (0..((nelems @reference)-1))
     next if @reference[$i] =~ m/^%%/ # skip timestamp comments
 
@@ -71,10 +71,10 @@ for my $i (0..((nelems @reference)-1))
         @reference[$i] =~ s/Standard link: \\emph\{Pod::LaTeX\}/Standard link: the \\emph\{Pod::LaTeX\} manpage/
         @reference[$i] =~ s/\\textsf\{sec\} in \\emph\{Pod::LaTeX\}/the section on \\textsf\{sec\} in the \\emph\{Pod::LaTeX\} manpage/
     
-    is(@output[$i], @reference[$i])
+    is: @output[$i], @reference[$i]
 
 
-close($infh) or die "Error closing INFH test.tex: $^OS_ERROR\n"
+close: $infh or die: "Error closing INFH test.tex: $^OS_ERROR\n"
 
 
 __DATA__

@@ -143,9 +143,9 @@ or for deciding between running the tests at all:
 =cut
 
 sub plan
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
-    $tb->plan(< @_)
+    $tb->plan: < @_
 
 
 
@@ -218,9 +218,9 @@ This is the same as Test::Simple's ok() routine.
 =cut
 
 sub ok($test, ?$name)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
-    $tb->ok($test, $name)
+    $tb->ok: $test, $name
 
 
 =item B<is>
@@ -284,15 +284,15 @@ function which is an alias of isnt().
 =cut
 
 sub is($lhs, $rhs, ?$msg)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
-    $tb->is_eq($lhs, $rhs, $msg)
+    $tb->is_eq: $lhs, $rhs, $msg
 
 
 sub isnt($lhs, $rhs, ?$msg)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
-    $tb->isnt_eq($lhs, $rhs, $msg)
+    $tb->isnt_eq: $lhs, $rhs, $msg
 
 
 
@@ -327,9 +327,9 @@ diagnostics on failure.
 =cut
 
 sub like($got, $expected, ?$name)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
-    $tb->like($got, $expected, $name)
+    $tb->like: $got, $expected, $name
 
 
 
@@ -343,9 +343,9 @@ given pattern.
 =cut
 
 sub unlike($got, $expected, ?$name)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
-    $tb->unlike($got, $expected, $name)
+    $tb->unlike: $got, $expected, $name
 
 
 
@@ -383,9 +383,9 @@ is()'s use of C<eq> will interfere:
 =cut
 
 sub cmp_ok
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
-    $tb->cmp_ok(< @_)
+    $tb->cmp_ok: < @_
 
 
 
@@ -420,32 +420,32 @@ as one test.  If you desire otherwise, use:
 
 sub can_ok($proto, @< @methods)
     my $class = ref $proto || $proto
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     unless( $class )
-        my $ok = $tb->ok( 0, "->can(...)" )
-        $tb->diag('    can_ok() called with empty class or reference')
+        my $ok = $tb->ok:  0, "->can(...)" 
+        $tb->diag: '    can_ok() called with empty class or reference'
         return $ok
     
 
     unless( nelems @methods )
-        my $ok = $tb->ok( 0, "$class->can(...)" )
-        $tb->diag('    can_ok() called with no methods')
+        my $ok = $tb->ok:  0, "$class->can(...)" 
+        $tb->diag: '    can_ok() called with no methods'
         return $ok
     
 
     my @nok = $@
     foreach my $method ( @methods)
-        $tb->_try(sub (@< @_) { $proto->can($method) }) or push @nok, $method
+        $tb->_try: sub (@< @_) { ($proto->can: $method) } or push: @nok, $method
     
 
     my $name
     $name = (nelems @methods) == 1 ?? "$class->can('@methods[0]')"
         !! "$class->can(...)"
 
-    my $ok = $tb->ok( !nelems @nok, $name )
+    my $ok = $tb->ok:  !nelems @nok, $name 
 
-    $tb->diag(< map { "    $class->can('$_') failed\n" }, @nok)
+    $tb->diag: < (map: { "    $class->can('$_') failed\n" }, @nok)
 
     return $ok
 
@@ -480,7 +480,7 @@ you'd like them to be more specific, you can supply an $object_name
 =cut
 
 sub isa_ok($object, $class, ?$obj_name)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     my $diag
     $obj_name = 'The object' unless defined $obj_name
@@ -492,19 +492,19 @@ sub isa_ok($object, $class, ?$obj_name)
     else
         # We can't use UNIVERSAL::isa because we want to honor isa() overrides
         local $^EVAL_ERROR = undef
-        my $rslt = try { $object->isa($class) }
+        my $rslt = try { ($object->isa: $class) }
         if( $^EVAL_ERROR )
-            if( $^EVAL_ERROR->message =~ m/^Can't call method "isa" on unblessed reference/ )
+            if( ($^EVAL_ERROR->message: ) =~ m/^Can't call method "isa" on unblessed reference/ )
                 # Its an unblessed reference
-                if( !UNIVERSAL::isa($object, $class) )
+                if( !(UNIVERSAL::isa: $object, $class) )
                     my $ref = ref $object
                     $diag = "$obj_name isn't a '$class' it's a '$ref'"
                 
             else
-                die <<WHOA
+                die: <<WHOA
 WHOA! I tried to call ->isa on your object and got some weird error.
 Here's the error.
-$($^EVAL_ERROR->message)
+$(($^EVAL_ERROR->message: ))
 WHOA
             
         elsif( !$rslt )
@@ -517,10 +517,10 @@ WHOA
 
     my $ok
     if( $diag )
-        $ok = $tb->ok( 0, $name )
-        $tb->diag("    $diag\n")
+        $ok = $tb->ok:  0, $name 
+        $tb->diag: "    $diag\n"
     else
-        $ok = $tb->ok( 1, $name )
+        $ok = $tb->ok:  1, $name 
     
 
     return $ok
@@ -545,13 +545,13 @@ Use these very, very, very sparingly.
 =cut
 
 sub pass
-    my $tb = Test::More->builder
-    $tb->ok(1, < @_)
+    my $tb = Test::More->builder: 
+    $tb->ok: 1, < @_
 
 
 sub fail
-    my $tb = Test::More->builder
-    $tb->ok(0, < @_)
+    my $tb = Test::More->builder: 
+    $tb->ok: 0, < @_
 
 
 =back
@@ -607,34 +607,34 @@ because the notion of "compile-time" is relative.  Instead, you want:
 
 sub use_ok($module, @< @imports)
     @imports = $@ unless (nelems @imports)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     my(@: $pack,$filename,$line) =@:  caller
 
     my $code
-    if( (nelems @imports) == 1 and ref @imports[0] and @imports[0]->isa('version') )
+    if( (nelems @imports) == 1 and ref @imports[0] and @imports[0]->isa: 'version' )
         # probably a version check.  Perl needs to see the bare number
         # for it to work with non-Exporter based modules.
         $code = <<USE
-package $pack;
-use $module $(@imports[0]->stringify);
-1;
+package $pack
+use $module $(@imports[0]->stringify: )
+1
 USE
     else
         $code = <<USE
-package $pack;
-use $module < \@args[0]->\@;
+package $pack
+use $module < \@args[0]->\@
 1;
 USE
     
 
-    my(@: $eval_result, $eval_error) =  _eval($code, \@imports)
-    my $ok = $tb->ok( $eval_result, "use $module;" )
+    my(@: $eval_result, $eval_error) =  _eval: $code, \@imports
+    my $ok = $tb->ok:  $eval_result, "use $module;" 
 
     unless( $ok )
-        $tb->diag(<<DIAGNOSTIC)
+        $tb->diag: <<DIAGNOSTIC
     Tried to use '$module'.
-    Error:  $($eval_error->message)
+    Error:  $(($eval_error->message: ))
 DIAGNOSTIC
 
     
@@ -662,14 +662,14 @@ sub _eval
 
 sub dies_like($coderef, $like, ?$name)
 
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
-    if (try { $coderef->(); 1; })
-        $tb->diag("didn't die")
-        return $tb->ok(0, $name)
+    if (try {( $coderef->& <: ); 1; })
+        $tb->diag: "didn't die"
+        return $tb->ok: 0, $name
     
-    my $err = $^EVAL_ERROR->description
-    return $tb->like($err, $like, $name) or diag($^EVAL_ERROR->stacktrace)
+    my $err = $^EVAL_ERROR->description: 
+    return $tb->like: $err, $like, $name or diag: ($^EVAL_ERROR->stacktrace: )
 
 
 =item B<require_ok>
@@ -682,30 +682,28 @@ Like use_ok(), except it requires the $module or $file.
 =cut
 
 sub require_ok ($module)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     my $pack = caller
 
     # Try to deterine if we've been given a module name or file.
     # Module names must be barewords, files not.
-    $module = qq['$module'] unless _is_module_name($module)
+    $module = qq['$module'] unless _is_module_name: $module
 
     my $code = <<REQUIRE
-package $pack;
-require $module;
-1;
+package $pack
+require $module
+1
 REQUIRE
 
-    my(@: $eval_result, $eval_error) =  _eval($code)
-    my $ok = $tb->ok( $eval_result, "require $module;" )
+    my(@: $eval_result, $eval_error) =  _eval: $code
+    my $ok = $tb->ok:  $eval_result, "require $module;" 
 
     unless( $ok )
-        $tb->diag(<<DIAGNOSTIC)
+        $tb->diag: <<DIAGNOSTIC
     Tried to require '$module'.
-    Error:  $($eval_error->message)
+    Error:  $(($eval_error->message: ))
 DIAGNOSTIC
-
-    
 
     return $ok
 
@@ -757,7 +755,7 @@ along these lines.
 =cut
 
 our (@Data_Stack, %Refs_Seen)
-my $DNE = bless \$@, 'Does::Not::Exist'
+my $DNE = bless: \$@, 'Does::Not::Exist'
 
 sub _dne
     ref @_[0] eq ref $DNE
@@ -765,7 +763,7 @@ sub _dne
 
 
 sub is_deeply
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     unless( (nelems @_) == 2 or (nelems @_) == 3 )
         my $msg = <<WARNING
@@ -775,9 +773,9 @@ of a reference to it
 WARNING
         chop $msg   # clip off newline so carp() will put in line/file
 
-        warn sprintf $msg, scalar nelems @_
+        warn: sprintf: $msg, scalar nelems @_
 
-        return $tb->ok(0)
+        return $tb->ok: 0
     
 
     my (@: $got, $expected, ?$name) =  @_
@@ -785,11 +783,11 @@ WARNING
     my $ok
 
     local @Data_Stack = $@
-    if( _deep_check($got, $expected) )
-        $ok = $tb->ok(1, $name)
+    if( (_deep_check: $got, $expected) )
+        $ok = $tb->ok: 1, $name
     else
-        $ok = $tb->ok(0, $name)
-        $tb->diag( _format_stack(< @Data_Stack))
+        $ok = $tb->ok: 0, $name
+        $tb->diag:  (_format_stack: < @Data_Stack)
     
 
     return $ok
@@ -835,7 +833,7 @@ sub _format_stack
 
     my $out = "Structures begin differing at:\n"
     foreach my $val ( @vals)
-        $val = _dne($val)    ?? "Does not exist" !! dump::view($val)
+        $val = (_dne: $val)    ?? "Does not exist" !! dump::view: $val
     
 
     $out .= "@vars[0] = @vals[0]\n"
@@ -852,7 +850,7 @@ sub _type
     return '' if !ref $thing
 
     for my $type (qw(ARRAY HASH REF SCALAR GLOB CODE Regexp))
-        return $type if UNIVERSAL::isa($thing, $type)
+        return $type if UNIVERSAL::isa: $thing, $type
     
 
     return ''
@@ -900,9 +898,9 @@ interfere with the test.
 =cut
 
 sub diag
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
-    $tb->diag(< @_)
+    $tb->diag: < @_
 
 
 =item B<diag>
@@ -916,9 +914,9 @@ together.
 =cut
 
 sub info
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
-    $tb->info(< @_)
+    $tb->info: < @_
 
 
 =back
@@ -985,22 +983,22 @@ use TODO.  Read on.
 
 #'#
 sub skip($why, ?$how_many)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     unless( defined $how_many )
         # $how_many can only be avoided when no_plan is in use.
-        warn "skip() needs to know \$how_many tests are in the block"
-            unless $tb->has_plan eq 'no_plan'
+        warn: "skip() needs to know \$how_many tests are in the block"
+            unless ($tb->has_plan: ) eq 'no_plan'
         $how_many = 1
     
 
     if( defined $how_many and $how_many =~ m/\D/ )
-        warn "skip() was passed a non-numeric number of tests.  Did you get the arguments backwards?"
+        warn: "skip() was passed a non-numeric number of tests.  Did you get the arguments backwards?"
         $how_many = 1
     
 
     for( 1..$how_many )
-        $tb->skip($why)
+        $tb->skip: $why
     
 
     local $^WARNING = 0
@@ -1070,17 +1068,17 @@ interpret them as passing.
 =cut
 
 sub todo_skip($why, ?$how_many)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     unless( defined $how_many )
         # $how_many can only be avoided when no_plan is in use.
-        warn "todo_skip() needs to know \$how_many tests are in the block"
-            unless $tb->has_plan eq 'no_plan'
+        warn: "todo_skip() needs to know \$how_many tests are in the block"
+            unless ($tb->has_plan: ) eq 'no_plan'
         $how_many = 1
     
 
     for( 1..$how_many )
-        $tb->todo_skip($why)
+        $tb->todo_skip: $why
     
 
     local $^WARNING = 0
@@ -1123,9 +1121,9 @@ The test will exit with 255.
 
 sub BAIL_OUT
     my $reason = shift
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
-    $tb->BAIL_OUT($reason)
+    $tb->BAIL_OUT: $reason
 
 
 =back
@@ -1163,13 +1161,13 @@ multi-level structures are handled correctly.
 #'#
 sub eq_array
     local @Data_Stack
-    _deep_check(< @_)
+    _deep_check: < @_
 
 
 sub _eq_array($a1, $a2)
 
-    if( grep { !_type($_) eq 'ARRAY' }, (@:  $a1, $a2) )
-        warn "eq_array passed a non-array ref"
+    if( (grep: { !(_type: $_) eq 'ARRAY' }, (@:  $a1, $a2)) )
+        warn: "eq_array passed a non-array ref"
         return 0
     
 
@@ -1181,8 +1179,8 @@ sub _eq_array($a1, $a2)
         my $e1 = $_ +> (nelems $a1->@)-1 ?? $DNE !! $a1->[$_]
         my $e2 = $_ +> (nelems $a2->@)-1 ?? $DNE !! $a2->[$_]
 
-        push @Data_Stack, \%:  type => 'ARRAY', idx => $_, vals => \(@: $e1, $e2) 
-        $ok = _deep_check($e1,$e2)
+        push: @Data_Stack, \%:  type => 'ARRAY', idx => $_, vals => \(@: $e1, $e2) 
+        $ok = _deep_check: $e1,$e2
         pop @Data_Stack if $ok
 
         last unless $ok
@@ -1192,7 +1190,7 @@ sub _eq_array($a1, $a2)
 
 
 sub _deep_check($e1, $e2)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     my $ok = 0
 
@@ -1205,48 +1203,48 @@ sub _deep_check($e1, $e2)
         # Quiet uninitialized value warnings when comparing undefs.
         local $^WARNING = 0
 
-        if( %Refs_Seen{?ref::address($e1)} )
-            return %Refs_Seen{?ref::address($e1)} eq ref::address($e2)
+        if( %Refs_Seen{?(ref::address: $e1)} )
+            return %Refs_Seen{?(ref::address: $e1)} eq ref::address: $e2
         
-        %Refs_Seen{+ref::address($e1)} = ref::address($e2)
+        %Refs_Seen{+(ref::address: $e1)} = ref::address: $e2
 
-        if (_dne($e1) or _dne($e2))
-            $ok = _dne($e1) && _dne($e2)
+        if (_dne: $e1 or _dne: $e2)
+            $ok = (_dne: $e1) && _dne: $e2
             return $ok
         
 
-        my $type = ref::svtype($e1)
-        $type = 'DIFFERENT' unless ref::svtype($e2) eq $type
+        my $type = ref::svtype: $e1
+        $type = 'DIFFERENT' unless (ref::svtype: $e2) eq $type
 
         if( $type eq 'DIFFERENT' )
-            push @Data_Stack, \%:  type => $type, vals => \(@: $e1, $e2) 
+            push: @Data_Stack, \%:  type => $type, vals => \(@: $e1, $e2) 
             $ok = 0
         elsif( $type eq 'PLAINVALUE' )
             $ok = ($e1 eq $e2)
             if ( ! $ok )
-                push @Data_Stack, \%:  type => '', vals => \(@: $e1, $e2) 
+                push: @Data_Stack, \%:  type => '', vals => \(@: $e1, $e2) 
         elsif( $type eq 'CODE' )
             $ok = ($e1 &== $e2)
             if ( ! $ok )
-                push @Data_Stack, \%:  type => $type, vals => \(@: $e1, $e2) 
+                push: @Data_Stack, \%:  type => $type, vals => \(@: $e1, $e2) 
         elsif( $type eq 'ARRAY' )
-            $ok = _eq_array(\$e1, \$e2)
+            $ok = _eq_array: \$e1, \$e2
         elsif( $type eq 'HASH' )
-            $ok = _eq_hash(\$e1, \$e2)
+            $ok = _eq_hash: \$e1, \$e2
         elsif( $type eq 'REF' )
             if ($e1 \== $e2)
                 return 1
             
-            push @Data_Stack, \%:  type => $type, vals => \(@: $e1, $e2) 
-            $ok = _deep_check($e1->$, $e2->$)
+            push: @Data_Stack, \%:  type => $type, vals => \(@: $e1, $e2) 
+            $ok = _deep_check: $e1->$, $e2->$
             pop @Data_Stack if $ok
         elsif( $type eq 'UNDEF' )
             $ok = 1
         elsif( $type eq 'COMPLEX' )
-            push @Data_Stack, \%:  type => $type, vals => \(@: '...', '...') 
+            push: @Data_Stack, \%:  type => $type, vals => \(@: '...', '...') 
             $ok = 0
         else
-            _whoa(1, "Unknown type '$type' in _deep_check")
+            _whoa: 1, "Unknown type '$type' in _deep_check"
         
     
 
@@ -1256,7 +1254,7 @@ sub _deep_check($e1, $e2)
 
 sub _whoa($check, $desc)
     if( $check )
-        die <<WHOA
+        die: <<WHOA
 WHOA!  $desc
 This should never happen!  Please contact the author immediately!
 WHOA
@@ -1275,13 +1273,13 @@ is a deep check.
 
 sub eq_hash
     local @Data_Stack
-    return _deep_check(< @_)
+    return _deep_check: < @_
 
 
 sub _eq_hash($a1, $a2)
 
-    if( grep { !_type($_) eq 'HASH' }, (@:  $a1, $a2) )
-        warn "eq_hash passed a non-hash ref"
+    if( (grep: { !(_type: $_) eq 'HASH' }, (@:  $a1, $a2)) )
+        warn: "eq_hash passed a non-hash ref"
         return 0
     
 
@@ -1293,8 +1291,8 @@ sub _eq_hash($a1, $a2)
         my $e1 = exists $a1->{$k} ?? $a1->{?$k} !! $DNE
         my $e2 = exists $a2->{$k} ?? $a2->{?$k} !! $DNE
 
-        push @Data_Stack, \%:  type => 'HASH', idx => $k, vals => \(@: $e1, $e2) 
-        $ok = _deep_check($e1, $e2)
+        push: @Data_Stack, \%:  type => 'HASH', idx => $k, vals => \(@: $e1, $e2) 
+        $ok = _deep_check: $e1, $e2
         pop @Data_Stack if $ok
 
         last unless $ok
@@ -1332,10 +1330,10 @@ Test::Deep contains much better set comparison functions.
 sub eq_set($a1, $a2, ?$name)
     return 0 unless (nelems $a1->@) == nelems $a2->@
 
-    return eq_array(
-           \ (sort { $a cmp $b }, map { dump::view($_) }, $a1->@ ),
-           \ (sort { $a cmp $b }, map { dump::view($_) }, $a2->@ ),
-           )
+    return eq_array: 
+           \ ((sort: { $a cmp $b }, (map: { (dump::view: $_) }, $a1->@)) )
+           \ ((sort: { $a cmp $b }, (map: { (dump::view: $_) }, $a2->@)) )
+           
 
 
 =back

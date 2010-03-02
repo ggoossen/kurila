@@ -4,7 +4,7 @@ our ($VERSION, %MMAP, $AUTOLOAD)
 
 $VERSION = "1.15"
 
-%MMAP = %: 
+%MMAP = %:
     "SHA-1"      => \(@: "Digest::SHA1", \(@: "Digest::SHA", 1), \(@: "Digest::SHA2", 1))
     "SHA-224"    => \(@: \(@: "Digest::SHA", 224))
     "SHA-256"    => \(@: \(@: "Digest::SHA", 256), \(@: "Digest::SHA2", 256))
@@ -24,22 +24,22 @@ sub new
         $algorithm =~ s/\W+//
         "Digest::$algorithm"
     
-    $impl = \(@: $impl) unless ref($impl)
+    $impl = \(@: $impl) unless ref: $impl
     my $err
     for  ( $impl->@)
         my $class = $_
         my @args
-        (@: $class, @< @args) =  $class->@ if ref($class)
-        unless (exists Symbol::fetch_glob("$class\::")->*->{"VERSION"})
+        (@: $class, @< @args) =  $class->@ if ref: $class
+        unless (exists (Symbol::fetch_glob: "$class\::")->*->{"VERSION"})
             eval "require $class"
             if ($^EVAL_ERROR)
                 $err ||= $^EVAL_ERROR
                 next
             
         
-        return $class->new(< @args, < @_)
+        return $class->new: < @args, < @_
     
-    die $err
+    die: $err
 
 
 1

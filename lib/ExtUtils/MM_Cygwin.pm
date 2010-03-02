@@ -43,10 +43,10 @@ if configured for dynamic loading, triggers #define EXT in EXTERN.h
 
 sub cflags($self,$libperl)
     return $self->{?CFLAGS} if $self->{?CFLAGS}
-    return '' unless $self->needs_linking()
+    return '' unless $self->needs_linking: 
 
-    my $base = $self->SUPER::cflags($libperl)
-    foreach (split m/\n/, $base)
+    my $base = $self->SUPER::cflags: $libperl
+    foreach ((split: m/\n/, $base))
         m/^(\S*)\s*=\s*(\S*)$/ and $self->{+$1} = $2
     ;
     $self->{+CCFLAGS} .= " -DUSEIMPORTLIB" if (%Config{?useshrplib} eq 'true')

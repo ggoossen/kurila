@@ -45,11 +45,11 @@ our $Deparse    //= 0
 #
 sub new($c, $v, ?$n)
 
-    die "Usage:  PACKAGE->new(ARRAYREF, [ARRAYREF])"
-        unless (defined($v) && (ref($v) eq 'ARRAY'))
-    $n = \$@ unless (defined($n) && (ref($v) eq 'ARRAY'))
+    die: "Usage:  PACKAGE->new(ARRAYREF, [ARRAYREF])"
+        unless ((defined: $v) && ((ref: $v) eq 'ARRAY'))
+    $n = \$@ unless ((defined: $n) && ((ref: $v) eq 'ARRAY'))
 
-    my $s = \%: 
+    my $s = \%:
         level      => 0           # current recursive depth
         indent     => $Indent     # various styles of indenting
         pad     => $Pad        # all lines prefixed by this string
@@ -79,7 +79,7 @@ sub new($c, $v, ?$n)
         $s->{+xpad} = "  "
         $s->{+sep} = "\n"
     
-    return bless($s, $c)
+    return bless: $s, $c
 
 
 do
@@ -88,19 +88,19 @@ do
 
     *format_refaddr  = sub (@< @_)
         require Scalar::Util
-        pack "J", Scalar::Util::refaddr(shift)
+        pack: "J", Scalar::Util::refaddr: shift
 
 
 #
 # add-to or query the table of already seen references
 #
 sub Seen($s, $g)
-    if (defined($g) && (ref($g) eq 'HASH'))
-        init_refaddr_format()
+    if ((defined: $g) && ((ref: $g) eq 'HASH'))
+        (init_refaddr_format: )
         my($k, $v, $id)
         while ((@: $k, $v) =(@:  each $g->%))
             if (defined $v and ref $v)
-                $id = format_refaddr($v)
+                $id = format_refaddr: $v
                 if ($k =~ m/^[*](.*)$/)
                     $k = (ref $v eq 'ARRAY') ?? ( "\\\@" . $1 ) !!
                         (ref $v eq 'HASH')  ?? ( "\\\%" . $1 ) !!
@@ -111,12 +111,12 @@ sub Seen($s, $g)
                 
                 $s->{seen}->{+$id} = \@: $k, $v
             else
-                warn "Only refs supported, ignoring non-ref item \$$k"
+                warn: "Only refs supported, ignoring non-ref item \$$k"
             
         
         return $s
     else
-        return map { < $_->@ }, values $s->{seen}->%
+        return map: { < $_->@ }, values $s->{seen}->%
     
 
 
@@ -124,7 +124,7 @@ sub Seen($s, $g)
 # set or query the values to be dumped
 #
 sub Values($s, $v)
-    if (defined($v) && (ref($v) eq 'ARRAY'))
+    if ((defined: $v) && ((ref: $v) eq 'ARRAY'))
         $s->{+todump} = \ $v->@        # make a copy
         return $s
     else
@@ -136,7 +136,7 @@ sub Values($s, $v)
 # set or query the names of the values to be dumped
 #
 sub Names($s, $n)
-    if (defined($n) && (ref($n) eq 'ARRAY'))
+    if ((defined: $n) && ((ref: $n) eq 'ARRAY'))
         $s->{+names} = \ $n->@         # make a copy
         return $s
     else
@@ -145,7 +145,7 @@ sub Names($s, $n)
 
 
 sub Dump
-    return Dumpperl( < @_ )
+    return Dumpperl:  < @_ 
 
 
 #
@@ -158,9 +158,9 @@ sub Dumpperl
     my(@out, $name)
     my $i = 0
     local(@post)
-    init_refaddr_format()
+    init_refaddr_format:
 
-    $s = $s->new(< @_) unless ref $s
+    $s = ($s->new: < @_) unless ref $s
 
     for my $val ( $s->{todump}->@)
         my $out = ""
@@ -169,9 +169,9 @@ sub Dumpperl
         if (defined $name)
             if ($name =~ m/^[*](.*)$/)
                 if (defined $val)
-                    $name = (ref::svtype($val) eq 'ARRAY') ?? ( '@' . $1 ) !!
-                        (ref::svtype($val) eq 'HASH')  ?? ( '%' . $1 ) !!
-                        (ref::svtype($val) eq 'CODE')  ?? ( '*' . $1 ) !!
+                    $name = ((ref::svtype: $val) eq 'ARRAY') ?? ( '@' . $1 ) !!
+                        ((ref::svtype: $val) eq 'HASH')  ?? ( '%' . $1 ) !!
+                        ((ref::svtype: $val) eq 'CODE')  ?? ( '*' . $1 ) !!
                         ( '$' . $1 ) 
                 else
                     $name = "\$" . $1
@@ -184,25 +184,25 @@ sub Dumpperl
         
 
         # Ensure hash iterator is reset
-        if (ref($val) eq 'HASH')
-            keys($val->%)
+        if ((ref: $val) eq 'HASH')
+            keys: $val->%
         
 
         my $valstr
         do
             local($s->{+apad}) = $s->{?apad}
-            $s->{+apad} .= ' ' x (length($name) + 3) if $s->{?indent} +>= 2
-            $valstr = $s->_dump($val, $name)
+            $s->{+apad} .= ' ' x ((length: $name) + 3) if $s->{?indent} +>= 2
+            $valstr = $s->_dump: $val, $name
         
 
         $valstr = "$name = " . $valstr . ';' if (nelems @post) or !$s->{?terse}
         $out .= $s->{?pad} . $valstr . $s->{?sep}
-        $out .= $s->{?pad} . join(';' . $s->{?sep} . $s->{?pad}, @post)
+        $out .= $s->{?pad} . join: ';' . $s->{?sep} . $s->{?pad}, @post
             . ';' . $s->{?sep} if (nelems @post)
 
-        push @out, $out
+        push: @out, $out
     
-    return join('', @out)
+    return join: '', @out
 
 
 # wrap string in single quotes (escaping if needed)
@@ -229,7 +229,7 @@ sub _dump
     $out = ""
     $ipad = $s->{?xpad} x $s->{?level}
 
-    my $realtype = ref::svtype($rval->$)
+    my $realtype = ref::svtype: $rval->$
     if ($reftype)
 
         my $val = $rval->$
@@ -237,19 +237,19 @@ sub _dump
         # method.  Trap errors and warn() instead of die()ing, like the XS
         # implementation.
         my $freezer = $s->{?freezer}
-        if ($freezer and UNIVERSAL::can($val, $freezer))
-            try { $val->?$freezer() }
-            warn "WARNING(Freezer method call failed): $($^EVAL_ERROR->message)" if $^EVAL_ERROR
+        if ($freezer and UNIVERSAL::can: $val, $freezer)
+            try {( $val->?$freezer: ) }
+            warn: "WARNING(Freezer method call failed): $(($^EVAL_ERROR->message: ))" if $^EVAL_ERROR
         
 
         require Scalar::Util
-        $realpack = Scalar::Util::blessed($val)
-        $realtype = $realpack ?? Scalar::Util::reftype($val) !! ref $val
-        my $id = format_refaddr($val)
+        $realpack = Scalar::Util::blessed: $val
+        $realtype = $realpack ?? (Scalar::Util::reftype: $val) !! ref $val
+        my $id = format_refaddr: $val
 
         # if it has a name, we need to either look it up, or keep a tab
         # on it so we know when we hit it later
-        if (defined($name) and length($name))
+        if (defined: $name and length: $name)
             # keep a tab on it so that we dont fall into recursive pit
             if (exists $s->{seen}->{$id})
                 #       if ($s->{expdepth} < $s->{level}) {
@@ -257,13 +257,13 @@ sub _dump
                     $out = ($realtype eq 'HASH')  ?? '\$%' !!
                         ($realtype eq 'ARRAY') ?? '\$@' !!
                         'do{my $o}' 
-                    push @post, $name . " = " . $s->{seen}->{$id}->[0]
+                    push: @post, $name . " = " . $s->{seen}->{$id}->[0]
                 else
                     $out = $s->{seen}->{$id}->[0]
                     if ($name =~ m/^([\@\%])/)
                         my $start = $1
                         if ($out =~ m/^\\$start/)
-                            $out = substr($out, 1)
+                            $out = substr: $out, 1
                         else
                             $out = $start . '{' . $out . '}'
                 
@@ -273,13 +273,13 @@ sub _dump
                 # store our name
                 $s->{seen}->{+$id} = \@:  (($name =~ m/^[@%]/)     ?? ('\' . $name ) !!
                                            ($realtype eq 'CODE' and
-                                               $name =~ m/^[*](.*)$/) ?? ('\&' . $1 )   !!
+                                            $name =~ m/^[*](.*)$/) ?? ('\&' . $1 )   !!
                                            $name          )
                                           $val 
 
         my $no_bless = 0
         my $is_regex = 0
-        if ( $realpack and re::is_regexp($val) )
+        if ( $realpack and re::is_regexp: $val )
             $is_regex = 1
             $no_bless = $realpack eq 'Regexp'
         
@@ -291,7 +291,7 @@ sub _dump
         if (!$s->{?purity}
               and $s->{?maxdepth} +> 0
               and $s->{?level} +>= $s->{?maxdepth})
-            return dump::view($val)
+            return dump::view: $val
         
 
         # we have a blessed ref
@@ -316,41 +316,41 @@ sub _dump
             # regexp_pattern() in list context to get the modifiers separately.
             # But since this means loading the full debugging engine in process we wont
             # bother unless its necessary for accuracy.
-            if (($realpack ne 'Regexp') && defined(*re::regexp_pattern{CODE}))
-                $pat = re::regexp_pattern($val)
+            if (($realpack ne 'Regexp') && (defined: *re::regexp_pattern{CODE}))
+                $pat = re::regexp_pattern: $val
             else
                 $pat = "$val"
             
             $pat =~ s,/,\\/,g
             $out .= "qr/$pat/"
         else
-            $out .= '\' . $s->_dump($val->$, $name) # '
+            $out .= '\' . $s->_dump: $val->$, $name # '
         
 
         if ($realpack and !$no_bless) # we have a blessed ref
-            $out .= ', ' . _quote($realpack) . ' )'
+            $out .= ', ' . (_quote: $realpack) . ' )'
             $out .= '->' . $s->{?toaster} . '()'  if $s->{?toaster} ne ''
             $s->{+apad} = $blesspad
         
         $s->{+level}--
     elsif ($realtype eq 'REF')
         if ($realpack)
-            $out .= 'do{\(my $o = ' . $s->_dump($rval->$, "\$\{$name\}") . ')}'
+            $out .= 'do{\(my $o = ' . ($s->_dump: $rval->$, "\$\{$name\}") . ')}'
         else
-            $out .= '\' . $s->_dump($rval, "\$\{$name\}") # '
+            $out .= '\' . $s->_dump: $rval, "\$\{$name\}" # '
         
     elsif ($realtype eq 'GLOB')
-        my $name = Symbol::glob_name($rval)
+        my $name = Symbol::glob_name: $rval
         if ($name =~ m/^[A-Za-z_][\w:]*$/)
             $name =~ s/^main::/::/
             $sname = $name
         else
-            $sname = $s->_dump($name, "")
+            $sname = $s->_dump: $name, ""
             $sname = '{' . $sname . '}'
         
 
         # first, catalog the scalar
-        my $id = format_refaddr($rval)
+        my $id = format_refaddr: $rval
         if ($name ne '')
             if (exists $s->{seen}->{$id})
                 if ($s->{seen}->{$id}->[2])
@@ -374,18 +374,18 @@ sub _dump
                 # _dump can push into @post, so we hold our place using $postlen
                 my $postlen = scalar nelems @post
                 @post[$postlen] = "\*$sname = "
-                local ($s->{+apad}) = " " x length(@post[$postlen]) if $s->{?indent} +>= 2
-                @post[$postlen] .= $s->_dump($gval, "\*$sname\{$k\}")
+                local ($s->{+apad}) = " " x (length: @post[$postlen]) if $s->{?indent} +>= 2
+                @post[$postlen] .= $s->_dump: $gval, "\*$sname\{$k\}"
             
         
         $out .= '*' . $sname
-        $out .= '\' . $s->_dump($rval->$, "*\{$name\}") # '
+        $out .= '\' . $s->_dump: $rval->$, "*\{$name\}" # '
 
         if ($id)
             # if we made it this far, $id was added to seen list at current
             # level, so remove it to get deep copies
             if ($s->{?deepcopy})
-                delete($s->{seen}->{$id})
+                delete: $s->{seen}->{$id}
             elsif ($name)
                 $s->{seen}->{$id}->[2] = 1
         
@@ -399,7 +399,7 @@ sub _dump
         for my $v ( $rval->@)
             $sname = $mname . '[' . $i . ']'
             $out .= $pad . $ipad . '#' . $i if $s->{?indent} +>= 3
-            $out .= $pad . $ipad . $s->_dump($v, $sname)
+            $out .= $pad . $ipad . $s->_dump: $v, $sname
             $out .= "," if $i++ +< (nelems $rval->@) -1
         
         $out .= $pad . ($s->{?xpad} x ($s->{?level} - 1)) if $i
@@ -414,30 +414,30 @@ sub _dump
         $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/
         my (@: $sortkeys, ?$keys, ?$key) = @: $s->{?sortkeys}
         if ($sortkeys)
-            if (ref($s->{?sortkeys}) eq 'CODE')
-                $keys = $s->{?sortkeys}->($rval)
-                unless (ref($keys) eq 'ARRAY')
-                    warn "Sortkeys subroutine did not return ARRAYREF"
+            if ((ref: $s->{?sortkeys}) eq 'CODE')
+                $keys = $s->{?sortkeys}->& <: $rval
+                unless ((ref: $keys) eq 'ARRAY')
+                    warn: "Sortkeys subroutine did not return ARRAYREF"
                     $keys = \$@
                 
             else
-                $keys = \ sort keys $rval->%
+                $keys = \ sort: keys $rval->%
             
         
         while ((@: ?$k, ?$v) = ! $sortkeys ?? (@: each $rval->%) !!
-                 (nelems $keys->@) ?? (@: ($key = shift($keys->@)), $rval->{?$key}) !!
+                 (nelems $keys->@) ?? (@: ($key = (shift: $keys->@)), $rval->{?$key}) !!
                  $@ )
-            my $nk = $s->_dump($k, "")
+            my $nk = $s->_dump: $k, ""
             $nk = $1 if !$s->{?quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/
             $sname = $mname . '{' . $nk . '}'
             $out .= $pad . $ipad . $nk . $pair
 
             # temporarily alter apad
-            $s->{+apad} .= (" " x (length($nk) + 4)) if $s->{?indent} +>= 2
-            $out .= $s->_dump($rval->{?$k}, $sname) . ","
+            $s->{+apad} .= (" " x ((length: $nk) + 4)) if $s->{?indent} +>= 2
+            $out .= ($s->_dump: $rval->{?$k}, $sname) . ","
             $s->{+apad} = $lpad if $s->{?indent} +>= 2
         
-        if (substr($out, -1) eq ',')
+        if ((substr: $out, -1) eq ',')
             chop $out
             $out .= $pad . ($s->{?xpad} x ($s->{?level} - 1))
         
@@ -445,13 +445,13 @@ sub _dump
     elsif ($realtype eq 'CODE')
         if ($s->{?deparse})
             require B::Deparse
-            my $sub =  'sub ' . (B::Deparse->new)->coderef2text($rval)
+            my $sub =  'sub ' . ((B::Deparse->new: ))->coderef2text: $rval
             my $pad    =  $s->{?sep} . $s->{?pad} . $s->{?apad} . $s->{?xpad} x ($s->{?level} - 1)
             $sub    =~ s/\n/$pad/gs
             $out   .=  $sub
         else
             $out .= 'sub { "DUMMY" }'
-            warn "Encountered CODE ref, using dummy placeholder" if $s->{?purity}
+            warn: "Encountered CODE ref, using dummy placeholder" if $s->{?purity}
         
     elsif ($realtype eq 'PLAINVALUE')
         if ($rval->$ =~ m/^(?:0|-?[1-9]\d{0,8})\z/) # safe decimal number
@@ -459,15 +459,15 @@ sub _dump
         else                             # string
             if ($s->{?useqq} or $rval->$ =~ m/[\x[80]-\x[FF]]/)
                 # Fall back to qq if there's Unicode
-                $out .= qquote($rval->$, $s->{?useqq})
+                $out .= qquote: $rval->$, $s->{?useqq}
             else
-                $out .= _quote($rval->$)
+                $out .= _quote: $rval->$
             
         
     elsif ($realtype eq "UNDEF")
         $out .= "undef"
     else
-        die "Can\'t handle $realtype type."
+        die: "Can\'t handle $realtype type."
     
 
     return $out
@@ -477,17 +477,17 @@ sub _dump
 # non-OO style of earlier version
 #
 sub Dumper
-    return Data::Dumper->Dump(\ @_)
+    return Data::Dumper->Dump: \ @_
 
 
 # compat stub
 sub DumperX
-    return Data::Dumper->Dumpxs(\ @_, \$@)
+    return Data::Dumper->Dumpxs: \ @_, \$@
 
 
-sub Dumpf { return Data::Dumper->Dump(< @_) }
+sub Dumpf { return (Data::Dumper->Dump: < @_) }
 
-sub Dumpp { print $^STDOUT, < Data::Dumper->Dump(< @_) }
+sub Dumpp { (print: $^STDOUT, < (Data::Dumper->Dump: < @_)) }
 
 #
 # reset the "seen" cache
@@ -499,7 +499,7 @@ sub Reset
 
 
 sub Indent($s, $v)
-    if (defined($v))
+    if ((defined: $v))
         if ($v == 0)
             $s->{+xpad} = ""
             $s->{+sep} = ""
@@ -515,63 +515,63 @@ sub Indent($s, $v)
 
 
 sub Pair($s, ?$v)
-    defined($v) ?? do { ($s->{+pair} = $v); return $s} !! $s->{?pair}
+    (defined: $v) ?? do { ($s->{+pair} = $v); return $s} !! $s->{?pair}
 
 
 sub Pad($s, $v)
-    defined($v) ?? do { ($s->{+pad} = $v); return $s} !! $s->{?pad}
+    (defined: $v) ?? do { ($s->{+pad} = $v); return $s} !! $s->{?pad}
 
 
 sub Varname($s, $v)
-    defined($v) ?? do {($s->{+varname} = $v); return $s} !! $s->{?varname}
+    (defined: $v) ?? do {($s->{+varname} = $v); return $s} !! $s->{?varname}
 
 
 sub Purity($s, $v)
-    defined($v) ?? do {($s->{+purity} = $v); return $s} !! $s->{?purity}
+    (defined: $v) ?? do {($s->{+purity} = $v); return $s} !! $s->{?purity}
 
 
 sub Useqq($s, $v)
-    defined($v) ?? do {($s->{+useqq} = $v); return $s} !! $s->{?useqq}
+    (defined: $v) ?? do {($s->{+useqq} = $v); return $s} !! $s->{?useqq}
 
 
 sub Terse($s, $v)
-    defined($v) ?? do {($s->{+terse} = $v); return $s} !! $s->{?terse}
+    (defined: $v) ?? do {($s->{+terse} = $v); return $s} !! $s->{?terse}
 
 
 sub Freezer($s, $v)
-    defined($v) ?? do {($s->{+freezer} = $v); return $s} !! $s->{?freezer}
+    (defined: $v) ?? do {($s->{+freezer} = $v); return $s} !! $s->{?freezer}
 
 
 sub Toaster($s, $v)
-    defined($v) ?? do {($s->{+toaster} = $v); return $s} !! $s->{?toaster}
+    (defined: $v) ?? do {($s->{+toaster} = $v); return $s} !! $s->{?toaster}
 
 
 sub Deepcopy($s, $v)
-    defined($v) ?? do {($s->{+deepcopy} = $v); return $s} !! $s->{?deepcopy}
+    (defined: $v) ?? do {($s->{+deepcopy} = $v); return $s} !! $s->{?deepcopy}
 
 
 sub Quotekeys($s, $v)
-    defined($v) ?? do {($s->{+quotekeys} = $v); return $s} !! $s->{?quotekeys}
+    (defined: $v) ?? do {($s->{+quotekeys} = $v); return $s} !! $s->{?quotekeys}
 
 
 sub Bless($s, $v)
-    defined($v) ?? do {($s->{+'bless'} = $v); return $s} !! $s->{?'bless'}
+    (defined: $v) ?? do {($s->{+'bless'} = $v); return $s} !! $s->{?'bless'}
 
 
 sub Maxdepth($s, $v)
-    defined($v) ?? do {($s->{+'maxdepth'} = $v); return $s} !! $s->{?'maxdepth'}
+    (defined: $v) ?? do {($s->{+'maxdepth'} = $v); return $s} !! $s->{?'maxdepth'}
 
 
 sub Sortkeys($s, $v)
-    defined($v) ?? do {($s->{+'sortkeys'} = $v); return $s} !! $s->{?'sortkeys'}
+    (defined: $v) ?? do {($s->{+'sortkeys'} = $v); return $s} !! $s->{?'sortkeys'}
 
 
 sub Deparse($s, $v)
-    defined($v) ?? do {($s->{+'deparse'} = $v); return $s} !! $s->{?'deparse'}
+    (defined: $v) ?? do {($s->{+'deparse'} = $v); return $s} !! $s->{?'deparse'}
 
 
 # used by qquote below
-my %esc = %: 
+my %esc = %:
     "\a" => "\\a"
     "\b" => "\\b"
     "\t" => "\\t"
@@ -585,7 +585,7 @@ sub qquote
     local($_) = shift
     s/([\\\"\@\$\{\}])/\\$1/g
     my $bytes; do { use bytes; $bytes = length }
-    s/([^\x[00]-\x[7f]])/$('\x'.sprintf("[\%02x]",ord($1)))/g if $bytes +> length
+    s/([^\x[00]-\x[7f]])/$('\x'.(sprintf: "[\%02x]",(ord: $1)))/g if $bytes +> length
     return qq("$_") unless
         m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/  # fast exit
 
@@ -593,11 +593,11 @@ sub qquote
     s/([\a\b\t\n\f\r\e])/%esc{?$1}/g
 
     # no need for 3 digits in escape for these
-    s/([\0-\037])(?!\d)/$('\'.sprintf('%o',ord($1)))/g
-    s/([\0-\037\177])/$('\'.sprintf('\%03o',ord($1)))/g
+    s/([\0-\037])(?!\d)/$('\'.(sprintf: '%o',(ord: $1)))/g
+    s/([\0-\037\177])/$('\'.(sprintf: '\%03o',(ord: $1)))/g
     # all but last branch below not supported --BEHAVIOR SUBJECT TO CHANGE--
     if ($high eq "iso8859")
-        s/([\200-\240])/$('\'.sprintf('%o',ord($1)))/g
+        s/([\200-\240])/$('\'.(sprintf: '%o',(ord: $1)))/g
      elsif ($high eq "utf8") {
     #     use utf8;
     #     $str =~ s/([^\040-\176])/sprintf "\\x{%04x}", ord($1)/ge;
@@ -605,7 +605,7 @@ sub qquote
     # leave it as it is
     }else
         use utf8
-        s/([^\040-\176])/$(sprintf "\\x\{\%04x\}", ord($1))/g
+        s/([^\040-\176])/$((sprintf: "\\x\{\%04x\}", (ord: $1)))/g
     
 
     return qq("$_")
@@ -613,7 +613,7 @@ sub qquote
 
 # helper sub to sort hash keys in Perl < 5.8.0 where we don't have
 # access to sortsv() from XS
-sub _sortkeys { \ sort keys @_[0]->% }
+sub _sortkeys { \ (sort: keys @_[0]->%) }
 
 1
 __END__

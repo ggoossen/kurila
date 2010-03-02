@@ -1,5 +1,5 @@
 use Pod::Usage
-pod2usage(-verbose => 2, -exit => 17, -input => $^DATA)
+pod2usage: -verbose => 2, -exit => 17, -input => $^DATA
 
 __DATA__
 =head1 NAME

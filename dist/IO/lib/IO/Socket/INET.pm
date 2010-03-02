@@ -16,42 +16,42 @@ use Errno
 @ISA = qw(IO::Socket)
 $VERSION = "1.31"
 
-my $EINVAL = exists(&Errno::EINVAL) ?? Errno::EINVAL() !! 1
+my $EINVAL = (exists: &Errno::EINVAL) ?? (Errno::EINVAL: ) !! 1
 
-IO::Socket::INET->register_domain( AF_INET )
+IO::Socket::INET->register_domain:  AF_INET 
 
 my %socket_type = %:  tcp  => SOCK_STREAM
                       udp  => SOCK_DGRAM
                       icmp => SOCK_RAW
     
 my %proto_number
-%proto_number{+tcp}  = Socket::IPPROTO_TCP()  if exists &Socket::IPPROTO_TCP
-%proto_number{+udp}  = Socket::IPPROTO_UDP()  if exists &Socket::IPPROTO_UDP
-%proto_number{+icmp} = Socket::IPPROTO_ICMP() if exists &Socket::IPPROTO_ICMP
-my %proto_name = %:  < reverse @:< %proto_number 
+%proto_number{+tcp}  = (Socket::IPPROTO_TCP: )  if exists &Socket::IPPROTO_TCP
+%proto_number{+udp}  = (Socket::IPPROTO_UDP: )  if exists &Socket::IPPROTO_UDP
+%proto_number{+icmp} = (Socket::IPPROTO_ICMP: ) if exists &Socket::IPPROTO_ICMP
+my %proto_name = %:  < reverse: @:< %proto_number 
 
 sub new
     my $class = shift
-    unshift(@_, "PeerAddr") if (nelems @_) == 1
-    return $class->SUPER::new(< @_)
+    unshift: @_, "PeerAddr" if (nelems @_) == 1
+    return $class->SUPER::new: < @_
 
 
 sub _cache_proto
     my @proto = @_
-    for ( map { lc($_) }, (@:  @proto[0], < split(' ', @proto[1])))
+    for ( (map: { (lc: $_) }, (@:  @proto[0], < (split: ' ', @proto[1]))))
         %proto_number{+$_} = @proto[2]
     
     %proto_name{+@proto[2]} = @proto[0]
 
 
 sub _get_proto_number
-    my $name = lc(shift)
+    my $name = lc: shift
     return undef unless defined $name
     return %proto_number{?$name} if exists %proto_number{$name}
 
-    my @proto = @:  getprotobyname($name) 
+    my @proto = @:  getprotobyname: $name 
     return undef unless (nelems @proto)
-    _cache_proto(< @proto)
+    _cache_proto: < @proto
 
     return @proto[2]
 
@@ -61,9 +61,9 @@ sub _get_proto_name
     return undef unless defined $num
     return %proto_name{?$num} if exists %proto_name{$num}
 
-    my @proto = @:  getprotobynumber($num) 
+    my @proto = @:  getprotobynumber: $num 
     return undef unless (nelems @proto)
-    _cache_proto(< @proto)
+    _cache_proto: < @proto
 
     return @proto[0]
 
@@ -76,7 +76,7 @@ sub _sock_info($addr,$port,$proto)
         if(defined $addr && $addr =~ s,:([\w\(\)/]+)$,,)
 
     if(defined $proto  && $proto =~ m/\D/)
-        my $num = _get_proto_number($proto)
+        my $num = _get_proto_number: $proto
         unless (defined $num)
             $^EVAL_ERROR = "Bad protocol '$proto'"
             return
@@ -88,7 +88,7 @@ sub _sock_info($addr,$port,$proto)
         my $defport = ($port =~ s,\((\d+)\)$,,) ?? $1 !! undef
         my $pnum = (@: $port =~ m,^(\d+)$,)[0]
 
-        @serv = @:  getservbyname($port, _get_proto_name($proto) || "") 
+        @serv = @:  getservbyname: $port, (_get_proto_name: $proto) || "" 
             if ($port =~ m,\D,)
 
         $port = @serv[?2] || $defport || $pnum
@@ -97,7 +97,7 @@ sub _sock_info($addr,$port,$proto)
             return
         
 
-        $proto = _get_proto_number(@serv[3]) if (nelems @serv) && !$proto
+        $proto = (_get_proto_number: @serv[3]) if (nelems @serv) && !$proto
     
 
     return  @: $addr || undef
@@ -111,10 +111,10 @@ sub _error
     my $err = shift
     do
         local($^OS_ERROR)
-        my $title = ref($sock).": "
-        $^EVAL_ERROR = join("", (@:  @_[0] =~ m/^$title/ ?? "" !! $title, < @_))
-        $sock->close()
-            if(defined fileno($sock))
+        my $title = (ref: $sock).": "
+        $^EVAL_ERROR = join: "", (@:  @_[0] =~ m/^$title/ ?? "" !! $title, < @_)
+        $sock->close: 
+            if(defined (fileno: $sock))
     
     $^OS_ERROR = $err
     return undef
@@ -123,10 +123,10 @@ sub _error
 sub _get_addr($sock,$addr_str, $multi)
     my @addr
     if ($multi && $addr_str !~ m/^\d+(?:\.\d+){3}$/)
-        (@: _, _, _, _, @< @addr) = @: gethostbyname($addr_str)
+        (@: _, _, _, _, @< @addr) = @: gethostbyname: $addr_str
     else
-        my $h = inet_aton($addr_str)
-        push(@addr, $h) if defined $h
+        my $h = inet_aton: $addr_str
+        push: @addr, $h if defined $h
     
     @addr
 
@@ -138,99 +138,99 @@ sub configure($sock,$arg)
     $arg->{+LocalAddr} = $arg->{?LocalHost}
         if exists $arg->{LocalHost} && !exists $arg->{LocalAddr}
 
-    (@: $laddr,$lport,$proto) =  _sock_info($arg->{?LocalAddr},
-                                          $arg->{?LocalPort},
-                                          $arg->{?Proto})
-        or return _error($sock, $^OS_ERROR, $^EVAL_ERROR)
+    (@: $laddr,$lport,$proto) =  _sock_info: $arg->{?LocalAddr}
+                                             $arg->{?LocalPort}
+                                             $arg->{?Proto}
+        or return _error: $sock, $^OS_ERROR, $^EVAL_ERROR
 
-    $laddr = defined $laddr ?? inet_aton($laddr)
+    $laddr = defined $laddr ?? inet_aton: $laddr
         !! INADDR_ANY
 
-    return _error($sock, $EINVAL, "Bad hostname '",$arg->{?LocalAddr},"'")
+    return _error: $sock, $EINVAL, "Bad hostname '",$arg->{?LocalAddr},"'"
         unless(defined $laddr)
 
     $arg->{+PeerAddr} = $arg->{?PeerHost}
         if exists $arg->{PeerHost} && !exists $arg->{PeerAddr}
 
     unless(exists $arg->{Listen})
-        (@: $raddr,$rport,$proto) =  _sock_info($arg->{?PeerAddr},
-                                              $arg->{?PeerPort},
-                                              $proto)
-            or return _error($sock, $^OS_ERROR, $^EVAL_ERROR)
+        (@: $raddr,$rport,$proto) =  _sock_info: $arg->{?PeerAddr}
+                                                 $arg->{?PeerPort}
+                                                 $proto
+            or return _error: $sock, $^OS_ERROR, $^EVAL_ERROR
     
 
-    $proto ||= _get_proto_number('tcp')
+    $proto ||= _get_proto_number: 'tcp'
 
-    $type = $arg->{?Type} || %socket_type{?lc _get_proto_name($proto)}
+    $type = $arg->{?Type} || %socket_type{?lc (_get_proto_name: $proto)}
 
     my @raddr = $@
 
     if(defined $raddr)
-        @raddr = $sock->_get_addr($raddr, $arg->{?MultiHomed})
-        return _error($sock, $EINVAL, "Bad hostname '",$arg->{?PeerAddr},"'")
+        @raddr = $sock->_get_addr: $raddr, $arg->{?MultiHomed}
+        return _error: $sock, $EINVAL, "Bad hostname '",$arg->{?PeerAddr},"'"
             unless (nelems @raddr)
     
 
     while(1)
 
-        $sock->socket(AF_INET, $type, $proto) or
-            return _error($sock, $^OS_ERROR, "$^OS_ERROR")
+        $sock->socket: AF_INET, $type, $proto or
+            return _error: $sock, $^OS_ERROR, "$^OS_ERROR"
 
         if (defined $arg->{?Blocking})
-            defined $sock->blocking($arg->{Blocking})
-                or return _error($sock, $^OS_ERROR, "$^OS_ERROR")
+            defined $sock->blocking: $arg->{Blocking}
+                or return _error: $sock, $^OS_ERROR, "$^OS_ERROR"
         
 
         if ($arg->{?Reuse} || $arg->{?ReuseAddr})
-            $sock->sockopt(SO_REUSEADDR,1) or
-                return _error($sock, $^OS_ERROR, "$^OS_ERROR")
+            $sock->sockopt: SO_REUSEADDR,1 or
+                return _error: $sock, $^OS_ERROR, "$^OS_ERROR"
         
 
         if ($arg->{?ReusePort})
-            $sock->sockopt( <SO_REUSEPORT,1) or
-                return _error($sock, $^OS_ERROR, "$^OS_ERROR")
+            $sock->sockopt:  <(SO_REUSEPORT: ),1 or
+                return _error: $sock, $^OS_ERROR, "$^OS_ERROR"
         
 
         if ($arg->{?Broadcast})
-            $sock->sockopt(SO_BROADCAST,1) or
-                return _error($sock, $^OS_ERROR, "$^OS_ERROR")
+            $sock->sockopt: SO_BROADCAST,1 or
+                return _error: $sock, $^OS_ERROR, "$^OS_ERROR"
         
 
         if($lport || ($laddr ne INADDR_ANY) || exists $arg->{Listen})
-            $sock->bind($lport || 0, $laddr) or
-                return _error($sock, $^OS_ERROR, "$^OS_ERROR")
+            $sock->bind: $lport || 0, $laddr or
+                return _error: $sock, $^OS_ERROR, "$^OS_ERROR"
         
 
         if(exists $arg->{Listen})
-            $sock->listen($arg->{?Listen} || 5) or
-                return _error($sock, $^OS_ERROR, "$^OS_ERROR")
+            $sock->listen: $arg->{?Listen} || 5 or
+                return _error: $sock, $^OS_ERROR, "$^OS_ERROR"
             last
         
 
         # don't try to connect unless we're given a PeerAddr
-        last unless exists($arg->{PeerAddr})
+        last unless exists: $arg->{PeerAddr}
 
         $raddr = shift @raddr
 
-        return _error($sock, $EINVAL, 'Cannot determine remote port')
+        return _error: $sock, $EINVAL, 'Cannot determine remote port'
             unless($rport || $type == SOCK_DGRAM || $type == SOCK_RAW)
 
         last
             unless($type == SOCK_STREAM || defined $raddr)
 
-        return _error($sock, $EINVAL, "Bad hostname '",$arg->{?PeerAddr},"'")
+        return _error: $sock, $EINVAL, "Bad hostname '",$arg->{?PeerAddr},"'"
             unless defined $raddr
 
         #        my $timeout = ${*$sock}{'io_socket_timeout'};
         #        my $before = time() if $timeout;
 
         undef $^EVAL_ERROR
-        if ($sock->connect(pack_sockaddr_in($rport, $raddr)))
+        if (($sock->connect: (pack_sockaddr_in: $rport, $raddr)))
             #            ${*$sock}{'io_socket_timeout'} = $timeout;
             return $sock
         
 
-        return _error($sock, $^OS_ERROR, $^EVAL_ERROR || "Timeout")
+        return _error: $sock, $^OS_ERROR, $^EVAL_ERROR || "Timeout"
             unless (nelems @raddr)
 
     #	if ($timeout) {
@@ -247,47 +247,47 @@ sub configure($sock,$arg)
 
 
 sub connect
-    nelems(@_) == 2 || (nelems @_) == 3 or
-        croak 'usage: $sock->connect(NAME) or $sock->connect(PORT, ADDR)'
+    2 == (nelems: @_) || (nelems @_) == 3 or
+        croak: 'usage: $sock->connect(NAME) or $sock->connect(PORT, ADDR)'
     my $sock = shift
-    return $sock->SUPER::connect((nelems @_) == 1 ?? shift !! pack_sockaddr_in(< @_))
+    return $sock->SUPER::connect: (nelems @_) == 1 ?? shift !! (pack_sockaddr_in: < @_)
 
 
 sub bind
-    nelems(@_) == 2 || (nelems @_) == 3 or
-        croak 'usage: $sock->bind(NAME) or $sock->bind(PORT, ADDR)'
+    2 == (nelems: @_) || (nelems @_) == 3 or
+        croak: 'usage: $sock->bind(NAME) or $sock->bind(PORT, ADDR)'
     my $sock = shift
-    return $sock->SUPER::bind((nelems @_) == 1 ?? shift !! pack_sockaddr_in(< @_))
+    return $sock->SUPER::bind: (nelems @_) == 1 ?? shift !! (pack_sockaddr_in: < @_)
 
 
 sub sockaddr($sock)
-    my $name = $sock->sockname
-    $name ?? sockaddr_in($name)[1] !! undef
+    my $name = $sock->sockname: 
+    $name ?? (sockaddr_in: $name)[1] !! undef
 
 
 sub sockport($sock)
-    my $name = $sock->sockname
-    $name ?? sockaddr_in($name)[0] !! undef
+    my $name = $sock->sockname: 
+    $name ?? (sockaddr_in: $name)[0] !! undef
 
 
 sub sockhost($sock)
-    my $addr = $sock->sockaddr
-    $addr ?? inet_ntoa($addr) !! undef
+    my $addr = $sock->sockaddr: 
+    $addr ?? (inet_ntoa: $addr) !! undef
 
 
 sub peeraddr($sock)
-    my $name = $sock->peername
-    $name ?? sockaddr_in($name)[1] !! undef
+    my $name = $sock->peername: 
+    $name ?? (sockaddr_in: $name)[1] !! undef
 
 
 sub peerport($sock)
-    my $name = $sock->peername
-    $name ?? sockaddr_in($name)[0] !! undef
+    my $name = $sock->peername: 
+    $name ?? (sockaddr_in: $name)[0] !! undef
 
 
 sub peerhost($sock)
-    my $addr = $sock->peeraddr
-    $addr ?? inet_ntoa($addr) !! undef
+    my $addr = $sock->peeraddr: 
+    $addr ?? (inet_ntoa: $addr) !! undef
 
 
 1

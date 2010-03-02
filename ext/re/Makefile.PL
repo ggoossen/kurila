@@ -6,24 +6,24 @@ my $object = 're_exec$(OBJ_EXT) re_comp$(OBJ_EXT) re$(OBJ_EXT)'
 
 my $defines = '-DPERL_EXT_RE_BUILD -DPERL_EXT_RE_DEBUG -DPERL_EXT'
 
-WriteMakefile(
-    NAME                => 're',
-    VERSION_FROM        => 're.pm',
-    XSPROTOARG          => '-noprototypes',
-    OBJECT              => $object,
-    DEFINE             => $defines,
-    clean               => (%:  FILES => '*$(OBJ_EXT) *.c ../../lib/re.pm' ),
-    )
+WriteMakefile: 
+    NAME                => 're'
+    VERSION_FROM        => 're.pm'
+    XSPROTOARG          => '-noprototypes'
+    OBJECT              => $object
+    DEFINE             => $defines
+    clean               => (%:  FILES => '*$(OBJ_EXT) *.c ../../lib/re.pm' )
+    
 
 package MY
 
 sub upupfile
-    File::Spec->catfile( File::Spec->updir, File::Spec->updir, @_[0])
+    File::Spec->catfile:  (File::Spec->updir: ), (File::Spec->updir: ), @_[0]
 
 
 sub postamble
-    my $regcomp_c = upupfile('regcomp.c')
-    my $regexec_c = upupfile('regexec.c')
+    my $regcomp_c = upupfile: 'regcomp.c'
+    my $regexec_c = upupfile: 'regexec.c'
 
     <<EOF
 re_comp.c : $regcomp_c
@@ -44,12 +44,12 @@ EOF
 sub MY::c_o
     my(@: $self) =  @_
     package MY; # so that "SUPER" works right
-    my $inh = $self->SUPER::c_o(< @_)
+    my $inh = $self->SUPER::c_o: < @_
     use Config;
-    if (config_value("osname") eq 'aix'
-          && config_value("ccversion") eq '5.0.1.0')
+    if ((config_value: "osname") eq 'aix'
+          && (config_value: "ccversion") eq '5.0.1.0')
         # Known buggy optimizer.
-        my $cccmd = $self->const_cccmd
+        my $cccmd = $self->const_cccmd: 
         $cccmd =~ s/^CCCMD\s*=\s*//
         $cccmd =~ s/\s\$\(OPTIMIZE\)\s/ /
         $inh .= qq{

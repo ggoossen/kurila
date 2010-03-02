@@ -46,7 +46,7 @@ output.
 # set up testing
 ####
 
-my $t = Test::Builder->new
+my $t = Test::Builder->new: 
 
 ###
 # make us an exporter
@@ -65,8 +65,8 @@ sub _export_to_level
     my $pkg = shift
     my $level = shift
     shift                  # XXX redundant arg
-    my $callpkg = caller($level)
-    $pkg->export($callpkg, < @_)
+    my $callpkg = caller: $level
+    $pkg->export: $callpkg, < @_
 
 
 sub import
@@ -75,9 +75,9 @@ sub import
 
     my $caller = caller
 
-    $t->exported_to($caller)
+    $t->exported_to: $caller
     if (@plan)
-        $t->plan(< @plan)
+        $t->plan: < @plan
     
 
     my @imports = @:  () 
@@ -88,15 +88,15 @@ sub import
         
     
 
-    __PACKAGE__->_export_to_level(1, __PACKAGE__, < @imports)
+    __PACKAGE__->_export_to_level: 1, __PACKAGE__, < @imports
 
 
 ###
 # set up file handles
 ###
 
-my $out = Test::Builder::Tester::Tie->new("STDOUT")
-my $err = Test::Builder::Tester::Tie->new("STDERR")
+my $out = Test::Builder::Tester::Tie->new: "STDOUT"
+my $err = Test::Builder::Tester::Tie->new: "STDERR"
 
 ####
 # exported functions
@@ -120,30 +120,30 @@ my $original_harness_env
 sub _start_testing
     # even if we're running under Test::Harness pretend we're not
     # for now.  This needed so Test::Builder doesn't add extra spaces
-    $original_harness_env = env::var('HARNESS_ACTIVE') || 0
-    env::var('HARNESS_ACTIVE' ) = 0
+    $original_harness_env = (env::var: 'HARNESS_ACTIVE') || 0
+    (env::var: 'HARNESS_ACTIVE' ) = 0
 
     # remember what the handles were set to
-    $original_output_handle  = $t->output()
-    $original_failure_handle = $t->failure_output()
-    $original_todo_handle    = $t->todo_output()
+    $original_output_handle  = $t->output: 
+    $original_failure_handle = $t->failure_output: 
+    $original_todo_handle    = $t->todo_output: 
 
     # switch out to our own handles
-    $t->output($out->handle)
-    $t->failure_output($err->handle)
-    $t->todo_output($err->handle)
+    $t->output: ($out->handle: )
+    $t->failure_output: ($err->handle: )
+    $t->todo_output: ($err->handle: )
 
     # clear the expected list
-    $out->reset()
-    $err->reset()
+    $out->reset: 
+    $err->reset: 
 
     # remeber that we're testing
     $testing = 1
-    $testing_num = $t->current_test
-    $t->current_test = 0
+    $testing_num = $t->current_test: 
+    ($t->current_test: ) = 0
 
     # look, we shouldn't do the ending stuff
-    $t->no_ending(1)
+    $t->no_ending: 1
 
 
 =head2 Functions
@@ -182,16 +182,16 @@ output filehandles)
 
 sub test_out
     # do we need to do any setup?
-    _start_testing() unless $testing
+    _start_testing:  unless $testing
 
-    $out->expect(< @_)
+    $out->expect: < @_
 
 
 sub test_err
     # do we need to do any setup?
-    _start_testing() unless $testing
+    _start_testing:  unless $testing
 
-    $err->expect(< @_)
+    $err->expect: < @_
 
 
 =item test_fail
@@ -222,14 +222,14 @@ more simply as:
 
 sub test_fail
     # do we need to do any setup?
-    _start_testing() unless $testing
+    _start_testing:  unless $testing
 
     # work out what line we should be on
     my (@: $package, $filename, $line, ...) = @: caller
-    $line = $line + (shift() || 0) # prevent warnings
+    $line = $line + ((shift: ) || 0) # prevent warnings
 
     # expect that on stderr
-    $err->expect("#     Failed test ($^PROGRAM_NAME at line $line)")
+    $err->expect: "#     Failed test ($^PROGRAM_NAME at line $line)"
 
 
 =item test_diag
@@ -264,11 +264,11 @@ without the newlines.
 
 sub test_diag
     # do we need to do any setup?
-    _start_testing() unless $testing
+    _start_testing:  unless $testing
 
     # expect the same thing, but prepended with "#     "
     local $_ = undef
-    $err->expect(< map {"# $_"}, @_)
+    $err->expect: < (map: {"# $_"}, @_)
 
 
 =item test_test
@@ -318,41 +318,41 @@ sub test_test
         $mess = shift
     else
         %args = %:  < @_ 
-        $mess = %args{?name} if exists(%args{name})
-        $mess = %args{?title} if exists(%args{title})
-        $mess = %args{?label} if exists(%args{label})
+        $mess = %args{?name} if exists: %args{name}
+        $mess = %args{?title} if exists: %args{title}
+        $mess = %args{?label} if exists: %args{label}
     
 
     # er, are we testing?
-    die "Not testing.  You must declare output with a test function first."
+    die: "Not testing.  You must declare output with a test function first."
         unless $testing
 
     # okay, reconnect the test suite back to the saved handles
-    $t->output($original_output_handle)
-    $t->failure_output($original_failure_handle)
-    $t->todo_output($original_todo_handle)
+    $t->output: $original_output_handle
+    $t->failure_output: $original_failure_handle
+    $t->todo_output: $original_todo_handle
 
     # restore the test no, etc, back to the original point
-    $t->current_test = $testing_num
+    ($t->current_test: ) = $testing_num
     $testing = 0
 
     # re-enable the original setting of the harness
-    env::var('HARNESS_ACTIVE' ) = $original_harness_env
+    (env::var: 'HARNESS_ACTIVE' ) = $original_harness_env
 
     # check the output we've stashed
-    unless ($t->ok(    (%args{?skip_out} || $out->check)
-        && (%args{?skip_err} || $err->check),
-        $mess))
+    unless (($t->ok:     (%args{?skip_out} || ($out->check: ))
+                                   && (%args{?skip_err} || ($err->check: ))
+                         $mess))
         # print out the diagnostic information about why this
         # test failed
 
         local $_ = undef
 
-        $t->diag(< map {"$_\n"}, (@:  $out->complaint))
-            unless %args{?skip_out} || $out->check
+        $t->diag: < (map: {"$_\n"}, (@:  ($out->complaint: )))
+            unless %args{?skip_out} || $out->check: 
 
-        $t->diag(< map {"$_\n"}, (@:  $err->complaint))
-            unless %args{?skip_err} || $err->check
+        $t->diag: < (map: {"$_\n"}, (@:  ($err->complaint: )))
+            unless %args{?skip_err} || $err->check: 
     
 
 
@@ -370,7 +370,7 @@ C<line_num(+3)> idiom is arguably nicer.
 
 sub line_num
     my (@: $package, $filename, $line, ...) = @: caller
-    return $line + (shift() || 0) # prevent warnings
+    return $line + ((shift: ) || 0) # prevent warnings
 
 
 =back
@@ -475,8 +475,8 @@ package Test::Builder::Tester::Tie
 
 sub new($class, $type)
 
-    my $self = bless \(%:  got => '', type => $type ), $class
-    open my $fh, '>', \$self->{+'got'} or die "$^OS_ERROR"
+    my $self = bless: \(%:  got => '', type => $type ), $class
+    open: my $fh, '>', \$self->{+'got'} or die: "$^OS_ERROR"
     $self->{+'filehandle'} = $fh
     return $self
 
@@ -491,8 +491,8 @@ sub expect
 
     my @checks = @_
     foreach my $check ( @checks)
-        $check = $self->_translate_Failed_check($check)
-        push $self->{wanted}->@, ref $check ?? $check !! "$check\n"
+        $check = $self->_translate_Failed_check: $check
+        push: $self->{wanted}->@, ref $check ?? $check !! "$check\n"
     
 
 
@@ -532,31 +532,31 @@ sub check
 
 sub complaint
     my $self = shift
-    my $type   = $self->type
-    my $got    = $self->got
-    my $wanted = join "\n", $self->wanted->@
+    my $type   = $self->type: 
+    my $got    = $self->got: 
+    my $wanted = join: "\n", ($self->wanted: )->@
 
     # are we running in colour mode?
-    if (Test::Builder::Tester::color)
+    if ((Test::Builder::Tester::color: ))
         # get color
         try { require Term::ANSIColor }
         unless ($^EVAL_ERROR)
             # colours
 
-            my $green = Term::ANSIColor::color("black").
-                Term::ANSIColor::color("on_green")
-            my $red   = Term::ANSIColor::color("black").
-                Term::ANSIColor::color("on_red")
-            my $reset = Term::ANSIColor::color("reset")
+            my $green = (Term::ANSIColor::color: "black").
+                Term::ANSIColor::color: "on_green"
+            my $red   = (Term::ANSIColor::color: "black").
+                Term::ANSIColor::color: "on_red"
+            my $reset = Term::ANSIColor::color: "reset"
 
             # work out where the two strings start to differ
             my $char = 0
-            $char++ while substr($got, $char, 1) eq substr($wanted, $char, 1)
+            $char++ while (substr: $got, $char, 1) eq substr: $wanted, $char, 1
 
             # get the start string and the two end strings
-            my $start     = $green . substr($wanted, 0,   $char)
-            my $gotend    = $red   . substr($got   , $char) . $reset
-            my $wantedend = $red   . substr($wanted, $char) . $reset
+            my $start     = $green . substr: $wanted, 0,   $char
+            my $gotend    = $red   . (substr: $got   , $char) . $reset
+            my $wantedend = $red   . (substr: $wanted, $char) . $reset
 
             # make the start turn green on and off
             $start =~ s/\n/$reset\n$green/g
@@ -580,7 +580,7 @@ sub complaint
 
 sub reset
     my $self = shift
-    seek $self->{?'filehandle'}, 0, 0
+    seek: $self->{?'filehandle'}, 0, 0
     $self->{+'got'} = ''
     $self->{+'wanted'} = \@: 
 

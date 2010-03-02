@@ -9,7 +9,7 @@ use Pod::Simple ()
 our (@ISA, $VERSION, $FREAKYMODE)
 $VERSION = '2.02'
 @ISA = @: 'Pod::Simple::Methody'
-BEGIN { *DEBUG = exists(&Pod::Simple::DEBUG)
+BEGIN { *DEBUG = exists: &Pod::Simple::DEBUG
     ?? \&Pod::Simple::DEBUG
     !! sub() {0}
 }
@@ -20,11 +20,11 @@ $Text::Wrap::huge = 'overflow'
 
 sub new
     my $self = shift
-    my $new = $self->SUPER::new(< @_)
+    my $new = $self->SUPER::new: < @_
     $new->{+'output_fh'} ||= $^STDOUT
-    $new->accept_target_as_text( <qw( text plaintext plain ))
-    $new->nix_X_codes(1)
-    $new->nbsp_for_S(1)
+    $new->accept_target_as_text:  <qw( text plaintext plain )
+    $new->nix_X_codes: 1
+    $new->nbsp_for_S: 1
     $new->{+'Thispara'} = ''
     $new->{+'Indent'} = 0
     $new->{+'Indentstring'} = '   '
@@ -59,25 +59,25 @@ sub   end_over_block   { --@_[0]->{+'Indent'} }
 
 # . . . . . Now the actual formatters:
 
-sub end_head1       { @_[0]->emit_par(-4) }
-sub end_head2       { @_[0]->emit_par(-3) }
-sub end_head3       { @_[0]->emit_par(-2) }
-sub end_head4       { @_[0]->emit_par(-1) }
-sub end_Para        { @_[0]->emit_par( 0) }
-sub end_item_bullet { @_[0]->emit_par( 0) }
-sub end_item_number { @_[0]->emit_par( 0) }
-sub end_item_text   { @_[0]->emit_par(-2) }
+sub end_head1       { @_[0]->emit_par: -4 }
+sub end_head2       { @_[0]->emit_par: -3 }
+sub end_head3       { @_[0]->emit_par: -2 }
+sub end_head4       { @_[0]->emit_par: -1 }
+sub end_Para        { @_[0]->emit_par:  0 }
+sub end_item_bullet { @_[0]->emit_par:  0 }
+sub end_item_number { @_[0]->emit_par:  0 }
+sub end_item_text   { @_[0]->emit_par: -2 }
 
 sub emit_par
-    my(@: $self, $tweak_indent) = @: splice(@_,0,2)
+    my(@: $self, $tweak_indent) = @: splice: @_,0,2
     my $indent = ' ' x ( 2 * $self->{?'Indent'} + 4 + ($tweak_indent||0) )
     # Yes, 'STRING' x NEGATIVE gives '', same as 'STRING' x 0
 
-    $self->{+'Thispara'} =~ s/\x{AD}//g if Pod::Simple::ASCII
-    my $out = Text::Wrap::wrap($indent, $indent, ($self->{+'Thispara'} .= "\n"))
+    $self->{+'Thispara'} =~ s/\x{AD}//g if Pod::Simple::ASCII: 
+    my $out = Text::Wrap::wrap: $indent, $indent, ($self->{+'Thispara'} .= "\n")
 
-    $out =~ s/\x{A0}/ /g if Pod::Simple::ASCII
-    print $self->{?'output_fh'} ,$out, "\n"
+    $out =~ s/\x{A0}/ /g if Pod::Simple::ASCII: 
+    print: $self->{?'output_fh'} ,$out, "\n"
     $self->{+'Thispara'} = ''
 
     return
@@ -87,7 +87,7 @@ sub emit_par
 
 sub end_Verbatim
     my $self = shift
-    if(Pod::Simple::ASCII)
+    if((Pod::Simple::ASCII: ))
         $self->{+'Thispara'} =~ s/\x{A0}/ /g
         $self->{+'Thispara'} =~ s/\x{AD}//g
     
@@ -97,9 +97,9 @@ sub end_Verbatim
 
     $self->{+'Thispara'} =~ s/^/$i/mg
 
-    print  $self->{?'output_fh'}    ,'',
-        $self->{?'Thispara'},
-        "\n\n"
+    print: $self->{?'output_fh'}    ,''
+           $self->{?'Thispara'}
+           "\n\n"
     
     $self->{+'Thispara'} = ''
     return

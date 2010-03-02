@@ -16,7 +16,7 @@ $XS_VERSION = $VERSION
 $VERSION    = eval $VERSION
 
 require XSLoader
-XSLoader::load('List::Util', $XS_VERSION)
+XSLoader::load: 'List::Util', $XS_VERSION
 
 1
 

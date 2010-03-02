@@ -18,28 +18,28 @@ $WRAP = 1 unless defined $WRAP
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 sub _openclose
-    return @+: map {
-                      m/^([-A-Za-z]+)=(\w[^\=]*)$/s or die "what's <$_>?";
-                      (@:  $1,  "\{\\$2\n",   "/$1",  "\}" );
-                   }, @_
+    return @+: map: {
+                        m/^([-A-Za-z]+)=(\w[^\=]*)$/s or die: "what's <$_>?";
+                        (@:  $1,  "\{\\$2\n",   "/$1",  "\}" );
+                        }, @_
 
 
 my @_to_accept
 
 %Tagmap = %:
     # 'foo=bar' means ('foo' => '{\bar'."\n", '/foo' => '}')
-    < _openclose(
-       'B=cs18\b',
-       'I=cs16\i',
-       'C=cs19\f1\lang1024\noproof',
-       'F=cs17\i\lang1024\noproof',
+    < _openclose: 
+       'B=cs18\b'
+       'I=cs16\i'
+       'C=cs19\f1\lang1024\noproof'
+       'F=cs17\i\lang1024\noproof'
 
-       'VerbatimI=cs26\i',
-       'VerbatimB=cs27\b',
-       'VerbatimBI=cs28\b\i',
+       'VerbatimI=cs26\i'
+       'VerbatimB=cs27\b'
+       'VerbatimBI=cs28\b\i'
 
-       < map {; m/^([-a-z]+)/s && push @_to_accept, $1; $_ },
-           qw[
+       < map: {; m/^([-a-z]+)/s && (push: @_to_accept, $1); $_ },
+                 qw[
                 underline=ul         smallcaps=scaps  shadow=shad
                 superscript=super    subscript=sub    strikethrough=strike
                 outline=outl         emboss=embo      engrave=impr   
@@ -50,7 +50,7 @@ my @_to_accept
             ]
             # But no double-strikethrough, because MSWord can't agree with the
             #  RTF spec on whether it's supposed to be \strikedl or \striked1 (!!!)
-            )
+       
 
     # Bit of a hack here:
     'L=pod' => '{\cs22\i'."\n"
@@ -89,57 +89,56 @@ my @_to_accept
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 sub new
-    my $new = shift->SUPER::new(< @_)
-    $new->nix_X_codes(1)
-    $new->nbsp_for_S(1)
-    $new->accept_targets( 'rtf', 'RTF' )
+    my $new = shift->SUPER::new: < @_
+    $new->nix_X_codes: 1
+    $new->nbsp_for_S: 1
+    $new->accept_targets:  'rtf', 'RTF' 
 
     $new->{+'Tagmap'} = \%: < %Tagmap
 
-    $new->accept_codes(< @_to_accept)
-    $new->accept_codes('VerbatimFormatted')
-    DEBUG +> 2 and print $^STDOUT, "To accept: ", join(' ', @_to_accept), "\n"
-    $new->doc_lang(
-        (  env::var('RTFDEFLANG') || '') =~ m/^(\d{1,10})$/s ?? $1
-        !! (env::var('RTFDEFLANG') || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ?? hex($1)
-        # yes, tolerate hex!
-        !! (env::var('RTFDEFLANG') || '') =~ m/^([a-fA-F0-9]{4})$/s ?? hex($1)
-        # yes, tolerate even more hex!
-        !! '1033'
-        )
+    $new->accept_codes: < @_to_accept
+    $new->accept_codes: 'VerbatimFormatted'
+    (DEBUG: )+> 2 and print: $^STDOUT, "To accept: ", (join: ' ', @_to_accept), "\n"
+    $new->doc_lang: 
+        (  (env::var: 'RTFDEFLANG') || '') =~ m/^(\d{1,10})$/s ?? $1
+            !! ((env::var: 'RTFDEFLANG') || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ?? hex: $1
+            # yes, tolerate hex!
+            !! ((env::var: 'RTFDEFLANG') || '') =~ m/^([a-fA-F0-9]{4})$/s ?? hex: $1
+            # yes, tolerate even more hex!
+            !! '1033'
 
-    $new->head1_halfpoint_size(32)
-    $new->head2_halfpoint_size(28)
-    $new->head3_halfpoint_size(25)
-    $new->head4_halfpoint_size(22)
-    $new->codeblock_halfpoint_size(18)
-    $new->header_halfpoint_size(17)
-    $new->normal_halfpoint_size(25)
+    $new->head1_halfpoint_size: 32
+    $new->head2_halfpoint_size: 28
+    $new->head3_halfpoint_size: 25
+    $new->head4_halfpoint_size: 22
+    $new->codeblock_halfpoint_size: 18
+    $new->header_halfpoint_size: 17
+    $new->normal_halfpoint_size: 25
 
     return $new
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-__PACKAGE__->_accessorize(
-    'doc_lang',
-    'head1_halfpoint_size',
-    'head2_halfpoint_size',
-    'head3_halfpoint_size',
-    'head4_halfpoint_size',
-    'codeblock_halfpoint_size',
-    'header_halfpoint_size',
-    'normal_halfpoint_size',
-    'no_proofing_exemptions',
-    )
+__PACKAGE__->_accessorize: 
+    'doc_lang'
+    'head1_halfpoint_size'
+    'head2_halfpoint_size'
+    'head3_halfpoint_size'
+    'head4_halfpoint_size'
+    'codeblock_halfpoint_size'
+    'header_halfpoint_size'
+    'normal_halfpoint_size'
+    'no_proofing_exemptions'
+    
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 sub run
     my $self = @_[0]
-    return $self->do_middle if $self->bare_output
+    return ($self->do_middle: ) if $self->bare_output: 
     return
-          $self->do_beginning && $self->do_middle && $self->do_end
+          ($self->do_beginning: ) && ($self->do_middle: ) && $self->do_end: 
 
 
 
@@ -154,19 +153,19 @@ sub do_middle      # the main work
     my @indent_stack
     $self->{+'rtfindent'} = 0 unless defined $self->{?'rtfindent'}
 
-    while($token = $self->get_token)
+    while($token = ($self->get_token: ))
 
-        if( ($type = $token->type) eq 'text' )
+        if( ($type = ($token->type: )) eq 'text' )
             if( $self->{?'rtfverbatim'} )
-                DEBUG +> 1 and print $^STDOUT, "  $type " , < $token->text, " in verbatim!\n"
-                $scratch = rtf_esc_codely($token->text)
-                print $fh, $scratch
+                (DEBUG: )+> 1 and print: $^STDOUT, "  $type " , < ($token->text: ), " in verbatim!\n"
+                $scratch = rtf_esc_codely: ($token->text: )
+                print: $fh, $scratch
                 next
             
 
-            DEBUG +> 1 and print $^STDOUT, "  $type " , < $token->text, "\n"
+            (DEBUG: )+> 1 and print: $^STDOUT, "  $type " , < ($token->text: ), "\n"
 
-            $scratch = $token->text
+            $scratch = $token->text: 
             $scratch =~ s/\t/ /g
             $scratch =~ s/[\cb\cc]//g
 
@@ -189,7 +188,7 @@ sub do_middle      # the main work
         /\cb$1\cc/xsg
             
 
-            $scratch = rtf_esc($scratch)
+            $scratch = rtf_esc: $scratch
             $scratch =~
                 s/(
             [^\cm\cj\n]{65}        # Snare 65 characters from a line
@@ -200,27 +199,27 @@ sub do_middle      # the main work
                 if $WRAP
             # This may wrap at well past the 65th column, but not past the 120th.
 
-            print $fh, $scratch
+            print: $fh, $scratch
 
         elsif( $type eq 'start' )
-            DEBUG +> 1 and print $^STDOUT, "  +$type ", <$token->tagname,
-                " (", < map( {"<$_> " }, $token->attr_hash->%), ")\n"
+            (DEBUG: )+> 1 and print: $^STDOUT, "  +$type ", <($token->tagname: )
+                                     " (", < (map:  {"<$_> " }, ($token->attr_hash: )->%), ")\n"
 
-            if( ($tagname = $token->tagname) eq 'Verbatim'
+            if( ($tagname = ($token->tagname: )) eq 'Verbatim'
                 or $tagname eq 'VerbatimFormatted'
                 )
                 ++$self->{+'rtfverbatim'}
-                my $next = $self->get_token
+                my $next = $self->get_token: 
                 next unless defined $next
                 my $line_count = 1
-                if($next->type eq 'text')
-                    my $t = $next->text_r
+                if(($next->type: ) eq 'text')
+                    my $t = $next->text_r: 
                     while( $t->$ =~ m/$/mg )
                         last if  ++$line_count  +> 15 # no point in counting further
                     
-                    DEBUG +> 3 and print $^STDOUT, "    verbatim line count: $line_count\n"
+                    (DEBUG: )+> 3 and print: $^STDOUT, "    verbatim line count: $line_count\n"
                 
-                $self->unget_token($next)
+                $self->unget_token: $next
                 $self->{+'rtfkeep'} = ($line_count +> 15) ?? '' !! '\keepn' 
 
             elsif( $tagname =~ m/^item-/s )
@@ -233,87 +232,87 @@ sub do_middle      # the main work
                 # It's not terribly pretty, but it really does make things pretty.
                 #
                 while(1)
-                    push @to_unget, < $self->get_token
-                    pop(@to_unget), last unless defined @to_unget[-1]
+                    push: @to_unget, < $self->get_token: 
+                    (pop: @to_unget), last unless defined @to_unget[-1]
                     # Erroneously used to be "unshift" instead of pop!  Adds instead
                     # of removes, and operates on the beginning instead of the end!
 
-                    if(@to_unget[-1]->type eq 'text')
-                        if( ($text_count_here += length @to_unget[-1]->text_r->$) +> 150 )
-                            DEBUG +> 1 and print $^STDOUT, "    item-* is too long to be keepn'd.\n"
+                    if ((@to_unget[-1]->type: ) eq 'text')
+                        if( ($text_count_here += length (@to_unget[-1]->text_r: )->$) +> 150 )
+                            (DEBUG: )+> 1 and print: $^STDOUT, "    item-* is too long to be keepn'd.\n"
                             last
                         
                     elsif ((nelems @to_unget) +> 1 and
-                        @to_unget[-2]->type eq 'end' and
-                        @to_unget[-2]->tagname =~ m/^item-/s
+                        (@to_unget[-2]->type: ) eq 'end' and
+                        (@to_unget[-2]->tagname: ) =~ m/^item-/s
                         )
                         # Bail out here, after setting rtfitemkeepn yea or nay.
                         $self->{+'rtfitemkeepn'} = '\keepn' if
-                              @to_unget[-1]->type eq 'start' and
-                              @to_unget[-1]->tagname eq 'Para'
+                              (@to_unget[-1]->type: ) eq 'start' and
+                              (@to_unget[-1]->tagname: ) eq 'Para'
 
-                        DEBUG +> 1 and printf $^STDOUT, "    item-* before \%s(\%s) \%s keepn'd.\n", <
-                            @to_unget[-1]->type,
-                            @to_unget[-1]->can('tagname') ?? < @to_unget[-1]->tagname !! '',
-                            $self->{?'rtfitemkeepn'} ?? "gets" !! "doesn't get"
+                        (DEBUG: )+> 1 and printf: $^STDOUT, "    item-* before \%s(\%s) \%s keepn'd.\n", <
+                                                      (@to_unget[-1]->type: )
+                                                  (@to_unget[-1]->can: 'tagname') ?? < (@to_unget[-1]->tagname: ) !! ''
+                                                  $self->{?'rtfitemkeepn'} ?? "gets" !! "doesn't get"
                         last
                     elsif ((nelems @to_unget) +> 40)
-                        DEBUG +> 1 and print $^STDOUT, "    item-* now has too many tokens (",
-                            scalar(nelems @to_unget),
-                            (DEBUG +> 4) ?? (q<: >, < map( { <$_->dump }, @to_unget)) !! (),
-                            ") to be keepn'd.\n"
+                        (DEBUG: )+> 1 and print: $^STDOUT, "    item-* now has too many tokens ("
+                                                 (scalar: nelems @to_unget)
+                                                 ((DEBUG: )+> 4) ?? (q<: >, < (map:  { <($_->dump: ) }, @to_unget)) !! ()
+                                                 ") to be keepn'd.\n"
                         last # give up
                     
                 # else keep while'ing along
                 
                 # Now put it aaaaall back...
-                $self->unget_token(< @to_unget)
+                $self->unget_token: < @to_unget
 
             elsif( $tagname =~ m/^over-/s )
-                push @stack, $1
-                push @indent_stack,
-                    int($token->attr('indent') * 4 * $self->normal_halfpoint_size)
-                DEBUG and print $^STDOUT, "Indenting over @indent_stack[-1] twips.\n"
+                push: @stack, $1
+                push: @indent_stack
+                      int: ($token->attr: 'indent') * 4 * ($self->normal_halfpoint_size: )
+                DEBUG: and print: $^STDOUT, "Indenting over @indent_stack[-1] twips.\n"
                 $self->{+'rtfindent'} += @indent_stack[-1]
 
             elsif ($tagname eq 'L')
-                $tagname .= '=' . ($token->attr('type') || 'pod')
+                $tagname .= '=' . (($token->attr: 'type') || 'pod')
 
             elsif ($tagname eq 'Data')
-                my $next = $self->get_token
+                my $next = $self->get_token: 
                 next unless defined $next
-                unless( $next->type eq 'text' )
-                    $self->unget_token($next)
+                unless( ($next->type: ) eq 'text' )
+                    $self->unget_token: $next
                     next
                 
-                DEBUG and print $^STDOUT, "    raw text ", < $next->text, "\n"
-                printf $fh, "\n" . $next->text . "\n"
+                DEBUG: and print: $^STDOUT, "    raw text ", < ($next->text: ), "\n"
+                printf: $fh, "\n" . ($next->text: ) . "\n"
                 next
             
 
-            defined($scratch = $self->{'Tagmap'}->{?$tagname}) or next
+            defined: ($scratch = $self->{'Tagmap'}->{?$tagname}) or next
             $scratch =~ s/\#([^\#]+)\#/$self->{?$1}/g # interpolate
-            print $fh, $scratch
+            print: $fh, $scratch
 
             if ($tagname eq 'item-number')
-                print $fh, < $token->attr('number'), ". \n"
+                print: $fh, < ($token->attr: 'number'), ". \n"
             elsif ($tagname eq 'item-bullet')
-                print $fh, "\\'95 \n"
+                print: $fh, "\\'95 \n"
             #for funky testing: print $fh '', rtf_esc("\x{4E4B}\x{9053}");
             
 
         elsif( $type eq 'end' )
-            DEBUG +> 1 and print $^STDOUT, "  -$type ", <$token->tagname,"\n"
-            if( ($tagname = $token->tagname) =~ m/^over-/s )
-                DEBUG and print $^STDOUT, "Indenting back @indent_stack[-1] twips.\n"
+            (DEBUG: )+> 1 and print: $^STDOUT, "  -$type ", <($token->tagname: ),"\n"
+            if( ($tagname = ($token->tagname: )) =~ m/^over-/s )
+                DEBUG: and print: $^STDOUT, "Indenting back @indent_stack[-1] twips.\n"
                 $self->{+'rtfindent'} -= pop @indent_stack
                 pop @stack
             elsif( $tagname eq 'Verbatim' or $tagname eq 'VerbatimFormatted')
                 --$self->{+'rtfverbatim'}
             
-            defined($scratch = $self->{'Tagmap'}->{?"/$tagname"}) or next
+            defined: ($scratch = $self->{'Tagmap'}->{?"/$tagname"}) or next
             $scratch =~ s/\#([^\#]+)\#/$self->{?$1}/g # interpolate
-            print $fh, $scratch
+            print: $fh, $scratch
         
     
     return 1
@@ -323,27 +322,27 @@ sub do_middle      # the main work
 sub do_beginning
     my $self = @_[0]
     my $fh = $self->{?'output_fh'}
-    return print $fh, join '', @:  <
-                                       $self->doc_init, <
-                                       $self->font_table, <
-                                       $self->stylesheet, <
-                                       $self->color_table, <
-                                       $self->doc_info, <
-                                       $self->doc_start
-                                   "\n"
+    return print: $fh, join: '', @:  <
+                                         ($self->doc_init: ), <
+                                         ($self->font_table: ), <
+                                         ($self->stylesheet: ), <
+                                         ($self->color_table: ), <
+                                         ($self->doc_info: ), <
+                                         $self->doc_start: 
+                                     "\n"
     
 
 
 sub do_end
     my $self = @_[0]
     my $fh = $self->{?'output_fh'}
-    return print $fh, '}' # that should do it
+    return print: $fh, '}' # that should do it
 
 
 ###########################################################################
 
 sub stylesheet
-    return sprintf <<'END', <
+    return sprintf: <<'END',
 {\stylesheet
 {\snext0 Normal;}
 {\*\cs10 \additive Default Paragraph Font;}
@@ -369,13 +368,11 @@ sub stylesheet
 }
 
 END
-
-        @_[0]->codeblock_halfpoint_size(), <
-        @_[0]->head1_halfpoint_size(), <
-        @_[0]->head2_halfpoint_size(), <
-        @_[0]->head3_halfpoint_size(), <
-        @_[0]->head4_halfpoint_size(),
-    
+                    < (@_[0]->codeblock_halfpoint_size: )
+                    < (@_[0]->head1_halfpoint_size: )
+                    < (@_[0]->head2_halfpoint_size: )
+                    < (@_[0]->head3_halfpoint_size: )
+                    < (@_[0]->head4_halfpoint_size: )
 
 
 ###########################################################################
@@ -409,17 +406,17 @@ END
 sub doc_info
     my $self = @_[0]
 
-    my $class = ref($self) || $self
+    my $class = (ref: $self) || $self
 
     my $tag = __PACKAGE__ . ' ' . $VERSION
 
     unless($class eq __PACKAGE__)
         $tag = " ($tag)"
-        $tag = " v" . $self->VERSION . $tag   if   defined $self->VERSION
+        $tag = " v" . ($self->VERSION: ) . $tag   if   defined $self->VERSION: 
         $tag = $class . $tag
     
 
-    return sprintf <<'END',
+    return sprintf: <<'END'
 {\info{\doccomm
 %s
  using %s v%s
@@ -430,16 +427,16 @@ sub doc_info
 END
 
         # None of the following things should need escaping, I dare say!
-        $tag,
-        @ISA[0], < @ISA[0]->VERSION(),
-        $^PERL_VERSION, scalar(gmtime),
+                    $tag
+                    @ISA[0], < (@ISA[0]->VERSION: )
+                    $^PERL_VERSION, (scalar: gmtime)
     
 
 
 sub doc_start
     my $self = @_[0]
-    my $title = $self->get_short_title()
-    DEBUG and print $^STDOUT, "Short Title: <$title>\n"
+    my $title = $self->get_short_title: 
+    DEBUG: and print: $^STDOUT, "Short Title: <$title>\n"
     $title .= ' ' if length $title
 
     $title =~ s/ *$/ /s
@@ -452,13 +449,13 @@ sub doc_start
         if $title =~ m/^\S+$/s and $title =~ m/::/s
     # catches the most common case, at least
 
-    DEBUG and print $^STDOUT, "Title0: <$title>\n"
-    $title = rtf_esc($title)
-    DEBUG and print $^STDOUT, "Title1: <$title>\n"
+    DEBUG: and print: $^STDOUT, "Title0: <$title>\n"
+    $title = rtf_esc: $title
+    DEBUG: and print: $^STDOUT, "Title1: <$title>\n"
     $title = '\lang1024\noproof ' . $title
         if $is_obviously_module_name
 
-    return sprintf <<'END',
+    return sprintf: <<'END'
 \deflang%s\plain\lang%s\widowctrl
 {\header\pard\qr\plain\f2\fs%s
 %s
@@ -466,10 +463,10 @@ p.\chpgn\par}
 \fs%s
 
 END
-        ( <$self->doc_lang) x 2, <
-        $self->header_halfpoint_size,
-        $title, <
-        $self->normal_halfpoint_size,
+                    ( <($self->doc_lang: )) x 2, <
+                        ($self->header_halfpoint_size: )
+                    $title, <
+                        ($self->normal_halfpoint_size: )
     
 
 
@@ -479,10 +476,10 @@ END
 use integer
 sub rtf_esc
     my $x # scratch
-    ($x = (((nelems @_) == 1) ?? @_[0] !! join '', @_)
+    ($x = (((nelems @_) == 1) ?? @_[0] !! (join: '', @_))
      ) =~ s/([F\x[00]-\x[1F]\-\\\{\}\x[7F]-\x[FF]])/%Escape{?$1}/g  # ESCAPER
     # Escape \, {, }, -, control chars, and 7f-ff.
-    $x =~ s/([^\x[00]-\x[FF]])/$('\\uc1\\u'.((ord($1)+<32768)??ord($1)!!(ord($1)-65536)).'?')/g
+    $x =~ s/([^\x[00]-\x[FF]])/$('\\uc1\\u'.(((ord: $1)+<32768)??(ord: $1)!!((ord: $1)-65536)).'?')/g
     return $x
 
 
@@ -494,18 +491,18 @@ sub rtf_esc_codely
     #  looks just like a normal dash character).
 
     my $x # scratch
-    ($x = (((nelems @_) == 1) ?? @_[0] !! join '', @_)
+    ($x = (((nelems @_) == 1) ?? @_[0] !! (join: '', @_))
      ) =~ s/([F\x[00]-\x[1F]\\\{\}\x[7F]-\x[FF]])/%Escape{?$1}/g  # ESCAPER
     # Escape \, {, }, -, control chars, and 7f-ff.
-    $x =~ s/([^\x00-\xFF])/$('\\uc1\\u'.((ord($1)+<32768)??ord($1)!!(ord($1)-65536)).'?')/g
+    $x =~ s/([^\x[00]-\x[FF]])/$('\\uc1\\u'.(((ord: $1)+<32768)??(ord: $1)!!((ord: $1)-65536)).'?')/g
     return $x
 
 
-%Escape = %: 
-    < ( @+: map( { (@: chr($_),chr($_)) },       # things not apparently needing escaping
-              0x20 .. 0x7E ) )
-    < ( @+: map( { (@: chr($_),sprintf("\\'\%02x", $_)) },    # apparently escapeworthy things
-                         @: < 0x00 .. 0x1F, 0x5c, 0x7b, 0x7d, < 0x7f .. 0xFF, 0x46) )
+%Escape = %:
+    < ( @+: (map:  { (@: (chr: $_),(chr: $_)) },       # things not apparently needing escaping
+                       0x20 .. 0x7E ) )
+    < ( @+: (map:  { (@: (chr: $_),(sprintf: "\\'\%02x", $_)) },    # apparently escapeworthy things
+                       @: < 0x00 .. 0x1F, 0x5c, 0x7b, 0x7d, < 0x7f .. 0xFF, 0x46) )
 
     # We get to escape out 'F' so that we can send RTF files thru the mail
     # without the slightest worry that paragraphs beginning with "From"

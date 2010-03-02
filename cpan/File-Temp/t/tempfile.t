@@ -3,7 +3,7 @@
 
 
 use Test::More
-BEGIN { plan tests => 22}
+BEGIN { (plan: tests => 22)}
 use File::Spec
 
 # Will need to check that all files were unlinked correctly
@@ -16,17 +16,17 @@ my (@files, @dirs, @still_there)
 # These are tidied up
 END 
     foreach ( @still_there)
-        ok( -f $_ )
-        ok( unlink( $_ ) )
-        ok( !(-f $_) )
+        ok:  -f $_ 
+        ok:  (unlink:  $_ ) 
+        ok:  !(-f $_) 
     
 
 
 # Loop over an array hoping that the files dont exist
-END { foreach ( @files) { ok( !(-e $_) )} }
+END { foreach ( @files) { (ok:  !(-e $_) )} }
 
 # And a test for directories
-END { foreach ( @dirs)  { ok( !(-d $_) )} }
+END { foreach ( @dirs)  { (ok:  !(-d $_) )} }
 
 # Need to make sure that the END blocks are setup before
 # the ones that File::Temp configures since END blocks are evaluated
@@ -35,92 +35,92 @@ END { foreach ( @dirs)  { ok( !(-d $_) )} }
 use File::Temp < qw/ tempfile tempdir/
 
 # Now we start the tests properly
-ok(1)
+ok: 1
 
 
 # Tempfile
 # Open tempfile in some directory, unlink at end
-my (@: $fh, $tempfile) =  tempfile(
-    UNLINK => 1,
-    SUFFIX => '.txt',
-    )
+my (@: $fh, $tempfile) =  tempfile: 
+    UNLINK => 1
+    SUFFIX => '.txt'
+    
 
-ok( (-f $tempfile) )
+ok:  (-f $tempfile) 
 # Should still be around after closing
-ok( close( $fh ) )
-ok( (-f $tempfile) )
+ok:  (close:  $fh ) 
+ok:  (-f $tempfile) 
 # Check again at exit
-push(@files, $tempfile)
+push: @files, $tempfile
 
 # TEMPDIR test
 # Create temp directory in current dir
 my $template = 'tmpdirXXXXXX'
-print $^STDOUT, "# Template: $template\n"
-my $tempdir = tempdir( $template ,
-                       DIR => File::Spec->curdir,
-                       CLEANUP => 1,
-                       )
+print: $^STDOUT, "# Template: $template\n"
+my $tempdir = tempdir:  $template 
+                        DIR => (File::Spec->curdir: )
+                        CLEANUP => 1
+                       
 
-print $^STDOUT, "# TEMPDIR: $tempdir\n"
+print: $^STDOUT, "# TEMPDIR: $tempdir\n"
 
-ok( (-d $tempdir) )
-push(@dirs, $tempdir)
+ok:  (-d $tempdir) 
+push: @dirs, $tempdir
 
 # Create file in the temp dir
-(@: $fh, $tempfile) =  tempfile(
-    DIR => $tempdir,
-    UNLINK => 1,
-    SUFFIX => '.dat',
-    )
+(@: $fh, $tempfile) =  tempfile: 
+    DIR => $tempdir
+    UNLINK => 1
+    SUFFIX => '.dat'
+    
 
-print $^STDOUT, "# TEMPFILE: Created $tempfile\n"
+print: $^STDOUT, "# TEMPFILE: Created $tempfile\n"
 
-ok( (-f $tempfile))
-push(@files, $tempfile)
+ok:  (-f $tempfile)
+push: @files, $tempfile
 
 # Test tempfile
 # ..and again
-(@: $fh, $tempfile) =  tempfile(
-    DIR => $tempdir,
-    )
+(@: $fh, $tempfile) =  tempfile: 
+    DIR => $tempdir
+    
 
 
-ok( (-f $tempfile ))
-push(@files, $tempfile)
+ok:  (-f $tempfile )
+push: @files, $tempfile
 
 # Test tempfile
 # ..and another with changed permissions (read-only)
-(@: $fh, $tempfile) =  tempfile(
-    DIR => $tempdir,
-    )
-chmod 0444, $tempfile
+(@: $fh, $tempfile) =  tempfile: 
+    DIR => $tempdir
+    
+chmod: 0444, $tempfile
 
-ok( (-f $tempfile ))
-push(@files, $tempfile)
+ok:  (-f $tempfile )
+push: @files, $tempfile
 
-print $^STDOUT, "# TEMPFILE: Created $tempfile\n"
+print: $^STDOUT, "# TEMPFILE: Created $tempfile\n"
 
 # and another (with template)
 
-(@: $fh, $tempfile) =  tempfile( 'helloXXXXXXX',
-                               DIR => $tempdir,
-                               UNLINK => 1,
-                               SUFFIX => '.dat',
-                               )
+(@: $fh, $tempfile) =  tempfile:  'helloXXXXXXX'
+                                  DIR => $tempdir
+                                  UNLINK => 1
+                                  SUFFIX => '.dat'
+                               
 
-print $^STDOUT, "# TEMPFILE: Created $tempfile\n"
+print: $^STDOUT, "# TEMPFILE: Created $tempfile\n"
 
-ok( (-f $tempfile) )
-push(@files, $tempfile)
+ok:  (-f $tempfile) 
+push: @files, $tempfile
 
 
 # Create a temporary file that should stay around after
 # it has been closed
-(@: $fh, $tempfile) =  tempfile( 'permXXXXXXX', UNLINK => 0 )
-print $^STDOUT, "# TEMPFILE: Created $tempfile\n"
-ok( -f $tempfile )
-ok( close( $fh ) )
-push( @still_there, $tempfile) # check at END
+(@: $fh, $tempfile) =  tempfile:  'permXXXXXXX', UNLINK => 0 
+print: $^STDOUT, "# TEMPFILE: Created $tempfile\n"
+ok:  -f $tempfile 
+ok:  (close:  $fh ) 
+push:  @still_there, $tempfile # check at END
 
 # Would like to create a temp file and just retrieve the handle
 # but the test is problematic since:
@@ -130,19 +130,19 @@ push( @still_there, $tempfile) # check at END
 #    on NFS
 # Try to do what we can.
 # Tempfile croaks on error so we need an eval
-$fh = try { tempfile( 'ftmpXXXXX', DIR => < File::Spec->tmpdir ) }
+$fh = try { (tempfile:  'ftmpXXXXX', DIR => < (File::Spec->tmpdir: ) ) }
 
 :SKIP
     do
-    skip "Skip Failed probably due to NFS", 2 if not $fh
+    skip: "Skip Failed probably due to NFS", 2 if not $fh
 
     # print something to it to make sure something is there
-    ok( print $fh, "Test\n" )
+    ok:  (print: $fh, "Test\n") 
 
     # Close it - can not check it is gone since we dont know the name
-    ok( close($fh) )
+    ok:  (close: $fh) 
 
 
 # Now END block will execute to test the removal of directories
-print $^STDOUT, "# End of tests. Execute END blocks\n"
+print: $^STDOUT, "# End of tests. Execute END blocks\n"
 

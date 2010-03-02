@@ -133,9 +133,9 @@ stat() on unopened filehandle at - line 14 character 1.
 ########
 # doio.c [Perl_do_print]
 use warnings 'uninitialized' ;
-print $^STDOUT, $a ;
+print: $^STDOUT, $a ;
 no warnings 'uninitialized' ;
-print $^STDOUT, $b ;
+print: $^STDOUT, $b ;
 EXPECT
 Use of uninitialized value $main::a in print at - line 3 character 1.
 ########
@@ -153,7 +153,7 @@ Unsuccessful stat on filename containing newline at - line 4 character 1.
 # doio.c [Perl_do_aexec5]
 BEGIN {
     if ($^OS_NAME eq 'MacOS') {
-        print $^STDOUT, <<EOM;
+        print: $^STDOUT, <<EOM;
 SKIPPED
 # no exec on Mac OS
 EOM
@@ -161,9 +161,9 @@ EOM
     }
 }
 use warnings 'io' ;
-exec "lskdjfalksdjfdjfkls","" ;
+exec: "lskdjfalksdjfdjfkls","" ;
 no warnings 'io' ;
-exec "lskdjfalksdjfdjfkls","" ;
+exec: "lskdjfalksdjfdjfkls","" ;
 EXPECT
 OPTION regex
 Can't exec "lskdjfalksdjfdjfkls": .+
@@ -171,7 +171,7 @@ Can't exec "lskdjfalksdjfdjfkls": .+
 # doio.c [Perl_do_exec3]
 BEGIN {
     if ($^OS_NAME eq 'MacOS') {
-        print $^STDOUT, <<EOM;
+        print: $^STDOUT, <<EOM;
 SKIPPED
 # no exec on Mac OS
 EOM
@@ -179,9 +179,9 @@ EOM
     }
 }
 use warnings 'io' ;
-exec "lskdjfalksdjfdjfkls", "abc" ;
+exec: "lskdjfalksdjfdjfkls", "abc" ;
 no warnings 'io' ;
-exec "lskdjfalksdjfdjfkls", "abc" ;
+exec: "lskdjfalksdjfdjfkls", "abc" ;
 EXPECT
 OPTION regex
 Can't exec "lskdjfalksdjfdjfkls(:? abc)?": .+
@@ -189,7 +189,7 @@ Can't exec "lskdjfalksdjfdjfkls(:? abc)?": .+
 # doio.c [win32_execvp]
 BEGIN {
     if ($^OS_NAME eq 'MacOS') {
-        print $^STDOUT, <<EOM;
+        print: $^STDOUT, <<EOM;
 SKIPPED
 # no exec on Mac OS
 EOM
@@ -197,7 +197,7 @@ EOM
     }
 }
 use warnings 'exec' ;
-exec $^EXECUTABLE_NAME, "-e0" ;
+exec: $^EXECUTABLE_NAME, "-e0" ;
 EXPECT
 
 ########
@@ -213,7 +213,7 @@ Filehandle STDOUT opened only for output at - line 3 character 9.
 use Config;
 BEGIN {
     if (config_value("useperlio")) {
-        print $^STDOUT, <<EOM;
+        print: $^STDOUT, <<EOM;
 SKIPPED
 # warns only without perlio
 EOM
@@ -222,10 +222,10 @@ EOM
 }
 use warnings 'io';
 my $x = "foo";
-open FOO, '>', \$x;
-open BAR, '>&', $^STDOUT; # should not warn
+open: FOO, '>', \$x;
+open: BAR, '>&', $^STDOUT; # should not warn
 no warnings 'io';
-open FOO, '>', \$x;
+open: FOO, '>', \$x;
 EXPECT
 Can't open a reference at - line 14 character 1.
 ########
@@ -233,7 +233,7 @@ Can't open a reference at - line 14 character 1.
 use Config;
 BEGIN {
     if (!config_value("useperlio")) {
-        print $^STDOUT, <<EOM;
+        print: $^STDOUT, <<EOM;
 SKIPPED
 # warns only with perlio
 EOM
@@ -242,9 +242,9 @@ EOM
 }
 use warnings 'io' ;
 close $^STDOUT;
-open \*FH1, "<", "TEST"; close \*FH1;
+open: \*FH1, "<", "TEST"; close \*FH1;
 no warnings 'io' ;
-open \*FH2, "<", "TEST"; close \*FH2;
+open: \*FH2, "<", "TEST"; close \*FH2;
 EXPECT
 Filehandle STDOUT reopened only for input at - line 14 character 1.
 ########
@@ -252,7 +252,7 @@ Filehandle STDOUT reopened only for input at - line 14 character 1.
 use Config;
 BEGIN {
     if (!config_value("useperlio")) {
-        print $^STDOUT, <<EOM;
+        print: $^STDOUT, <<EOM;
 SKIPPED
 # warns only with perlio
 EOM
@@ -261,10 +261,10 @@ EOM
 }
 use warnings 'io' ;
 close $^STDIN;
-open my $fh1, ">", "doiowarn.tmp"; close $fh1;
+open: my $fh1, ">", "doiowarn.tmp"; close $fh1;
 no warnings 'io' ;
-open my $fh2, ">", "doiowarn.tmp"; close $fh2;
-unlink "doiowarn.tmp";
+open: my $fh2, ">", "doiowarn.tmp"; close $fh2;
+unlink: "doiowarn.tmp";
 EXPECT
 Filehandle STDIN reopened only for output at - line 14 character 1.
 ########

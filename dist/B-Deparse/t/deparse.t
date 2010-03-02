@@ -6,17 +6,17 @@ use feature ":5.10"
 use Test::More tests => 56
 
 use B::Deparse
-my $deparse = B::Deparse->new()
-ok($deparse)
+my $deparse = B::Deparse->new: 
+ok: $deparse
 
 # Tell B::Deparse about our ambient pragmas
 do { my ($hint_bits, $warning_bits, $hinthash);
     BEGIN { (@: $hint_bits, $warning_bits, $hinthash) = (@: $^HINT_BITS, $^WARNING_BITS, \$^HINTS); }
-    $deparse->ambient_pragmas (
-        hint_bits    => $hint_bits,
-        warning_bits => $warning_bits,
-        '%^H'	  => $hinthash,
-        );
+    $deparse->ambient_pragmas : 
+        hint_bits    => $hint_bits
+        warning_bits => $warning_bits
+        '%^H'	  => $hinthash
+        ;
 }
 
 $^INPUT_RECORD_SEPARATOR = "\n####\n"
@@ -37,49 +37,49 @@ while ( ~< $^DATA)
     my $coderef = eval "sub \{$input\n\}"
 
     if ($^EVAL_ERROR and $^EVAL_ERROR->{?description})
-        diag("$num deparsed: $($^EVAL_ERROR->message)")
-        diag("input: '$input'")
-        ok(0, $testname)
+        diag: "$num deparsed: $(($^EVAL_ERROR->message: ))"
+        diag: "input: '$input'"
+        ok: 0, $testname
     else
-        my $deparsed = $deparse->coderef2text( $coderef )
+        my $deparsed = $deparse->coderef2text:  $coderef 
         my $regex = $expected
         $regex =~ s/(\S+)/\Q$1/g
         $regex =~ s/\s+/ \\s+ /g
         $regex = '^ \{ \s* ' . $regex . ' \s* \} $'
-        like($deparsed, qr/$regex/x, $testname)
+        like: $deparsed, qr/$regex/x, $testname
 
 
 use constant 'c', 'stuff'
 :TODO do
-    todo_skip("fix deparse", 4)
-    my $deparsed_txt = "sub ".$deparse->coderef2text(\&c)
-    my $deparsed_sub = eval $deparsed_txt; die if $^EVAL_ERROR
-    is($deparsed_sub->(), 'stuff')
+    todo_skip: "fix deparse", 4
+    my $deparsed_txt = "sub ".$deparse->coderef2text: \&c
+    my $deparsed_sub = eval $deparsed_txt; die: if $^EVAL_ERROR
+    is: ($deparsed_sub->& <: ), 'stuff'
 
     my $a = 0
-    is("\{\n    (-1) ** \$a;\n\}", $deparse->coderef2text(sub (@< @_){(-1) ** $a }))
+    is: "\{\n    (-1) ** \$a;\n\}", ($deparse->coderef2text: sub (@< @_){(-1) ** $a })
 
     use constant cr => \(@: 'hello');
-    my $string = "sub " . $deparse->coderef2text(\&cr)
+    my $string = "sub " . $deparse->coderef2text: \&cr
     my $subref = eval $string
-    die "Failed eval '$string': $($^EVAL_ERROR->message)" if $^EVAL_ERROR
-    my $val = $subref->() or diag $string
-    is(ref($val), 'ARRAY')
-    is($val->[0], 'hello')
+    die: "Failed eval '$string': $(($^EVAL_ERROR->message: ))" if $^EVAL_ERROR
+    my $val =( $subref->& <: ) or diag: $string
+    is: (ref: $val), 'ARRAY'
+    is: $val->[0], 'hello'
 
 
 my $Is_VMS = $^OS_NAME eq 'VMS'
 my $Is_MacOS = $^OS_NAME eq 'MacOS'
 
-my $path = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH
+my $path = join: " ", map: { qq["-I$_"] }, $^INCLUDE_PATH
 $path .= " -MMac::err=unix" if $Is_MacOS
 my $redir = $Is_MacOS ?? "" !! "2>&1"
 
 $a = `$^EXECUTABLE_NAME $path "-MO=Deparse" -w -e 1 $redir`
 $a =~ s/-e syntax OK\n//g
 $a =~ s/.*possible typo.*\n//	   # Remove warning line
-$a =~ s{\\340\\242}{\\s} if (ord("\\") == 224) # EBCDIC, cp 1047 or 037
-$a =~ s{\\274\\242}{\\s} if (ord("\\") == 188) # $^O eq 'posix-bc'
+$a =~ s{\\340\\242}{\\s} if ((ord: "\\") == 224) # EBCDIC, cp 1047 or 037
+$a =~ s{\\274\\242}{\\s} if ((ord: "\\") == 188) # $^O eq 'posix-bc'
 $b = <<'EOF'
 BEGIN { $^WARNING = 1; }
 BEGIN { $^INPUT_RECORD_SEPARATOR = "\n"; }
@@ -99,7 +99,7 @@ $b =~ s/(LINE:)/sub BEGIN \{
 $1/ if $Is_MacOS
 do
     local our $TODO = 1
-    is($a, $b)
+    is: $a, $b
 
 
 #Re: perlbug #35857, patch #24505
@@ -109,8 +109,8 @@ package B::Deparse::Wrapper
 use warnings
 use warnings::register
 sub getcode
-    my $deparser = B::Deparse->new()
-    return $deparser->coderef2text(shift)
+    my $deparser = B::Deparse->new: 
+    return $deparser->coderef2text: shift
 
 
 package main
@@ -121,16 +121,16 @@ use Fcntl < qw/O_TRUNC O_APPEND O_EXCL/
 use warnings
 sub test
     my $val = shift
-    my $res = B::Deparse::Wrapper::getcode($val)
-    like( $res, qr/use warnings/)
+    my $res = B::Deparse::Wrapper::getcode: $val
+    like:  $res, qr/use warnings/
 
 sub testsub
     42
 
 my ($q,$p)
 my $x=sub { (@:  ++$q,++$p ) }
-test($x)
-eval <<EOFCODE and test($x)
+test: $x
+eval <<EOFCODE and test: $x
    package bar;
    use warnings;
    use warnings::register;
@@ -161,15 +161,15 @@ $test /= 2 if ++$test;
 ####
 # 10
 my $x;
-print *STDOUT, $main::x;
+print: *STDOUT, $main::x;
 ####
 # 11
 my @x;
-print *STDOUT, @main::x[1];
+print: *STDOUT, @main::x[1];
 ####
 # 12
 my %x;
-%x{warn()};
+%x{warn:};
 ####
 # 0
 @(: my $x, my $y) = @(: 'xx', 'yy');
@@ -178,7 +178,7 @@ my @x = @(: 1 .. 10);
 ####
 # 13
 my $foo;
-$_ .= ~<(*ARGV) . ~<($foo);
+$_ .= (~< *ARGV) . (~< $foo);
 ####
 # 14
 use utf8;
@@ -219,25 +219,25 @@ foreach our $i (1) {
 ####
 # 29
 my @x;
-print *STDOUT, reverse(sort(@x));
+print: *STDOUT, reverse: sort: @x;
 ####
 # 30
 my @x;
-print *STDOUT, (sort {$b cmp $a} , @x);
+print: *STDOUT, (sort: {$b cmp $a} , @x);
 >>>>
 my @x;
-print *STDOUT, sort(sub { $main::b cmp $main::a; } , @x);
+print: *STDOUT, sort: sub { $main::b cmp $main::a; } , @x;
 ####
 # 32 TODO
-foreach (reverse @main::a)
-    print $^STDOUT, $_
+foreach (reverse: @main::a)
+    print: $^STDOUT, $_
 ####
 # 33 TODO range
-foreach (reverse 2 .. 5)
-    print $^STDOUT, $_
+foreach (reverse: 2 .. 5)
+    print: $^STDOUT, $_
 ####
 # 34  (bug #38684)
-@main::ary = @(: split(' ', 'foo', 0));
+@main::ary = @(: split: ' ', 'foo', 0);
 ####
 # 35 (bug #40055)
 do { () }; 
@@ -263,10 +263,10 @@ my $f = sub {
 ####
 # 42
 my $bar;
-'Foo'->?$bar('orz');
+'Foo'->?$bar: 'orz';
 ####
 # 43
-'Foo'->bar('orz');
+'Foo'->bar: 'orz';
 ####
 # 44
 'Foo'->bar;
@@ -293,7 +293,7 @@ my @array;
 my %hash;
 %hash{[@(: 'foo', 'bar')]};
 ####
-testsub();
+testsub: ;
 ####
 my($x, $y);
 if ($x) {
@@ -306,36 +306,36 @@ if ($x) {
 my($x, $y, $z);
 $x = $y || $y;
 ####
-# TODO calling non-existing sub
-x()
+# calling non-existing sub
+x: ;
 ####
 # TODO 53 conditions in elsifs (regression in change #33710 which fixed bug #37302)
 my ($x, $y);
-if ($x) { testsub(); }
-elsif ($y) { testsub(); }
-elsif ($x and $y) { testsub(); }
-elsif ($x or $y) { testsub(); }
-else { testsub(); }
+if ($x) { testsub: ; }
+elsif ($y) { testsub: ; }
+elsif ($x and $y) { testsub: ; }
+elsif ($x or $y) { testsub: ; }
+else { testsub: ; }
 ####
 # TODO 54 interpolation in regexps
 my($y, $t)
 m/x$($y)z$t/
 my $c;
-x() unless $a;
-x() if $a;
-x() unless $a or $b;
-x() if $a or $b;
-x() unless $a and $b;
-x() if $a and $b;
-x() if not $a || $b and $c;
-x() unless not $a || $b and $c;
-x() if not $a && $b or $c;
-x() unless not $a && $b or $c;
-x() unless $a or $b or $c;
-x() if $a or $b or $c;
-x() unless $a and $b and $c;
-x() if $a and $b and $c;
-x() unless not $a && $b && $c;
+x: unless $a;
+x: if $a;
+x: unless $a or $b;
+x: if $a or $b;
+x: unless $a and $b;
+x: if $a and $b;
+x: if not $a || $b and $c;
+x: unless not $a || $b and $c;
+x: if not $a && $b or $c;
+x: unless not $a && $b or $c;
+x: unless $a or $b or $c;
+x: if $a or $b or $c;
+x: unless $a and $b and $c;
+x: if $a and $b and $c;
+x: unless not $a && $b && $c;
 ####
 # TODO tests for deparsing constants
 warn PI;

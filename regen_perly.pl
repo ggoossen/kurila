@@ -29,7 +29,7 @@
 # it may work elsewhere but no specific attempt has been made to make it
 # portable.
 
-sub usage { die "usage: $^PROGRAM_NAME [ -b bison_executable ] [ file.y ]\n" }
+sub usage { (die: "usage: $^PROGRAM_NAME [ -b bison_executable ] [ file.y ]\n") }
 
 use warnings
 
@@ -37,13 +37,13 @@ use warnings
 my $bison = 'bison'
 
 if ((nelems @ARGV) +>= 2 and @ARGV[0] eq '-b')
-    shift(@ARGV)
-    $bison = shift(@ARGV)
+    shift: @ARGV
+    $bison = shift: @ARGV
 
 
-my $y_file = shift(@ARGV) || 'perly.y'
+my $y_file = (shift: @ARGV) || 'perly.y'
 
-usage unless (nelems @ARGV)==0 && $y_file =~ m/\.y$/
+usage: unless (nelems @ARGV)==0 && $y_file =~ m/\.y$/
 
 (my $h_file    = $y_file) =~ s/\.y$/.h/
 (my $act_file  = $y_file) =~ s/\.y$/.act/
@@ -62,7 +62,7 @@ usage unless (nelems @ARGV)==0 && $y_file =~ m/\.y$/
 # the test below to allow that version too. DAPM Feb 04.
 
 my $version = `$bison -V`
-unless ($version =~ m/\b(1\.875[a-z]?|2\.[0134])\b/) { die <<EOF; }
+unless ($version =~ m/\b(1\.875[a-z]?|2\.[0134])\b/) { die: <<EOF; }
 
 You have the wrong version of bison in your path; currently 1.875
 2.0, 2.1 or 2.3 is required.  Try installing
@@ -73,48 +73,48 @@ $version
 EOF
 
 # creates $tmpc_file and $tmph_file
-my_system("$bison -d -o $tmpc_file $y_file")
+my_system: "$bison -d -o $tmpc_file $y_file"
 
-open my $ctmpfile, "<", $tmpc_file or die "Can't open $tmpc_file: $^OS_ERROR\n"
+open: my $ctmpfile, "<", $tmpc_file or die: "Can't open $tmpc_file: $^OS_ERROR\n"
 my $clines
 do { local $^INPUT_RECORD_SEPARATOR = undef; $clines = ~< $ctmpfile; }
-die "failed to read $tmpc_file: length mismatch\n"
+die: "failed to read $tmpc_file: length mismatch\n"
     unless length $clines == -s $tmpc_file
 close $ctmpfile
 
-my (@: $actlines, $tablines) =  extract($clines)
+my (@: $actlines, $tablines) =  extract: $clines
 
-$tablines .= make_type_tab($y_file, $tablines)
+$tablines .= make_type_tab: $y_file, $tablines
 
-chmod 0644, $act_file
-open my $actfile, ">", "$act_file" or die "can't open $act_file: $^OS_ERROR\n"
-print $actfile, $actlines
+chmod: 0644, $act_file
+open: my $actfile, ">", "$act_file" or die: "can't open $act_file: $^OS_ERROR\n"
+print: $actfile, $actlines
 close $actfile
-chmod 0444, $act_file
+chmod: 0444, $act_file
 
-chmod 0644, $tab_file
-open my $tabfile, ">", "$tab_file" or die "can't open $tab_file: $^OS_ERROR\n"
-print $tabfile, $tablines
+chmod: 0644, $tab_file
+open: my $tabfile, ">", "$tab_file" or die: "can't open $tab_file: $^OS_ERROR\n"
+print: $tabfile, $tablines
 close $tabfile
-chmod 0444, $tab_file
+chmod: 0444, $tab_file
 
-unlink $tmpc_file
+unlink: $tmpc_file
 
 # Wrap PERL_CORE round the symbol definitions. Also,  the
 # C<#line 30 "perly.y"> confuses the Win32 resource compiler and the
 # C<#line 188 "perlytmp.h"> gets picked up by make depend, so remove them.
 
-open my $tmph_fh, "<", $tmph_file or die "Can't open $tmph_file: $^OS_ERROR\n"
-chmod 0644, $h_file
-open my $h_fh, ">", "$h_file" or die "Can't open $h_file: $^OS_ERROR\n"
+open: my $tmph_fh, "<", $tmph_file or die: "Can't open $tmph_file: $^OS_ERROR\n"
+chmod: 0644, $h_file
+open: my $h_fh, ">", "$h_file" or die: "Can't open $h_file: $^OS_ERROR\n"
 my $endcore_done = 0
 # Token macros need to be generated manually on bison 2.4
 my $gather_tokens = ($version =~ m/\b2\.4\b/ ?? undef !! 0)
 my $tokens
 while ( ~< $tmph_fh->*)
-    print $h_fh, "#ifdef PERL_CORE\n" if iohandle::input_line_number($tmph_fh) == 1
+    print: $h_fh, "#ifdef PERL_CORE\n" if (iohandle::input_line_number: $tmph_fh) == 1
     if (!$endcore_done and m/YYSTYPE_IS_DECLARED/)
-        print $h_fh, "#endif /* PERL_CORE */\n"
+        print: $h_fh, "#endif /* PERL_CORE */\n"
         $endcore_done = 1
 
     next if m/^#line \d+ ".*"/
@@ -128,14 +128,14 @@ while ( ~< $tmph_fh->*)
            my @: ?$tok, ?$val = @: m/(\w+) \s* = \s* (\d+)/x
            $tokens .= "#define $tok $val\n" if $tok
 
-    print $h_fh, $_
+    print: $h_fh, $_
 
 close $tmph_fh
 close $h_fh
-chmod 0444, $h_file
-unlink $tmph_file
+chmod: 0444, $h_file
+unlink: $tmph_file
 
-print $^STDOUT, "rebuilt:  $h_file $tab_file $act_file\n"
+print: $^STDOUT, "rebuilt:  $h_file $tab_file $act_file\n"
 
 exit 0
 
@@ -157,7 +157,7 @@ sub extract
         }\s*;                           # end of last table
        )
     @xms
-        or die "Can't extract tables from $tmpc_file\n"
+        or die: "Can't extract tables from $tmpc_file\n"
     $tablines = $1
 
 
@@ -181,7 +181,7 @@ sub extract
             YY_SYMBOL_PRINT
         )
     @xms
-        or die "Can't extract actions from $tmpc_file\n"
+        or die: "Can't extract actions from $tmpc_file\n"
     $actlines = $1
 
     # C<#line 188 "perlytmp.c"> gets picked up by make depend, so remove them.
@@ -192,7 +192,7 @@ sub extract
     # convert yyvsp[nnn] into ps[nnn].val
 
     $actlines =~ s/yyvsp\[(.*?)\]/ps[$1].val/g
-        or die "Can't convert value stack name\n"
+        or die: "Can't convert value stack name\n"
 
     return @: $actlines. "\n", $tablines. "\n"
 
@@ -232,28 +232,28 @@ sub make_type_tab($y_file, $tablines)
     my %tokens
     my %types
     my $default_token
-    open my $fh, '<', $y_file or die "Can't open $y_file: $^OS_ERROR\n"
+    open: my $fh, '<', $y_file or die: "Can't open $y_file: $^OS_ERROR\n"
     while ( ~< $fh)
         if (m/(\$\d+)\s*=/)
-            warn "$y_file:$(iohandle::input_line_number($fh)): dangerous assignment to $1: $_"
+            warn: "$y_file:$((iohandle::input_line_number: $fh)): dangerous assignment to $1: $_"
 
 
         if (m/__DEFAULT__/)
             m{(\w+) \s* ; \s* /\* \s* __DEFAULT__}x
-                or die "$y_file: can't parse __DEFAULT__ line: $_"
-            die "$y_file: duplicate __DEFAULT__ line: $_"
+                or die: "$y_file: can't parse __DEFAULT__ line: $_"
+            die: "$y_file: duplicate __DEFAULT__ line: $_"
                 if defined $default_token
             $default_token = $1
             next
 
         next unless m/^%(token|type)/
         s/^%(token|type)\s+<(\w+)>\s+//
-            or die "$y_file: unparseable token/type line: $_"
-        for (split ' ', $_)
+            or die: "$y_file: unparseable token/type line: $_"
+        for ((split: ' ', $_))
             %tokens{+$_} = $2
         %types{+$2} = 1
 
-    die "$y_file: no __DEFAULT__ token defined\n" unless $default_token
+    die: "$y_file: no __DEFAULT__ token defined\n" unless $default_token
     %types{+$default_token} = 1
 
     $tablines =~ m/^\Qstatic const char *const yytname[] =\E\n
@@ -261,18 +261,18 @@ sub make_type_tab($y_file, $tablines)
             (.*?)
             ^};
             /xsm
-        or die "Can't extract yytname[] from table string\n"
+        or die: "Can't extract yytname[] from table string\n"
     my $fields = $1
     $fields =~ s{"([^"]+)"}
                 {$( "toketype_" .
     (defined %tokens{?$1} ?? %tokens{?$1} !! $default_token)
     )}g
     $fields =~ s/, \s* 0 \s* $//x
-        or die "make_type_tab: couldn't delete trailing ',0'\n"
+        or die: "make_type_tab: couldn't delete trailing ',0'\n"
 
     return
         "\ntypedef enum \{\n\t"
-        . join(", ", map { "toketype_$_" }, sort keys %types)
+        . join: ", ", (map: { "toketype_$_" }, (sort: keys %types))
         . "\n\} toketypes;\n\n"
         . "/* type of each token/terminal */\n"
         . "static const toketypes yy_type_tab[] =\n\{\n"
@@ -282,13 +282,13 @@ sub make_type_tab($y_file, $tablines)
 
 
 sub my_system
-    system(< @_)
+    system: < @_
     if ($^CHILD_ERROR == -1)
-        die "failed to execute command '$(join ' ',@_)': $^OS_ERROR\n"
+        die: "failed to execute command '$((join: ' ',@_))': $^OS_ERROR\n"
     elsif ($^CHILD_ERROR ^&^ 127)
-        die sprintf "command '$(join ' ',@_)' died with signal \%d\n",
-            ($^CHILD_ERROR ^&^ 127)
+        die: sprintf: "command '$((join: ' ',@_))' died with signal \%d\n"
+                      ($^CHILD_ERROR ^&^ 127)
     elsif ($^CHILD_ERROR >> 8)
-        die sprintf "command '$(join ' ',@_)' exited with value \%d\n", $^CHILD_ERROR >> 8
+        die: sprintf: "command '$((join: ' ',@_))' exited with value \%d\n", $^CHILD_ERROR >> 8
 
 

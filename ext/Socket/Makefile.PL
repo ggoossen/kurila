@@ -1,13 +1,13 @@
 use ExtUtils::MakeMaker
 use ExtUtils::Constant v0.11 'WriteConstants'
 use Config
-WriteMakefile(
-    NAME         => 'Socket',
-    VERSION_FROM => 'Socket.pm',
-    (config_value("libs") =~ m/(-lsocks\S*)/ ?? (LIBS => \(@:  "$1" ) ) !! ()),
-    XSPROTOARG   => '-noprototypes',            # XXX remove later?
-    realclean => (%:  FILES=> 'const-c.inc const-xs.inc' ),
-    )
+WriteMakefile: 
+    NAME         => 'Socket'
+    VERSION_FROM => 'Socket.pm'
+    ((config_value: "libs") =~ m/(-lsocks\S*)/ ?? (LIBS => \(@:  "$1" ) ) !! ())
+    XSPROTOARG   => '-noprototypes'            # XXX remove later?
+    realclean => (%:  FILES=> 'const-c.inc const-xs.inc' )
+    
 my @names = @:  <qw(AF_802 AF_AAL AF_APPLETALK AF_CCITT AF_CHAOS AF_CTF
                 AF_DATAKIT AF_DECnet AF_DLI AF_ECMA AF_GOSIP AF_HYLINK
                 AF_IMPLINK AF_INET AF_INET6 AF_ISO AF_KEY
@@ -56,19 +56,19 @@ my @names = @:  <qw(AF_802 AF_AAL AF_APPLETALK AF_CCITT AF_CHAOS AF_CTF
                 \%: name=>"SHUT_RDWR", type=>"IV", default=>\(@: "IV", "2")
 
 foreach (qw(MSG_CTRUNC MSG_DONTROUTE MSG_OOB MSG_PEEK MSG_PROXY SCM_RIGHTS))
-    push @names,
-        \%: name=>$_, type=>"IV"
-            macro=>\(@: "#if defined($_) || defined(HAS_$_) /* might be an enum */\n"
-                        "#endif\n")
+    push: @names
+          \%: name=>$_, type=>"IV"
+              macro=>\(@: "#if defined($_) || defined(HAS_$_) /* might be an enum */\n"
+                          "#endif\n")
 
 foreach (qw(INADDR_ANY INADDR_LOOPBACK INADDR_NONE INADDR_BROADCAST))
-    push @names,
-        \%: name => $_, type => "SV"
-            pre=>"struct in_addr ip_address; ip_address.s_addr = htonl($_);"
-            value => "sv_2mortal(newSVpvn((char *)&ip_address,sizeof ip_address ))",
+    push: @names
+          \%: name => $_, type => "SV"
+              pre=>"struct in_addr ip_address; ip_address.s_addr = htonl($_);"
+              value => "sv_2mortal(newSVpvn((char *)&ip_address,sizeof ip_address ))"
 
-WriteConstants(
-    PROXYSUBS => 1,
-    NAME => 'Socket',
-    NAMES => \@names,
-    )
+WriteConstants: 
+    PROXYSUBS => 1
+    NAME => 'Socket'
+    NAMES => \@names
+    

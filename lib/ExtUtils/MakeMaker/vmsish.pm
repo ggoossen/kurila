@@ -12,9 +12,9 @@ sub import
     return unless $IsVMS
 
     shift
-    unshift @_, 'vmsish'
+    unshift: @_, 'vmsish'
 
-    return vmsish::import(< @_)
+    return vmsish::import: < @_
 
 
 1

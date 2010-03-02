@@ -285,20 +285,20 @@ $VERSION = eval $VERSION
 ##
 
 sub new
-    my $class = ref(@_[0]) || @_[0] || "IO::Handle"
-    (nelems @_) == 1 or die "usage: new $class"
-    my $io = gensym
-    bless $io, $class
+    my $class = (ref: @_[0]) || @_[0] || "IO::Handle"
+    (nelems @_) == 1 or die: "usage: new $class"
+    my $io = (gensym: )
+    bless: $io, $class
 
 
 sub new_from_fd
-    my $class = ref(@_[0]) || @_[0] || "IO::Handle"
-    (nelems @_) == 3 or die "usage: new_from_fd $class FD, MODE"
-    my $io = gensym
+    my $class = (ref: @_[0]) || @_[0] || "IO::Handle"
+    (nelems @_) == 3 or die: "usage: new_from_fd $class FD, MODE"
+    my $io = (gensym: )
     shift
-    IO::Handle::fdopen($io, < @_)
+    IO::Handle::fdopen: $io, < @_
         or return undef
-    bless $io, $class
+    bless: $io, $class
 
 
 ################################################
@@ -310,24 +310,24 @@ sub _open_mode_string($mode)
         or $mode =~ s/^r(\+?)$/$1</
         or $mode =~ s/^w(\+?)$/$1>/
         or $mode =~ s/^a(\+?)$/$1>>/
-        or die "IO::Handle: bad open mode: $mode"
+        or die: "IO::Handle: bad open mode: $mode"
     $mode
 
 
 sub fdopen($io, $fd, $mode)
 
     my $fdmode = '&'
-    if (!ref($fd) && $fd =~ m#^\d+$#)
+    if (!(ref: $fd) && $fd =~ m#^\d+$#)
         # It's an FD number; prefix with "=".
         $fdmode .= "="
     
 
-    open($io, _open_mode_string($mode) . $fdmode, $fd)
+    open: $io, (_open_mode_string: $mode) . $fdmode, $fd
         ?? $io !! undef
 
 
 sub close($io)
-    close($io)
+    close: $io
 
 
 ################################################
@@ -338,27 +338,27 @@ sub close($io)
 # select
 
 sub opened($io)
-    defined fileno($io)
+    defined fileno: $io
 
 
 sub fileno($io)
-    fileno($io)
+    fileno: $io
 
 
 sub getc($io)
-    getc($io)
+    getc: $io
 
 
 sub eof($io)
-    eof($io)
+    eof: $io
 
 
 sub print($this, @< @args)
-    print $this, < @args
+    print: $this, < @args
 
 
 sub printf($this, @< @args)
-    printf $this, < @args
+    printf: $this, < @args
 
 
 sub getline($this)
@@ -372,34 +372,31 @@ sub getlines($this)
 
 
 sub truncate($io, $len)
-    truncate($io, $len)
+    truncate: $io, $len
 
 
 sub read($io, $bufref, $len, ?$offset)
-    read($io, $bufref->$, $len, $offset || 0)
+    read: $io, $bufref->$, $len, $offset || 0
 
 
 sub sysread($io, $bufref, $len, ?$offset)
-    sysread($io, $bufref->$, $len, $offset || 0)
+    sysread: $io, $bufref->$, $len, $offset || 0
 
 
-sub write
-    nelems(@_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])'
-    @_[+2] = length(@_[1]) unless defined @_[?2]
-    print  @_[0]  ,substr(@_[1], @_[?3] || 0, @_[2])
+sub write($io, $buf, ?$len, ?$offset)
+    $len //= length: $buf
+    print: $io, substr: $buf, $offset || 0, $len
 
 
-sub syswrite
-    nelems(@_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])'
-    if (defined(@_[?2]))
-        syswrite(@_[0], @_[1], @_[2], @_[?3] || 0)
+sub syswrite($io, $buf, ?$len, ?$offset)
+    if (defined: $len)
+        syswrite: $io, $buf, $len, $offset || 0
     else
-        syswrite(@_[0], @_[1])
-
+        syswrite: $io, $buf
 
 
 sub stat($io)
-    stat(@_[0])
+    stat: @_[0]
 
 
 ################################################
@@ -407,41 +404,41 @@ sub stat($io)
 ##
 
 sub autoflush($fh, @< @_)
-    my $prev = iohandle::output_autoflush($fh)
-    iohandle::output_autoflush($fh, @_ ?? @_[0] !! 1)
+    my $prev = iohandle::output_autoflush: $fh
+    iohandle::output_autoflush: $fh, @_ ?? @_[0] !! 1
     return $prev
 
 
 sub output_field_separator
-    warn "output_field_separator is not supported on a per-handle basis"
-        if ref(@_[0])
+    warn: "output_field_separator is not supported on a per-handle basis"
+        if ref: @_[0]
     my $prev = $^OUTPUT_FIELD_SEPARATOR
     $^OUTPUT_FIELD_SEPARATOR = @_[1] if (nelems @_) +> 1
     $prev
 
 
 sub input_record_separator(@< @_)
-    warn "input_record_separator is not supported on a per-handle basis"
-        if ref(@_[0])
+    warn: "input_record_separator is not supported on a per-handle basis"
+        if ref: @_[0]
     my $prev = $^INPUT_RECORD_SEPARATOR
     $^INPUT_RECORD_SEPARATOR = @_[1] if (nelems @_) +> 1
     $prev
 
 
 sub input_line_number
-    ref(@_[0]) or die 'usage: $io->input_line_number'
-    my $fh = qualify(@_[0], $: caller)
-    my $prev = iohandle::input_line_number($fh)
-    iohandle::input_line_number($fh, @_[1]) if (nelems @_) +> 1
+    ref: @_[0] or die: 'usage: $io->input_line_number'
+    my $fh = qualify: @_[0], $: caller
+    my $prev = iohandle::input_line_number: $fh
+    iohandle::input_line_number: $fh, @_[1] if (nelems @_) +> 1
     return $prev
 
 
 sub fcntl($io, $op, $value)
-    return fcntl($io, $op, $value)
+    return fcntl: $io, $op, $value
 
 
 sub ioctl($io, $op, $value)
-    return ioctl($io, $op, $value)
+    return ioctl: $io, $op, $value
 
 
 # this sub is for compatability with older releases of IO that used
@@ -451,15 +448,15 @@ sub ioctl($io, $op, $value)
 # any new code should just chech defined(&CONSTANT_NAME)
 
 sub constant($name)
-    (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && exists Symbol::fetch_glob($name)->*->&)
-        ?? Symbol::fetch_glob($name)->*->() !! undef
+    (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && exists (Symbol::fetch_glob: $name)->*->&)
+        ??( (Symbol::fetch_glob: $name)->*->& <: ) !! undef
 
 
 
 sub printflush($io, @< @args)
-    my $prev_autoflush = iohandle::output_autoflush($io, 1)
-    print $io, < @args
-    iohandle::output_autoflush($io, $prev_autoflush)
+    my $prev_autoflush = iohandle::output_autoflush: $io, 1
+    print: $io, < @args
+    iohandle::output_autoflush: $io, $prev_autoflush
     return
 
 

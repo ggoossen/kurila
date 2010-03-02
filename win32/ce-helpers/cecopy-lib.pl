@@ -10,19 +10,19 @@ sub mk
     return if exists %dirs{$r}
     if ($r=~m/\//)
         $r=~m/^(.*)\/[^\/]*?$/
-        mk($1)
+        mk: $1
     
-    print $^STDERR, "..\\miniperl.exe -MCross comp.pl --do cemkdir [p]\\lib\\$r\n"
-    system("..\\miniperl.exe -I..\\lib -MCross comp.pl --do cemkdir [p]\\lib\\$r")
+    print: $^STDERR, "..\\miniperl.exe -MCross comp.pl --do cemkdir [p]\\lib\\$r\n"
+    system: "..\\miniperl.exe -I..\\lib -MCross comp.pl --do cemkdir [p]\\lib\\$r"
     %dirs{+$r}++
 
 for ( @files)
     if (m/\//)
         m/^(.*)\/[^\/]*?$/
-        mk($1)
+        mk: $1
     
     # currently no stripping POD
-    system("..\\miniperl.exe -I..\\lib -MCross comp.pl --copy pc:..\\lib\\$_ ce:[p]\\lib\\$_")
+    system: "..\\miniperl.exe -I..\\lib -MCross comp.pl --copy pc:..\\lib\\$_ ce:[p]\\lib\\$_"
 
 
 sub BEGIN

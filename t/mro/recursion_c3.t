@@ -6,8 +6,8 @@ use signals
 
 require './test.pl'
 
-plan(skip_all => "Your system has no SIGALRM") if ! signals::supported("ALRM")
-plan(tests => 8)
+plan: skip_all => "Your system has no SIGALRM" if ! signals::supported: "ALRM"
+plan: tests => 8
 
 =pod
 
@@ -70,21 +70,21 @@ my @loopies = @:
 
 foreach my $loopy ( @loopies)
     try {
-        local signals::handler("ALRM") = sub (@< @_) { die "ALRMTimeout" };
-        alarm(3);
-        $loopy->();
-        mro::get_linear_isa('K', 'c3');
+        local (signals::handler: "ALRM") = sub (@< @_) { (die: "ALRMTimeout") };
+        (alarm: 3);(
+        $loopy->& <: );
+        (mro::get_linear_isa: 'K', 'c3');
     }
 
     if(my $err = $^EVAL_ERROR)
         if($err->{?description} =~ m/ALRMTimeout/)
-            ok(0, "Loop terminated by SIGALRM")
+            ok: 0, "Loop terminated by SIGALRM"
         elsif($err->{?description} =~ m/Recursive inheritance detected/)
-            ok(1, "Graceful exception thrown")
+            ok: 1, "Graceful exception thrown"
         else
-            ok(0, "Unrecognized exception: $($err->message)")
+            ok: 0, "Unrecognized exception: $(($err->message: ))"
         
     else
-        ok(0, "Infinite loop apparently succeeded???")
+        ok: 0, "Infinite loop apparently succeeded???"
     
 

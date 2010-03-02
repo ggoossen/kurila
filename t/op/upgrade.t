@@ -11,7 +11,7 @@ BEGIN
 my $null
 
 $^OS_ERROR = 1
-my %types = %: 
+my %types = %:
     null => $null
     iv => 3
     nv => .5
@@ -25,12 +25,12 @@ my %types = %:
 %types{+pviv} = "Perl rules!"
 
 %types{+pvmg} = "Perl rules!!"
-study(%types{pvmg})
+study: %types{pvmg}
 
 # use Devel::Peek; Dump $pvmg;
 
 my @keys = keys %types
-plan tests => (nelems @keys) * nelems @keys
+plan: tests => (nelems @keys) * nelems @keys
 
 foreach my $source_type ( @keys)
     foreach my $dest_type ( @keys)
@@ -40,8 +40,8 @@ foreach my $source_type ( @keys)
         $vars->{+source} = %types{?$source_type}
         # The assignment can potentially trigger assertion failures, so it's
         # useful to have the diagnostics about what was attempted printed first
-        print $^STDOUT, "# Assigning $source_type to $dest_type\n"
+        print: $^STDOUT, "# Assigning $source_type to $dest_type\n"
         $vars->{+dest} = $vars->{?source}
-        cmp_ok($vars->{?dest}, ((ref $vars->{?source}) ?? '\==' !! 'eq'), $vars->{?source})
+        cmp_ok: $vars->{?dest}, ((ref $vars->{?source}) ?? '\==' !! 'eq'), $vars->{?source}
     
 

@@ -140,7 +140,7 @@ Use of uninitialized value $y in chop at - line 3 character 9.
 # perlbug 20011116.125
 use warnings 'uninitialized'
 $a = undef
-my $foo = join '', @: $a, "\n"
+my $foo = join: '', @: $a, "\n"
 $foo = "$a\n"
 $foo = "a:$a\n"
 EXPECT
@@ -184,9 +184,9 @@ Argument "def" isn't numeric in bitwise and (^&^) at - line 3 character 11.
 ########
 # sv.c
 use warnings 'numeric' ;
-my $x = pack i => "def" ;
+my $x = pack: i => "def" ;
 no warnings 'numeric' ;
-my $z = pack i => "def" ;
+my $z = pack: i => "def" ;
 EXPECT
 Argument "def" isn't numeric in pack at - line 3 character 9.
 ########
@@ -212,20 +212,20 @@ Subroutine main::fred redefined at - line 5 character 1.
 ########
 # sv.c
 use warnings 'printf' ;
-open my $f, ">", ($^OS_NAME eq 'VMS' ?? 'NL:' !! '/dev/null') ;
-printf $f, "\%z\n" ;
-my $a = sprintf "\%z" ;
-printf $f, "\%" ;
-$a = sprintf "\%" ;
-printf $f, "\%\x{02}" ;
-$a = sprintf "\%\x{02}" ;
+open: my $f, ">", ($^OS_NAME eq 'VMS' ?? 'NL:' !! '/dev/null') ;
+printf: $f, "\%z\n" ;
+my $a = sprintf: "\%z" ;
+printf: $f, "\%" ;
+$a = sprintf: "\%" ;
+printf: $f, "\%\x{02}" ;
+$a = sprintf: "\%\x{02}" ;
 no warnings 'printf' ;
-printf $f, "\%z\n" ;
-$a = sprintf "\%z" ;
-printf $f, "\%" ;
-$a = sprintf "\%" ;
-printf $f, "\%\x{02}" ;
-$a = sprintf "\%\x{02}" ;
+printf: $f, "\%z\n" ;
+$a = sprintf: "\%z" ;
+printf: $f, "\%" ;
+$a = sprintf: "\%" ;
+printf: $f, "\%\x{02}" ;
+$a = sprintf: "\%\x{02}" ;
 EXPECT
 Invalid conversion in printf: "%z" at - line 4 character 1.
 Invalid conversion in sprintf: "%z" at - line 5 character 9.

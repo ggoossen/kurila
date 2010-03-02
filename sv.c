@@ -6436,7 +6436,7 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 
     default:
 	if (! SvROK(sv))
-	    Perl_croak(aTHX_ "Not a subroutine reference");
+	    Perl_croak(aTHX_ "Expected a CODE reference but got a %s", Ddesc(sv));
 	sv = SvRV(sv);
 	if (SvTYPE(sv) == SVt_PVCV) {
 	    cv = (CV*)sv;

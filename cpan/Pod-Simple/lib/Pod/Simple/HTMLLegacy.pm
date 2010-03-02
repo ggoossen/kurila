@@ -24,57 +24,57 @@ sub pod2html
 
         my($netscape) # dummy
         local @ARGV = @args
-        GetOptions(
-            "help"       => \$help,
-            "verbose!"   => \$verbose,
-            "infile=s"   => \$infile,
-            "outfile=s"  => \$outfile,
-            "title=s"    => \$title,
-            "index!"     => \$index,
+        GetOptions: 
+            "help"       => \$help
+            "verbose!"   => \$verbose
+            "infile=s"   => \$infile
+            "outfile=s"  => \$outfile
+            "title=s"    => \$title
+            "index!"     => \$index
 
-            "netscape!"   => \$netscape,
-            ) or return bad_opts(< @args)
-        bad_opts(< @args) if (nelems @ARGV) # it should be all switches!
-        return help_message() if $help
+            "netscape!"   => \$netscape
+             or return bad_opts: < @args
+        bad_opts: < @args if (nelems @ARGV) # it should be all switches!
+        return (help_message: ) if $help
     
 
     for((@: $infile, $outfile)) { $_ = undef unless defined and length }
 
     if($verbose)
-        warn sprintf "\%s version \%s\n", __PACKAGE__, $VERSION
-        warn "OK, processed args [$(join ' ',@args)] ...\n"
-        warn sprintf
-            " Verbose: \%s\n Index: \%s\n Infile: \%s\n Outfile: \%s\n Title: \%s\n",
-            < map { defined($_) ?? $_ !! "(nil)" }, @: 
-            $verbose,     $index,     $infile,     $outfile,     $title
+        warn: sprintf: "\%s version \%s\n", __PACKAGE__, $VERSION
+        warn: "OK, processed args [$((join: ' ',@args))] ...\n"
+        warn: sprintf: 
+                  " Verbose: \%s\n Index: \%s\n Infile: \%s\n Outfile: \%s\n Title: \%s\n"
+                  < map: { (defined: $_) ?? $_ !! "(nil)" }, @:
+                             $verbose,     $index,     $infile,     $outfile,     $title
 
         *Pod::Simple::HTML::DEBUG = sub(){1}
 
     require Pod::Simple::HTML
-    Pod::Simple::HTML->VERSION(3)
+    Pod::Simple::HTML->VERSION: 3
 
-    die "No such input file as $infile\n"
+    die: "No such input file as $infile\n"
         if defined $infile and ! -e $infile
 
 
-    my $pod = Pod::Simple::HTML->new
-    $pod->force_title($title) if defined $title
-    $pod->index($index)
-    return $pod->parse_from_file($infile, $outfile)
+    my $pod = Pod::Simple::HTML->new: 
+    $pod->force_title: $title if defined $title
+    $pod->index: $index
+    return $pod->parse_from_file: $infile, $outfile
 
 
 #--------------------------------------------------------------------------
 
-sub bad_opts     { die < _help_message();         }
-sub help_message { print $^STDOUT, < _help_message() }
+sub bad_opts     { (die: < (_help_message: ));         }
+sub help_message { (print: $^STDOUT, < (_help_message: )) }
 
 #--------------------------------------------------------------------------
 
 sub _help_message
 
-    join '', @: 
+    join: '', @:
 
-        "[", __PACKAGE__, " version ", $VERSION, qq~]
+              "[", __PACKAGE__, " version ", $VERSION, qq~]
 Usage:  pod2html --help --infile=<name> --outfile=<name>
    --verbose --index --noindex
 

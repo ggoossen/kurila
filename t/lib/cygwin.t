@@ -1,11 +1,9 @@
 #!perl
 
-BEGIN {
-    unless ($^OS_NAME eq "cygwin") {
-        print $^STDOUT, "1..0 # skipped: cygwin specific test\n";
-        exit 0;
-    }
-}
+BEGIN
+    unless ($^OS_NAME eq "cygwin")
+        print: $^STDOUT, "1..0 # skipped: cygwin specific test\n"
+        exit 0
 
 use Test::More tests => 16;
 

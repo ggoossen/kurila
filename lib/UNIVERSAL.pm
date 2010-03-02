@@ -16,7 +16,7 @@ our @EXPORT_OK = qw(isa can VERSION)
 sub import
     return unless @_[0] eq __PACKAGE__
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1
-    return Exporter::import(< @_)
+    return Exporter::import: < @_
 
 
 1

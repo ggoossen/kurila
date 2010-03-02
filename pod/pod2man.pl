@@ -17,17 +17,17 @@ our ($running_under_some_shell)
 # Insert -- into @ARGV before any single dash argument to hide it from
 # Getopt::Long; we want to interpret it as meaning stdin.
 my $stdin
-@ARGV = @+: map { $_ eq '-' && !$stdin++ ?? (@: '--', $_) !! @: $_ }, @ARGV
+@ARGV = @+: map: { $_ eq '-' && !$stdin++ ?? (@: '--', $_) !! @: $_ }, @ARGV
 
 # Parse our options, trying to retain backwards compatibility with pod2man but
 # allowing short forms as well.  --lax is currently ignored.
 my %options
-Getopt::Long::config ('bundling_override')
-GetOptions (\%options, 'section|s=s', 'release|r:s', 'center|c=s',
-            'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
-            'fixedbolditalic=s', 'name|n=s', 'official|o', 'quotes|q=s',
-            'lax|l', 'help|h', 'verbose|v', 'utf8|u') or exit 1
-pod2usage (0) if %options{help}
+Getopt::Long::config : 'bundling_override'
+GetOptions: \%options, 'section|s=s', 'release|r:s', 'center|c=s'
+            'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s'
+            'fixedbolditalic=s', 'name|n=s', 'official|o', 'quotes|q=s'
+            'lax|l', 'help|h', 'verbose|v', 'utf8|u' or exit 1
+pod2usage: 0 if %options{help}
 
 # Official sets --center, but don't override things explicitly set.
 if (%options{?official} && !defined %options{?center})
@@ -44,12 +44,12 @@ delete %options{lax}
 
 # Initialize and run the formatter, pulling a pair of input and output off at
 # a time.
-my $parser = Pod::Man->new( < %options)
+my $parser = Pod::Man->new:  < %options
 my @files
 do
-    @files = splice (@ARGV, 0, 2)
-    print $^STDOUT, "  @files[1]\n" if $verbose
-    $parser->parse_from_file (@files)
+    @files = splice: @ARGV, 0, 2
+    print: $^STDOUT, "  @files[1]\n" if $verbose
+    $parser->parse_from_file : @files
  while (@ARGV)
 
 __END__

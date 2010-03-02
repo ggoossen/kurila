@@ -15,45 +15,45 @@ use Getopt::Long
 my $outfile
 my $check_only = 0
 my $quiet = 0
-GetOptions ('output=s' => \$outfile,
-            'check'    => \$check_only,
-            'quiet'    => \$quiet)
+GetOptions: 'output=s' => \$outfile
+            'check'    => \$check_only
+            'quiet'    => \$quiet
 
-my $file = (@ARGV) ?? shift(@ARGV) !! 'MANIFEST'
+my $file = (@ARGV) ?? (shift: @ARGV) !! 'MANIFEST'
 
 # Read in the MANIFEST file
-open(my $IN, '<', $file)
-    or die("Can't read '$file': $^OS_ERROR")
+open: my $IN, '<', $file
+    or die: "Can't read '$file': $^OS_ERROR"
 my @manifest = @: ~< $IN
-close($IN) or die($^OS_ERROR)
-chomp(@manifest)
+close: $IN or die: $^OS_ERROR
+chomp: @manifest
 
 # Sort by dictionary order (ignore-case and
 #   consider whitespace and alphanumeric only)
-my @sorted = sort {
-                      (my $aa = $a) =~ s/[^\s\da-zA-Z]//g;
-                      (my $bb = $b) =~ s/[^\s\da-zA-Z]//g;
-                      uc($aa) cmp uc($bb);
-                  }, @manifest
+my @sorted = sort: {
+                       (my $aa = $a) =~ s/[^\s\da-zA-Z]//g;
+                       (my $bb = $b) =~ s/[^\s\da-zA-Z]//g;
+                       (uc: $aa) cmp (uc: $bb);
+                       }, @manifest
 
 # Check if the file is sorted or not
 my $exit_code = 0
-for my $ii (0..nelems(@manifest)-1)
+for my $ii (0..(nelems: @manifest)-1)
     next if (@manifest[$ii] eq @sorted[$ii])
     $exit_code = 1   # Not sorted
     last
 
 # Output sorted file
-if (defined($outfile))
-    open(my $OUT, '>', $outfile)
-        or die("Can't open output file '$outfile': $^OS_ERROR")
-    print($OUT, join("\n", @sorted), "\n")
-    close($OUT) or die($^OS_ERROR)
+if ((defined: $outfile))
+    open: my $OUT, '>', $outfile
+        or die: "Can't open output file '$outfile': $^OS_ERROR"
+    print: $OUT, (join: "\n", @sorted), "\n"
+    close: $OUT or die: $^OS_ERROR
 
 # Report on sort results
-print($^STDERR, "'$file' is$($exit_code ?? ' NOT' !! '') sorted properly\n") if ! $quiet
+print: $^STDERR, "'$file' is$($exit_code ?? ' NOT' !! '') sorted properly\n" if ! $quiet
 
 # Exit with the sort results status
-exit($exit_code)
+exit: $exit_code
 
 # EOF

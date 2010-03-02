@@ -13,7 +13,7 @@ our $VERSION = '1.06'
 my $pkg = __PACKAGE__
 unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ )
     my (@: _, $f, $l) = @: caller
-    die("Incorrect use of pragma '$(__PACKAGE__)' at $f line $l.\n")
+    die: "Incorrect use of pragma '$(__PACKAGE__)' at $f line $l.\n"
 
 
 =head1 NAME
@@ -139,7 +139,7 @@ See L<perlmodlib/Pragmatic Modules> and L<perllexwarn>.
 
 =cut
 
-our %Offsets = %: 
+our %Offsets = %:
 
     # Warnings Categories added in Perl 5.008
 
@@ -195,7 +195,7 @@ our %Offsets = %:
     'imprecision'       => 92
     
 
-our %Bits = %: 
+our %Bits = %:
     'all'               => "\x[555555555555555555555515]" # [0..46]
     'ambiguous'         => "\x[000000000000000400000000]" # [29]
     'bareword'          => "\x[000000000000001000000000]" # [30]
@@ -245,7 +245,7 @@ our %Bits = %:
     'void'              => "\x[000000000000000000000004]" # [45]
     
 
-our %DeadBits = %: 
+our %DeadBits = %:
     'all'               => "\x[aaaaaaaaaaaaaaaaaaaaaa2a]" # [0..46]
     'ambiguous'         => "\x[000000000000000800000000]" # [29]
     'bareword'          => "\x[000000000000002000000000]" # [30]
@@ -299,19 +299,19 @@ our $NONE     = "\0\0\0\0\0\0\0\0\0\0\0\0"
 our $LAST_BIT = 94 
 our $BYTES    = 12 
 
-our $All = "" ; vec($All, %Offsets{'all'}, 2 => 3)
+our $All = "" ; vec: $All, %Offsets{'all'}, 2 => 3
 
-sub bits
+sub bits(@< @args)
     # called from B::Deparse.pm
 
-    push @_, 'all' unless @_
+    push: @args, 'all' unless @args
 
     my $mask
     my $catmask 
     my $fatal = 0 
     my $no_fatal = 0 
 
-    foreach my $word ( @_ )
+    foreach my $word ( @args )
         if ($word eq 'FATAL')
             $fatal = 1
             $no_fatal = 0
@@ -324,8 +324,7 @@ sub bits
             $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal 
         
         else
-            die("Unknown warnings category '$word'")
-    
+            die: "Unknown warnings category '$word'"
 
     return $mask 
 
@@ -339,12 +338,12 @@ sub import
 
     my $mask = $^WARNING_BITS 
 
-    if (vec($mask, %Offsets{'all'}, 1))
+    if ((vec: $mask, %Offsets{'all'}, 1))
         $mask ^|^= %Bits{'all'} 
-        $mask ^|^= %DeadBits{'all'} if vec($mask, %Offsets{'all'}+1, 1)
+        $mask ^|^= %DeadBits{'all'} if vec: $mask, %Offsets{'all'}+1, 1
     
 
-    push @_, 'all' unless @_
+    push: @_, 'all' unless @_
 
     foreach my $word ( @_ )
         if ($word eq 'FATAL')
@@ -359,7 +358,7 @@ sub import
             $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal 
         
         else
-            die("Unknown warnings category '$word'")
+            die: "Unknown warnings category '$word'"
     
 
     $^WARNING_BITS = $mask 
@@ -371,12 +370,12 @@ sub unimport
     my $catmask 
     my $mask = $^WARNING_BITS 
 
-    if (vec($mask, %Offsets{'all'}, 1))
+    if ((vec: $mask, %Offsets{'all'}, 1))
         $mask ^|^= %Bits{'all'} 
-        $mask ^|^= %DeadBits{'all'} if vec($mask, %Offsets{'all'}+1, 1)
+        $mask ^|^= %DeadBits{'all'} if vec: $mask, %Offsets{'all'}+1, 1
     
 
-    push @_, 'all' unless @_
+    push: @_, 'all' unless @_
 
     foreach my $word ( @_ )
         if ($word eq 'FATAL')
@@ -385,7 +384,7 @@ sub unimport
             $mask ^&^= ^~^($catmask ^|^ %DeadBits{$word} ^|^ $All)
         
         else
-            die("Unknown warnings category '$word'")
+            die: "Unknown warnings category '$word'"
     
 
     $^WARNING_BITS = $mask 
@@ -402,27 +401,27 @@ sub __chk
         # check the category supplied.
         $category = shift 
         if (my $type = ref $category)
-            die("not an object")
+            die: "not an object"
                 if exists %builtin_type{$type}
             $category = $type
             $isobj = 1 
         
         $offset = %Offsets{?$category}
-        die("Unknown warnings category '$category'")
+        die: "Unknown warnings category '$category'"
             unless defined $offset
     else
-        $category = (@: caller(1))[0] 
+        $category = (@: (caller: 1))[0] 
         $offset = %Offsets{?$category}
-        die("package '$category' not registered for warnings")
+        die: "package '$category' not registered for warnings"
             unless defined $offset 
     
 
-    my $this_pkg = (@: caller(1))[0] 
+    my $this_pkg = (@: (caller: 1))[0] 
     my $i = 2 
     my $pkg 
 
     if ($isobj)
-        while (do { package DB; $pkg = (@: caller($i++))[0] } )
+        while (do { package DB; $pkg = (@: (caller: $i++))[0] } )
             last unless @DB::args && @DB::args[0] =~ m/^$category=/ 
         
         $i -= 2 
@@ -430,51 +429,51 @@ sub __chk
         $i = 2
     
 
-    my $callers_bitmask = (@: caller($i))[9] 
+    my $callers_bitmask = (@: (caller: $i))[9] 
     return @: $callers_bitmask, $offset, $i 
 
 
 sub enabled
-    die("Usage: warnings::enabled([category])")
-        unless nelems(@_) == 1 || nelems(@_) == 0 
+    die: "Usage: warnings::enabled([category])"
+        unless (nelems: @_) == 1 || (nelems: @_) == 0 
 
-    my (@: $callers_bitmask, $offset, $i) = __chk(< @_) 
+    my (@: $callers_bitmask, $offset, $i) = __chk: < @_ 
 
     return 0 unless defined $callers_bitmask 
-    return vec($callers_bitmask, $offset, 1) ||
-        vec($callers_bitmask, %Offsets{'all'}, 1) 
+    return (vec: $callers_bitmask, $offset, 1) ||
+        vec: $callers_bitmask, %Offsets{'all'}, 1 
 
 
 
 sub warn
-    die("Usage: warnings::warn([category,] 'message')")
-        unless nelems(@_) == 2 || nelems(@_) == 1 
+    die: "Usage: warnings::warn([category,] 'message')"
+        unless (nelems: @_) == 2 || (nelems: @_) == 1 
 
     my $message = pop 
-    my (@: $callers_bitmask, $offset, $i) = __chk(<@_) 
-    die($message)
-        if vec($callers_bitmask, $offset+1, 1) ||
-      vec($callers_bitmask, %Offsets{'all'}+1, 1) 
-    CORE::warn($message) 
+    my (@: $callers_bitmask, $offset, $i) = __chk: <@_ 
+    die: $message
+        if (vec: $callers_bitmask, $offset+1, 1) ||
+      vec: $callers_bitmask, %Offsets{'all'}+1, 1 
+    CORE::warn: $message 
 
 
 sub warnif
-    die("Usage: warnings::warnif([category,] 'message')")
-        unless nelems(@_) == 2 || nelems(@_) == 1 
+    die: "Usage: warnings::warnif([category,] 'message')"
+        unless (nelems: @_) == 2 || (nelems: @_) == 1 
 
     my $message = pop 
-    my (@: $callers_bitmask, $offset, $i) = __chk(<@_) 
+    my (@: $callers_bitmask, $offset, $i) = __chk: <@_ 
 
     return
         unless defined $callers_bitmask &&
-        (vec($callers_bitmask, $offset, 1) ||
-         vec($callers_bitmask, %Offsets{'all'}, 1)) 
+        ((vec: $callers_bitmask, $offset, 1) ||
+         (vec: $callers_bitmask, %Offsets{'all'}, 1)) 
 
-    die($message)
-        if vec($callers_bitmask, $offset+1, 1) ||
-      vec($callers_bitmask, %Offsets{'all'}+1, 1) 
+    die: $message
+        if (vec: $callers_bitmask, $offset+1, 1) ||
+      vec: $callers_bitmask, %Offsets{'all'}+1, 1 
 
-    CORE::warn($message) 
+    CORE::warn: $message 
 
 
 1

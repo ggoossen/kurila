@@ -7,7 +7,7 @@ require DynaLoader
 our @ISA = qw(DynaLoader)
 our $VERSION = '1.10'
 
-B::OP->bootstrap($VERSION)
+B::OP->bootstrap: $VERSION
 
 @B::OP::ISA = @:  'B::OBJECT' 
 @B::UNOP::ISA = @:  'B::OP' 
@@ -29,83 +29,83 @@ use constant OP_LIST    => 141    # MUST FIX CONSTANTS.
 # This is where we implement op.c in Perl. Sssh.
 sub linklist
     my $o = shift
-    if ( $o->can("first") and $o->first and  $o->first->$ )
-        $o->next( < $o->first->linklist )
-        my $kid = $o->first
+    if ( $o->can: "first" and $o->first:  and  ($o->first: )->$ )
+        $o->next:  <( ($o->first: )->linklist: ) 
+        my $kid = $o->first: 
         while ($kid->$)
-            if (  $kid->sibling->$ )
-                $kid->next( < $kid->sibling->linklist )
+            if (  ($kid->sibling: )->$ )
+                $kid->next:  <( ($kid->sibling: )->linklist: ) 
             else
-                $kid->next($o)
+                $kid->next: $o
             
-            $kid = $kid->sibling
+            $kid = $kid->sibling: 
         
     else
-        $o->next($o)
+        $o->next: $o
     
-    $o->clean
-    return $o->next
+    $o->clean: 
+    return $o->next: 
 
 
 sub append_elem( $class, $type, $first, $last)
     return $last  unless $first and $first->$
     return $first unless $last  and $last->$
 
-    if ( $first->type() != $type
-           or ( $type == OP_LIST and ( $first->flags ^&^ B::OPf_PARENS ) ) )
-        return B::LISTOP->new( $type, 0, $first, $last )
+    if ( ($first->type: ) != $type
+           or ( $type == (OP_LIST: )and ( ($first->flags: ) ^&^ B::OPf_PARENS ) ) )
+        return B::LISTOP->new:  $type, 0, $first, $last 
     
 
-    if ( $first->flags() ^&^ B::OPf_KIDS )
+    if ( ($first->flags: ) ^&^ B::OPf_KIDS )
 
-        $first->last->sibling($last)
+        ($first->last: )->sibling: $last
     else
-        $first->flags( $first->flags ^|^ B::OPf_KIDS )
-        $first->first($last)
+        $first->flags:  ($first->flags: ) ^|^ B::OPf_KIDS 
+        $first->first: $last
     
-    $first->last($last)
+    $first->last: $last
     return $first
 
 
 sub prepend_elem( $class, $type, $first, $last)
-    if ( $last->type() != $type )
-        return B::LISTOP->new( $type, 0, $first, $last )
+    if ( ($last->type: ) != $type )
+        return B::LISTOP->new:  $type, 0, $first, $last 
     
 
-    if ( $type == OP_LIST )
-        $first->sibling( < $last->first->sibling )
-        $last->first->sibling($first)
-        $last->flags( $last->flags ^&^ ^~^B::OPf_PARENS )
-            unless ( $first->flags ^&^ B::OPf_PARENS )
+    if ( $type == (OP_LIST: ))
+        $first->sibling:  <( ($last->first: )->sibling: ) 
+        ($last->first: )->sibling: $first
+        $last->flags:  ($last->flags: ) ^&^ ^~^B::OPf_PARENS 
+            unless ( ($first->flags: ) ^&^ B::OPf_PARENS )
     else
-        unless ( $last->flags ^&^ B::OPf_KIDS )
-            $last->last($first)
-            $last->flags( $last->flags ^|^ B::OPf_KIDS )
+        unless ( ($last->flags: ) ^&^ B::OPf_KIDS )
+            $last->last: $first
+            $last->flags:  ($last->flags: ) ^|^ B::OPf_KIDS 
         
-        $first->sibling( < $last->first )
-        $last->first($first)
+        $first->sibling:  < ($last->first: ) 
+        $last->first: $first
     
-    $last->flags( $last->flags ^|^ B::OPf_KIDS )
+    $last->flags:  ($last->flags: ) ^|^ B::OPf_KIDS 
     return $last    # I cannot believe this works.
 
 
 sub scope
     my $o = shift
     return unless $o and $o->$
-    if ( $o->flags ^&^ B::OPf_PARENS )
-        $o = B::OP->prepend_elem( < B::opnumber("lineseq"), <
-            B::OP->new( "enter", 0 ), $o )
-        $o->type( < B::opnumber("leave") )
+    if ( ($o->flags: ) ^&^ B::OPf_PARENS )
+        $o = B::OP->prepend_elem:  < (B::opnumber: "lineseq"), <
+                                       (B::OP->new:  "enter", 0 ), $o 
+        $o->type:  < (B::opnumber: "leave") 
     else
-        if ( $o->type == B::opnumber("lineseq") )
+        if ( ($o->type: ) == (B::opnumber: "lineseq") )
             my $kid
-            $o->type( < B::opnumber("scope") )
-            $kid = $o->first
-            die "This probably shouldn't happen (\$kid->null)\n"
-                if ( $kid->type == B::opnumber("nextstate")
-                     or $kid->type == B::opnumber("dbstate") )
+            $o->type:  < (B::opnumber: "scope") 
+            $kid = $o->first: 
+            die: "This probably shouldn't happen (\$kid->null)\n"
+                if ( ($kid->type: ) == B::opnumber: "nextstate"
+                     or ($kid->type: ) == (B::opnumber: "dbstate") )
         else
-            $o = B::LISTOP->new( "scope", 0, $o, undef )
+            $o = B::LISTOP->new:  "scope", 0, $o, undef 
         
     
     return  @: $o

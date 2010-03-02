@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker
 sub MY::libscan($self, $path)
     package MY
 
-    return $path if $self->SUPER::libscan($path) and
+    return $path if $self->SUPER::libscan: $path and
       $path !~ m! [~%]$
                             | \.(cache\.cm|swp|orig|rej)$
                             | regen\.pl$
@@ -16,7 +16,7 @@ sub MY::libscan($self, $path)
     return ''
 
 
-WriteMakefile(
-    VERSION_FROM        => "lib/IPC/SysV.pm",
-    NAME        => "IPC::SysV",
-    )
+WriteMakefile: 
+    VERSION_FROM        => "lib/IPC/SysV.pm"
+    NAME        => "IPC::SysV"
+    

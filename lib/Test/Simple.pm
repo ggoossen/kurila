@@ -76,7 +76,7 @@ will do what you mean (fail if stuff is empty)
 =cut
 
 sub ok($ok, ?$name)
-    $CLASS->builder->ok($ok, $name)
+    ($CLASS->builder: )->ok: $ok, $name
 
 
 

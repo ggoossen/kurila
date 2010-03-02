@@ -2,7 +2,7 @@
 
 use Test::More
 
-BEGIN { plan tests => 8 }
+BEGIN { (plan: tests => 8) }
 
 
 BEGIN 
@@ -11,7 +11,7 @@ BEGIN
     # we chdir() out of the "t" directory.
     if ($^OS_NAME eq 'MSWin32')
         require Win32
-        Win32->import()
+        Win32->import: 
     
 
 
@@ -22,7 +22,7 @@ use File::Spec          # used to get absolute paths
 # Will move up one level to make it easier to generate
 # reliable pathnames for testing File::CheckTree
 
-chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $^OS_ERROR"
+chdir: (File::Spec->updir: ) or die: "cannot change to parent of t/ directory: $^OS_ERROR"
 
 
 #### TEST 1 -- No warnings ####
@@ -30,13 +30,13 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $^OS_E
 
 do
     my ($num_warnings, $path_to_README)
-    $path_to_README = File::Spec->rel2abs('README')
+    $path_to_README = File::Spec->rel2abs: 'README'
 
     my @warnings
-    local $^WARN_HOOK = sub (@< @_) { push @warnings, @_[0]->{?description} }
+    local $^WARN_HOOK = sub (@< @_) { (push: @warnings, @_[0]->{?description}) }
 
     try {
-        $num_warnings = validate qq{
+        $num_warnings = validate: qq{
             lib  -d
 # comment, followed "blank" line (w/ whitespace):
            
@@ -48,11 +48,11 @@ do
     }
 
     for (@warnings)
-        print $^STDERR, $_
-    if ( !$^EVAL_ERROR && !@warnings && defined($num_warnings) && $num_warnings == 0 )
-        ok(1)
+        print: $^STDERR, $_
+    if ( !$^EVAL_ERROR && !@warnings && (defined: $num_warnings) && $num_warnings == 0 )
+        ok: 1
     else
-        ok(0)
+        ok: 0
     
 
 
@@ -62,10 +62,10 @@ do
 do
     my ($num_warnings, @warnings)
 
-    local $^WARN_HOOK = sub (@< @_) { push @warnings, @_[0]->{?description} }
+    local $^WARN_HOOK = sub (@< @_) { (push: @warnings, @_[0]->{?description}) }
 
     try {
-        $num_warnings = validate qq{
+        $num_warnings = validate: qq{
             lib    -f
             README -f
         };
@@ -73,13 +73,11 @@ do
 
     if ( !$^EVAL_ERROR && (nelems @warnings) == 1
            && @warnings[0] =~ m/lib is not a plain file/
-           && defined($num_warnings)
+           && defined: $num_warnings
         && $num_warnings == 1 )
-        ok(1)
+        ok: 1
     else
-        ok(0)
-    
-
+        ok: 0
 
 
 #### TEST 3 -- Multiple warnings ####
@@ -89,14 +87,14 @@ do
 do
     my ($num_warnings, @warnings)
 
-    local $^WARN_HOOK = sub (@< @_) { push @warnings, @_[0]->{?description} }
+    local $^WARN_HOOK = sub (@< @_) { (push: @warnings, @_[0]->{?description}) }
 
     try {
-        $num_warnings = validate q{
+        $num_warnings = validate: q{
             lib     -effd
             README -f || die
             README -d || warn
-            lib    -f || warn "my warning: $file\n"
+            lib    -f || warn: "my warning: $file\n"
         };
     }
 
@@ -104,26 +102,24 @@ do
            && @warnings[0] =~ m/lib is not a plain file/
            && @warnings[1] =~ m/README is not a directory/
            && @warnings[2] =~ m/my warning: lib/
-           && defined($num_warnings)
+           && defined: $num_warnings
         && $num_warnings == 3 )
-        ok(1)
+        ok: 1
     else
-        ok(0)
-    
-
+        ok: 0
 
 
 #### TEST 4 -- cd directive ####
 # cd directive followed by relative paths, followed by full paths
 do
     my ($num_warnings, @warnings, $path_to_libFile, $path_to_dist)
-    $path_to_libFile = File::Spec->rel2abs(File::Spec->catdir('lib','File'))
-    $path_to_dist    = File::Spec->rel2abs(File::Spec->curdir)
+    $path_to_libFile = File::Spec->rel2abs: (File::Spec->catdir: 'lib','File')
+    $path_to_dist    = File::Spec->rel2abs: (File::Spec->curdir: )
 
-    local $^WARN_HOOK = sub (@< @_) { push @warnings, @_[0]->{?description} }
+    local $^WARN_HOOK = sub (@< @_) { (push: @warnings, @_[0]->{?description}) }
 
     try {
-        $num_warnings = validate qq{
+        $num_warnings = validate: qq{
             lib                -d || die
             '$path_to_libFile' cd
             Spec               -e
@@ -138,13 +134,11 @@ do
     if ( !$^EVAL_ERROR && (nelems @warnings) == 2
            && @warnings[0] =~ m/Spec is not a plain file/
            && @warnings[1] =~ m/INSTALL is not a directory/
-           && defined($num_warnings)
+           && defined: $num_warnings
         && $num_warnings == 2 )
-        ok(1)
+        ok: 1
     else
-        ok(0)
-    
-
+        ok: 0
 
 
 #### TEST 5 -- Exception ####
@@ -153,7 +147,7 @@ do
     my $num_warnings
 
     try {
-        $num_warnings = validate q{
+        $num_warnings = validate: q{
             lib       -ef || die
             README    -d
         };
@@ -161,9 +155,9 @@ do
 
     if ( $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/lib is not a plain file/
         && not defined $num_warnings )
-        ok(1)
+        ok: 1
     else
-        ok(0, "$^EVAL_ERROR")
+        ok: 0, "$^EVAL_ERROR"
     
 
 
@@ -174,25 +168,24 @@ do
     my $num_warnings
 
     try {
-        $num_warnings = validate q{
-            lib       -ef || die "yadda $file yadda...\n"
+        $num_warnings = validate: q{
+            lib       -ef || die: "yadda $file yadda...\n"
             README    -d
         };
     }
 
     if ( $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/yadda lib yadda/
         && not defined $num_warnings )
-        ok(1)
+        ok: 1
     else
-        ok(0)
-    
+        ok: 0
 
 
 #### TEST 7 -- Quoted file names ####
 do
     my $num_warnings
     try {
-        $num_warnings = validate q{
+        $num_warnings = validate: q{
             "a file with whitespace" !-ef
             'a file with whitespace' !-ef
         };
@@ -200,10 +193,10 @@ do
 
     if ( !$^EVAL_ERROR )
         # No errors mean we compile correctly
-        ok(1)
+        ok: 1
     else
-        ok(0)
-        print $^STDERR, $^EVAL_ERROR
+        ok: 0
+        print: $^STDERR, $^EVAL_ERROR
     ;
 
 
@@ -211,11 +204,11 @@ do
 do
     my $num_warnings
     try {
-        $num_warnings = validate q{
+        $num_warnings = validate: q{
             a file with whitespace !-ef
         };
     }
 
     # We got a syntax error for a malformed file query
-    like ( $^EVAL_ERROR->message, qr/syntax error/)
+    like:  ($^EVAL_ERROR->message: ), qr/syntax error/
 

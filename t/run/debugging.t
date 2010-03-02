@@ -12,14 +12,13 @@ BEGIN
 # skip all tests unless perl was compiled with -DDEBUGGING
 BEGIN 
     require Config
-    if (Config::config_value('ccflags') !~ m/-DDEBUGGING\b/)
-        skip_all("Perl built w/o -DDEBUGGING")
-    
+    if ((Config::config_value: 'ccflags') !~ m/-DDEBUGGING\b/)
+        skip_all: "Perl built w/o -DDEBUGGING"
 
 
 plan(tests => 1)
 
-my $result = runperl( prog      => 'print $^STDOUT, "foo"',
+my $result = runperl( prog      => 'print: $^STDOUT, "foo"',
                       args      => \(@:  '-Dx' ),
                       stderr    => 1,
                       )
@@ -51,22 +50,22 @@ my $refdump = <<'EO_DX_OUT'
             FLAGS = (VOID,KIDS)
             {
 5               TYPE = pushmark  ===> 6
-                LOCATION = -e 1 7 
+                LOCATION = -e 1 8 
                 FLAGS = (SCALAR)
             }
             {
 7               TYPE = rv2gv  ===> 8
-                LOCATION = -e 1 7 
+                LOCATION = -e 1 8 
                 FLAGS = (SCALAR,KIDS,SPECIAL)
                 {
 6                   TYPE = magicsv  ===> 7
-                    LOCATION = -e 1 7 
+                    LOCATION = -e 1 8 
                     FLAGS = (SCALAR)
                 }
             }
             {
 8               TYPE = const  ===> 9
-                LOCATION = -e 1 22 
+                LOCATION = -e 1 23 
                 FLAGS = (SCALAR)
                 SV = PV("foo"\0) [UTF8 "foo"]
             }

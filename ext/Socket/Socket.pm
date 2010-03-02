@@ -363,7 +363,7 @@ use XSLoader ()
 	       TCP_NODELAY
 	       TCP_STDURG)
 
-%EXPORT_TAGS = %: 
+%EXPORT_TAGS = %:
     crlf    => qw(CR LF CRLF $CR $LF $CRLF)
     all     => @EXPORT +@+ @EXPORT_OK
     
@@ -374,19 +374,19 @@ BEGIN
     sub CRLF () {"\015\012"}
 
 
-*CR   = \CR()
-*LF   = \LF()
-*CRLF = \CRLF()
+*CR   = \(CR: )
+*LF   = \(LF: )
+*CRLF = \(CRLF: )
 
 sub sockaddr_in
     if (nelems @_ == 1)
-        return unpack_sockaddr_in(< @_)
+        return unpack_sockaddr_in: < @_
     else
-        die "usage:   sin_sv = sockaddr_in(port,iaddr))" unless (nelems @_) == 2
-        return pack_sockaddr_in(< @_)
+        die: "usage:   sin_sv = sockaddr_in(port,iaddr))" unless (nelems @_) == 2
+        return pack_sockaddr_in: < @_
     
 
 
-XSLoader::load 'Socket', $VERSION
+XSLoader::load:  'Socket', $VERSION
 
 1

@@ -36,7 +36,7 @@ $VERSION = '2.02'
 # This table is taken near verbatim from Pod::PlainText in Pod::Parser,
 # which got it near verbatim from the original Pod::Text.  It is therefore
 # credited to Tom Christiansen, and I'm glad I didn't have to write it.  :)
-%ESCAPES = %: 
+%ESCAPES = %:
     'amp'       =>    '&'      # ampersand
     'lt'        =>    '<'      # left chevron, less-than
     'gt'        =>    '>'      # right chevron, greater-than
@@ -126,8 +126,7 @@ sub initialize
     $self->%{+INDENTS}  = \$@              # Stack of indentations.
     $self->%{+MARGIN}   = $self->%{?indent}  # Current left margin in spaces.
 
-    $self->SUPER::initialize
-
+    $self->SUPER::initialize:
 
 
 ############################################################################
@@ -143,9 +142,9 @@ sub command
     my $command = shift
     return if $command eq 'pod'
     return if ($self->%{?EXCLUDE} && $command ne 'end')
-    $self->item ("\n") if defined $self->%{?ITEM}
+    $self->item : "\n" if defined $self->%{?ITEM}
     $command = 'cmd_' . $command
-    $self->?$command (< @_)
+    $self->?$command : < @_
 
 
 # Called for a verbatim paragraph.  Gets the paragraph, the line number, and
@@ -153,17 +152,17 @@ sub command
 # to spaces.
 sub verbatim($self, $_, _, ?_)
     return if $self->%{?EXCLUDE}
-    $self->item if defined $self->%{?ITEM}
+    $self->item:  if defined $self->%{?ITEM}
     return if m/^\s*$/
     s/^(\s*\S+)/$((' ' x $self->%{?MARGIN}) . $1)/gm
-    $self->output ($_)
+    $self->output : $_
 
 
 # Called for a regular text block.  Gets the paragraph, the line number, and
 # a Pod::Paragraph object.  Perform interpolation and output the results.
 sub textblock($self, $_, $line, _)
     return if $self->%{?EXCLUDE}
-    $self->output ($_), return if $self->%{?VERBATIM}
+    ($self->output : $_), return if $self->%{?VERBATIM}
 
     # Perform a little magic to collapse multiple L<> references.  This is
     # here mostly for backwards-compatibility.  We'll just rewrite the whole
@@ -192,9 +191,9 @@ sub textblock($self, $_, $line, _)
     } {$( do {
         my $_ = $1;
         s%L</([^>]+)>%$1%g;
-        my @items = split m/(?:,?\s+(?:and\s+)?)/;
+        my @items = (split: m/(?:,?\s+(?:and\s+)?)/);
         my $string = "the ";
-        for my $i (0 .. nelems(@items)-1) {
+        for my $i (0 .. (nelems: @items)-1) {
             $string .= @items[$i];
             $string .= ", " if (nelems @items) +> 2 && $i != (nelems @items)-1;
             $string .= " and " if ($i == (nelems @items) - 2);
@@ -205,12 +204,12 @@ sub textblock($self, $_, $line, _)
     })}gx
 
     # Now actually interpolate and output the paragraph.
-    $_ = $self->interpolate ($_, $line)
+    $_ = $self->interpolate : $_, $line
     s/\s+$/\n/
     if (defined $self->%{?ITEM})
-        $self->item ($_ . "\n")
+        $self->item : $_ . "\n"
     else
-        $self->output ( $self->reformat ($_ . "\n"))
+        $self->output :  ($self->reformat : $_ . "\n")
     
 
 
@@ -227,7 +226,7 @@ sub interior_sequence
     # Expand escapes into the actual character now, warning if invalid.
     if ($command eq 'E')
         return %ESCAPES{?$_} if defined %ESCAPES{?$_}
-        warn "Unknown escape: E<$_>"
+        warn: "Unknown escape: E<$_>"
         return "E<$_>"
     
 
@@ -243,12 +242,12 @@ sub interior_sequence
     
 
     # Anything else needs to get dispatched to another method.
-    if    ($command eq 'B') { return $self->seq_b ($_) }
-        elsif ($command eq 'C') { return $self->seq_c ($_) }
-        elsif ($command eq 'F') { return $self->seq_f ($_) }
-        elsif ($command eq 'I') { return $self->seq_i ($_) }
-        elsif ($command eq 'L') { return $self->seq_l ($_) }
-    else { warn "Unknown sequence $command<$_>" }
+    if    ($command eq 'B') { return ($self->seq_b : $_) }
+        elsif ($command eq 'C') { return ($self->seq_c : $_) }
+        elsif ($command eq 'F') { return ($self->seq_f : $_) }
+        elsif ($command eq 'I') { return ($self->seq_i : $_) }
+        elsif ($command eq 'L') { return ($self->seq_l : $_) }
+    else { warn: "Unknown sequence $command<$_>" }
 
 
 # Called for each paragraph that's actually part of the POD.  We take
@@ -256,7 +255,7 @@ sub interior_sequence
 sub preprocess_paragraph
     my $self = shift
     local $_ = shift
-    1 while s/^(.*?)(\t+)/$($1 . ' ' x (length ($2) * 8 - length ($1) % 8))/m
+    1 while s/^(.*?)(\t+)/$($1 . ' ' x ((length: $2) * 8 - (length: $1) % 8))/m
     $_
 
 
@@ -272,12 +271,12 @@ sub cmd_head1
     my $self = shift
     local $_ = shift
     s/\s+$//
-    $_ = $self->interpolate ($_, shift)
+    $_ = $self->interpolate : $_, shift
     if ($self->%{?alt})
-        $self->output ("\n==== $_ ====\n\n")
+        $self->output : "\n==== $_ ====\n\n"
     else
         $_ .= "\n" if $self->%{?loose}
-        $self->output ($_ . "\n")
+        $self->output : $_ . "\n"
     
 
 
@@ -286,11 +285,11 @@ sub cmd_head2
     my $self = shift
     local $_ = shift
     s/\s+$//
-    $_ = $self->interpolate ($_, shift)
+    $_ = $self->interpolate : $_, shift
     if ($self->%{?alt})
-        $self->output ("\n==   $_   ==\n\n")
+        $self->output : "\n==   $_   ==\n\n"
     else
-        $self->output (' ' x ($self->%{?indent} / 2) . $_ . "\n\n")
+        $self->output : ' ' x ($self->%{?indent} / 2) . $_ . "\n\n"
     
 
 
@@ -299,11 +298,11 @@ sub cmd_head3
     my $self = shift
     local $_ = shift
     s/\s+$//
-    $_ = $self->interpolate ($_, shift)
+    $_ = $self->interpolate : $_, shift
     if ($self->%{?alt})
-        $self->output ("\n= $_ =\n")
+        $self->output : "\n= $_ =\n"
     else
-        $self->output (' ' x ($self->%{?indent}) . $_ . "\n")
+        $self->output : ' ' x ($self->%{?indent}) . $_ . "\n"
     
 
 
@@ -316,7 +315,7 @@ sub cmd_over
     my $self = shift
     local $_ = shift
     unless (m/^[-+]?\d+\s+$/) { $_ = $self->%{?indent} }
-    push ( $self->%{INDENTS}->@, $self->%{?MARGIN})
+    push:  $self->%{INDENTS}->@, $self->%{?MARGIN}
     $self->%{+MARGIN} += ($_ + 0)
 
 
@@ -324,7 +323,7 @@ sub cmd_over
 sub cmd_back($self, ...)
     $self->%{+MARGIN} = pop  $self->%{INDENTS}->@
     unless (defined $self->%{?MARGIN})
-        warn "Unmatched =back"
+        warn: "Unmatched =back"
         $self->%{+MARGIN} = $self->%{?indent}
     
 
@@ -332,10 +331,10 @@ sub cmd_back($self, ...)
 # An individual list item.
 sub cmd_item
     my $self = shift
-    if (defined $self->%{?ITEM}) { $self->item }
+    if (defined $self->%{?ITEM}) { ($self->item: ) }
     local $_ = shift
     s/\s+$//
-    $self->%{+ITEM} = $self->interpolate ($_)
+    $self->%{+ITEM} = $self->interpolate : $_
 
 
 # Begin a block for a particular translator.  Setting VERBATIM triggers
@@ -366,7 +365,7 @@ sub cmd_for
     local $_ = shift
     my $line = shift
     return unless s/^text\b[ \t]*\n?//
-    $self->verbatim ($_, $line)
+    $self->verbatim : $_, $line
 
 
 
@@ -411,7 +410,7 @@ sub seq_l
     elsif (m/^[-:.\w]+(?:\(\S+\))?$/)
         (@: $manpage, $section) = @: $_, ''
     elsif (m%/%)
-        (@: $manpage, $section) =  split (m/\s*\/\s*/, $_, 2)
+        (@: $manpage, $section) =  split: m/\s*\/\s*/, $_, 2
     
 
     my $text = ''
@@ -448,7 +447,7 @@ sub item
     local $_ = shift
     my $tag = $self->%{?ITEM}
     unless (defined $tag)
-        warn "item called without tag"
+        warn: "item called without tag"
         return
     
     undef $self->%{+ITEM}
@@ -456,20 +455,20 @@ sub item
     unless (defined $indent) { $indent = $self->%{?indent} }
     my $space = ' ' x $indent
     $space =~ s/^ /:/ if $self->%{?alt}
-    if (!$_ || m/^\s+$/ || ($self->%{?MARGIN} - $indent +< length ($tag) + 1))
+    if (!$_ || m/^\s+$/ || ($self->%{?MARGIN} - $indent +< (length: $tag) + 1))
         my $margin = $self->%{?MARGIN}
         $self->%{+MARGIN} = $indent
-        my $output = $self->reformat ($tag)
+        my $output = $self->reformat : $tag
         $output =~ s/\n*$/\n/
-        $self->output ($output)
+        $self->output : $output
         $self->%{+MARGIN} = $margin
-        $self->output ( $self->reformat ($_)) if m/\S/
+        $self->output :  ($self->reformat : $_) if m/\S/
     else
-        $_ = $self->reformat ($_)
+        $_ = $self->reformat : $_
         s/^ /:/ if ($self->%{?alt} && $indent +> 0)
         my $tagspace = ' ' x length $tag
-        s/^($space)$tagspace/$1$tag/ or warn "Bizarre space in item"
-        $self->output ($_)
+        s/^($space)$tagspace/$1$tag/ or warn: "Bizarre space in item"
+        $self->output : $_
     
 
 
@@ -516,11 +515,11 @@ sub reformat
     else
         s/\s+/ /g
     
-    $self->wrap ($_)
+    $self->wrap : $_
 
 
 # Output text to the output device.
-sub output { @_[1] =~ s/\01/ /g; print  @_[0]->output_handle  ,@_[1] }
+sub output { @_[1] =~ s/\01/ /g; (print: (@_[0]->output_handle: )  ,@_[1]) }
 
 
 ############################################################################
@@ -537,14 +536,14 @@ sub pod2text
     # entry function, so handle -a and -<number>.
     while (@_[0] =~ m/^-/)
         my $flag = shift
-        if    ($flag eq '-a')       { push (@args, alt => 1)    }elsif ($flag =~ m/^-(\d+)$/) { push (@args, width => $1) }else
-            unshift (@_, $flag)
+        if    ($flag eq '-a')       { (push: @args, alt => 1)    }elsif ($flag =~ m/^-(\d+)$/) { (push: @args, width => $1) }else
+            unshift: @_, $flag
             last
         
     
 
     # Now that we know what arguments we're using, create the parser.
-    my $parser = Pod::PlainText->new (< @args)
+    my $parser = Pod::PlainText->new : < @args
 
     # If two arguments were given, the second argument is going to be a file
     # handle.  That means we want to call parse_from_filehandle(), which
@@ -552,14 +551,14 @@ sub pod2text
     # open will handle the <&STDIN case automagically.
     if (defined @_[1])
         my $in
-        unless (open ($in, "<", @_[0]))
-            die ("Can't open @_[0] for reading: $^OS_ERROR\n")
+        unless ((open: $in, "<", @_[0]))
+            die: "Can't open @_[0] for reading: $^OS_ERROR\n"
             return
         
         @_[0] = $in
-        return $parser->parse_from_filehandle (< @_)
+        return $parser->parse_from_filehandle : < @_
     else
-        return $parser->parse_from_file (< @_)
+        return $parser->parse_from_file : < @_
     
 
 

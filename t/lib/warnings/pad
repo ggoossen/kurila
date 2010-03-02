@@ -193,18 +193,18 @@ EXPECT
 use warnings 'closure' ;
 sub f {
     my $x = "ok";
-    sub { eval 'print $^STDOUT, $x, "\n"' };
+    sub { eval 'print: $^STDOUT, $x, "\n"' };
 }
-f()->();
+(f:)->();
 EXPECT
 ok
 ########
 use warnings 'closure' ;
 do {
     my $x = "ok";
-    sub f2 { eval 'print $^STDOUT, $x, "\n"' }
+    sub f2 { eval 'print: $^STDOUT, $x, "\n"' }
 };
-f2();
+f2:
 EXPECT
 ok
 ########

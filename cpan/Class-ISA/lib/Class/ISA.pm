@@ -140,9 +140,9 @@ Sean M. Burke C<sburke@cpan.org>
 
 ###########################################################################
 
-sub self_and_super_versions { @+: map {
-        @: $_ => (defined(Symbol::fetch_glob("$_\::VERSION")->*->$) ?? Symbol::fetch_glob("$_\::VERSION")->*->$ !! undef)
-    }, self_and_super_path(@_[0])
+sub self_and_super_versions { @+: map: {
+                                           @: $_ => ((defined: (Symbol::fetch_glob: "$_\::VERSION")->*->$) ?? (Symbol::fetch_glob: "$_\::VERSION")->*->$ !! undef)
+                                           }, self_and_super_path: @_[0]
 }
 
 # Also consider magic like:
@@ -163,7 +163,7 @@ sub self_and_super_versions { @+: map {
 
 ###########################################################################
 sub super_path
-    my @ret = self_and_super_path(< @_)
+    my @ret = self_and_super_path: < @_
     shift @ret if (nelems @ret)
     return @ret
 
@@ -182,18 +182,19 @@ sub self_and_super_path
 
     my $current
     while((nelems @in_stack))
-        next unless defined($current = shift @in_stack) && length($current)
-        print $^STDOUT, "At $current\n" if $Debug
-        push @out, $current
-        unshift @in_stack,
-            < map
-            { my $c = $_; # copy, to avoid being destructive
-              substr($c,0,2, "main::") if substr($c,0,2) eq '::';
-              # Canonize the :: -> main::, ::foo -> main::foo thing.
-              # Should I ever canonize the Foo'Bar = Foo::Bar thing?
-              %seen{+$c}++ ?? () !! $c;
-            },
-            Symbol::fetch_glob("$current\::ISA")->*->@
+        next unless (defined: ($current = shift @in_stack)) && length: $current
+        print: $^STDOUT, "At $current\n" if $Debug
+        push: @out, $current
+        unshift:
+            @in_stack
+            < map:
+                { my $c = $_; # copy, to avoid being destructive
+                  substr: $c,0,2, "main::" if (substr: $c,0,2) eq '::';
+                  # Canonize the :: -> main::, ::foo -> main::foo thing.
+                  # Should I ever canonize the Foo'Bar = Foo::Bar thing?
+                  %seen{+$c}++ ?? () !! $c;
+                 }
+                (Symbol::fetch_glob: "$current\::ISA")->*->@
 
     # I.e., if this class has any parents (at least, ones I've never seen
     # before), push them, in order, onto the stack of classes I need to

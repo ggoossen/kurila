@@ -4,18 +4,18 @@ my $is_mswin    = $^OS_NAME eq 'MSWin32'
 my $is_netware  = $^OS_NAME eq 'NetWare'
 my $is_vms      = $^OS_NAME eq 'VMS'
 
-WriteMakefile(
-    NAME => 'DynaLoader',
-    LINKTYPE    => 'static',
-    DEFINE      => '-DLIBC="$(LIBC)"',
-    SKIP        => qw(dynamic dynamic_lib dynamic_bs),
-    XSPROTOARG => '-noprototypes',              # XXX remove later?
-    VERSION_FROM => 'DynaLoader_pm.PL',
-    PL_FILES    => (%: 'DynaLoader_pm.PL'=>'DynaLoader.pm'),
-    PM          => (%: 'DynaLoader.pm' => '$(INST_LIBDIR)/DynaLoader.pm'),
-    depend      => (%: 'DynaLoader$(OBJ_EXT)' => 'dlutils.c'),
-    clean       => (%: FILES => 'DynaLoader.c DynaLoader.xs DynaLoader.pm '),
-    )
+WriteMakefile: 
+    NAME => 'DynaLoader'
+    LINKTYPE    => 'static'
+    DEFINE      => '-DLIBC="$(LIBC)"'
+    SKIP        => qw(dynamic dynamic_lib dynamic_bs)
+    XSPROTOARG => '-noprototypes'              # XXX remove later?
+    VERSION_FROM => 'DynaLoader_pm.PL'
+    PL_FILES    => (%: 'DynaLoader_pm.PL'=>'DynaLoader.pm')
+    PM          => (%: 'DynaLoader.pm' => '$(INST_LIBDIR)/DynaLoader.pm')
+    depend      => (%: 'DynaLoader$(OBJ_EXT)' => 'dlutils.c')
+    clean       => (%: FILES => 'DynaLoader.c DynaLoader.xs DynaLoader.pm ')
+    
 
 sub MY::postamble
     my $test_xs

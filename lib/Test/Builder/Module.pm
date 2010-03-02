@@ -76,20 +76,20 @@ sub import
     # Don't run all this when loading ourself.
     return 1 if $class eq 'Test::Builder::Module'
 
-    my $test = $class->builder
+    my $test = $class->builder: 
 
     my $caller = caller
 
-    $test->exported_to($caller)
+    $test->exported_to: $caller
 
-    $class->import_extra(\@_)
-    my @imports = $class->_strip_imports(\@_)
+    $class->import_extra: \@_
+    my @imports = $class->_strip_imports: \@_
 
     if (@_)
-        $test->plan(< @_)
+        $test->plan: < @_
     
 
-    $class->export_to_level(1, $class, < @imports)
+    $class->export_to_level: 1, $class, < @imports
 
 
 
@@ -104,10 +104,10 @@ sub _strip_imports
         my $item = $list->[$idx]
 
         if( defined $item and $item eq 'import' )
-            push @imports, < $list->[$idx+1]->@
+            push: @imports, < $list->[$idx+1]->@
             $idx++
         else
-            push @other, $item
+            push: @other, $item
         
 
         $idx++
@@ -168,7 +168,7 @@ call builder() inside each function rather than store it in a global.
 =cut
 
 sub builder
-    return Test::Builder->new
+    return Test::Builder->new: 
 
 
 

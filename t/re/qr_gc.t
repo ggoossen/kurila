@@ -3,7 +3,7 @@
 BEGIN
     require './test.pl'
 
-plan tests => 2
+plan: tests => 2
 
 our $TODO = "leaking since 32751"
 
@@ -17,13 +17,13 @@ do
 do
     my $rx = qr//
 
-is( $destroyed, 1, "destroyed regexp" )
+is:  $destroyed, 1, "destroyed regexp" 
 
 undef $destroyed
 
 do
-    my $var = bless \$%, "Foo"
+    my $var = bless: \$%, "Foo"
     my $rx = qr/(?{ $var })/
 
-is( $destroyed, 1, "destroyed regexp with closure capture" )
+is:  $destroyed, 1, "destroyed regexp with closure capture" 
 

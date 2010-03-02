@@ -3,7 +3,7 @@
 
 use warnings
 
-require q(./test.pl); plan(tests => 1)
+require q(./test.pl); plan: tests => 1
 
 =pod
 
@@ -35,4 +35,4 @@ do
 
 
 try { @Z::ISA = (@: 'XY', 'YX') }
-like($^EVAL_ERROR->{?description}, qr/^Inconsistent /, '... got the right error with an inconsistent hierarchy')
+like: $^EVAL_ERROR->{?description}, qr/^Inconsistent /, '... got the right error with an inconsistent hierarchy'

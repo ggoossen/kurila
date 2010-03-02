@@ -7,7 +7,7 @@ use POSIX
 
 # E.g. \t might or might not be isprint() depending on the locale,
 # so let's reset to the default.
-setlocale(LC_ALL, 'C') if config_value("d_setlocale")
+setlocale: LC_ALL, 'C' if config_value: "d_setlocale"
 
 $^OUTPUT_AUTOFLUSH = 1
 
@@ -18,7 +18,7 @@ $^OUTPUT_AUTOFLUSH = 1
 # this string belongs.  This is a *complete* list: any classes not
 # listed, are expected to return '0' for the given string.
 my %classes =
-    %: 
+    %:
     'a'    => \ qw(print graph alnum alpha lower xdigit)
     'A'    => \ qw(print graph alnum alpha upper xdigit)
     'z'    => \ qw(print graph alnum alpha lower)
@@ -56,16 +56,16 @@ my %classes =
 my %functions
 foreach my $s (keys %classes)
     %classes{+$s} = 
-        \%+: map
+        \%+: map: 
                 sub ($_)
-                  %functions{+"is$_"}++	# Keep track of all the 'is<xxx>' functions
-                  %: "is$_" => 1		# Our return value: is<xxx>($s) should pass.
-                , %classes{$s}->@
+                    %functions{+"is$_"}++	# Keep track of all the 'is<xxx>' functions
+                    %: "is$_" => 1		# Our return value: is<xxx>($s) should pass.
+                %classes{$s}->@
 
 # Expected number of tests is one each for every combination of a
 # known is<xxx> function and string listed above.
-require '../../t/test.pl'
-plan(tests => nkeys(%classes) * nkeys(%functions))
+require 'test.pl'
+plan: tests => (nkeys: %classes) * (nkeys: %functions)
 
 
 #
@@ -74,11 +74,11 @@ plan(tests => nkeys(%classes) * nkeys(%functions))
 # always run all functions on every string, and expect to get 0 for the
 # character classes not listed in the given string's hash value.
 #
-foreach my $s (sort keys %classes)
-    foreach my $f (sort keys %functions)
+foreach my $s ((sort: keys %classes))
+    foreach my $f ((sort: keys %functions))
         my $expected = exists %classes{$s}->{$f}
         my $actual   = eval "POSIX::$f( \$s )"
 
-        ok( $actual == $expected, "$f('$s') == $actual")
+        ok:  $actual == $expected, "$f('$s') == $actual"
     
 

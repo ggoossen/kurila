@@ -5,29 +5,29 @@ our $VERSION = '0.12'
 use File::Spec ()
 
 sub import
-    my $who = _who()
+    my $who = (_who: )
 
-    Symbol::fetch_glob("$($who)::load")->* = \&load
+    (Symbol::fetch_glob: "$($who)::load")->* = \&load
 
 
 sub load ($mod, @< @args)
     $mod or return
-    my $who = _who()
+    my $who = (_who: )
 
-    if( _is_file( $mod ) )
+    if( (_is_file:  $mod ) )
         require $mod
     else
         :LOAD do
             my $err
             for my $flag ( qw[1 0] )
-                my $file = _to_file( $mod, $flag)
+                my $file = _to_file:  $mod, $flag
                 try { require $file }
-                $^EVAL_ERROR ?? ($err .= $^EVAL_ERROR->message) !! last LOAD
+                $^EVAL_ERROR ?? ($err .= ($^EVAL_ERROR->message: )) !! last LOAD
             
-            die $err if $err
+            die: $err if $err
         
     
-    __PACKAGE__->_export_to_level(1, $mod, < @args) if @args
+    __PACKAGE__->_export_to_level: 1, $mod, < @args if @args
 
 
 ### 5.004's Exporter doesn't have export_to_level.
@@ -36,21 +36,21 @@ sub _export_to_level
     my $pkg     = shift
     my $level   = shift
     my $mod     = shift
-    my $callpkg = caller($level)
+    my $callpkg = caller: $level
 
-    $mod->export($callpkg, < @_)
+    $mod->export: $callpkg, < @_
 
 
 sub _to_file
     local $_ = shift
     my $pm      = shift || ''
 
-    my @parts = split m/::/
+    my @parts = split: m/::/
 
     ### because of [perl #19213], see caveats ###
     my $file = $^OS_NAME eq 'MSWin32'
-        ?? join "/", @parts
-        !! File::Spec->catfile( < @parts )
+        ?? join: "/", @parts
+        !! File::Spec->catfile:  < @parts 
 
     $file   .= '.pm' if $pm
 
@@ -59,12 +59,12 @@ sub _to_file
     ### format. Therefor, better unixify it first
     ### Patch in reply to John Malmbergs patch (as mentioned
     ### above) on p5p Tue 21 Aug 2007 04:55:07
-    $file = VMS::Filespec::unixify($file) if $^OS_NAME eq 'VMS'
+    $file = (VMS::Filespec::unixify: $file) if $^OS_NAME eq 'VMS'
 
     return $file
 
 
-sub _who { (@: caller(1))[0] }
+sub _who { (@: (caller: 1))[0] }
 
 sub _is_file
     local $_ = shift

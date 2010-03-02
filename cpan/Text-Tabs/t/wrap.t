@@ -2,7 +2,7 @@
 
 
 
-my @tests =split(m/\nEND\n/s, <<DONE)
+my @tests =split: m/\nEND\n/s, <<DONE
 TEST1
 This 
 is
@@ -119,48 +119,48 @@ DONE
 
 use Test::More
 
-plan tests => 2 + nelems(@tests)
+plan: tests => 2 + nelems: @tests
 
 use Text::Wrap
 
-my $rerun = env::var('PERL_DL_NONLAZY') ?? 0 !! 1
+my $rerun = (env::var: 'PERL_DL_NONLAZY') ?? 0 !! 1
 
 my @st = @tests
 while (@st)
-    my $in = shift(@st)
-    my $out = shift(@st)
+    my $in = shift: @st
+    my $out = shift: @st
 
     $in =~ s/^TEST(\d+)?\n//
 
-    my $back = wrap('   ', ' ', $in)
+    my $back = wrap: '   ', ' ', $in
 
-    is($back, $out)
+    is: $back, $out
 
 
 
 @st = @tests
 while(@st)
-    my $in = shift(@st)
-    my $out = shift(@st)
+    my $in = shift: @st
+    my $out = shift: @st
 
     $in =~ s/^TEST(\d+)?\n//
 
-    my @in =split("\n", $in, -1)
-    @in = @: (< map { "$_\n" }, @in[[0..(nelems @in)-2]]), @in[-1]
+    my @in =split: "\n", $in, -1
+    @in = @: (< (map: { "$_\n" }, @in[[0..(nelems @in)-2]])), @in[-1]
 
-    my $back = wrap('   ', ' ', <@in)
+    my $back = wrap: '   ', ' ', <@in
 
-    is($back, $out, "wrap of $(dump::view($in))")
+    is: $back, $out, "wrap of $((dump::view: $in))"
 
 
 $Text::Wrap::huge = 'overflow'
 
 my $tw = 'This_is_a_word_that_is_too_long_to_wrap_we_want_to_make_sure_that_the_program_does_not_crash_and_burn'
-my $w = wrap('zzz','yyy',$tw)
-is($w, "zzz$tw")
+my $w = wrap: 'zzz','yyy',$tw
+is: $w, "zzz$tw"
 
 do
     local $Text::Wrap::columns = 10
     local $Text::Wrap::huge = "wrap"
-    is(wrap("verylongindent", "", "foo"), "verylongindent\nfoo")
+    is: (wrap: "verylongindent", "", "foo"), "verylongindent\nfoo"
 
