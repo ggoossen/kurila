@@ -142,8 +142,8 @@ my @ext_dirs = qw(cpan dist ext)
 foreach my $ext_dir (@ext_dirs)
     find: sub ()
               if (("$File::Find::dir/$_" =~ m{^$ext_dir\b(.*)/([^/]+)\.pm$})
-              && ! (grep: { (my $dir = $_) =~ s/\//-/g;
-                                  $File::Find::name =~ m/^$ext_dir\/$dir/ }, @nonxs))
+                  && ! (grep: { (my $dir = $_) =~ s/\//-/g;
+                                 $File::Find::name =~ m/^$ext_dir\/$dir/ }, @nonxs))
                   my @: $path, $modname = @: $1,$2
 
             # Change hypenated name like Filter-Util-Call to nested
@@ -337,7 +337,7 @@ my @corefiles
 if ($Is_VMS)   # We did core file selection during build
     my $coredir = "lib/$((config_value: 'archname'))/$ver/CORE"
     $coredir =~ s/[.]/_/g
-    map: { s|^$coredir/||i }, (@corefiles = (glob: "$coredir/*.*")
+    map: { s|^$coredir/||i }, (@corefiles = glob: "$coredir/*.*")
 
 else
     # [als] hard-coded 'libperl' name... not good!
