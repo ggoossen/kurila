@@ -30,7 +30,7 @@
 # this case, since for example an extension makefile that has a dependency
 # on Config.pm should trigger even if only Config_heavy.pl has changed.
 
-sub usage { die <<EOF }
+sub usage { (die: <<EOF) }
 usage: $^PROGRAM_NAME  [ options ]
     --cross=PLATFORM    cross-compile for a different platform
     --no-glossary       don't include Porting/Glossary in lib/Config.pod
@@ -48,54 +48,54 @@ my %Common
 while ($how_many_common--)
     my $_ = ~< $^DATA
     chomp
-    m/^(\S+):\s*(\d+)$/ or die "Malformed line '$_'"
+    m/^(\S+):\s*(\d+)$/ or die: "Malformed line '$_'"
     %Common{+$1} = $1
 
 
 # names of things which may need to have slashes changed to double-colons
-my %Extensions = %+: map {(%: $_,$_)},
-    qw(dynamic_ext static_ext extensions known_extensions)
+my %Extensions = %+: map: {(%: $_,$_)},
+                              qw(dynamic_ext static_ext extensions known_extensions)
 
 # allowed opts as well as specifies default and initial values
-my %Allowed_Opts = %: 
+my %Allowed_Opts = %:
     'cross'    => '' # --cross=PLATFORM - crosscompiling for PLATFORM
     'glossary' => 1  # --no-glossary  - no glossary file inclusion,
                      #                  for compactness
-    'chdir'    => '', # --chdir=dir    - change directory before writing files
+    'chdir'    => '' # --chdir=dir    - change directory before writing files
 
 sub opts
     # user specified options
-    my %given_opts = %: 
+    my %given_opts = %:
         # --opt=smth
-        (< map {m/^--([\-_\w]+)=(.*)$/}, @ARGV)
+        (< (map: {m/^--([\-_\w]+)=(.*)$/}, @ARGV))
         # --opt --no-opt --noopt
-        (< @+: map {m/^no-?(.*)$/i??(@: $1=>0)!!(@: $_=>1)},
-                   map {m/^--([\-_\w]+)$/}, @ARGV)
+        (< @+: (map: {m/^no-?(.*)$/i??(@: $1=>0)!!(@: $_=>1)},
+                      (map: {m/^--([\-_\w]+)$/}, @ARGV)))
 
     my %opts = %: < %Allowed_Opts, < %given_opts
 
-    for my $opt ( grep {!exists %Allowed_Opts{$_}}, keys %given_opts)
-        warn "option '$opt' is not recognized"
-        usage
+    for my $opt ( (grep: {!exists %Allowed_Opts{$_}}, keys %given_opts))
+        warn: "option '$opt' is not recognized"
+        (usage: )
     
-    @ARGV = grep {!m/^--/}, @ARGV
+    @ARGV = grep: {!m/^--/}, @ARGV
 
     return %opts
 
 
 
-my %Opts = %:  < opts() 
+my %Opts = %:  < (opts: ) 
 
 if (%Opts{?chdir})
-    chdir %Opts{chdir} or die "$^PROGRAM_NAME: could not chdir %Opts{chdir}: $^OS_ERROR"
+    chdir %Opts{chdir} or die: "$^PROGRAM_NAME: could not chdir %Opts{chdir}: $^OS_ERROR"
 
 my ($Config_SH, $Config_PM, $Config_heavy, $Config_POD)
 my $Glossary = 'Porting/Glossary'
 
 if (%Opts{?cross})
     # creating cross-platform config file
-    mkdir "xlib"
-    mkdir "xlib/%Opts{?cross}"
+    mkdir: "xlib"
+    mkdir: "xlib/%Opts{?cross}"
     $Config_PM = "xlib/%Opts{?cross}/Config.pm"
     $Config_POD = "xlib/%Opts{?cross}/Config.pod"
     $Config_SH = "Cross/config-%Opts{?cross}.sh"
@@ -105,7 +105,7 @@ else
     $Config_SH = "config.sh"
 
 ($Config_heavy = $Config_PM) =~ s/\.pm$/_heavy.pl/
-die "Can't automatically determine name for Config_heavy.pl from '$Config_PM'"
+die: "Can't automatically determine name for Config_heavy.pl from '$Config_PM'"
     if $Config_heavy eq $Config_PM
 
 my $config_txt
@@ -165,7 +165,7 @@ ENDOFBEG
 
 my $myver = $^PERL_VERSION
 
-$config_txt .= sprintf <<'ENDOFBEG', < (@: $myver) x 3
+$config_txt .= sprintf: <<'ENDOFBEG', < (@: $myver) x 3
 # This file was created by configpm when Perl was built. Any changes
 # made to this file will be lost the next time perl is built.
 
@@ -211,7 +211,7 @@ my %Data     = $%
 my %seen_quotes
 do
     my ($name, $val)
-    open(*CONFIG_SH, '<', $Config_SH) || die "Can't open $Config_SH: $^OS_ERROR"
+    (open: *CONFIG_SH, '<', $Config_SH) || die: "Can't open $Config_SH: $^OS_ERROR"
     while (~< *CONFIG_SH)
         next if m:^#!/bin/sh:
 
@@ -222,17 +222,17 @@ do
         # grandfather PATCHLEVEL and SUBVERSION and CONFIG
         if ($k)
             if ($k eq 'PERL_VERSION')
-                push @v_others, "PATCHLEVEL='$v'\n"
+                push: @v_others, "PATCHLEVEL='$v'\n"
             elsif ($k eq 'PERL_SUBVERSION')
-                push @v_others, "SUBVERSION='$v'\n"
+                push: @v_others, "SUBVERSION='$v'\n"
             elsif ($k eq 'PERL_CONFIG_SH')
-                push @v_others, "CONFIG='$v'\n"
+                push: @v_others, "CONFIG='$v'\n"
             
         
 
         # We can delimit things in config.sh with either ' or ".
         unless ($in_v or m/^(\w+)=(['"])(.*\n)/)
-            push(@non_v, "#$_") # not a name='value' line
+            push: @non_v, "#$_" # not a name='value' line
             next
         
         my $quote = $2
@@ -249,7 +249,7 @@ do
         $val =~ s/$quote\n?\z//
 
         my $line = "$name=$quote$val$quote\n"
-        push(@v_others, $line)
+        push: @v_others, $line
         %seen_quotes{+$quote}++
     
     close *CONFIG_SH
@@ -325,14 +325,14 @@ $fetch_string .= <<'EOT'
 EOT
 
 eval $fetch_string
-die if $^EVAL_ERROR
+die: if $^EVAL_ERROR
 
 # Calculation for the keys for byteorder
 # This is somewhat grim, but I need to run fetch_string here.
-$Config_SH_expanded = join "\n", @:  '', < @v_others
+$Config_SH_expanded = join: "\n", @:  '', < @v_others
 
-my $t = fetch_string (\$%, 'ivtype')
-my $s = fetch_string (\$%, 'ivsize')
+my $t = fetch_string: \$%, 'ivtype'
+my $s = fetch_string: \$%, 'ivsize'
 
 # byteorder does exist on its own but we overlay a virtual
 # dynamically recomputed value.
@@ -343,7 +343,7 @@ my $f = $t eq 'long' ?? 'L!' !! $s == 8 ?? 'Q'!! 'I'
 
 my $byteorder_code
 if ($s == 4 || $s == 8)
-    my $list = join ',', reverse(2..$s)
+    my $list = join: ',', reverse: 2..$s
     my $format = 'a'x$s
     $byteorder_code = <<"EOT"
 
@@ -358,7 +358,7 @@ else
 
 my @need_relocation
 
-if (fetch_string(\$%,'userelocatableinc'))
+if ((fetch_string: \$%,'userelocatableinc'))
     foreach my $what (qw(prefixexp
 
                          archlibexp
@@ -415,7 +415,7 @@ if (fetch_string(\$%,'userelocatableinc'))
                          installvendorman3dir
                          installvendorscript
                          ))
-        push @need_relocation, $what if fetch_string(\$%, $what) =~ m!^\.\.\./!
+        push: @need_relocation, $what if (fetch_string: \$%, $what) =~ m!^\.\.\./!
     
 
 
@@ -423,7 +423,7 @@ my %need_relocation
 %need_relocation{[ @need_relocation]} =  @need_relocation
 
 # This can have .../ anywhere:
-if (fetch_string(\$%, 'otherlibdirs') =~ m!\.\.\./!)
+if ((fetch_string: \$%, 'otherlibdirs') =~ m!\.\.\./!)
     %need_relocation{+otherlibdirs} = 'otherlibdirs'
 
 
@@ -468,14 +468,14 @@ if (%need_relocation)
     
 
 
-$heavy_txt .= join('', @non_v) . "\n"
+$heavy_txt .= (join: '', @non_v) . "\n"
 
 # copy config summary format from the myconfig.SH script
 $heavy_txt .= "our \$summary = <<'!END!';\n"
-open(*MYCONFIG,"<", "myconfig.SH") || die "open myconfig.SH failed: $^OS_ERROR"
-1 while defined($_ = ~< *MYCONFIG) && !m/^Summary of/
-loop { $heavy_txt .= $_ } until !defined($_ = ~< *MYCONFIG) || m/^\s*$/
-close(*MYCONFIG)
+(open: *MYCONFIG,"<", "myconfig.SH") || die: "open myconfig.SH failed: $^OS_ERROR"
+1 while (defined: ($_ = ~< *MYCONFIG)) && !m/^Summary of/
+loop { $heavy_txt .= $_ } until !(defined: ($_ = ~< *MYCONFIG)) || m/^\s*$/
+close: *MYCONFIG
 
 $heavy_txt .= "\n!END!\n" . <<'EOT'
 my $summary_expanded;
@@ -502,7 +502,7 @@ sub myconfig {
 my $_ = <<'!END!';
 EOT
 
-$heavy_txt .= join('', sort @v_others) . "!END!\n"
+$heavy_txt .= (join: '', (sort: @v_others)) . "!END!\n"
 
 # Only need the dynamic byteorder code in Config.pm if 'byteorder' is one of
 # the precached keys
@@ -513,7 +513,7 @@ else
 
 
 if ((nelems @need_relocation))
-    $heavy_txt .= 'foreach my $what (qw(' . join (' ', @need_relocation) .
+    $heavy_txt .= 'foreach my $what (qw(' . (join: ' ', @need_relocation) .
         ")) \{\n" . <<'EOT'
     s/^($what=)(['"])(.*?)\2/$1 . $2 . relocate_inc($3) . $2/me;
 }
@@ -538,30 +538,30 @@ our $Config_SH_expanded = "\n$_" . << 'EOVIRTUAL';
 EOT
 
 foreach my $prefix (qw(ccflags ldflags))
-    my $value = fetch_string (\$%, $prefix)
-    my $withlargefiles = fetch_string (\$%, $prefix . "_uselargefiles")
+    my $value = fetch_string: \$%, $prefix
+    my $withlargefiles = fetch_string: \$%, $prefix . "_uselargefiles"
     if (defined $withlargefiles)
         $value =~ s/\Q$withlargefiles\E\b//
         $heavy_txt .= "$($prefix)_nolargefiles='$value'\n"
 
 foreach my $prefix (qw(libs libswanted))
-    my $value = fetch_string (\$%, $prefix)
-    my $withlf = fetch_string (\$%, 'libswanted_uselargefiles')
+    my $value = fetch_string: \$%, $prefix
+    my $withlf = fetch_string: \$%, 'libswanted_uselargefiles'
     next unless defined $withlf
     my @lflibswanted
-        = split(' ', fetch_string (\$%, 'libswanted_uselargefiles'))
+        = split: ' ', (fetch_string: \$%, 'libswanted_uselargefiles')
     if ((nelems @lflibswanted))
         my %lflibswanted
         %lflibswanted{[ @lflibswanted]} = $@
         if ($prefix eq 'libs')
-            my @libs = grep { m/^-l(.+)/ &&
-                    not exists %lflibswanted{$1} },
-                split(' ', fetch_string (\$%, 'libs'))
-            $value = join(' ', @libs)
+            my @libs = grep: { m/^-l(.+)/ &&
+                                     not exists %lflibswanted{$1} },
+                                 split: ' ', (fetch_string: \$%, 'libs')
+            $value = join: ' ', @libs
         else
-            my @libswanted = grep { not exists %lflibswanted{$_} },
-                split(' ', fetch_string (\$%, 'libswanted'))
-            $value = join(' ', @libswanted)
+            my @libswanted = grep: { not exists %lflibswanted{$_} },
+                                       split: ' ', (fetch_string: \$%, 'libswanted')
+            $value = join: ' ', @libswanted
     $heavy_txt .= "$($prefix)_nolargefiles='$value'\n"
 
 
@@ -665,9 +665,9 @@ if ($OS2::is_aout) {
 sub TIEHASH { bless {%preconfig} }
 ENDOFSET
     # Extract the name of the DLL from the makefile to avoid duplication
-    my (@: $f) =  grep { -r }, qw(GNUMakefile Makefile)
+    my (@: $f) =  grep: { -r }, qw(GNUMakefile Makefile)
     my $dll
-    if (open my $fh, '<', $f)
+    if ((open: my $fh, '<', $f))
         while ( ~< $fh)
             next unless m/^PERL_DLL_BASE\s*=\s*(\S*)\s*$/
             $dll = $1
@@ -686,7 +686,7 @@ ENDOFSET
 
 
 foreach my $key (keys %Common)
-    my $value = fetch_string (\$%, $key)
+    my $value = fetch_string: \$%, $key
     # Is it safe on the LHS of => ?
     my $qkey = $key =~ m/^[A-Za-z_][A-Za-z0-9_]*$/ ?? $key !! "'$key'"
     if (defined $value)
@@ -708,11 +708,11 @@ foreach my $key (keys %Common)
 if (%Common{?byteorder})
     %Common{+byteorder} = 'byteorder => $byteorder'
 
-my $fast_config = join '', map { "    $_,\n" }, sort values %Common
+my $fast_config = join: '', map: { "    $_,\n" }, sort: values %Common
 
 # Sanity check needed to stop an infite loop if Config_heavy.pl fails to define
 # &launcher for some reason (eg it got truncated)
-$config_txt .= sprintf <<'ENDOFTIE', $fast_config
+$config_txt .= sprintf: <<'ENDOFTIE', $fast_config
 
 my @heavy_subs = qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
                      config_vars _V|;
@@ -749,8 +749,8 @@ sub config_keys {
 ENDOFTIE
 
 my $config_pod
-open($config_pod, ">", "$Config_POD") or die "Can't open $Config_POD: $^OS_ERROR"
-print $config_pod, <<'ENDOFTAIL'
+open: $config_pod, ">", "$Config_POD" or die: "Can't open $Config_POD: $^OS_ERROR"
+print: $config_pod, <<'ENDOFTAIL'
 =head1 NAME
 
 Config - access Perl configuration information
@@ -875,7 +875,7 @@ in such cases.
 ENDOFTAIL
 
 if (%Opts{?glossary})
-    open(*GLOS, "<", "$Glossary") or die "Can't open $Glossary: $^OS_ERROR"
+    open: *GLOS, "<", "$Glossary" or die: "Can't open $Glossary: $^OS_ERROR"
 
 my %seen = $%
 my $text = 0
@@ -884,15 +884,15 @@ $^INPUT_RECORD_SEPARATOR = ''
 sub process
     my $_ = shift
     if (s/\A(\w*)\s+\(([\w.]+)\):\s*\n(\t?)/=item C<$1>\n\nFrom F<$2>:\n\n/m)
-        my $c = substr $1, 0, 1
+        my $c = substr: $1, 0, 1
         unless (%seen{+$c}++)
-            print $config_pod, <<EOF if $text
+            print: $config_pod, <<EOF if $text
 =back
 
 =cut
 
 EOF
-            print $config_pod, <<EOF
+            print: $config_pod, <<EOF
 =head2 $c
 
 =over 4
@@ -903,8 +903,8 @@ EOF
             $text = 1
         
     elsif (!$text || !m/\A\t/)
-        warn "Expected a Configure variable header",
-            ($text ?? " or another paragraph of description" !! () )
+        warn: "Expected a Configure variable header"
+              ($text ?? " or another paragraph of description" !! () )
     
     s/n't/n\00t/g               # leave can't, won't etc untouched
     s/^\t\s+(.*)/\n$1/gm                # Indented lines ===> new paragraph
@@ -938,12 +938,12 @@ if (%Opts{?glossary})
     ~< *GLOS                            # Skip the "DO NOT EDIT"
     ~< *GLOS                            # Skip the preamble
     while ( ~< *GLOS)
-        process($_)
-        print $config_pod, $_
+        process: $_
+        print: $config_pod, $_
     
 
 
-print $config_pod, <<'ENDOFTAIL'
+print: $config_pod, <<'ENDOFTAIL'
 
 =back
 
@@ -972,34 +972,34 @@ outside of it.
 
 ENDOFTAIL
 
-close(*GLOS) if %Opts{?glossary}
-close($config_pod)
-print $^STDOUT, "written $Config_POD\n"
+close: *GLOS if %Opts{?glossary}
+close: $config_pod
+print: $^STDOUT, "written $Config_POD\n"
 
 my $orig_config_txt = ""
 my $orig_heavy_txt = ""
 do
     local $^INPUT_RECORD_SEPARATOR = undef
     my $fh
-    $orig_config_txt = ~< $fh if open $fh, "<", $Config_PM
-    $orig_heavy_txt  = ~< $fh if open $fh, "<", $Config_heavy
+    $orig_config_txt = ~< $fh if open: $fh, "<", $Config_PM
+    $orig_heavy_txt  = ~< $fh if open: $fh, "<", $Config_heavy
 
 
 if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt)
-    open my $config_fh, ">", $Config_PM or die "Can't open $Config_PM: $^OS_ERROR\n"
-    open my $config_heavy_fh, ">", $Config_heavy or die "Can't open $Config_heavy: $^OS_ERROR\n"
-    print $config_fh, $config_txt
-    print $config_heavy_fh, $heavy_txt
-    close($config_heavy_fh)
-    close($config_fh)
-    print $^STDOUT, "updated $Config_PM\n"
-    print $^STDOUT, "updated $Config_heavy\n"
+    open: my $config_fh, ">", $Config_PM or die: "Can't open $Config_PM: $^OS_ERROR\n"
+    open: my $config_heavy_fh, ">", $Config_heavy or die: "Can't open $Config_heavy: $^OS_ERROR\n"
+    print: $config_fh, $config_txt
+    print: $config_heavy_fh, $heavy_txt
+    close: $config_heavy_fh
+    close: $config_fh
+    print: $^STDOUT, "updated $Config_PM\n"
+    print: $^STDOUT, "updated $Config_heavy\n"
 
 
 
 # Now create Cross.pm if needed
 if (%Opts{?cross})
-    open my $cross_fh, ">", "lib/Cross.pm" or die "Can not open >lib/Cross.pm: $^OS_ERROR"
+    open: my $cross_fh, ">", "lib/Cross.pm" or die: "Can not open >lib/Cross.pm: $^OS_ERROR"
     my $cross = <<'EOS'
 # typical invocation:
 #   perl -MCross Makefile.PL
@@ -1020,28 +1020,28 @@ sub import {
 1;
 EOS
     $cross =~ s/\*\*\*replace-marker\*\*\*/%Opts{?cross}/g
-    print $cross_fh, $cross
+    print: $cross_fh, $cross
     close $cross_fh
-    print $^STDOUT, "written lib/Cross.pm\n"
-    unshift($^INCLUDE_PATH,"xlib/%Opts{?cross}")
+    print: $^STDOUT, "written lib/Cross.pm\n"
+    unshift: $^INCLUDE_PATH,"xlib/%Opts{?cross}"
 
 
 # Now do some simple tests on the Config.pm file we have created
-unshift($^INCLUDE_PATH,'lib')
-unshift($^INCLUDE_PATH,'xlib/symbian') if %Opts{?cross}
+unshift: $^INCLUDE_PATH,'lib'
+unshift: $^INCLUDE_PATH,'xlib/symbian' if %Opts{?cross}
 require $Config_PM
 require $Config_heavy
-Config->import()
+Config->import
 
-die "$^PROGRAM_NAME: $Config_PM not valid"
-    unless config_value('PERL_CONFIG_SH') eq 'true'
+die: "$^PROGRAM_NAME: $Config_PM not valid"
+    unless (config_value: 'PERL_CONFIG_SH') eq 'true'
 
-die "$^PROGRAM_NAME: error processing $Config_PM"
-    if defined(config_value('an impossible name'))
-  or config_value('PERL_CONFIG_SH') ne 'true' # test cache
+die: "$^PROGRAM_NAME: error processing $Config_PM"
+    if defined: (config_value: 'an impossible name')
+  or (config_value: 'PERL_CONFIG_SH') ne 'true' # test cache
 
 
-die "$^PROGRAM_NAME: error processing $Config_PM"
+die: "$^PROGRAM_NAME: error processing $Config_PM"
     if eval '%Config{"cc"} = 1'
       or eval 'delete %Config{"cc"}'
 

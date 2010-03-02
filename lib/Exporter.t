@@ -1,7 +1,7 @@
 #!perl -w
 
 BEGIN 
-    if( env::var('PERL_CORE') )
+    if( (env::var: 'PERL_CORE') )
         chdir 't' if -d 't'
         $^INCLUDE_PATH = @:  '../lib'
 
@@ -11,10 +11,10 @@ my $test
 sub ok($ok, $name)
 
     # You have to do it this way or VMS will get confused.
-    printf $^STDOUT, "\%sok \%d\%s\n", ($ok ?? '' !! 'not '), $test,
-        (defined $name ?? " - $name" !! '')
+    printf: $^STDOUT, "\%sok \%d\%s\n", ($ok ?? '' !! 'not '), $test
+            (defined $name ?? " - $name" !! '')
 
-    printf $^STDOUT, "# Failed test at line \%d\n", (@: caller)[2] unless $ok
+    printf: $^STDOUT, "# Failed test at line \%d\n", (@: caller)[2] unless $ok
 
     $test++
     return $ok
@@ -22,9 +22,9 @@ sub ok($ok, $name)
 
 BEGIN 
     $test = 1
-    print $^STDOUT, "1..25\n"
+    print: $^STDOUT, "1..25\n"
     require Exporter
-    ok( 1, 'Exporter compiled' )
+    ok:  1, 'Exporter compiled' 
 
 our @Exporter_Methods
 
@@ -43,10 +43,10 @@ do
 
     # Make sure Testing can do everything its supposed to.
     foreach my $meth ( @main::Exporter_Methods)
-        main::ok( Testing->can($meth), "subclass can $meth()" )
+        main::ok:  (Testing->can: $meth), "subclass can $meth()" 
     
 
-    our %EXPORT_TAGS = %: 
+    our %EXPORT_TAGS = %:
         This => qw(stuff %left)
         That => qw(Above the @wailing)
         tray => qw(Fasten $seatbelt)
@@ -55,10 +55,10 @@ do
     our @EXPORT_OK = qw(under &your $seat)
     our $VERSION = '1.05'
 
-    main::ok( Testing->require_version(1.05),   'require_version()' )
-    try { Testing->require_version(1.11); 1 }
-    main::ok( $^EVAL_ERROR,                               'require_version() fail' )
-    main::ok( Testing->require_version(0),      'require_version(0)' )
+    main::ok:  (Testing->require_version: 1.05),   'require_version()' 
+    try { (Testing->require_version: 1.11); 1 }
+    main::ok:  $^EVAL_ERROR,                               'require_version() fail' 
+    main::ok:  (Testing->require_version: 0),      'require_version(0)' 
 
     sub lifejacket  { 'lifejacket'  }
     sub stuff       { 'stuff'       }
@@ -76,88 +76,88 @@ do
     sub Is { 'Is' };
     BEGIN {*is = \&Is};
 
-    Exporter::export_ok_tags()
+    (Exporter::export_ok_tags: )
 
-    my %tags     = %+: map { %: $_ => 1 }, @+: values %EXPORT_TAGS
-    my %exportok = %+: map { %: $_ => 1 }, @EXPORT_OK
+    my %tags     = %+: map: { %: $_ => 1 }, @+: values %EXPORT_TAGS
+    my %exportok = %+: map: { %: $_ => 1 }, @EXPORT_OK
     my $ok = 1
     foreach my $tag (keys %tags)
         $ok = exists %exportok{$tag}
     
-    main::ok( $ok, 'export_ok_tags()' )
+    main::ok:  $ok, 'export_ok_tags()' 
 
 
 do
     package Foo
     Testing->import
 
-    main::ok( exists &lifejacket,      'simple import' )
+    main::ok:  exists &lifejacket,      'simple import' 
 
-    my $got = try {lifejacket( < @_ )}
-    main::ok ( $^EVAL_ERROR eq "", 'check we can call the imported subroutine')
-        or print $^STDERR, "# \$\@ is $^EVAL_ERROR\n"
-    main::ok ( $got eq 'lifejacket', 'and that it gave the correct result')
-        or print $^STDERR, "# expected 'lifejacket', got " .
-        (defined $got ?? "'$got'" !! "undef") . "\n"
+    my $got = try {(lifejacket:  < @_ )}
+    main::ok :  $^EVAL_ERROR eq "", 'check we can call the imported subroutine'
+        or print: $^STDERR, "# \$\@ is $^EVAL_ERROR\n"
+    main::ok :  $got eq 'lifejacket', 'and that it gave the correct result'
+        or print: $^STDERR, "# expected 'lifejacket', got " .
+                      (defined $got ?? "'$got'" !! "undef") . "\n"
 
     # The string eval is important. It stops $Foo::{is} existing when
     # Testing->import is called.
-    main::ok( eval "defined &is",
-              "Import a subroutine where exporter must create the typeglob" )
+    main::ok:  eval "defined &is"
+               "Import a subroutine where exporter must create the typeglob" 
     $got = eval "&is <: "
-    main::ok ( ! $^EVAL_ERROR, 'check we can call the imported autoloaded subroutine')
-        or chomp ($^EVAL_ERROR), print $^STDERR, "# \$\@ is $^EVAL_ERROR\n"
-    main::ok ( $got eq 'Is', 'and that it gave the correct result')
-        or print $^STDERR, "# expected 'Is', got " .
-        (defined $got ?? "'$got'" !! "undef") . "\n"
+    main::ok :  ! $^EVAL_ERROR, 'check we can call the imported autoloaded subroutine'
+        or (chomp: $^EVAL_ERROR), print: $^STDERR, "# \$\@ is $^EVAL_ERROR\n"
+    main::ok :  $got eq 'Is', 'and that it gave the correct result'
+        or print: $^STDERR, "# expected 'Is', got " .
+                      (defined $got ?? "'$got'" !! "undef") . "\n"
 
 
 package Bar
 my @imports = qw($seatbelt &Above stuff @wailing %left)
-Testing->import(< @imports)
+Testing->import: < @imports
 
-main::ok( (!grep { eval "!defined $_" }, map({ m/^\w/ ?? "&$_" !! $_ }, @imports)),
-          'import by symbols' )
+main::ok:  (!(grep: { eval "!defined $_" }, (map: { m/^\w/ ?? "&$_" !! $_ }, @imports)))
+           'import by symbols' 
 
 
 package Yar
 my @tags = qw(:This :tray)
-Testing->import(< @tags)
+Testing->import: < @tags
 
-main::ok( (!grep { eval "!defined $_" }, map { m/^\w/ ?? "&$_" !! $_ },
-           @+: %Testing::EXPORT_TAGS{[ map { s/^://; $_ },@tags ]}),
-          'import by tags' )
+main::ok:  (!(grep: { eval "!defined $_" }, (map: { m/^\w/ ?? "&$_" !! $_ },
+                                                      @+: %Testing::EXPORT_TAGS{[ (map: { s/^://; $_ },@tags) ]})))
+           'import by tags' 
 
 
 package Arrr
-Testing->import( <qw(!lifejacket))
+Testing->import:  <qw(!lifejacket)
 
-main::ok( !exists &lifejacket,     'deny import by !' )
+main::ok:  !exists &lifejacket,     'deny import by !' 
 
 
 package Mars
-Testing->import('/e/')
+Testing->import: '/e/'
 
-main::ok( (!grep { eval "!defined $_" }, map { m/^\w/ ?? "&$_" !! $_ },
-           grep { m/e/ }, (@:  < @Testing::EXPORT, < @Testing::EXPORT_OK)),
-          'import by regex')
+main::ok:  (!(grep: { eval "!defined $_" }, (map: { m/^\w/ ?? "&$_" !! $_ },
+                                                      (grep: { m/e/ }, (@:  < @Testing::EXPORT, < @Testing::EXPORT_OK)))))
+           'import by regex'
 
 
 package Venus
-Testing->import('!/e/')
+Testing->import: '!/e/'
 
-main::ok( (!grep { eval "defined $_" }, map { m/^\w/ ?? "&$_" !! $_ },
-           grep { m/e/ }, (@:  < @Testing::EXPORT, < @Testing::EXPORT_OK)),
-          'deny import by regex')
-main::ok( !exists &lifejacket, 'further denial' )
+main::ok:  (!(grep: { eval "defined $_" }, (map: { m/^\w/ ?? "&$_" !! $_ },
+                                                     (grep: { m/e/ }, (@:  < @Testing::EXPORT, < @Testing::EXPORT_OK)))))
+           'deny import by regex'
+main::ok:  !exists &lifejacket, 'further denial' 
 
 
 do
     package More::Testing
     our @ISA = qw(Exporter)
     our $VERSION = 0
-    try { More::Testing->require_version(0); 1 }
-    main::ok(!$^EVAL_ERROR,       'require_version(0) and $VERSION = 0')
+    try { (More::Testing->require_version: 0); 1 }
+    main::ok: !$^EVAL_ERROR,       'require_version(0) and $VERSION = 0'
 
 
 package Moving::Target
@@ -169,21 +169,21 @@ sub bar {"This is bar"};
 
 package Moving::Target::Test
 
-Moving::Target->import ('foo')
+Moving::Target->import : 'foo'
 
-main::ok (foo() eq "This is foo", "imported foo before EXPORT_OK changed")
+main::ok : (foo: ) eq "This is foo", "imported foo before EXPORT_OK changed"
 
-push @Moving::Target::EXPORT_OK, 'bar'
+push: @Moving::Target::EXPORT_OK, 'bar'
 
-Moving::Target->import ('bar')
+Moving::Target->import : 'bar'
 
-main::ok (bar() eq "This is bar", "imported bar after EXPORT_OK changed")
+main::ok : (bar: ) eq "This is bar", "imported bar after EXPORT_OK changed"
 
 package The::Import
 
 use Exporter 'import'
 
-main::ok(\&import \== \&Exporter::import, "imported the import routine")
+main::ok: \&import \== \&Exporter::import, "imported the import routine"
 
 our @EXPORT = qw( wibble )
 sub wibble {return "wobble"};

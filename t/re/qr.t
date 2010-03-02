@@ -4,8 +4,8 @@ BEGIN
     require './test.pl'
 
 
-plan tests => 1
+plan: tests => 1
 
 my $rx = qr//
 
-is(ref $rx, "Regexp", "qr// blessed into `Regexp' by default")
+is: ref $rx, "Regexp", "qr// blessed into `Regexp' by default"

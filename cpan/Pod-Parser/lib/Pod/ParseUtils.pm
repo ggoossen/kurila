@@ -59,11 +59,11 @@ See the individual methods/properties for details.
 
 sub new
     my $this = shift
-    my $class = ref($this) || $this
+    my $class = (ref: $this) || $this
     my %params = %:  < @_ 
     my $self = \%: < %params
-    bless $self, $class
-    $self->initialize()
+    bless: $self, $class
+    $self->initialize
     return $self
 
 
@@ -161,7 +161,7 @@ If an argument has been given, it is pushed on the list of items.
 # The individual =items of this list
 sub item($self, ?$item)
     if(defined $item)
-        push($self->{_items}->@, $item)
+        push: $self->{_items}->@, $item
         return $item
     else
         return $self->{_items}->@
@@ -234,18 +234,18 @@ failure, the error message is stored in C<$@>.
 
 sub new
     my $this = shift
-    my $class = ref($this) || $this
+    my $class = (ref: $this) || $this
     my $self = \%: 
-    bless $self, $class
-    $self->initialize()
+    bless: $self, $class
+    $self->initialize
     if(defined @_[0])
-        if(ref(@_[0]))
+        if((ref: @_[0]))
             # called with a list of parameters
             $self->% = %:  < @_[0]->% 
-            $self->_construct_text()
+            $self->_construct_text
         else
             # called with L<> contents
-            return undef unless($self->parse(@_[0]))
+            return undef unless(($self->parse: @_[0]))
         
     
     return $self
@@ -285,13 +285,13 @@ sub parse
 
     # strip leading/trailing whitespace
     if(s/^[\s\n]+//)
-        $self->warning("ignoring leading whitespace in link")
+        $self->warning: "ignoring leading whitespace in link"
     
     if(s/[\s\n]+$//)
-        $self->warning("ignoring trailing whitespace in link")
+        $self->warning: "ignoring trailing whitespace in link"
     
-    unless(length($_))
-        _invalid_link("empty link")
+    unless((length: $_))
+        _invalid_link: "empty link"
         return undef
     
 
@@ -353,7 +353,7 @@ sub parse
 
     # empty alternative text expands to node name
     if(defined $alttext)
-        if(!length($alttext))
+        if(!(length: $alttext))
             $alttext = $node ^|^ $page
         
     else
@@ -361,29 +361,29 @@ sub parse
     
 
     if($page =~ m/[(]\w*[)]$/)
-        $self->warning("(section) in '$page' deprecated")
+        $self->warning: "(section) in '$page' deprecated"
     
     if(!$quoted && $node =~ m:[|/]: && $type ne 'hyperlink')
-        $self->warning("node '$node' contains non-escaped | or /")
+        $self->warning: "node '$node' contains non-escaped | or /"
     
     if($alttext =~ m:[|/]:)
-        $self->warning("alternative text '$node' contains non-escaped | or /")
+        $self->warning: "alternative text '$node' contains non-escaped | or /"
     
     $self->{+page} = $page
     $self->{+node} = $node
     $self->{+alttext} = $alttext
     #warn "DEBUG: page=$page section=$section item=$item alttext=$alttext\n";
     $self->{+type} = $type
-    $self->_construct_text()
+    $self->_construct_text
     1
 
 
 sub _construct_text
     my $self = shift
-    my $alttext = $self->alttext()
-    my $type = $self->type()
-    my $section = $self->node()
-    my $page = $self->page()
+    my $alttext = $self->alttext
+    my $type = $self->type
+    my $section = $self->node
+    my $page = $self->page
     my $page_ext = ''
     $page =~ s/([(]\w*[)])$// && ($page_ext = $1)
     if($alttext)
@@ -454,7 +454,7 @@ parsing process.
 sub warning
     my $self = shift
     if((nelems @_))
-        push($self->{_warnings}->@, < @_)
+        push: $self->{_warnings}->@, < @_
         return @_
     
     return $self->{?_warnings}->@
@@ -491,7 +491,7 @@ This method sets or returns the POD page this link points to.
 sub page
     if ((nelems @_) +> 1)
         @_[0]->{+page} = @_[1]
-        @_[0]->_construct_text()
+        @_[0]->_construct_text
     
     @_[0]->{?page}
 
@@ -506,7 +506,7 @@ As above, but the destination node text of the link.
 sub node
     if ((nelems @_) +> 1)
         @_[0]->{+node} = @_[1]
-        @_[0]->_construct_text()
+        @_[0]->_construct_text
     
     @_[0]->{?node}
 
@@ -521,7 +521,7 @@ Sets or returns an alternative text specified in the link.
 sub alttext
     if ((nelems @_) +> 1)
         @_[0]->{+alttext} = @_[1]
-        @_[0]->_construct_text()
+        @_[0]->_construct_text
     
     @_[0]->{?alttext}
 
@@ -549,19 +549,19 @@ Returns the link as contents of C<LE<lt>E<gt>>. Reciprocal to B<parse()>.
 # The link itself
 sub link
     my $self = shift
-    my $link = $self->page() || ''
-    if($self->node())
-        my $node = $self->node()
-        if($self->type() eq 'section')
+    my $link = $self->page || ''
+    if($self->node)
+        my $node = $self->node
+        if($self->type eq 'section')
             $link .= ($link ?? '/' !! '') . '"' . $node . '"'
-        elsif($self->type() eq 'hyperlink')
-            $link = $self->node()
+        elsif($self->type eq 'hyperlink')
+            $link = $self->node
         else # item
             $link .= '/' . $node
         
     
-    if($self->alttext())
-        my $text = $self->alttext()
+    if($self->alttext)
+        my $text = $self->alttext
         $text =~ s/\|/E<verbar>/g
         $text =~ s:/:E<sol>:g
         $link = "$text|$link"
@@ -602,9 +602,9 @@ POD documents of class Pod::Cache::Item.
 
 sub new
     my $this = shift
-    my $class = ref($this) || $this
+    my $class = (ref: $this) || $this
     my $self = \@: 
-    bless $self, $class
+    bless: $self, $class
     return $self
 
 
@@ -617,8 +617,8 @@ list of all cache elements.
 
 sub item($self,%< %param)
     if(%param)
-        my $item = Pod::Cache::Item->new(< %param)
-        push($self->@, $item)
+        my $item = Pod::Cache::Item->new: < %param
+        push: $self->@, $item
         return $item
     else
         return $self->@
@@ -637,7 +637,7 @@ not found.
 
 sub find_page($self,$page)
     foreach( $self->@)
-        if($_->page() eq $page)
+        if($_->page eq $page)
             return $_
         
     
@@ -664,11 +664,11 @@ Create a new object.
 
 sub new
     my $this = shift
-    my $class = ref($this) || $this
+    my $class = (ref: $this) || $this
     my %params = %:  < @_ 
     my $self = \%: < %params
-    bless $self, $class
-    $self->initialize()
+    bless: $self, $class
+    $self->initialize
     return $self
 
 
@@ -736,7 +736,7 @@ unique id for the C<find_node> method to work correctly.
 # The POD nodes
 sub nodes($self,@< @nodes)
     if((nelems @nodes))
-        push($self->{nodes}->@, < @nodes)
+        push: $self->{nodes}->@, < @nodes
         return @nodes
     else
         return $self->{?nodes}->@
@@ -753,8 +753,8 @@ stored in the node array) or undef if not found.
 
 sub find_node($self,$node)
     my @search
-    push(@search, < $self->{?nodes}->@) if($self->{?nodes})
-    push(@search, < $self->{?idx}->@) if($self->{?idx})
+    push: @search, < $self->{?nodes}->@ if($self->{?nodes})
+    push: @search, < $self->{?idx}->@ if($self->{?idx})
     foreach( @search)
         if($_->[0] eq $node)
             return $_->[1] # id
@@ -779,7 +779,7 @@ unique id.
 # The POD index entries
 sub idx($self,@< @idx)
     if((nelems @idx))
-        push($self->{idx}->@, < @idx)
+        push: $self->{idx}->@, < @idx
         return @idx
     else
         return $self->{?idx}->@

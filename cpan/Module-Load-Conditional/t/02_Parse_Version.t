@@ -5,21 +5,21 @@ my $Class   = 'Module::Load::Conditional'
 my $Meth    = '_parse_version'
 my $Verbose = (nelems @ARGV) ?? 1 !! 0
 
-use_ok( $Class )
+use_ok:  $Class 
 
 ### versions that should parse
 do {   for my $str (  __PACKAGE__->_succeed )
-        my $res = $Class->?$Meth( $str, $Verbose )
-        ok( defined $res,       "String '$str' identified as version string" )
+        my $res = $Class->?$Meth:  $str, $Verbose 
+        ok:  defined $res,       "String '$str' identified as version string" 
 
-        is( $res->vcmp(0), 1,              "   Version is '$($res->stringify)'" )
+        is:  ($res->vcmp: 0), 1,              "   Version is '$($res->stringify)'" 
     
 }
 
 ### version that should fail
 do {   for my $str (  __PACKAGE__->_fail )
-        my $res = $Class->?$Meth( $str, $Verbose )
-        ok( ! defined $res,     "String '$str' is not a version string" )
+        my $res = $Class->?$Meth:  $str, $Verbose 
+        ok:  ! defined $res,     "String '$str' is not a version string" 
     
 }
 
@@ -31,7 +31,7 @@ do {   for my $str (  __PACKAGE__->_fail )
 ################################
 
 sub _succeed
-    return grep { m/\S/ }, map { s/^\s*//; $_ }, split "\n", q[
+    return grep: { m/\S/ }, map: { s/^\s*//; $_ }, split: "\n", q[
         our $VERSION = 1;
         *VERSION = \'1.01';
         use version; our $VERSION = qv('0.0.2');
@@ -56,7 +56,7 @@ sub _succeed
 
 
 sub _fail
-    return grep { m/\S/ }, map { s/^\s*//; $_ }, split "\n", q[
+    return grep: { m/\S/ }, map: { s/^\s*//; $_ }, split: "\n", q[
         our ($VERSION, %ERROR, $ERROR, $Warn, $Die);
         sub version { $GD::Graph::colour::VERSION }
         my $VERS = qr{ $HWS VERSION $HWS \n }xms;

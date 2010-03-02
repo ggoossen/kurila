@@ -9,7 +9,7 @@ use File::Basename
 use File::Spec
 use MakeMaker::Test::Utils
 
-my %Files = %: 
+my %Files = %:
     'PL_FILES-Module/Makefile.PL'   => <<'END'
 use ExtUtils::MakeMaker;
 
@@ -22,9 +22,9 @@ WriteMakefile(
   );
 END
 
-    'PL_FILES-Module/single.PL'        => _gen_pl_files()
-    'PL_FILES-Module/multi.PL'         => _gen_pl_files()
-    'PL_FILES-Module/Bar_pm.PL'        => _gen_pm_files()
+    'PL_FILES-Module/single.PL'        => (_gen_pl_files: )
+    'PL_FILES-Module/multi.PL'         => (_gen_pl_files: )
+    'PL_FILES-Module/Bar_pm.PL'        => (_gen_pm_files: )
     'PL_FILES-Module/lib/PL/Foo.pm' => <<'END'
 # Module to load to ensure PL_FILES have blib in $^INCLUDE_PATH.
 package PL::Foo;
@@ -86,17 +86,17 @@ END
 
 
 sub setup
-    setup_mm_test_root()
+    (setup_mm_test_root: )
     chdir 'MM_TEST_ROOT:[t]' if $^OS_NAME eq 'VMS'
 
     while(my(@: ?$file, ?$text) =(@:  each %Files))
         # Convert to a relative, native file path.
-        $file = 'File::Spec'->catfile('File::Spec'->curdir, < split m{\/}, $file)
+        $file = 'File::Spec'->catfile: 'File::Spec'->curdir, < (split: m{\/}, $file)
 
-        my $dir = dirname($file)
-        mkpath $dir
-        open(my $fh, ">", "$file") || die "Can't create $file: $^OS_ERROR"
-        print $fh, $text
+        my $dir = dirname: $file
+        mkpath: $dir
+        (open: my $fh, ">", "$file") || die: "Can't create $file: $^OS_ERROR"
+        print: $fh, $text
         close $fh
     
 
@@ -105,9 +105,9 @@ sub setup
 
 sub teardown
     foreach my $file (keys %Files)
-        my $dir = dirname($file)
+        my $dir = dirname: $file
         if( -e $dir )
-            rmtree($dir) || return
+            (rmtree: $dir) || return
         
     
     return 1

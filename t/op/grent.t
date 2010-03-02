@@ -6,7 +6,7 @@ BEGIN
 
 try {my @n = (@:  getgrgid 0 )}
 if ($^EVAL_ERROR and $^EVAL_ERROR->{?description} =~ m/(The \w+ function is unimplemented)/)
-    skip_all "getgrgid unimplemented"
+    skip_all: "getgrgid unimplemented"
 
 
 our (%Config, $where)
@@ -22,18 +22,18 @@ if (not defined $where) # Try NIS.
     foreach my $ypcat (qw(/usr/bin/ypcat /bin/ypcat /etc/ypcat))
         my $gr
         if (-x $ypcat &&
-            open($gr, "$ypcat group 2>/dev/null |") &&
-            defined( ~< $gr))
-            print $^STDOUT, "# `ypcat group` worked\n"
+            (open: $gr, "$ypcat group 2>/dev/null |") &&
+            (defined:  ~< $gr))
+            print: $^STDOUT, "# `ypcat group` worked\n"
 
             # Check to make sure we're really using NIS.
-            if( open(my $nssw, "<", "/etc/nsswitch.conf" ) )
-                my(@: $group) =  grep { m/^\s*group:/ }, @:  ~< $nssw
+            if( (open: my $nssw, "<", "/etc/nsswitch.conf" ) )
+                my(@: $group) =  grep: { m/^\s*group:/ }, @:  ~< $nssw
 
                 # If there's no group line, assume it default to compat.
                 if( !$group || $group !~ m/(nis|compat)/ )
-                    print $^STDOUT, "# Doesn't look like you're using NIS in ".
-                        "/etc/nsswitch.conf\n"
+                    print: $^STDOUT, "# Doesn't look like you're using NIS in ".
+                               "/etc/nsswitch.conf\n"
                     last
                 
             
@@ -48,8 +48,8 @@ if (not defined $where) # Try NetInfo.
     foreach my $nidump (qw(/usr/bin/nidump))
         my $gr
         if (-x $nidump &&
-            open($gr, "$nidump group . 2>/dev/null |") &&
-            defined( ~< $gr))
+            (open: $gr, "$nidump group . 2>/dev/null |") &&
+            (defined:  ~< $gr))
             $where = "NetInfo group - $nidump"
             undef $reason
             last
@@ -60,20 +60,20 @@ if (not defined $where) # Try NetInfo.
 if (not defined $where) # Try local.
     my $GR = "/etc/group"
     my $gr_fh
-    if (-f $GR && open($gr_fh, "<", $GR) && defined( ~< $gr_fh))
+    if (-f $GR && (open: $gr_fh, "<", $GR) && (defined:  ~< $gr_fh))
         undef $reason
         $where = "local $GR"
     
 
 
 if ($reason)
-    skip_all $reason
+    skip_all: $reason
 
 
 
 # By now the GR filehandle should be open and full of juicy group entries.
 
-plan tests => 3
+plan: tests => 3
 
 # Go through at most this many groups.
 # (note that the first entry has been read away by now)
@@ -84,19 +84,19 @@ my $tst = 1
 my %perfect
 my %seen
 
-print $^STDOUT, "# where $where\n"
+print: $^STDOUT, "# where $where\n"
 
-ok( setgrent(), 'setgrent' ) || print $^STDOUT, "# $^OS_ERROR\n"
+(ok:  setgrent(), 'setgrent' ) || print: $^STDOUT, "# $^OS_ERROR\n"
 
 while ( ~< *GR)
     chomp
     # LIMIT -1 so that groups with no users don't fall off
-    my @s = split m/:/, $_, -1
+    my @s = split: m/:/, $_, -1
     my (@: $name_s,$passwd_s,$gid_s,$members_s) =  @s
     if ((nelems @s))
-        push  %seen{+$name_s}->@, iohandle::input_line_number(\*GR)
+        push: %seen{+$name_s}->@, iohandle::input_line_number: \*GR
     else
-        warn "# Your $where line $(iohandle::input_line_number(\*GR)) is empty.\n"
+        warn: "# Your $where line $((iohandle::input_line_number: \*GR)) is empty.\n"
         next
     
     if ($n == $max)
@@ -110,13 +110,13 @@ while ( ~< *GR)
         $members_s =~ s/\s*,\s*/,/g
         $members_s =~ s/\s+$//
         $members_s =~ s/^\s+//
-        my @n = @:  getgrgid($gid_s) 
+        my @n = @:  getgrgid: $gid_s 
         # 'nogroup' et al.
         next unless (nelems @n)
         my (@: $name,$passwd,$gid,$members) =  @n
         # Protect against one-to-many and many-to-one mappings.
         if ($name_s ne $name)
-            @n = @:  getgrnam($name_s) 
+            @n = @:  getgrnam: $name_s 
             (@: $name,$passwd,$gid,$members) =  @n
             next if $name_s ne $name
         
@@ -135,11 +135,11 @@ while ( ~< *GR)
 
 endgrent()
 
-print $^STDOUT, "# max = $max, n = $n, perfect = ", nkeys %perfect, "\n"
+print: $^STDOUT, "# max = $max, n = $n, perfect = ", nkeys %perfect, "\n"
 
 if (nkeys %perfect == 0 && $n)
     $max++
-    print $^STDOUT, <<EOEX
+    print: $^STDOUT, <<EOEX
 #
 # The failure of op/grent test is not necessarily serious.
 # It may fail due to local group administration conventions.
@@ -154,10 +154,10 @@ if (nkeys %perfect == 0 && $n)
 # 
 EOEX
 
-    fail()
-    print $^STDOUT, "#\t (not necessarily serious: run t/op/grent.t by itself)\n"
+    (fail: )
+    print: $^STDOUT, "#\t (not necessarily serious: run t/op/grent.t by itself)\n"
 else
-    pass()
+    (pass: )
 
 
 # Test both the scalar and list contexts.
@@ -168,7 +168,7 @@ setgrent()
 for (1..$max)
     my $gr = scalar getgrent()
     last unless defined $gr
-    push @gr1, $gr
+    push: @gr1, $gr
 
 endgrent()
 
@@ -178,8 +178,8 @@ setgrent()
 for (1..$max)
     my (@: $gr, ...) = @: getgrent()
     last unless defined $gr
-    push @gr2, $gr
+    push: @gr2, $gr
 
 endgrent()
 
-is("$(join ' ',@gr1)", "$(join ' ',@gr2)")
+is: "$((join: ' ',@gr1))", "$((join: ' ',@gr2))"

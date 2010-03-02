@@ -189,37 +189,37 @@ use warnings::register
 
 sub new
     my $pkg = shift
-    $pkg->TIEHASH(< @_)
+    $pkg->TIEHASH: < @_
 
 
 # Grandfather "new"
 
 sub TIEHASH
     my $pkg = shift
-    if (exists Symbol::fetch_glob("$($pkg)::new")->&)
-        warnings::warnif("WARNING: calling $($pkg)->new since $($pkg)->TIEHASH is missing")
-        $pkg->new(< @_)
+    if (exists (Symbol::fetch_glob: "$($pkg)::new")->&)
+        warnings::warnif: "WARNING: calling $($pkg)->new since $($pkg)->TIEHASH is missing"
+        $pkg->new: < @_
     else
-        die "$pkg doesn't define a TIEHASH method"
+        die: "$pkg doesn't define a TIEHASH method"
     
 
 
 sub EXISTS
     my $pkg = ref @_[0]
-    die "$pkg doesn't define an EXISTS method"
+    die: "$pkg doesn't define an EXISTS method"
 
 
 sub CLEAR
     my $self = shift
-    my $key = $self->FIRSTKEY(< @_)
+    my $key = $self->FIRSTKEY: < @_
     my @keys
 
     while (defined $key)
-        push @keys, $key
-        $key = $self->NEXTKEY(< @_, $key)
+        push: @keys, $key
+        $key = $self->NEXTKEY: < @_, $key
     
     foreach my $key ( @keys)
-        $self->DELETE(< @_, $key)
+        $self->DELETE: < @_, $key
     
 
 
@@ -230,10 +230,10 @@ sub CLEAR
 package Tie::StdHash
 # @ISA = qw(Tie::Hash);		# would inherit new() only
 
-sub TIEHASH  { bless \$%, @_[0] }
+sub TIEHASH  { (bless: \$%, @_[0]) }
 sub STORE    { @_[0]->{+@_[1]} = @_[2] }
 sub FETCH    { @_[0]->{?@_[1]} }
-sub FIRSTKEY { my $a = nelems( keys @_[0]->%); each @_[0]->% }
+sub FIRSTKEY { my $a = (nelems:  keys @_[0]->%); each @_[0]->% }
 sub NEXTKEY  { each @_[0]->% }
 sub EXISTS   { exists @_[0]->{@_[1]} }
 sub DELETE   { delete @_[0]->{@_[1]} }
@@ -242,7 +242,7 @@ sub SCALAR   { scalar @_[0]->% }
 
 package Tie::ExtraHash
 
-sub TIEHASH  { my $p = shift; bless \(@: \$%, < @_), $p }
+sub TIEHASH  { my $p = shift; (bless: \(@: \$%, < @_), $p) }
 sub STORE    { @_[0]->[0]->{+@_[1]} = @_[2] }
 sub FETCH    { @_[0]->[0]->{?@_[1]} }
 sub FIRSTKEY { my $a = scalar keys @_[0]->[0]->%; each @_[0]->[0]->% }

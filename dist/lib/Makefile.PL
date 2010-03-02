@@ -20,16 +20,16 @@ my $extra_meta_hash = %:
 
 my $mm_version = $ExtUtils::MakeMaker::VERSION
 
-WriteMakefile(
-  'NAME' => 'lib',
-  'VERSION' => $lib_version,
-  'LICENSE' => 'perl',
-  'PREREQ_PM' => $%,
-  'ABSTRACT_FROM' => 'lib_pm.PL',
-  'AUTHOR' => 'Steffen Mueller <smueller@cpan.org>',
-  'PL_FILES' => (%: 'lib_pm.PL' => 'lib.pm'),
-  'PM' => (%: 'lib.pm' => '$(INST_LIBDIR)/lib.pm' ),
-  'clean' => (%: FILES => 'lib.pm'),
-  )
+WriteMakefile: 
+  'NAME' => 'lib'
+  'VERSION' => $lib_version
+  'LICENSE' => 'perl'
+  'PREREQ_PM' => $%
+  'ABSTRACT_FROM' => 'lib_pm.PL'
+  'AUTHOR' => 'Steffen Mueller <smueller@cpan.org>'
+  'PL_FILES' => (%: 'lib_pm.PL' => 'lib.pm')
+  'PM' => (%: 'lib.pm' => '$(INST_LIBDIR)/lib.pm' )
+  'clean' => (%: FILES => 'lib.pm')
+  
 
 

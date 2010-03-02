@@ -1,40 +1,40 @@
 #!./perl
 
 use Pod::Plainer
-my $parser = Pod::Plainer->new()
+my $parser = Pod::Plainer->new
 my $header = "=pod\n\n"
 my $input  = 'plnr_in.pod'
 my $output = 'plnr_out.pod'
 
 my $test = 0
-print $^STDOUT, "1..7\n"
+print: $^STDOUT, "1..7\n"
 while( ~< $^DATA )
     my $expected = $header. ~< $^DATA
 
-    open(my $in, '>', $input) or die $^OS_ERROR
-    print $in, $header, $_
-    close $in or die $^OS_ERROR
+    open: my $in, '>', $input or die: $^OS_ERROR
+    print: $in, $header, $_
+    close $in or die: $^OS_ERROR
 
-    open $in, '<', $input or die $^OS_ERROR
-    open my $out, '>', $output or die $^OS_ERROR
-    $parser->parse_from_filehandle($in, $out)
+    open: $in, '<', $input or die: $^OS_ERROR
+    open: my $out, '>', $output or die: $^OS_ERROR
+    $parser->parse_from_filehandle: $in, $out
 
-    open $out, '<', $output or die $^OS_ERROR
+    open: $out, '<', $output or die: $^OS_ERROR
     my $returned; do { local $^INPUT_RECORD_SEPARATOR = undef; $returned = ~< $out; }
 
     unless( $returned eq $expected )
-        print $^STDOUT, < map { s/^/\#/mg; $_; },
-            map { $: $_ },               # to avoid readonly values
-            @:                    "EXPECTED:\n", $expected, "GOT:\n", $returned
-        print $^STDOUT, "not "
+        print: $^STDOUT, < map: { s/^/\#/mg; $_; },
+                                    map: { $: $_ },               # to avoid readonly values
+                                             @:                    "EXPECTED:\n", $expected, "GOT:\n", $returned
+        print: $^STDOUT, "not "
     
-    printf $^STDOUT, "ok \%d\n", ++$test
+    printf: $^STDOUT, "ok \%d\n", ++$test
     close $out
     close $in
 
 END 
-    1 while unlink $input
-    1 while unlink $output
+    1 while unlink: $input
+    1 while unlink: $output
 
 
 __END__

@@ -19,11 +19,11 @@ sub output_extension   { 'rtf' }
 sub page_for_perldoc($self, $tempfile, $perldoc)
     return unless $perldoc->IS_MSWin32
 
-    my $rtf_pager = env::var('RTFREADER') || 'write.exe'
+    my $rtf_pager = (env::var: 'RTFREADER') || 'write.exe'
 
-    $perldoc->aside( "About to launch <\"$rtf_pager\" \"$tempfile\">\n" )
+    $perldoc->aside:  "About to launch <\"$rtf_pager\" \"$tempfile\">\n" 
 
-    return 1 if system( qq{"$rtf_pager"}, qq{"$tempfile"} ) == 0
+    return 1 if (system:  qq{"$rtf_pager"}, qq{"$tempfile"} ) == 0
     return 0
 
 

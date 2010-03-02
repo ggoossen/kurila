@@ -11,8 +11,8 @@ our @ISA = qw(ExtUtils::Liblist::Kid File::Spec)
 sub lsdir
     shift
     my $rex = qr/@_[1]/
-    opendir my $dir, @_[0]
-    my @out = grep { m/$rex/ }, @: readdir $dir
+    opendir: my $dir, @_[0]
+    my @out = grep: { m/$rex/ }, @: readdir $dir
     closedir $dir
     return @out
 

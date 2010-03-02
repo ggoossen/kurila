@@ -14,12 +14,12 @@ use Carp
 $VERSION = "1.23"
 $VERSION = eval $VERSION
 
-IO::Socket::UNIX->register_domain( AF_UNIX )
+IO::Socket::UNIX->register_domain:  AF_UNIX 
 
 sub new
     my $class = shift
-    unshift(@_, "Peer") if (nelems @_) == 1
-    return $class->SUPER::new(< @_)
+    unshift: @_, "Peer" if (nelems @_) == 1
+    return $class->SUPER::new: < @_
 
 
 sub configure($sock,$arg)
@@ -27,20 +27,20 @@ sub configure($sock,$arg)
 
     my $type = $arg->{?Type} || SOCK_STREAM
 
-    $sock->socket(AF_UNIX, $type, 0) or
+    $sock->socket: AF_UNIX, $type, 0 or
         return undef
 
     if(exists $arg->{Local})
-        my $addr = pack_sockaddr_un($arg->{?Local})
-        $sock->bind($addr) or
+        my $addr = pack_sockaddr_un: $arg->{?Local}
+        $sock->bind: $addr or
             return undef
     
     if(exists $arg->{Listen} && $type != SOCK_DGRAM)
-        $sock->listen($arg->{?Listen} || 5) or
+        $sock->listen: $arg->{?Listen} || 5 or
             return undef
     elsif(exists $arg->{Peer})
-        my $addr = pack_sockaddr_un($arg->{?Peer})
-        $sock->connect($addr) or
+        my $addr = pack_sockaddr_un: $arg->{?Peer}
+        $sock->connect: $addr or
             return undef
     
 
@@ -49,12 +49,12 @@ sub configure($sock,$arg)
 
 sub hostpath($sock)
     my $n = $sock->sockname || return undef
-    ( <sockaddr_un($n))[0]
+    ( <(sockaddr_un: $n))[0]
 
 
 sub peerpath($sock)
     my $n = $sock->peername || return undef
-    ( <sockaddr_un($n))[0]
+    ( <(sockaddr_un: $n))[0]
 
 
 1 # Keep require happy

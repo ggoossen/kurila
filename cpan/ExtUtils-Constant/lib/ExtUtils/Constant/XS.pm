@@ -38,7 +38,7 @@ others
 
 # '' is used as a flag to indicate non-ascii macro names, and hence the need
 # to pass in the utf8 on/off flag.
-%XS_Constant = %: 
+%XS_Constant = %:
     ''    => ''
     IV    => 'PUSHi(iv)'
     UV    => 'PUSHu((UV)iv)'
@@ -51,7 +51,7 @@ others
     UNDEF => ''	# implicit undef
     
 
-%XS_TypeSet = %: 
+%XS_TypeSet = %:
     IV    => '*iv_return = '
     UV    => '*iv_return = (IV)'
     NV    => '*nv_return = '
@@ -66,14 +66,14 @@ others
 sub header
     my $start = 1
     my @lines
-    push @lines, "#define PERL_constant_NOTFOUND\t$start\n"; $start++
-    push @lines, "#define PERL_constant_NOTDEF\t$start\n"; $start++
-    foreach (sort keys %XS_Constant)
+    (push: @lines, "#define PERL_constant_NOTFOUND\t$start\n"); $start++
+    (push: @lines, "#define PERL_constant_NOTDEF\t$start\n"); $start++
+    foreach ((sort: keys %XS_Constant))
         next if $_ eq ''
-        push @lines, "#define PERL_constant_IS$_\t$start\n"; $start++
+        (push: @lines, "#define PERL_constant_IS$_\t$start\n"); $start++
     
 
-    return join '', @lines
+    return join: '', @lines
 
 
 sub valid_type($self, $type)
@@ -87,11 +87,11 @@ sub assignment_clause_for_type
     my $type = $args->{?type}
     my $typeset = %XS_TypeSet{?$type}
     if (ref $typeset)
-        die "Type $type is aggregate, but only single value given"
+        die: "Type $type is aggregate, but only single value given"
             if (nelems @_) == 1
-        return map {"$typeset->[$_]@_[$_];"}, 0 .. ((nelems $typeset->@)-1)
+        return map: {"$typeset->[$_]@_[$_];"}, 0 .. ((nelems $typeset->@)-1)
     elsif (defined $typeset)
-        die "Aggregate value given for type $type"
+        die: "Aggregate value given for type $type"
             if (nelems @_) +> 1
         return "$typeset@_[0];"
     
@@ -126,7 +126,7 @@ sub macro_from_name($self, $item)
 
 sub macro_from_item($self, $item)
     my $macro = $item->{?macro}
-    $macro = $self->macro_from_name($item) unless defined $macro
+    $macro = ($self->macro_from_name: $item) unless defined $macro
     $macro
 
 
@@ -136,8 +136,8 @@ sub memEQ
 
 
 sub params($self, $what)
-    foreach (sort keys $what->%)
-        warn "ExtUtils::Constant doesn't know how to handle values of type $_" unless defined %XS_Constant{?$_}
+    foreach ((sort: keys $what->%))
+        warn: "ExtUtils::Constant doesn't know how to handle values of type $_" unless defined %XS_Constant{?$_}
     
     my $params = \$%
     $params->{+''} = 1 if $what->{?''}
@@ -197,14 +197,14 @@ sub dogfood($self, $args, @< @items)
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 EOT
-    $result .= $self->dump_names (\(%: default_type=>$default_type, what=>$what
-                                       indent=>0, declare_types=>1),
-        < @items)
+    $result .= $self->dump_names : \(%: default_type=>$default_type, what=>$what
+                                        indent=>0, declare_types=>1)
+                                   < @items
     $result .= <<'EOT'
 
 print constant_types(), "\n"; # macro defs
 EOT
-    $package = perl_stringify($package)
+    $package = perl_stringify: $package
     $result .=
         "foreach (C_constant (\"$package\", '$subname', '$default_type', \$types, "
     # The form of the indent parameter isn't defined. (Yet)
@@ -212,7 +212,7 @@ EOT
         require Data::Dumper
         $Data::Dumper::Terse=1
         $Data::Dumper::Terse=1 # Not used once. :-)
-        chomp ($indent = Data::Dumper::Dumper ($indent))
+        chomp: ($indent = (Data::Dumper::Dumper : $indent))
         $result .= $indent
     else
         $result .= 'undef'

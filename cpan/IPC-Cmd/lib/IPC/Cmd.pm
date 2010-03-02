@@ -7,7 +7,7 @@ BEGIN
 
     use constant IS_VMS   => $^OS_NAME eq 'VMS'                       ?? 1 !! 0
     use constant IS_WIN32 => $^OS_NAME eq 'MSWin32'                   ?? 1 !! 0
-    use constant IS_WIN98 => (IS_WIN32 and !Win32::IsWinNT())   ?? 1 !! 0
+    use constant IS_WIN98 => (IS_WIN32: and !(Win32::IsWinNT: ))   ?? 1 !! 0
 
     use Exporter    ()
 
@@ -15,8 +15,8 @@ BEGIN
     $VERBOSE        = 0
     $DEBUG          = 0
     $WARN           = 1
-    $USE_IPC_RUN    = IS_WIN32 && !IS_WIN98
-    $USE_IPC_OPEN3  = not IS_VMS
+    $USE_IPC_RUN    = (IS_WIN32: )&& !(IS_WIN98: )
+    $USE_IPC_OPEN3  = not (IS_VMS: )
 
     @ISA            = qw[Exporter]
     @EXPORT_OK      = qw[can_run run]
@@ -98,13 +98,13 @@ sub can_use_ipc_run
     my $verbose = shift || 0
 
     ### ipc::run doesn't run on win98
-    return if IS_WIN98
+    return if IS_WIN98: 
 
     ### if we dont have ipc::run, we obviously can't use it.
-    return unless can_load(
-        modules => \(%:  'IPC::Run' => '0.55' ),
-        verbose => ($WARN && $verbose),
-        )
+    return unless can_load: 
+        modules => \(%:  'IPC::Run' => '0.55' )
+        verbose => ($WARN && $verbose)
+        
 
     ### otherwise, we're good to go
     return 1
@@ -125,14 +125,14 @@ sub can_use_ipc_open3
 
     ### ipc::open3 is not working on VMS becasue of a lack of fork.
     ### todo, win32 also does not have fork, so need to do more research.
-    return 0 if IS_VMS
+    return 0 if IS_VMS: 
 
     ### ipc::open3 works on every platform, but it can't capture buffers
     ### on win32 :(
-    return unless can_load(
-        modules => \(%:  < @+: map { @: $_ => '0.0'}, qw|IPC::Open3 IO::Select Symbol| ),
-        verbose => ($WARN && $verbose),
-        )
+    return unless can_load: 
+        modules => \(%:  < @+: (map: { @: $_ => '0.0'}, qw|IPC::Open3 IO::Select Symbol|) )
+        verbose => ($WARN && $verbose)
+        
 
     return 1
 
@@ -148,7 +148,7 @@ sub can_capture_buffer
     my $self    = shift
 
     return 1 if $USE_IPC_RUN    && $self->can_use_ipc_run
-    return 1 if $USE_IPC_OPEN3  && $self->can_use_ipc_open3 && !IS_WIN32
+    return 1 if $USE_IPC_OPEN3  && $self->can_use_ipc_open3 && !(IS_WIN32: )
     return
 
 
@@ -178,23 +178,23 @@ sub can_run
     if ( $^OS_NAME eq 'VMS' )
         require VMS::DCLsym
         my $syms = VMS::DCLsym->new
-        return $command if scalar $syms->getsym( uc $command )
+        return $command if scalar $syms->getsym:  uc $command 
     
 
     require Config
     require File::Spec
     require ExtUtils::MakeMaker
 
-    if( File::Spec->file_name_is_absolute($command) )
-        return MM->maybe_command($command)
+    if( (File::Spec->file_name_is_absolute: $command) )
+        return MM->maybe_command: $command
 
     else
         for my $dir (@:
-            < split(m/\Q$(Config::config_value('path_sep'))\E/, env::var('PATH'))
+            < split: m/\Q$(Config::config_value('path_sep'))\E/, (env::var: 'PATH')
             File::Spec->curdir
                 )
-            my $abs = File::Spec->catfile($dir, $command)
-            return $abs if $abs = MM->maybe_command($abs)
+            my $abs = File::Spec->catfile: $dir, $command
+            return $abs if $abs = MM->maybe_command: $abs
         
     
 
@@ -293,18 +293,18 @@ sub run
     my $def_buf = ''
 
     my($verbose,$cmd,$buffer)
-    my $tmpl = \%: 
+    my $tmpl = \%:
         verbose =>  %:  default  => $VERBOSE,  store => \$verbose
         buffer  =>  %:  default  => \$def_buf, store => \$buffer
         command =>  %:  required => 1,         store => \$cmd
-                        allow    => sub (@< @_) { !ref(@_[0]) or ref(@_[0]) eq 'ARRAY' }
+                        allow    => sub (@< @_) { !(ref: @_[0]) or (ref: @_[0]) eq 'ARRAY' }
 
-    unless( check( $tmpl, \%hash, $VERBOSE ) )
-        Carp::carp( <loc("Could not validate input: \%1", < Params::Check->last_error))
+    unless( (check:  $tmpl, \%hash, $VERBOSE ) )
+        Carp::carp:  <(loc: "Could not validate input: \%1", < Params::Check->last_error)
         return
     ;
 
-    print $^STDOUT, < loc("Running [\%1]...\n", (ref $cmd ?? "$(join ' ',$cmd->@)" !! $cmd)) if $verbose
+    print: $^STDOUT, < (loc: "Running [\%1]...\n", (ref $cmd ?? "$((join: ' ',$cmd->@))" !! $cmd)) if $verbose
 
     ### did the user pass us a buffer to fill or not? if so, set this
     ### flag so we know what is expected of us
@@ -320,9 +320,9 @@ sub run
         my $buf = shift
         return unless defined $buf
 
-        print $^STDOUT, $buf if $verbose
-        push @buffer,   $buf
-        push @buff_out, $buf
+        print: $^STDOUT, $buf if $verbose
+        push: @buffer,   $buf
+        push: @buff_out, $buf
     
 
     ### capture STDERR
@@ -330,9 +330,9 @@ sub run
         my $buf = shift
         return unless defined $buf
 
-        print $^STDERR, $buf if $verbose
-        push @buffer,   $buf
-        push @buff_err, $buf
+        print: $^STDERR, $buf if $verbose
+        push: @buffer,   $buf
+        push: @buff_err, $buf
     
 
 
@@ -343,37 +343,37 @@ sub run
     my $ok
 
     ### IPC::Run is first choice if $USE_IPC_RUN is set.
-    if( $USE_IPC_RUN and __PACKAGE__->can_use_ipc_run( 1 ) )
+    if( $USE_IPC_RUN and __PACKAGE__->can_use_ipc_run:  1  )
         ### ipc::run handlers needs the command as a string or an array ref
 
-        __PACKAGE__->_debug( "# Using IPC::Run. Have buffer: $have_buffer" )
+        __PACKAGE__->_debug:  "# Using IPC::Run. Have buffer: $have_buffer" 
             if $DEBUG
 
-        $ok = __PACKAGE__->_ipc_run( $cmd, $_out_handler, $_err_handler )
+        $ok = __PACKAGE__->_ipc_run:  $cmd, $_out_handler, $_err_handler 
 
     ### since IPC::Open3 works on all platforms, and just fails on
     ### win32 for capturing buffers, do that ideally
-    elsif ( $USE_IPC_OPEN3 and __PACKAGE__->can_use_ipc_open3( 1 ) )
+    elsif ( $USE_IPC_OPEN3 and __PACKAGE__->can_use_ipc_open3:  1  )
 
-        __PACKAGE__->_debug( "# Using IPC::Open3. Have buffer: $have_buffer" )
+        __PACKAGE__->_debug:  "# Using IPC::Open3. Have buffer: $have_buffer" 
             if $DEBUG
 
         ### in case there are pipes in there;
         ### IPC::Open3 will call exec and exec will do the right thing
-        $ok = __PACKAGE__->_open3_run(
-            ( ref $cmd ?? "$(join ' ',$cmd->@)" !! $cmd ),
+        $ok = __PACKAGE__->_open3_run: 
+            ( ref $cmd ?? "$((join: ' ',$cmd->@))" !! $cmd )
             $_out_handler, $_err_handler, $verbose
-            )
+            
 
     ### if we are allowed to run verbose, just dispatch the system command
     else
-        __PACKAGE__->_debug( "# Using system(). Have buffer: $have_buffer" )
+        __PACKAGE__->_debug:  "# Using system(). Have buffer: $have_buffer" 
             if $DEBUG
-        $ok = __PACKAGE__->_system_run( (ref $cmd ?? "$(join ' ',$cmd->@)" !! $cmd), $verbose )
+        $ok = __PACKAGE__->_system_run:  (ref $cmd ?? "$((join: ' ',$cmd->@))" !! $cmd), $verbose 
     
 
     ### fill the buffer;
-    $buffer->$ = join '', @buffer if (nelems @buffer)
+    $buffer->$ = (join: '', @buffer) if (nelems @buffer)
 
     ### return a list of flags and buffers (if available) in list
     ### context, or just a simple 'ok' in scalar
@@ -397,8 +397,8 @@ sub _open3_run
     ### define them beforehand, so we always have defined FH's
     ### to read from.
     use Symbol;
-    my $kidout      = Symbol::gensym()
-    my $kiderror    = Symbol::gensym()
+    my $kidout      = (Symbol::gensym: )
+    my $kiderror    = (Symbol::gensym: )
 
     ### Dup the filehandle so we can pass 'our' STDIN to the
     ### child process. This stops us from having to pump input
@@ -406,32 +406,32 @@ sub _open3_run
     ### to revive the FH afterwards, as IPC::Open3 closes it.
     ### We'll do the same for STDOUT and STDERR. It works without
     ### duping them on non-unix derivatives, but not on win32.
-    my @fds_to_dup = @:  IS_WIN32 && !$verbose
-                                      ?? < qw[STDIN STDOUT STDERR]
-                                      !! < qw[STDIN]
+    my @fds_to_dup = @:  (IS_WIN32: )&& !$verbose
+                              ?? < qw[STDIN STDOUT STDERR]
+                              !! < qw[STDIN]
         
-    __PACKAGE__->__dup_fds( < @fds_to_dup )
+    __PACKAGE__->__dup_fds:  < @fds_to_dup 
 
 
-    my $pid = IPC::Open3::open3(
-                    (@: '<&', $^STDIN),
-                    (IS_WIN32 ?? (@: '>&', $^STDOUT) !! $kidout),
-                    (IS_WIN32 ?? (@: '>&', $^STDERR) !! $kiderror),
+    my $pid = IPC::Open3::open3: 
+                    (@: '<&', $^STDIN)
+                    ((IS_WIN32: )?? (@: '>&', $^STDOUT) !! $kidout)
+                    ((IS_WIN32: )?? (@: '>&', $^STDERR) !! $kiderror)
                     $cmd
-                    )
+                    
 
     ### use OUR stdin, not $kidin. Somehow,
     ### we never get the input.. so jump through
     ### some hoops to do it :(
-    my $selector = IO::Select->new(
-        (IS_WIN32 ?? $^STDERR !! $kiderror),
-        $^STDIN,
-        (IS_WIN32 ?? $^STDOUT !! $kidout)
-        )
+    my $selector = IO::Select->new: 
+        ((IS_WIN32: )?? $^STDERR !! $kiderror)
+        $^STDIN
+        ((IS_WIN32: )?? $^STDOUT !! $kidout)
+        
 
-    ($^STDOUT)->autoflush(1);   ($^STDERR)->autoflush(1);   ($^STDIN)->autoflush(1)
-    $kidout->autoflush(1)   if UNIVERSAL::can($kidout,   'autoflush')
-    $kiderror->autoflush(1) if UNIVERSAL::can($kiderror, 'autoflush')
+    ($^STDOUT)->autoflush: 1);   ($^STDERR)->autoflush: 1);   ($^STDIN)->autoflush: 1
+    $kidout->autoflush: 1   if UNIVERSAL::can: $kidout,   'autoflush'
+    $kiderror->autoflush: 1 if UNIVERSAL::can: $kiderror, 'autoflush'
 
     ### add an epxlicit break statement
     ### code courtesy of theorbtwo from #london.pm
@@ -443,20 +443,20 @@ sub _open3_run
             my $buf
 
             ### $len is the amount of bytes read
-            my $len = sysread( $h, $buf, 4096 )    # try to read 4096 bytes
+            my $len = sysread:  $h, $buf, 4096     # try to read 4096 bytes
 
             ### see perldoc -f sysread: it returns undef on error,
             ### so bail out.
             if( not defined $len )
-                warn( <loc("Error reading from process: \%1", $^OS_ERROR))
+                warn:  <(loc: "Error reading from process: \%1", $^OS_ERROR)
                 last OUTER
             
 
             ### check for $len. it may be 0, at which point we're
             ### done reading, so don't try to process it.
             ### if we would print anyway, we'd provide bogus information
-            $_out_handler->( "$buf" ) if $len && $h \== $kidout
-            $_err_handler->( "$buf" ) if $len && $h \== $kiderror
+            $_out_handler->& <:  "$buf"  if $len && $h \== $kidout
+            $_err_handler->& <:  "$buf"  if $len && $h \== $kiderror
 
             ### Wait till child process is done printing to both
             ### stdout and stderr.
@@ -466,11 +466,11 @@ sub _open3_run
         
     
 
-    waitpid $pid, 0 # wait for it to die
+    waitpid: $pid, 0 # wait for it to die
 
     ### restore STDIN after duping, or STDIN will be closed for
     ### this current perl process!
-    __PACKAGE__->__reopen_fds( < @fds_to_dup )
+    __PACKAGE__->__reopen_fds:  < @fds_to_dup 
 
     return if $^CHILD_ERROR   # some error occurred
     return 1
@@ -483,7 +483,7 @@ sub _ipc_run
     my $_out_handler    = shift
     my $_err_handler    = shift
 
-    STDOUT->autoflush(1); STDERR->autoflush(1)
+    (STDOUT->autoflush: 1); STDERR->autoflush: 1
 
     ### a command like:
     # [
@@ -508,20 +508,20 @@ sub _ipc_run
         my $aref = \$@
         for my $item ( $cmd->@)
             if( $item =~ m/([<>|&])/ )
-                push @command, $aref, $item
+                push: @command, $aref, $item
                 $aref = \$@
                 $special_chars .= $1
             else
-                push $aref->@, $item
+                push: $aref->@, $item
             
         
-        push @command, $aref
+        push: @command, $aref
     else
-        @command = map { if( m/([<>|&])/ )
-                             $special_chars .= $1; $_
-                         else
-                             \ split m/ +/
-                       }, split( m/\s*([<>|&])\s*/, $cmd )
+        @command = map: { if( m/([<>|&])/ )
+                                $special_chars .= $1; $_
+                            else
+                                \ split: m/ +/
+                            }, split:  m/\s*([<>|&])\s*/, $cmd 
 
     ### if there's a pipe in the command, $^STDIN needs to
     ### be inserted *BEFORE* the pipe, to work on win32
@@ -544,12 +544,12 @@ sub _ipc_run
 
 
     # $^STDIN is already included in the @command, see a few lines up
-    return IPC::Run::run(   < @command,
-                            fileno($^STDOUT).'>',
-                            $_out_handler,
-                            fileno($^STDERR).'>',
-                            $_err_handler
-                            )
+    return IPC::Run::run:    < @command
+                             (fileno: $^STDOUT).'>'
+                             $_out_handler
+                             (fileno: $^STDERR).'>'
+                             $_err_handler
+                            
 
 
 sub _system_run
@@ -558,12 +558,12 @@ sub _system_run
     my $verbose = shift || 0
 
     my @fds_to_dup = @:  $verbose ?? () !! < qw[STDOUT STDERR] 
-    __PACKAGE__->__dup_fds( < @fds_to_dup )
+    __PACKAGE__->__dup_fds:  < @fds_to_dup 
 
     ### system returns 'true' on failure -- the exit code of the cmd
-    system( $cmd )
+    system:  $cmd 
 
-    __PACKAGE__->__reopen_fds( < @fds_to_dup )
+    __PACKAGE__->__reopen_fds:  < @fds_to_dup 
 
     return if $^CHILD_ERROR
     return 1
@@ -572,35 +572,35 @@ sub _system_run
 do  use File::Spec
     use Symbol
 
-    my %Map = %: 
-        STDOUT => \(@:  <qw|>&|, $^STDOUT, Symbol::gensym() )
-        STDERR => \(@:  <qw|>&|, $^STDERR, Symbol::gensym() )
-        STDIN  => \(@:  <qw|<&|, $^STDIN,  Symbol::gensym() )
+    my %Map = %:
+        STDOUT => \(@:  <qw|>&|, $^STDOUT, (Symbol::gensym: ) )
+        STDERR => \(@:  <qw|>&|, $^STDERR, (Symbol::gensym: ) )
+        STDIN  => \(@:  <qw|<&|, $^STDIN,  (Symbol::gensym: ) )
 
     ### dups FDs and stores them in a cache
     sub __dup_fds
         my $self    = shift
         my @fds     = @_
 
-        __PACKAGE__->_debug( "# Closing the following fds: $(join ' ',@fds)" ) if $DEBUG
+        __PACKAGE__->_debug:  "# Closing the following fds: $((join: ' ',@fds))"  if $DEBUG
 
         for my $name (  @fds )
             my(@: $redir, $fh, $glob) =  %Map{?$name}->@ or (
-                Carp::carp( <loc("No such FD: '\%1'", $name)), next )
+                (Carp::carp:  <(loc: "No such FD: '\%1'", $name)), next )
 
             ### MUST use the 2-arg version of open for dup'ing for
             ### 5.6.x compatibilty. 5.8.x can use 3-arg open
             ### see perldoc5.6.2 -f open for details
-            open $glob, $redir, fileno($fh) or (
-                        Carp::carp( <loc("Could not dup '$name': \%1", $^OS_ERROR)),
+            open: $glob, $redir, (fileno: $fh) or (
+                        (Carp::carp:  <(loc: "Could not dup '$name': \%1", $^OS_ERROR)),
                         return
                         )
 
             ### we should re-open this filehandle right now, not
             ### just dup it
             if( $redir eq '>&' )
-                open( $fh, ">", '' . File::Spec->devnull ) or (
-                    Carp::carp( <loc("Could not reopen '$name': \%1", $^OS_ERROR)),
+                open:  $fh, ">", '' . File::Spec->devnull  or (
+                    (Carp::carp:  <(loc: "Could not reopen '$name': \%1", $^OS_ERROR)),
                     return
                     )
 
@@ -611,14 +611,14 @@ do  use File::Spec
         my $self    = shift
         my @fds     = @_
 
-        __PACKAGE__->_debug( "# Reopening the following fds: $(join ' ',@fds)" ) if $DEBUG
+        __PACKAGE__->_debug:  "# Reopening the following fds: $((join: ' ',@fds))"  if $DEBUG
 
         for my $name (  @fds )
             my(@: $redir, $fh, $glob) =  %Map{?$name}->@ or (
-                Carp::carp( <loc("No such FD: '\%1'", $name)), next )
+                (Carp::carp:  <(loc: "No such FD: '\%1'", $name)), next )
 
-            open( $fh, $redir, fileno($glob) ) or (
-                    Carp::carp( <loc("Could not restore '$name': \%1", $^OS_ERROR)),
+            open:  $fh, $redir, (fileno: $glob)  or (
+                    (Carp::carp:  <(loc: "Could not restore '$name': \%1", $^OS_ERROR)),
                     return
                     )
 
@@ -634,7 +634,7 @@ sub _debug
     my $level   = shift || 0
 
     local $Carp::CarpLevel += $level
-    Carp::carp($msg)
+    Carp::carp: $msg
 
     return 1
 

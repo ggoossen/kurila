@@ -21,23 +21,23 @@ BEGIN
     )
 
 
-XSLoader::load 'Opcode', $VERSION
+XSLoader::load:  'Opcode', $VERSION
 
-_init_optags()
+(_init_optags: )
 
-sub ops_to_opset { opset(< @_) }	# alias for old name
+sub ops_to_opset { (opset: < @_) }	# alias for old name
 
 sub opset_to_hex ($v)
-    return "(invalid opset)" unless verify_opset($v)
-    unpack("h*",$v)
+    return "(invalid opset)" unless verify_opset: $v
+    unpack: "h*",$v
 
 
 sub opdump (?$pat)
     # handy utility: perl -MOpcode=opdump -e 'opdump File'
-    foreach( opset_to_ops( <full_opset()))
-        my $op = sprintf "  \%12s  \%s\n", $_, < opdesc($_)
+    foreach( (opset_to_ops:  <(full_opset: )))
+        my $op = sprintf: "  \%12s  \%s\n", $_, < opdesc: $_
         next if defined $pat and $op !~ m/$pat/i
-        print $^STDOUT, $op
+        print: $^STDOUT, $op
     
 
 
@@ -45,31 +45,31 @@ sub opdump (?$pat)
 
 sub _init_optags
     my(%all, %seen)
-    %all{[opset_to_ops(full_opset())]} = $@ # keys only
+    %all{[(opset_to_ops: (full_opset: ))]} = $@ # keys only
 
     local($_)
     local($^INPUT_RECORD_SEPARATOR) = "\n=cut" # skip to optags definition section
     ~< $^DATA
     $^INPUT_RECORD_SEPARATOR = "\n="		# now read in 'pod section' chunks
-    while(defined(my $line = ~< $^DATA))
+    while((defined: (my $line = ~< $^DATA)))
         next unless $line =~ m/^item\s+(:\w+)/
         my $tag = $1
 
         # Split into lines, keep only indented lines
-        my @lines = grep { m/^\s/    }, split(m/\n/, $line)
+        my @lines = grep: { m/^\s/    }, split: m/\n/, $line
         foreach ( @lines) { s/--.*//  } # delete comments
-        my @ops   = @+: map  { split ' ' }, @lines # get op words
+        my @ops   = @+: map: { (split: ' ') }, @lines # get op words
 
         foreach( @ops)
-            warn "$tag - $_ already tagged in %seen{?$_}\n" if %seen{?$_}
+            warn: "$tag - $_ already tagged in %seen{?$_}\n" if %seen{?$_}
             %seen{+$_} = $tag
             delete %all{$_}
         
         # opset will croak on invalid names
-        define_optag($tag, opset(< @ops))
+        define_optag: $tag, (opset: < @ops)
     
-    close($^DATA)
-    warn "Untagged opnames: ".join(' ',keys %all)."\n" if %all
+    close: $^DATA
+    warn: "Untagged opnames: ".(join: ' ',keys %all)."\n" if %all
 
 
 

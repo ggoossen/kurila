@@ -41,10 +41,10 @@ our @MINIMAL_EXPORT = qw()
 # Grandfather $NAME import
 sub import
     my $this = shift
-    my @list = grep { ! m/^-no_match_vars$/ }, @_ 
+    my @list = grep: { ! m/^-no_match_vars$/ }, @_ 
     local $Exporter::ExportLevel = 1
     *EXPORT = \@MINIMAL_EXPORT 
-    Exporter::import($this,< grep {s/^\$/*/}, @list)
+    Exporter::import: $this,< (grep: {s/^\$/*/}, @list)
 
 
 1

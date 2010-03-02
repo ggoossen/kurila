@@ -20,692 +20,692 @@ use Fcntl < qw(FD_CLOEXEC F_DUPFD F_GETFD F_GETFL F_GETLK F_RDLCK F_SETFD
 my $loaded
 
 sub import
-    load_imports() unless $loaded++
+    load_imports:  unless $loaded++
     my $this = shift
-    my @list = map { m/^\w+_h$/ ?? ":$_" !! $_ }, @_
+    my @list = map: { m/^\w+_h$/ ?? ":$_" !! $_ }, @_
     local $Exporter::ExportLevel = 1
-    Exporter::import($this,< @list)
+    Exporter::import: $this,< @list
 
 
-XSLoader::load 'POSIX', $VERSION
+XSLoader::load:  'POSIX', $VERSION
 
 sub usage($mess)
-    die "Usage: POSIX::$mess"
+    die: "Usage: POSIX::$mess"
 
 
 sub redef($mess)
-    die "Use method $mess instead"
+    die: "Use method $mess instead"
 
 
 sub unimpl($mess)
     $mess =~ s/xxx//
-    die "Unimplemented: POSIX::$mess"
+    die: "Unimplemented: POSIX::$mess"
 
 
 sub assert
-    usage "assert(expr)" if (nelems @_) != 1
+    usage: "assert(expr)" if (nelems @_) != 1
     if (!@_[0])
-        die "Assertion failed"
+        die: "Assertion failed"
     
 
 
 sub tolower
-    usage "tolower(string)" if (nelems @_) != 1
-    lc(@_[0])
+    usage: "tolower(string)" if (nelems @_) != 1
+    lc: @_[0]
 
 
 sub toupper
-    usage "toupper(string)" if (nelems @_) != 1
-    uc(@_[0])
+    usage: "toupper(string)" if (nelems @_) != 1
+    uc: @_[0]
 
 
 sub closedir
-    usage "closedir(dirhandle)" if (nelems @_) != 1
-    CORE::closedir(@_[0])
+    usage: "closedir(dirhandle)" if (nelems @_) != 1
+    CORE::closedir: @_[0]
 
 
 sub opendir
-    usage "opendir(directory)" if (nelems @_) != 1
+    usage: "opendir(directory)" if (nelems @_) != 1
     my $dirhandle
-    CORE::opendir($dirhandle, @_[0])
+    CORE::opendir: $dirhandle, @_[0]
         ?? $dirhandle
         !! undef
 
 
 sub readdir
-    usage "readdir(dirhandle)" if (nelems @_) != 1
-    CORE::readdir(@_[0])
+    usage: "readdir(dirhandle)" if (nelems @_) != 1
+    CORE::readdir: @_[0]
 
 
 sub rewinddir
-    usage "rewinddir(dirhandle)" if (nelems @_) != 1
-    CORE::rewinddir(@_[0])
+    usage: "rewinddir(dirhandle)" if (nelems @_) != 1
+    CORE::rewinddir: @_[0]
 
 
 sub errno
-    usage "errno()" if (nelems @_) != 0
+    usage: "errno()" if (nelems @_) != 0
     $^OS_ERROR + 0
 
 
 sub creat
-    usage "creat(filename, mode)" if (nelems @_) != 2
-    open(@_[0], O_WRONLY( < @_ ) ^|^ O_CREAT( < @_ ) ^|^ O_TRUNC( < @_ ), @_[1])
+    usage: "creat(filename, mode)" if (nelems @_) != 2
+    open: @_[0], (O_WRONLY:  < @_ ) ^|^ (O_CREAT:  < @_ ) ^|^ (O_TRUNC:  < @_ ), @_[1]
 
 
 sub fcntl
-    usage "fcntl(filehandle, cmd, arg)" if (nelems @_) != 3
-    CORE::fcntl(@_[0], @_[1], @_[2])
+    usage: "fcntl(filehandle, cmd, arg)" if (nelems @_) != 3
+    CORE::fcntl: @_[0], @_[1], @_[2]
 
 
 sub getgrgid
-    usage "getgrgid(gid)" if (nelems @_) != 1
-    CORE::getgrgid(@_[0])
+    usage: "getgrgid(gid)" if (nelems @_) != 1
+    CORE::getgrgid: @_[0]
 
 
 sub getgrnam
-    usage "getgrnam(name)" if (nelems @_) != 1
-    CORE::getgrnam(@_[0])
+    usage: "getgrnam(name)" if (nelems @_) != 1
+    CORE::getgrnam: @_[0]
 
 
 sub atan2
-    usage "atan2(x,y)" if (nelems @_) != 2
-    CORE::atan2(@_[0], @_[1])
+    usage: "atan2(x,y)" if (nelems @_) != 2
+    CORE::atan2: @_[0], @_[1]
 
 
 sub cos
-    usage "cos(x)" if (nelems @_) != 1
-    CORE::cos(@_[0])
+    usage: "cos(x)" if (nelems @_) != 1
+    CORE::cos: @_[0]
 
 
 sub exp
-    usage "exp(x)" if (nelems @_) != 1
-    CORE::exp(@_[0])
+    usage: "exp(x)" if (nelems @_) != 1
+    CORE::exp: @_[0]
 
 
 sub fabs
-    usage "fabs(x)" if (nelems @_) != 1
-    CORE::abs(@_[0])
+    usage: "fabs(x)" if (nelems @_) != 1
+    CORE::abs: @_[0]
 
 
 sub log
-    usage "log(x)" if (nelems @_) != 1
-    CORE::log(@_[0])
+    usage: "log(x)" if (nelems @_) != 1
+    CORE::log: @_[0]
 
 
 sub pow
-    usage "pow(x,exponent)" if (nelems @_) != 2
+    usage: "pow(x,exponent)" if (nelems @_) != 2
     @_[0] ** @_[1]
 
 
 sub sin
-    usage "sin(x)" if (nelems @_) != 1
-    CORE::sin(@_[0])
+    usage: "sin(x)" if (nelems @_) != 1
+    CORE::sin: @_[0]
 
 
 sub sqrt
-    usage "sqrt(x)" if (nelems @_) != 1
-    CORE::sqrt(@_[0])
+    usage: "sqrt(x)" if (nelems @_) != 1
+    CORE::sqrt: @_[0]
 
 
 sub getpwnam
-    usage "getpwnam(name)" if (nelems @_) != 1
-    CORE::getpwnam(@_[0])
+    usage: "getpwnam(name)" if (nelems @_) != 1
+    CORE::getpwnam: @_[0]
 
 
 sub getpwuid
-    usage "getpwuid(uid)" if (nelems @_) != 1
-    CORE::getpwuid(@_[0])
+    usage: "getpwuid(uid)" if (nelems @_) != 1
+    CORE::getpwuid: @_[0]
 
 
 sub longjmp
-    unimpl "longjmp() is C-specific: use die instead"
+    unimpl: "longjmp() is C-specific: use die instead"
 
 
 sub setjmp
-    unimpl "setjmp() is C-specific: use eval \{\} instead"
+    unimpl: "setjmp() is C-specific: use eval \{\} instead"
 
 
 sub siglongjmp
-    unimpl "siglongjmp() is C-specific: use die instead"
+    unimpl: "siglongjmp() is C-specific: use die instead"
 
 
 sub sigsetjmp
-    unimpl "sigsetjmp() is C-specific: use eval \{\} instead"
+    unimpl: "sigsetjmp() is C-specific: use eval \{\} instead"
 
 
 sub kill
-    usage "kill(pid, sig)" if (nelems @_) != 2
-    CORE::kill @_[1], @_[0]
+    usage: "kill(pid, sig)" if (nelems @_) != 2
+    CORE::kill:  @_[1], @_[0]
 
 
 sub raise
-    usage "raise(sig)" if (nelems @_) != 1
-    CORE::kill @_[0], $^PID     # Is this good enough?
+    usage: "raise(sig)" if (nelems @_) != 1
+    CORE::kill:  @_[0], $^PID     # Is this good enough?
 
 
 sub offsetof
-    unimpl "offsetof() is C-specific, stopped"
+    unimpl: "offsetof() is C-specific, stopped"
 
 
 sub clearerr
-    redef "IO::Handle::clearerr()"
+    redef: "IO::Handle::clearerr()"
 
 
 sub fclose
-    redef "IO::Handle::close()"
+    redef: "IO::Handle::close()"
 
 
 sub fdopen
-    redef "IO::Handle::new_from_fd()"
+    redef: "IO::Handle::new_from_fd()"
 
 
 sub feof
-    redef "IO::Handle::eof()"
+    redef: "IO::Handle::eof()"
 
 
 sub fgetc
-    redef "IO::Handle::getc()"
+    redef: "IO::Handle::getc()"
 
 
 sub fgets
-    redef "IO::Handle::gets()"
+    redef: "IO::Handle::gets()"
 
 
 sub fileno
-    redef "IO::Handle::fileno()"
+    redef: "IO::Handle::fileno()"
 
 
 sub fopen
-    redef "IO::File::open()"
+    redef: "IO::File::open()"
 
 
 sub fprintf
-    unimpl "fprintf() is C-specific--use printf instead"
+    unimpl: "fprintf() is C-specific--use printf instead"
 
 
 sub fputc
-    unimpl "fputc() is C-specific--use print instead"
+    unimpl: "fputc() is C-specific--use print instead"
 
 
 sub fputs
-    unimpl "fputs() is C-specific--use print instead"
+    unimpl: "fputs() is C-specific--use print instead"
 
 
 sub fread
-    unimpl "fread() is C-specific--use read instead"
+    unimpl: "fread() is C-specific--use read instead"
 
 
 sub freopen
-    unimpl "freopen() is C-specific--use open instead"
+    unimpl: "freopen() is C-specific--use open instead"
 
 
 sub fscanf
-    unimpl "fscanf() is C-specific--use <> and regular expressions instead"
+    unimpl: "fscanf() is C-specific--use <> and regular expressions instead"
 
 
 sub fseek
-    redef "IO::Seekable::seek()"
+    redef: "IO::Seekable::seek()"
 
 
 sub fsync
-    redef "IO::Handle::sync()"
+    redef: "IO::Handle::sync()"
 
 
 sub ferror
-    redef "IO::Handle::error()"
+    redef: "IO::Handle::error()"
 
 
 sub fflush
-    redef "IO::Handle::flush()"
+    redef: "IO::Handle::flush()"
 
 
 sub fgetpos
-    redef "IO::Seekable::getpos()"
+    redef: "IO::Seekable::getpos()"
 
 
 sub fsetpos
-    redef "IO::Seekable::setpos()"
+    redef: "IO::Seekable::setpos()"
 
 
 sub ftell
-    redef "IO::Seekable::tell()"
+    redef: "IO::Seekable::tell()"
 
 
 sub fwrite
-    unimpl "fwrite() is C-specific--use print instead"
+    unimpl: "fwrite() is C-specific--use print instead"
 
 
 sub getc
-    usage "getc(handle)" if (nelems @_) != 1
-    CORE::getc(@_[0])
+    usage: "getc(handle)" if (nelems @_) != 1
+    CORE::getc: @_[0]
 
 
 sub getchar
-    usage "getchar()" if (nelems @_) != 0
-    CORE::getc($^STDIN)
+    usage: "getchar()" if (nelems @_) != 0
+    CORE::getc: $^STDIN
 
 
 sub gets
-    usage "gets()" if (nelems @_) != 0
+    usage: "gets()" if (nelems @_) != 0
     scalar ~< $^STDIN
 
 
 sub perror
-    print $^STDERR, "$(join ' ',@_): " if (nelems @_)
-    print $^STDERR, $^OS_ERROR,"\n"
+    print: $^STDERR, "$((join: ' ',@_)): " if (nelems @_)
+    print: $^STDERR, $^OS_ERROR,"\n"
 
 
 sub printf
-    usage "printf(pattern, args...)" if (nelems @_) +< 1
-    CORE::printf $^STDOUT, < @_
+    usage: "printf(pattern, args...)" if (nelems @_) +< 1
+    CORE::printf:  $^STDOUT, < @_
 
 
 sub putc
-    unimpl "putc() is C-specific--use print instead"
+    unimpl: "putc() is C-specific--use print instead"
 
 
 sub putchar
-    unimpl "putchar() is C-specific--use print instead"
+    unimpl: "putchar() is C-specific--use print instead"
 
 
 sub puts
-    unimpl "puts() is C-specific--use print instead"
+    unimpl: "puts() is C-specific--use print instead"
 
 
 sub remove
-    usage "remove(filename)" if (nelems @_) != 1
-    (-d @_[0]) ?? CORE::rmdir(@_[0]) !! CORE::unlink(@_[0])
+    usage: "remove(filename)" if (nelems @_) != 1
+    (-d @_[0]) ?? (CORE::rmdir: @_[0]) !! CORE::unlink: @_[0]
 
 
 sub rename
-    usage "rename(oldfilename, newfilename)" if (nelems @_) != 2
-    CORE::rename(@_[0], @_[1])
+    usage: "rename(oldfilename, newfilename)" if (nelems @_) != 2
+    CORE::rename: @_[0], @_[1]
 
 
 sub rewind
-    usage "rewind(filehandle)" if (nelems @_) != 1
-    CORE::seek(@_[0],0,0)
+    usage: "rewind(filehandle)" if (nelems @_) != 1
+    CORE::seek: @_[0],0,0
 
 
 sub scanf
-    unimpl "scanf() is C-specific--use <> and regular expressions instead"
+    unimpl: "scanf() is C-specific--use <> and regular expressions instead"
 
 
 sub sprintf
-    usage "sprintf(pattern,args)" if (nelems @_) == 0
-    CORE::sprintf(shift,< @_)
+    usage: "sprintf(pattern,args)" if (nelems @_) == 0
+    CORE::sprintf: shift,< @_
 
 
 sub sscanf
-    unimpl "sscanf() is C-specific--use regular expressions instead"
+    unimpl: "sscanf() is C-specific--use regular expressions instead"
 
 
 sub tmpfile
-    redef "IO::File::new_tmpfile()"
+    redef: "IO::File::new_tmpfile()"
 
 
 sub ungetc
-    redef "IO::Handle::ungetc()"
+    redef: "IO::Handle::ungetc()"
 
 
 sub vfprintf
-    unimpl "vfprintf() is C-specific"
+    unimpl: "vfprintf() is C-specific"
 
 
 sub vprintf
-    unimpl "vprintf() is C-specific"
+    unimpl: "vprintf() is C-specific"
 
 
 sub vsprintf
-    unimpl "vsprintf() is C-specific"
+    unimpl: "vsprintf() is C-specific"
 
 
 sub abs
-    usage "abs(x)" if (nelems @_) != 1
-    CORE::abs(@_[0])
+    usage: "abs(x)" if (nelems @_) != 1
+    CORE::abs: @_[0]
 
 
 sub atexit
-    unimpl "atexit() is C-specific: use END \{\} instead"
+    unimpl: "atexit() is C-specific: use END \{\} instead"
 
 
 sub atof
-    unimpl "atof() is C-specific, stopped"
+    unimpl: "atof() is C-specific, stopped"
 
 
 sub atoi
-    unimpl "atoi() is C-specific, stopped"
+    unimpl: "atoi() is C-specific, stopped"
 
 
 sub atol
-    unimpl "atol() is C-specific, stopped"
+    unimpl: "atol() is C-specific, stopped"
 
 
 sub bsearch
-    unimpl "bsearch() not supplied"
+    unimpl: "bsearch() not supplied"
 
 
 sub calloc
-    unimpl "calloc() is C-specific, stopped"
+    unimpl: "calloc() is C-specific, stopped"
 
 
 sub div
-    unimpl "div() is C-specific, use /, \% and int instead"
+    unimpl: "div() is C-specific, use /, \% and int instead"
 
 
 sub exit
-    usage "exit(status)" if (nelems @_) != 1
-    CORE::exit(@_[0])
+    usage: "exit(status)" if (nelems @_) != 1
+    CORE::exit: @_[0]
 
 
 sub free
-    unimpl "free() is C-specific, stopped"
+    unimpl: "free() is C-specific, stopped"
 
 
 sub getenv
-    usage "getenv(name)" if (nelems @_) != 1
-    env::var(@_[0])
+    usage: "getenv(name)" if (nelems @_) != 1
+    env::var: @_[0]
 
 
 sub labs
-    unimpl "labs() is C-specific, use abs instead"
+    unimpl: "labs() is C-specific, use abs instead"
 
 
 sub ldiv
-    unimpl "ldiv() is C-specific, use /, \% and int instead"
+    unimpl: "ldiv() is C-specific, use /, \% and int instead"
 
 
 sub malloc
-    unimpl "malloc() is C-specific, stopped"
+    unimpl: "malloc() is C-specific, stopped"
 
 
 sub qsort
-    unimpl "qsort() is C-specific, use sort instead"
+    unimpl: "qsort() is C-specific, use sort instead"
 
 
 sub rand
-    unimpl "rand() is non-portable, use Perl's rand instead"
+    unimpl: "rand() is non-portable, use Perl's rand instead"
 
 
 sub realloc
-    unimpl "realloc() is C-specific, stopped"
+    unimpl: "realloc() is C-specific, stopped"
 
 
 sub srand
-    unimpl "srand()"
+    unimpl: "srand()"
 
 
 sub system
-    usage "system(command)" if (nelems @_) != 1
-    CORE::system(@_[0])
+    usage: "system(command)" if (nelems @_) != 1
+    CORE::system: @_[0]
 
 
 sub memchr
-    unimpl "memchr() is C-specific, use index() instead"
+    unimpl: "memchr() is C-specific, use index() instead"
 
 
 sub memcmp
-    unimpl "memcmp() is C-specific, use eq instead"
+    unimpl: "memcmp() is C-specific, use eq instead"
 
 
 sub memcpy
-    unimpl "memcpy() is C-specific, use = instead"
+    unimpl: "memcpy() is C-specific, use = instead"
 
 
 sub memmove
-    unimpl "memmove() is C-specific, use = instead"
+    unimpl: "memmove() is C-specific, use = instead"
 
 
 sub memset
-    unimpl "memset() is C-specific, use x instead"
+    unimpl: "memset() is C-specific, use x instead"
 
 
 sub strcat
-    unimpl "strcat() is C-specific, use .= instead"
+    unimpl: "strcat() is C-specific, use .= instead"
 
 
 sub strchr
-    unimpl "strchr() is C-specific, use index() instead"
+    unimpl: "strchr() is C-specific, use index() instead"
 
 
 sub strcmp
-    unimpl "strcmp() is C-specific, use eq instead"
+    unimpl: "strcmp() is C-specific, use eq instead"
 
 
 sub strcpy
-    unimpl "strcpy() is C-specific, use = instead"
+    unimpl: "strcpy() is C-specific, use = instead"
 
 
 sub strcspn
-    unimpl "strcspn() is C-specific, use regular expressions instead"
+    unimpl: "strcspn() is C-specific, use regular expressions instead"
 
 
 sub strerror
-    usage "strerror(errno)" if (nelems @_) != 1
+    usage: "strerror(errno)" if (nelems @_) != 1
     local $^OS_ERROR = @_[0]
     $^OS_ERROR . ""
 
 
 sub strlen
-    unimpl "strlen() is C-specific, use length instead"
+    unimpl: "strlen() is C-specific, use length instead"
 
 
 sub strncat
-    unimpl "strncat() is C-specific, use .= instead"
+    unimpl: "strncat() is C-specific, use .= instead"
 
 
 sub strncmp
-    unimpl "strncmp() is C-specific, use eq instead"
+    unimpl: "strncmp() is C-specific, use eq instead"
 
 
 sub strncpy
-    unimpl "strncpy() is C-specific, use = instead"
+    unimpl: "strncpy() is C-specific, use = instead"
 
 
 sub strpbrk
-    unimpl "strpbrk() is C-specific, stopped"
+    unimpl: "strpbrk() is C-specific, stopped"
 
 
 sub strrchr
-    unimpl "strrchr() is C-specific, use rindex() instead"
+    unimpl: "strrchr() is C-specific, use rindex() instead"
 
 
 sub strspn
-    unimpl "strspn() is C-specific, stopped"
+    unimpl: "strspn() is C-specific, stopped"
 
 
 sub strstr
-    usage "strstr(big, little)" if (nelems @_) != 2
-    CORE::index(@_[0], @_[1])
+    usage: "strstr(big, little)" if (nelems @_) != 2
+    CORE::index: @_[0], @_[1]
 
 
 sub strtok
-    unimpl "strtok() is C-specific, stopped"
+    unimpl: "strtok() is C-specific, stopped"
 
 
 sub chmod
-    usage "chmod(mode, filename)" if (nelems @_) != 2
-    CORE::chmod(@_[0], @_[1])
+    usage: "chmod(mode, filename)" if (nelems @_) != 2
+    CORE::chmod: @_[0], @_[1]
 
 
 sub fstat
-    usage "fstat(fd)" if (nelems @_) != 1
-    CORE::open(my $tmp, "<&", @_[0])            # Gross.
-    my @l = @:  CORE::stat($tmp) 
-    CORE::close($tmp)
+    usage: "fstat(fd)" if (nelems @_) != 1
+    CORE::open: my $tmp, "<&", @_[0]            # Gross.
+    my @l = @:  CORE::stat: $tmp 
+    CORE::close: $tmp
     @l
 
 
 sub mkdir
-    usage "mkdir(directoryname, mode)" if (nelems @_) != 2
-    CORE::mkdir(@_[0], @_[1])
+    usage: "mkdir(directoryname, mode)" if (nelems @_) != 2
+    CORE::mkdir: @_[0], @_[1]
 
 
 sub stat
-    usage "stat(filename)" if (nelems @_) != 1
-    CORE::stat(@_[0])
+    usage: "stat(filename)" if (nelems @_) != 1
+    CORE::stat: @_[0]
 
 
 sub umask
-    usage "umask(mask)" if (nelems @_) != 1
-    CORE::umask(@_[0])
+    usage: "umask(mask)" if (nelems @_) != 1
+    CORE::umask: @_[0]
 
 
 sub wait
-    usage "wait()" if (nelems @_) != 0
+    usage: "wait()" if (nelems @_) != 0
     CORE::wait()
 
 
 sub waitpid
-    usage "waitpid(pid, options)" if (nelems @_) != 2
-    CORE::waitpid(@_[0], @_[1])
+    usage: "waitpid(pid, options)" if (nelems @_) != 2
+    CORE::waitpid: @_[0], @_[1]
 
 
 sub gmtime
-    usage "gmtime(time)" if (nelems @_) != 1
-    CORE::gmtime(@_[0])
+    usage: "gmtime(time)" if (nelems @_) != 1
+    CORE::gmtime: @_[0]
 
 
 sub localtime
-    usage "localtime(time)" if (nelems @_) != 1
-    CORE::localtime(@_[0])
+    usage: "localtime(time)" if (nelems @_) != 1
+    CORE::localtime: @_[0]
 
 
 sub time
-    usage "time()" if (nelems @_) != 0
+    usage: "time()" if (nelems @_) != 0
     CORE::time
 
 
 sub alarm
-    usage "alarm(seconds)" if (nelems @_) != 1
-    CORE::alarm(@_[0])
+    usage: "alarm(seconds)" if (nelems @_) != 1
+    CORE::alarm: @_[0]
 
 
 sub chdir
-    usage "chdir(directory)" if (nelems @_) != 1
-    CORE::chdir(@_[0])
+    usage: "chdir(directory)" if (nelems @_) != 1
+    CORE::chdir: @_[0]
 
 
 sub chown
-    usage "chown(uid, gid, filename)" if (nelems @_) != 3
-    CORE::chown(@_[0], @_[1], @_[2])
+    usage: "chown(uid, gid, filename)" if (nelems @_) != 3
+    CORE::chown: @_[0], @_[1], @_[2]
 
 
 sub execl
-    unimpl "execl() is C-specific, stopped"
+    unimpl: "execl() is C-specific, stopped"
 
 
 sub execle
-    unimpl "execle() is C-specific, stopped"
+    unimpl: "execle() is C-specific, stopped"
 
 
 sub execlp
-    unimpl "execlp() is C-specific, stopped"
+    unimpl: "execlp() is C-specific, stopped"
 
 
 sub execv
-    unimpl "execv() is C-specific, stopped"
+    unimpl: "execv() is C-specific, stopped"
 
 
 sub execve
-    unimpl "execve() is C-specific, stopped"
+    unimpl: "execve() is C-specific, stopped"
 
 
 sub execvp
-    unimpl "execvp() is C-specific, stopped"
+    unimpl: "execvp() is C-specific, stopped"
 
 
 sub fork
-    usage "fork()" if (nelems @_) != 0
+    usage: "fork()" if (nelems @_) != 0
     CORE::fork
 
 
 sub getegid
-    usage "getegid()" if (nelems @_) != 0
+    usage: "getegid()" if (nelems @_) != 0
     $^EGID + 0
 
 
 sub geteuid
-    usage "geteuid()" if (nelems @_) != 0
+    usage: "geteuid()" if (nelems @_) != 0
     $^EUID + 0
 
 
 sub getgid
-    usage "getgid()" if (nelems @_) != 0
+    usage: "getgid()" if (nelems @_) != 0
     $^GID + 0
 
 
 sub getgroups
-    usage "getgroups()" if (nelems @_) != 0
+    usage: "getgroups()" if (nelems @_) != 0
     my %seen
-    grep( {!%seen{+$_}++ }, split(' ', $^EGID ))
+    grep:  {!%seen{+$_}++ }, (split: ' ', $^EGID )
 
 
 sub getlogin
-    usage "getlogin()" if (nelems @_) != 0
+    usage: "getlogin()" if (nelems @_) != 0
     CORE::getlogin()
 
 
 sub getpgrp
-    usage "getpgrp()" if (nelems @_) != 0
+    usage: "getpgrp()" if (nelems @_) != 0
     CORE::getpgrp
 
 
 sub getpid
-    usage "getpid()" if (nelems @_) != 0
+    usage: "getpid()" if (nelems @_) != 0
     $^PID
 
 
 sub getppid
-    usage "getppid()" if (nelems @_) != 0
+    usage: "getppid()" if (nelems @_) != 0
     CORE::getppid
 
 
 sub getuid
-    usage "getuid()" if (nelems @_) != 0
+    usage: "getuid()" if (nelems @_) != 0
     $^UID
 
 
 sub isatty
-    usage "isatty(filehandle)" if (nelems @_) != 1
+    usage: "isatty(filehandle)" if (nelems @_) != 1
     -t @_[0]
 
 
 sub link
-    usage "link(oldfilename, newfilename)" if (nelems @_) != 2
-    CORE::link(@_[0], @_[1])
+    usage: "link(oldfilename, newfilename)" if (nelems @_) != 2
+    CORE::link: @_[0], @_[1]
 
 
 sub rmdir
-    usage "rmdir(directoryname)" if (nelems @_) != 1
-    CORE::rmdir(@_[0])
+    usage: "rmdir(directoryname)" if (nelems @_) != 1
+    CORE::rmdir: @_[0]
 
 
 sub setbuf
-    redef "IO::Handle::setbuf()"
+    redef: "IO::Handle::setbuf()"
 
 
 sub setvbuf
-    redef "IO::Handle::setvbuf()"
+    redef: "IO::Handle::setvbuf()"
 
 
 sub sleep
-    usage "sleep(seconds)" if (nelems @_) != 1
-    @_[0] - CORE::sleep(@_[0])
+    usage: "sleep(seconds)" if (nelems @_) != 1
+    @_[0] - CORE::sleep: @_[0]
 
 
 sub unlink
-    usage "unlink(filename)" if (nelems @_) != 1
-    CORE::unlink(@_[0])
+    usage: "unlink(filename)" if (nelems @_) != 1
+    CORE::unlink: @_[0]
 
 
 sub utime
-    usage "utime(filename, atime, mtime)" if (nelems @_) != 3
-    CORE::utime(@_[1], @_[2], @_[0])
+    usage: "utime(filename, atime, mtime)" if (nelems @_) != 3
+    CORE::utime: @_[1], @_[2], @_[0]
 
 
 sub load_imports
-    %EXPORT_TAGS = %: 
+    %EXPORT_TAGS = %:
 
         assert_h =>     qw(assert)
 
@@ -861,7 +861,7 @@ sub load_imports
         %export{[ @+: values %EXPORT_TAGS]} = $@
         # Doing the de-dup with a temporary hash has the advantage that the SVs in
         # @EXPORT are actually shared hash key sacalars, which will save some memory.
-        push @EXPORT, < keys %export
+        push: @EXPORT, < keys %export
     
 
     @EXPORT_OK = qw(
@@ -928,7 +928,7 @@ sub load_imports
 
 package POSIX::SigAction
 
-sub new { bless \(%: HANDLER => @_[?1], MASK => @_[?2], FLAGS => @_[?3] || 0, SAFE => 0), @_[0] }
+sub new { (bless: \(%: HANDLER => @_[?1], MASK => @_[?2], FLAGS => @_[?3] || 0, SAFE => 0), @_[0]) }
 sub handler { @_[0]->{HANDLER} = @_[1] if (nelems @_) +> 1; @_[0]->{HANDLER} };
 sub mask    { @_[0]->{MASK}    = @_[1] if (nelems @_) +> 1; @_[0]->{MASK} };
 sub flags   { @_[0]->{FLAGS}   = @_[1] if (nelems @_) +> 1; @_[0]->{FLAGS} };

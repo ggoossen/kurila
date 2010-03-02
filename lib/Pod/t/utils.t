@@ -21,7 +21,7 @@ my @links = qw{
   text|"sec"
 }
 
-my @results = @: 
+my @results = @:
         "P<name>"
         "Q<ident> in P<name>"
         "Q<sec> in P<name>"
@@ -35,50 +35,50 @@ my @results = @:
     
 
 for my $i( 0..nelems @links )
-    my $link = Pod::Hyperlink->new( @links[?$i])
-    is($link->markup, @results[?$i])
+    my $link = Pod::Hyperlink->new:  @links[?$i]
+    is: $link->markup, @results[?$i]
 
 
 # Now test lists
 # This test needs to be better
-my $list = Pod::List->new( indent => 4,
-    start  => 52,
-    file   => "itemtest.t",
-    type   => "OL",)
+my $list = Pod::List->new:  indent => 4
+                            start  => 52
+                            file   => "itemtest.t"
+                            type   => "OL",
 
-ok($list)
+ok: $list
 
-is($list->indent, 4)
-is($list->start, 52)
-is($list->type, "OL")
+is: $list->indent, 4
+is: $list->start, 52
+is: $list->type, "OL"
 
 
 # Pod::Cache
 
 # also needs work
 
-my $cache = Pod::Cache->new()
+my $cache = Pod::Cache->new
 
 # Store it in the cache
-$cache->item(
-    page => "Pod::ParseUtils",
-    description => "A description",
-    file => "file.t",
-    )
+$cache->item: 
+    page => "Pod::ParseUtils"
+    description => "A description"
+    file => "file.t"
+    
 
 # Now look for an item of this name
-my $item = $cache->find_page("Pod::ParseUtils")
-ok($item)
+my $item = $cache->find_page: "Pod::ParseUtils"
+ok: $item
 
 # and a failure
-is($cache->find_page("Junk"), undef)
+is: ($cache->find_page: "Junk"), undef
 
 # Make sure that the item we found is the same one as the
 # first in the list
 my @i = $cache->item
-cmp_ok(@i[0], '\==', $item)
+cmp_ok: @i[0], '\==', $item
 
 # Check the contents
-is($item->page, "Pod::ParseUtils")
-is($item->description, "A description")
-is($item->file, "file.t")
+is: $item->page, "Pod::ParseUtils"
+is: $item->description, "A description"
+is: $item->file, "file.t"

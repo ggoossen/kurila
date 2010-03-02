@@ -7,7 +7,7 @@ our @EXPORT = qw(setup_recurs teardown_recurs)
 use File::Path
 use File::Basename
 
-my %Files = %: 
+my %Files = %:
     'Problem-Module/Makefile.PL'   => <<'END'
 use ExtUtils::MakeMaker;
 
@@ -29,12 +29,12 @@ END
 sub setup_recurs
     while(my(@: ?$file, ?$text) =(@:  each %Files))
         # Convert to a relative, native file path.
-        $file = 'File::Spec'->catfile('File::Spec'->curdir, < split m{\/}, $file)
+        $file = 'File::Spec'->catfile: 'File::Spec'->curdir, < (split: m{\/}, $file)
 
-        my $dir = dirname($file)
-        mkpath $dir
-        open(my $fh, ">", "$file") || die "Can't create $file: $^OS_ERROR"
-        print $fh, $text
+        my $dir = dirname: $file
+        mkpath: $dir
+        (open: my $fh, ">", "$file") || die: "Can't create $file: $^OS_ERROR"
+        print: $fh, $text
         close $fh
     
 
@@ -43,9 +43,9 @@ sub setup_recurs
 
 sub teardown_recurs
     foreach my $file (keys %Files)
-        my $dir = dirname($file)
+        my $dir = dirname: $file
         if( -e $dir )
-            rmtree($dir) || return
+            (rmtree: $dir) || return
         
     
     return 1

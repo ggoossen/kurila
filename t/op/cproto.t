@@ -2,18 +2,18 @@
 # Tests to ensure that we don't unexpectedly change prototypes of builtins
 
 BEGIN { require './test.pl'; }
-plan tests => 218
+plan: tests => 218
 
 while ( ~< $^DATA)
     chomp
-    (@: my $keyword, my $proto, ?local our $TODO) =  split " ", $_, 3
+    (@: my $keyword, my $proto, ?local our $TODO) =  split: " ", $_, 3
     if ($proto eq 'undef')
-        ok( !defined prototype "CORE::".$keyword, $keyword )
+        ok:  !defined prototype "CORE::".$keyword, $keyword 
     elsif ($proto eq 'unknown')
         try { prototype "CORE::".$keyword }
-        like( $^EVAL_ERROR->{?description}, qr/Can't find an opnumber for/, $keyword )
+        like:  $^EVAL_ERROR->{?description}, qr/Can't find an opnumber for/, $keyword 
     else
-        is( "(".prototype("CORE::".$keyword).")", $proto, $keyword )
+        is:  "(".(prototype: "CORE::".$keyword).")", $proto, $keyword 
     
 
 

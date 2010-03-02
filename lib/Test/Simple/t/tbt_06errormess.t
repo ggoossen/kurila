@@ -13,12 +13,12 @@ use Test::Builder::Tester
 # My brain is melting.  My brain is melting.  ETOOMANYLAYERSOFTESTING
 
 # create some private file handles
-my $output_handle = gensym
-my $error_handle  = gensym
+my $output_handle = (gensym: )
+my $error_handle  = (gensym: )
 
 # and tie them to this package
-my $out = Test::Builder::Tester::Tie->new('STDOUT')
-my $err = Test::Builder::Tester::Tie->new('STDERR')
+my $out = Test::Builder::Tester::Tie->new: 'STDOUT'
+my $err = Test::Builder::Tester::Tie->new: 'STDERR'
 
 # ooooh, use the test suite
 my $t = Test::Builder->new
@@ -32,21 +32,21 @@ my $testing_num
 
 sub start_testing
     # remember what the handles were set to
-    $original_output_handle  = $t->output()
-    $original_failure_handle = $t->failure_output()
-    $original_todo_handle    = $t->todo_output()
-    $original_harness_env    = env::var('HARNESS_ACTIVE')
+    $original_output_handle  = $t->output
+    $original_failure_handle = $t->failure_output
+    $original_todo_handle    = $t->todo_output
+    $original_harness_env    = env::var: 'HARNESS_ACTIVE'
 
     # switch out to our own handles
-    $t->output($out->handle)
-    $t->failure_output($err->handle)
-    $t->todo_output($err->handle)
+    $t->output: $out->handle
+    $t->failure_output: $err->handle
+    $t->todo_output: $err->handle
 
-    env::var('HARNESS_ACTIVE' ) = 0
+    (env::var: 'HARNESS_ACTIVE' ) = 0
 
     # clear the expected list
-    $out->reset()
-    $err->reset()
+    $out->reset
+    $err->reset
 
     # remeber that we're testing
     $testing_num = $t->current_test
@@ -62,10 +62,10 @@ sub my_test_test
     local $^WARNING = 0
 
     # reset the outputs
-    $t->output($original_output_handle)
-    $t->failure_output($original_failure_handle)
-    $t->todo_output($original_todo_handle)
-    env::var('HARNESS_ACTIVE' ) = $original_harness_env
+    $t->output: $original_output_handle
+    $t->failure_output: $original_failure_handle
+    $t->todo_output: $original_todo_handle
+    (env::var: 'HARNESS_ACTIVE' ) = $original_harness_env
 
     # reset the number of tests
     $t->current_test = $testing_num
@@ -75,10 +75,10 @@ sub my_test_test
     my $wanted
 
     # stdout
-    $t->ok($out->check, "STDOUT $text")
+    $t->ok: $out->check, "STDOUT $text"
 
     # stderr
-    $t->ok($err->check, "STDERR $text")
+    $t->ok: $err->check, "STDERR $text"
 
 
 ####################################################################
@@ -88,30 +88,30 @@ sub my_test_test
 # this is a quick test to check the hack that I've just implemented
 # actually does a cut down version of Test::Builder::Tester
 
-start_testing()
-$out->expect("ok 1 - foo")
-pass("foo")
-my_test_test("basic meta meta test")
+(start_testing: )
+$out->expect: "ok 1 - foo"
+pass: "foo"
+my_test_test: "basic meta meta test"
 
-start_testing()
-$out->expect("not ok 1 - foo")
-$err->expect("#     Failed test ($^PROGRAM_NAME at line ".line_num(1).")")
-fail("foo")
-my_test_test("basic meta meta test 2")
+(start_testing: )
+$out->expect: "not ok 1 - foo"
+$err->expect: "#     Failed test ($^PROGRAM_NAME at line ".(line_num: 1).")"
+fail: "foo"
+my_test_test: "basic meta meta test 2"
 
-start_testing()
-$out->expect("ok 1 - bar")
-test_out("ok 1 - foo")
-pass("foo")
-test_test("bar")
-my_test_test("meta meta test with tbt")
+(start_testing: )
+$out->expect: "ok 1 - bar"
+test_out: "ok 1 - foo"
+pass: "foo"
+test_test: "bar"
+my_test_test: "meta meta test with tbt"
 
-start_testing()
-$out->expect("ok 1 - bar")
-test_out("not ok 1 - foo")
-test_err("#     Failed test ($^PROGRAM_NAME at line ".line_num(1).")")
-fail("foo")
-test_test("bar")
-my_test_test("meta meta test with tbt2 ")
+(start_testing: )
+$out->expect: "ok 1 - bar"
+test_out: "not ok 1 - foo"
+test_err: "#     Failed test ($^PROGRAM_NAME at line ".(line_num: 1).")"
+fail: "foo"
+test_test: "bar"
+my_test_test: "meta meta test with tbt2 "
 
 ####################################################################

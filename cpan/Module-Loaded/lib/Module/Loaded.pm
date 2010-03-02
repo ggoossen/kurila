@@ -47,12 +47,12 @@ this and tell you from where the C<PACKAGE> has been loaded already.
 =cut
 
 sub mark_as_loaded ($pm)
-    my $file    = __PACKAGE__->_pm_to_file( $pm ) or return
+    my $file    = (__PACKAGE__->_pm_to_file:  $pm ) or return
     my $who     = (@: caller)[1]
 
-    my $where   = is_loaded( $pm )
+    my $where   = is_loaded:  $pm 
     if ( defined $where )
-        carp "'$pm' already marked as loaded ('$where')"
+        carp: "'$pm' already marked as loaded ('$where')"
 
     else
         $^INCLUDED{+$file} = $who
@@ -72,10 +72,10 @@ this and tell you the C<PACKAGE> has been unloaded already.
 =cut
 
 sub mark_as_unloaded ($pm)
-    my $file    = __PACKAGE__->_pm_to_file( $pm ) or return
+    my $file    = (__PACKAGE__->_pm_to_file:  $pm ) or return
 
-    unless( defined is_loaded( $pm ) )
-        carp "'$pm' already marked as unloaded"
+    unless( defined (is_loaded:  $pm ) )
+        carp: "'$pm' already marked as unloaded"
 
     else
         delete $^INCLUDED{ $file }
@@ -95,7 +95,7 @@ from where it is said to be loaded on success.
 =cut
 
 sub is_loaded ($pm)
-    my $file    = __PACKAGE__->_pm_to_file( $pm ) or return
+    my $file    = (__PACKAGE__->_pm_to_file:  $pm ) or return
 
     return $^INCLUDED{?$file} if exists $^INCLUDED{$file}
 
@@ -107,7 +107,7 @@ sub _pm_to_file
     my $pkg = shift
     my $pm  = shift or return
 
-    my $file = join '/', split '::', $pm
+    my $file = join: '/', split: '::', $pm
     $file .= '.pm'
 
     return $file

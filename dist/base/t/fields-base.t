@@ -8,11 +8,11 @@ BEGIN
         if (@_[0]->{?description} =~ m/^Hides field '.*?' in base class/)
             $W++
         else
-            print $^STDERR, @_[0]->message
+            print: $^STDERR, @_[0]->message
 
 use Test::More tests => 26
 
-BEGIN { use_ok('base'); }
+BEGIN { (use_ok: 'base'); }
 
 package B1
 use fields < qw(b1 b2 b3)
@@ -21,7 +21,7 @@ package B2
 use fields '_b1'
 use fields < qw(b1 _b2 b2)
 
-sub new { fields::new(shift) }
+sub new { (fields::new: shift) }
 
 package B3
 use fields < qw(b4 _b5 b6 _b7)
@@ -52,9 +52,9 @@ use base < qw(M B2)
 
 # Test that multiple inheritance fails.
 package D6
-try { 'base'->import( <qw(B2 M B3)); }
-main::like($^EVAL_ERROR->{?description}, qr/can't multiply inherit fields/i,
-           'No multiple field inheritance')
+try { ('base'->import:  <qw(B2 M B3)); }
+main::like: $^EVAL_ERROR->{?description}, qr/can't multiply inherit fields/i
+            'No multiple field inheritance'
 
 package Foo::Bar
 use base 'B1'
@@ -95,7 +95,7 @@ use fields < qw(b1)
 
 package main
 
-my %EXPECT = %: 
+my %EXPECT = %:
     B1 => \qw(b1 b2 b3)
     D1 => \qw(b1 b2 b3 d1 d2 d3)
     D2 => \qw(b1 b2 b3 _d1 _d2 d1 d2)
@@ -103,9 +103,9 @@ my %EXPECT = %:
     M  => \(@: qw())
     B2 => \qw(_b1 b1 _b2 b2)
     D3 => \(@: (undef,undef,undef, <
-                   qw(b2 b1 d1 _b1 _d1)))     # b1 is hidden
+                qw(b2 b1 d1 _b1 _d1)))     # b1 is hidden
     D4 => \(@: (undef,undef,undef, <
-                   qw(b2 b1 d1),undef,undef, <qw(_d3 d3)))
+                qw(b2 b1 d1),undef,undef, <qw(_d3 d3)))
 
     D5 => \(@: undef, 'b1', undef, 'b2')
 
@@ -123,7 +123,7 @@ my %EXPECT = %:
     
 
 while(my(@: ?$class, ?$efields) =(@:  each %EXPECT))
-    my %fields = %:  < Symbol::fetch_glob($class.'::FIELDS')->*->% 
+    my %fields = %:  < (Symbol::fetch_glob: $class.'::FIELDS')->*->% 
     my %expected_fields
     foreach my $idx (1..nelems $efields->@)
         my $key = $efields->[$idx-1]
@@ -131,11 +131,11 @@ while(my(@: ?$class, ?$efields) =(@:  each %EXPECT))
         %expected_fields{+$key} = $idx
     
 
-    main::is_deeply(\%fields, \%expected_fields, "\%FIELDS check:  $class")
+    main::is_deeply: \%fields, \%expected_fields, "\%FIELDS check:  $class"
 
 
 # Did we get the appropriate amount of warnings?
-is( $W, 1, 'right warnings' )
+is:  $W, 1, 'right warnings' 
 
 
 # A simple object creation and attribute access test
@@ -147,12 +147,12 @@ $obj2->{+b1} = "D3"
 # Slices
 
 $obj1->%{[(@: "_b1", "b1")]} = @: 17, 29
-is( $obj1->{?_b1}, 17 )
-is( $obj1->{?b1},  29 )
+is:  $obj1->{?_b1}, 17 
+is:  $obj1->{?b1},  29 
 
 $obj1->%{[(@: '_b1', 'b1')]} = @: 44,28
-is( $obj1->{?_b1}, 44 )
-is( $obj1->{?b1},  28 )
+is:  $obj1->{?_b1}, 44 
+is:  $obj1->{?b1},  28 
 
 
 
@@ -168,9 +168,9 @@ try {
 
     # The error must occur at run time for the eval to catch it.
     require base;
-    'base'->import( <qw(E1 E2));
+    ('base'->import:  <qw(E1 E2));
 }
-main::like( $^EVAL_ERROR->{?description}, qr/Can't multiply inherit fields/i, 'Again, no multi inherit' )
+main::like:  $^EVAL_ERROR->{?description}, qr/Can't multiply inherit fields/i, 'Again, no multi inherit' 
 
 
 # Test that a package with no fields can inherit from a package with
@@ -179,7 +179,7 @@ main::like( $^EVAL_ERROR->{?description}, qr/Can't multiply inherit fields/i, 'A
 package B9
 use fields < qw(b1)
 
-sub _mk_obj { fields::new(@_[0])->{?'b1'} };
+sub _mk_obj { (fields::new: @_[0])->{?'b1'} };
 
 package D9
 use base < qw(B9)
@@ -190,12 +190,12 @@ do
     my $w = 0
     local %^WARN_HOOK = sub (@< @_) { $w++ }
 
-    B9->_mk_obj()
+    B9->_mk_obj
     # used tp emit a warning that pseudohashes are deprecated, because
     # %FIELDS wasn't blessed.
-    D9->_mk_obj()
+    D9->_mk_obj
 
-    is ($w, 0, "pseudohash warnings in derived class with no fields of it's own")
+    is: $w, 0, "pseudohash warnings in derived class with no fields of it's own"
 
 
 # [perl #31078] an intermediate class with no additional fields caused
@@ -206,7 +206,7 @@ do
     use fields < qw(X1 _X2)
     sub new
         my $self = shift
-        $self = fields::new($self) unless ref $self
+        $self = (fields::new: $self) unless ref $self
         $self->{+X1} = "x1"
         $self->{+_X2} = "_x2"
         return $self
@@ -218,8 +218,8 @@ do
 
     sub new
         my $self = shift
-        $self = fields::new($self) unless ref $self
-        $self->SUPER::new()
+        $self = (fields::new: $self) unless ref $self
+         $self->SUPER::new: 
         return $self
     
 
@@ -230,14 +230,14 @@ do
 
     sub new
         my $self = shift
-        $self = fields::new($self) unless ref $self
-        $self->SUPER::new()
+        $self = (fields::new: $self) unless ref $self
+         $self->SUPER::new: 
         $self->{+Z1} = 'z1'
         return $self
     
 
     package main
 
-    my $c = Z->new()
-    is($c->get_X2, '_x2', "empty intermediate class")
+    my $c = Z->new
+    is: $c->get_X2, '_x2', "empty intermediate class"
 

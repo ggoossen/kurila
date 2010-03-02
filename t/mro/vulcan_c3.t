@@ -3,7 +3,7 @@
 
 use warnings
 
-require q(./test.pl); plan(tests => 1)
+require q(./test.pl); plan: tests => 1
 
 =pod
 
@@ -61,7 +61,7 @@ do
     use base ('Intelligent', 'Humanoid')
 
 
-ok(eq_array(
-    mro::get_linear_isa('Vulcan'),
-    \ qw(Vulcan Intelligent Sentient Humanoid BiPedal LifeForm Object)
-    ), '... got the right MRO for the Vulcan Dylan Example')  
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Vulcan')
+        \ qw(Vulcan Intelligent Sentient Humanoid BiPedal LifeForm Object)
+        ), '... got the right MRO for the Vulcan Dylan Example'  

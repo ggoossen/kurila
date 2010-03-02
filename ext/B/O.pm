@@ -11,15 +11,15 @@ sub import($class, @< @options)
     my (@: $quiet, $veryquiet) = @: 0, 0
     if (@options[0] eq '-q' || @options[0] eq '-qq')
         $quiet = 1
-        open ($saveout, ">&", $^STDOUT)
+        open: $saveout, ">&", $^STDOUT
         close $^STDOUT
-        open ($^STDOUT, ">", \$O::BEGIN_output)
+        open: $^STDOUT, ">", \$O::BEGIN_output
         if (@options[0] eq '-qq')
             $veryquiet = 1
         
         shift @options
     
-    my $backend = shift (@options)
+    my $backend = shift: @options
     eval q[
         BEGIN {
             minus_c;
@@ -53,7 +53,7 @@ sub import($class, @< @options)
             close $^STDERR if $veryquiet;
         }
     ]
-    die $^EVAL_ERROR if $^EVAL_ERROR
+    die: $^EVAL_ERROR if $^EVAL_ERROR
 
 
 1

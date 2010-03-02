@@ -8,7 +8,7 @@ use bytes ()		# for $bytes::hint_bits
 
 use utf8
 
-my %alias1 = %: 
+my %alias1 = %:
     # Icky 3.2 names with parentheses.
     'LINE FEED'		=> 'LINE FEED (LF)'
     'FORM FEED'		=> 'FORM FEED (FF)'
@@ -27,7 +27,7 @@ my %alias1 = %:
     'BOM'			=> 'BYTE ORDER MARK'
     
 
-my %alias2 = %: 
+my %alias2 = %:
     # Pre-3.2 compatibility (only for the first 256 characters).
     'HORIZONTAL TABULATION'	=> 'CHARACTER TABULATION'
     'VERTICAL TABULATION'	=> 'LINE TABULATION'
@@ -50,19 +50,19 @@ sub alias(@< @_)
 
 sub alias_file($arg)
     my $file
-    if (-f $arg && File::Spec->file_name_is_absolute ($arg))
+    if (-f $arg && (File::Spec->file_name_is_absolute : $arg))
         $file = $arg
     elsif ($arg =~ m/^\w+$/)
         $file = "unicore/$($arg)_alias.pl"
     else
-        die "Charnames alias files can only have identifier characters"
+        die: "Charnames alias files can only have identifier characters"
     
     if (my @alias = (@:  evalfile $file ))
         (nelems @alias) == 1 && !defined @alias[0] and
-            die "$file cannot be used as alias file for charnames"
+            die: "$file cannot be used as alias file for charnames"
         (nelems @alias) % 2 and
-            die "$file did not return a (valid) list of alias pairs"
-        alias (< @alias)
+            die: "$file did not return a (valid) list of alias pairs"
+        alias: < @alias
         return  @: 1
     
     0
@@ -77,7 +77,7 @@ sub charnames
         $name = %alias1{?$name}
     elsif (exists %alias2{$name})
         require warnings
-        warnings::warnif('deprecated', qq{Unicode character name "$name" is deprecated, use "%alias2{?$name}" instead})
+        warnings::warnif: 'deprecated', qq{Unicode character name "$name" is deprecated, use "%alias2{?$name}" instead}
         $name = %alias2{?$name}
     elsif (exists %alias3{$name})
         $name = %alias3{?$name}
@@ -108,8 +108,8 @@ sub charnames
             if ($^HINTS{?charnames_short} and $name =~ m/^(.+?):(.+)/s)
                 my (@: $script, $cname) = @: $1, $2
                 my $case = $cname =~ m/[[:upper:]]/ ?? "CAPITAL" !! "SMALL"
-                my $uc_cname = uc($cname)
-                my $uc_script = uc($script)
+                my $uc_cname = uc: $cname
+                my $uc_script = uc: $script
                 if ($txt =~ m/($hexre)\t\t$uc_script (?:$case )?LETTER \Q$uc_cname\E$/m)
                     $hexstr = $1
                 
@@ -121,7 +121,7 @@ sub charnames
         if (not defined $hexstr)
             my $case = $name =~ m/[[:upper:]]/ ?? "CAPITAL" !! "SMALL"
             for my $script ( $^HINTS{charnames_scripts}->@)
-                my $ucname = uc($name)
+                my $ucname = uc: $name
                 if ($txt =~ m/($hexre)\t\t$script (?:$case )?LETTER \Q$ucname\E$/m)
                     $hexstr = $1
                     last
@@ -131,7 +131,7 @@ sub charnames
 
         ## If we don't have it by now, give up.
         unless ($hexstr)
-            warn "Unknown charname '$name'"
+            warn: "Unknown charname '$name'"
             return "\x{FFFD}"
         
 
@@ -141,14 +141,14 @@ sub charnames
     
 
     no warnings 'utf8' # allow even illegal characters
-    return pack "U", $ord
+    return pack: "U", $ord
  # charnames
 
 sub import
     shift ## ignore class name
 
     if (not nelems @_)
-        warn("`use charnames' needs explicit imports list")
+        warn: "`use charnames' needs explicit imports list"
     
     $^HINTS{+charnames} = \&charnames 
 
@@ -159,46 +159,46 @@ sub import
     while (my $arg = shift)
         if ($arg eq ":alias")
             (nelems @_) or
-                die ":alias needs an argument in charnames"
+                die: ":alias needs an argument in charnames"
             my $alias = shift
             if (ref $alias)
                 ref $alias eq "HASH" or
-                    die "Only HASH reference supported as argument to :alias"
-                alias ($alias)
+                    die: "Only HASH reference supported as argument to :alias"
+                alias: $alias
                 next
             
             if ($alias =~ m{:(\w+)$})
                 $1 eq "full" || $1 eq "short" and
-                    die ":alias cannot use existing pragma :$1 (reversed order?)"
-                alias_file ($1) and $promote = 1
+                    die: ":alias cannot use existing pragma :$1 (reversed order?)"
+                alias_file: $1 and $promote = 1
                 next
             
-            alias_file ($alias)
+            alias_file: $alias
             next
         
-        if (substr($arg, 0, 1) eq ':' and ! ($arg eq ":full" || $arg eq ":short"))
-            warn "unsupported special '$arg' in charnames"
+        if ((substr: $arg, 0, 1) eq ':' and ! ($arg eq ":full" || $arg eq ":short"))
+            warn: "unsupported special '$arg' in charnames"
             next
         
-        push @args, $arg
+        push: @args, $arg
     
     (nelems @args) == 0 && $promote and @args = @: ":full"
     %h{[ @args]} = (@: 1) x nelems @args
 
     $^HINTS{+charnames_full} = delete %h{':full'}
     $^HINTS{+charnames_short} = delete %h{':short'}
-    $^HINTS{+charnames_scripts} = \ map { uc }, keys %h
+    $^HINTS{+charnames_scripts} = \ map: { uc }, keys %h
 
     ##
     ## If utf8? warnings are enabled, and some scripts were given,
     ## see if at least we can find one letter of each script.
     ##
-    if (warnings::enabled('utf8') && nelems $^HINTS{?charnames_scripts}->@)
+    if ((warnings::enabled: 'utf8') && nelems $^HINTS{?charnames_scripts}->@)
         $txt = evalfile "unicore/Name.pl" unless $txt
 
         for my $script ( $^HINTS{charnames_scripts}->@)
             if (not $txt =~ m/\t\t$script (?:CAPITAL |SMALL )?LETTER /)
-                warnings::warn('utf8',  "No such script: '$script'")
+                warnings::warn: 'utf8',  "No such script: '$script'"
             
         
     
@@ -208,7 +208,7 @@ my %viacode
 
 sub viacode
     if ((nelems @_) != 1)
-        warn "charnames::viacode() expects one argument"
+        warn: "charnames::viacode() expects one argument"
         return
     
 
@@ -218,17 +218,17 @@ sub viacode
     # function _getcode (), but it avoids the overhead of loading it
     my $hex
     if ($arg =~ m/^[1-9]\d*$/)
-        $hex = sprintf "\%04X", $arg
+        $hex = sprintf: "\%04X", $arg
     elsif ($arg =~ m/^(?:[Uu]\+|0[xX])?([[:xdigit:]]+)$/)
         $hex = $1
     else
-        warn("unexpected arg \"$arg\" to charnames::viacode()")
+        warn: "unexpected arg \"$arg\" to charnames::viacode()"
         return
     
 
     # checking the length first is slightly faster
-    if (length($hex) +> 5 && hex($hex) +> 0x10FFFF)
-        warn "Unicode characters only allocated up to U+10FFFF (you asked for U+$hex)"
+    if ((length: $hex) +> 5 && (hex: $hex) +> 0x10FFFF)
+        warn: "Unicode characters only allocated up to U+10FFFF (you asked for U+$hex)"
         return
     
 
@@ -245,7 +245,7 @@ my %vianame
 
 sub vianame
     if ((nelems @_) != 1)
-        warn "charnames::vianame() expects one name argument"
+        warn: "charnames::vianame() expects one name argument"
         return ()
     
 
@@ -257,10 +257,10 @@ sub vianame
 
     $txt = evalfile "unicore/Name.pl" unless $txt
 
-    my $pos = index $txt, "\t\t$arg\n"
+    my $pos = index: $txt, "\t\t$arg\n"
     if ($pos +>= 0)
-        my $posLF = rindex $txt, "\n", $pos
-        (my $code = substr $txt, $posLF + 1, 6) =~ s/\t//g
+        my $posLF = rindex: $txt, "\n", $pos
+        (my $code = (substr: $txt, $posLF + 1, 6)) =~ s/\t//g
         return (%vianame{+$arg} = CORE::hex $code)
 
     # If $pos is at the 1st line, $posLF must be $[ - 1 (not found);

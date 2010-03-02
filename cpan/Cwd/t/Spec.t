@@ -38,14 +38,14 @@ require File::Spec::Cygwin
 # tests are skipped on other OSs
 my $root = ''
 if ($^OS_NAME eq 'MacOS')
-    $root = File::Spec::Mac->rootdir()
+    $root = File::Spec::Mac->rootdir
 
 
 # Each element in this array is a single test. Storing them this way makes
 # maintenance easy, and should be OK since perl should be pretty functional
 # before these tests are run.
 
-my @tests = @: 
+my @tests = @:
     # [ Function          ,            Expected          ,         Platform ]
 
     \(@:  "Unix->case_tolerant()",         '0'  )
@@ -701,7 +701,7 @@ my @tests = @:
 
 
 
-plan tests => scalar (nelems @tests) + 1
+plan: tests => (scalar: nelems @tests) + 1
 
 do
     package File::Spec::FakeWin32
@@ -723,18 +723,18 @@ do
                 return
             
             *Cwd::getdcwd = *Cwd::getdcwd # Avoid a 'used only once' warning
-            return $self->SUPER::rel2abs(< @_)
+            return $self->SUPER::rel2abs: < @_
         
         *rel2abs = *rel2abs # Avoid a 'used only once' warning
     
 
 
 
-is("Win32->can('_cwd')", "Win32->can('_cwd')")
+is: "Win32->can('_cwd')", "Win32->can('_cwd')"
 
 # Test out the class methods
 for (  @tests )
-    tryfunc( < $_->@ ) 
+    tryfunc:  < $_->@  
 
 
 
@@ -749,24 +749,24 @@ sub tryfunc
         my $platform = shift 
 
         if ($platform && $^OS_NAME ne $platform)
-            skip("skip $function", 1)
+            skip: "skip $function", 1
             return
         
 
         $function =~ s/^([^\$].*->)/File::Spec::$1/
         my $got = eval $function
-        $got = join ',',$got if (ref \$got) eq "ARRAY"
+        $got = (join: ',',$got) if (ref \$got) eq "ARRAY"
 
         if ( $^EVAL_ERROR )
             if ( $^EVAL_ERROR->{?description} =~ m/^\Q$skip_exception/ )
-                skip "skip $function: $skip_exception", 1
+                skip: "skip $function: $skip_exception", 1
             else
-                die if $^EVAL_ERROR
-                is $^EVAL_ERROR, '', $function
+                die: if $^EVAL_ERROR
+                is: $^EVAL_ERROR, '', $function
             
             return
         
 
-        is $got, $expected, $function
+        is: $got, $expected, $function
     
 

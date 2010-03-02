@@ -6,8 +6,8 @@ use Test::More 'no_plan'
 
 my $make_exceptions_list = (@ARGV[?0]||'') eq '--make-exceptions-list'
 
-open my $diagfh, "<:raw", "../pod/perldiag.pod"
-  or die "Can't open ../pod/perldiag.pod: $^OS_ERROR"
+open: my $diagfh, "<:raw", "../pod/perldiag.pod"
+  or die: "Can't open ../pod/perldiag.pod: $^OS_ERROR"
 
 my %entries
 while (~< $^DATA)
@@ -28,20 +28,20 @@ while (~< $diagfh)
 my @todo = @: '..'
 while (@todo)
   my $todo = shift @todo
-  next if grep { $todo eq $_ }, @: '../t', '../lib', '../ext', '../dist', '../cpan'
+  next if grep: { $todo eq $_ }, @: '../t', '../lib', '../ext', '../dist', '../cpan'
   # opmini.c is just a copy of op.c, so there's no need to check again.
   next if $todo eq '../opmini.c'
   if (-d $todo)
-    push @todo, < glob "$todo/*"
+    push: @todo, < glob: "$todo/*"
   elsif ($todo =~ m/\.[ch]$/)
-    check_file($todo)
+    check_file: $todo
 
 sub check_file($codefn)
 
-  print $^STDOUT, "# $codefn\n"
+  print: $^STDOUT, "# $codefn\n"
 
-  open my $codefh, "<:raw", $codefn
-    or die "Can't open $codefn: $^OS_ERROR"
+  open: my $codefh, "<:raw", $codefn
+    or die: "Can't open $codefn: $^OS_ERROR"
 
   my $listed_as
   my $listed_as_line
@@ -56,7 +56,7 @@ sub check_file($codefn)
     next if $sub =~ m/^XS/
     if (m</\* diag_listed_as: (.*) \*/>)
       $listed_as = $1
-      $listed_as_line = iohandle::input_line_number($codefh) +1
+      $listed_as_line = (iohandle::input_line_number: $codefh) +1
     next if m/^#/
     next if m/^ * /
     while (m/\bDIE\b|Perl_(croak|die|warn(er)?)/ and not m/\);$/)
@@ -78,14 +78,14 @@ sub check_file($codefn)
     # This should happen *after* unwrapping, or we don't reformat the things
     # in later lines.
     # List from perlguts.pod "Formatted Printing of IVs, UVs, and NVs"
-    my %specialformats = %: IVdf => 'd',
-                            UVuf => 'd',
-                            UVof => 'o',
-                            UVxf => 'x',
-                            UVXf => 'X',
-                            NVef => 'f',
-                            NVff => 'f',
-                            NVgf => 'f',
+    my %specialformats = %: IVdf => 'd'
+                            UVuf => 'd'
+                            UVof => 'o'
+                            UVxf => 'x'
+                            UVXf => 'X'
+                            NVef => 'f'
+                            NVff => 'f'
+                            NVgf => 'f'
                             SVf  => 's'
     for my $from (keys %specialformats)
       s/%"\s*$from\s*"/\%%specialformats{$from}/g
@@ -104,10 +104,10 @@ sub check_file($codefn)
                      ){?$1||'die'}
       my @categories
       if ($2)
-        @categories = map {s/^WARN_//; lc $_}, split m/\s*[|,]\s*/, $2
+        @categories = map: {s/^WARN_//; lc $_}, split: m/\s*[|,]\s*/, $2
 
       my $name
-      if ($listed_as and $listed_as_line == iohandle::input_line_number($codefh))
+      if ($listed_as and $listed_as_line == (iohandle::input_line_number: $codefh))
         $name = $listed_as
       else
         $name = $3
@@ -134,28 +134,28 @@ sub check_file($codefn)
       # inside an #if 0 block.
       next if $name eq 'SKIPME'
 
-      my $linenr = iohandle::input_line_number($codefh)
+      my $linenr = iohandle::input_line_number: $codefh
       if (exists %entries{$name})
         if (%entries{$name}{todo})
           :TODO do
             local $TODO = 'in DATA'
-            fail("Presence of '$name' from $codefn line $linenr")
+            fail: "Presence of '$name' from $codefn line $linenr"
         else
-          ok("Presence of '$name' from $codefn line $linenr")
+          ok: "Presence of '$name' from $codefn line $linenr"
 
         # Later, should start checking that the severity is correct, too.
       elsif ($name =~ m/^panic: /)
         # Just too many panic:s, they are hard to diagnose, and there
         # is a generic "panic: %s" entry.  Leave these for another
         # pass.
-        ok("Presence of '$name' from $codefn line $linenr, covered by panic: \%s entry")
+        ok: "Presence of '$name' from $codefn line $linenr, covered by panic: \%s entry"
       else
         if ($make_exceptions_list)
-          print $^STDERR, "$name\n"
+          print: $^STDERR, "$name\n"
         else
-          fail("Presence of '$name' from $codefn line $linenr")
+          fail: "Presence of '$name' from $codefn line $linenr"
 
-      die if $name =~ m/\%\$/
+      die: if $name =~ m/\%\$/
 
 # Lists all missing things as of the inaguration of this script, so we
 # don't have to go from "meh" to perfect all at once.

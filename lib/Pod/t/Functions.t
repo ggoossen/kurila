@@ -4,26 +4,26 @@ use File::Basename
 use File::Spec
 
 use Test::More
-plan tests => 8
+plan: tests => 8
 
 use Pod::Functions
 
 # How do you test exported vars?
 my(@:  $pkg_ref, $exp_ref ) = @:  \%Pod::Functions::Kinds, \%Kinds 
-is( $pkg_ref, $exp_ref, '%Pod::Functions::Kinds exported' )
+is:  $pkg_ref, $exp_ref, '%Pod::Functions::Kinds exported' 
 
 (@:  $pkg_ref, $exp_ref ) = @:  \%Pod::Functions::Type, \%Type 
-is( $pkg_ref, $exp_ref, '%Pod::Functions::Type exported' )
+is:  $pkg_ref, $exp_ref, '%Pod::Functions::Type exported' 
 
 (@:  $pkg_ref, $exp_ref ) = @:  \%Pod::Functions::Flavor, \%Flavor 
-is( $pkg_ref, $exp_ref, '%Pod::Functions::Flavor exported' )
+is:  $pkg_ref, $exp_ref, '%Pod::Functions::Flavor exported' 
 
 (@:  $pkg_ref, $exp_ref ) = @:  \%Pod::Functions::Type_Description
                                 \%Type_Description 
-is( $pkg_ref, $exp_ref, '%Pod::Functions::Type_Description exported' )
+is:  $pkg_ref, $exp_ref, '%Pod::Functions::Type_Description exported' 
 
 (@:  $pkg_ref, $exp_ref ) = @:  \@Pod::Functions::Type_Order, \@Type_Order 
-is( $pkg_ref, $exp_ref, '@Pod::Functions::Type_Order exported' )
+is:  $pkg_ref, $exp_ref, '@Pod::Functions::Type_Order exported' 
 
 # Check @Type_Order
 my @catagories = qw(
@@ -32,28 +32,28 @@ my @catagories = qw(
     Objects Socket SysV User      Network Time
 )
 
-ok( eq_array( \@Type_Order, \@catagories ),
-    '@Type_Order' )
+ok:  (eq_array:  \@Type_Order, \@catagories )
+     '@Type_Order' 
 
-my @cat_keys = grep { exists %Type_Description{ $_ } }, @Type_Order
+my @cat_keys = grep: { exists %Type_Description{ $_ } }, @Type_Order
 
-ok( eq_array( \@cat_keys, \@catagories ),
-    'keys() %Type_Description' )
+ok:  (eq_array:  \@cat_keys, \@catagories )
+     'keys() %Type_Description' 
 
-my(@:  _, $path, _ ) =  fileparse( $^PROGRAM_NAME )
-my $pod_functions = File::Spec->catfile(
-    $path, File::Spec->updir, 'Functions.pm' )
+my(@:  _, $path, _ ) =  fileparse:  $^PROGRAM_NAME 
+my $pod_functions = File::Spec->catfile: 
+    $path, File::Spec->updir, 'Functions.pm' 
 
 :SKIP do
     my $test_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $^DATA }
 
-    skip( "Can't fork '$^EXECUTABLE_NAME': $^OS_ERROR", 1)
-        unless open my $fh, "-|", qq[$^EXECUTABLE_NAME "-I../lib" $pod_functions]
+    skip:  "Can't fork '$^EXECUTABLE_NAME': $^OS_ERROR", 1
+        unless open: my $fh, "-|", qq[$^EXECUTABLE_NAME "-I../lib" $pod_functions]
     my $fake_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $fh }
-    skip( "Pipe error: $^OS_ERROR", 1)
+    skip:  "Pipe error: $^OS_ERROR", 1
         unless close $fh
 
-    is( $fake_out, $test_out, 'run as plain program' )
+    is:  $fake_out, $test_out, 'run as plain program' 
 
 
 =head1 NAME

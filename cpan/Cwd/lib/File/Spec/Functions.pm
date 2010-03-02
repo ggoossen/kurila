@@ -37,8 +37,8 @@ require Exporter
 %EXPORT_TAGS = %:  ALL => @EXPORT_OK +@+ @EXPORT 
 
 foreach my $meth ( (@:  < @EXPORT, < @EXPORT_OK ))
-    my $sub = File::Spec->can($meth)
-    Symbol::fetch_glob($meth)->* = sub (@< @_) {$sub->('File::Spec', < @_)}
+    my $sub = File::Spec->can: $meth
+    (Symbol::fetch_glob: $meth)->* = sub (@< @_) {($sub->& <: 'File::Spec', < @_)}
 
 
 

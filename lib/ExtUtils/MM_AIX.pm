@@ -34,32 +34,32 @@ Define DL_FUNCS and DL_VARS and write the *.exp files.
 
 sub dlsyms($self,%< %attribs)
 
-    return '' unless $self->needs_linking()
+    return '' unless $self->needs_linking
 
     my(@: $funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \$%
     my(@: $vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \$@
     my(@: $funclist)  = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \$@
     my(@m)
 
-    push(@m,"
+    push: @m,"
 dynamic :: $self->{?BASEEXT}.exp
 
-") unless $self->{SKIPHASH}->{?'dynamic'} # dynamic and static are subs, so...
+" unless $self->{SKIPHASH}->{?'dynamic'} # dynamic and static are subs, so...
 
-    push(@m,"
+    push: @m,"
 static :: $self->{?BASEEXT}.exp
 
-") unless $self->{SKIPHASH}->{?'static'}  # we avoid a warning if we tick them
+" unless $self->{SKIPHASH}->{?'static'}  # we avoid a warning if we tick them
 
-    push(@m,"
+    push: @m,"
 $self->{?BASEEXT}.exp: Makefile.PL
 ",q|	$(PERLRUN) -e 'use ExtUtils::Mksymlists; \
 	Mksymlists("NAME" => "|,$self->{?NAME},'", "DL_FUNCS" => ', <
-        neatvalue($funcs), ', "FUNCLIST" => ', < neatvalue($funclist),
-        ', "DL_VARS" => ', < neatvalue($vars), q|);'
-|)
+              (neatvalue: $funcs), ', "FUNCLIST" => ', < (neatvalue: $funclist)
+          ', "DL_VARS" => ', < (neatvalue: $vars), q|);'
+|
 
-    join('', @m)
+    join: '', @m
 
 
 

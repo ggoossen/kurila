@@ -5,13 +5,13 @@ use Test::More
 use File::Spec
 use File::Spec::Win32
 
-plan tests => 3
+plan: tests => 3
 
-is 1, 1, "Loaded"
+is: 1, 1, "Loaded"
 
-my $num_keys = nelems env::keys
+my $num_keys = nelems (env::keys: )
 File::Spec->tmpdir
-is nelems(env::keys), $num_keys, "tmpdir() shouldn't change the contents of \%ENV"
+is: (nelems: (env::keys: )), $num_keys, "tmpdir() shouldn't change the contents of \%ENV"
 
 File::Spec::Win32->tmpdir
-is nelems(env::keys), $num_keys, "Win32->tmpdir() shouldn't change the contents of \%ENV"
+is: (nelems: (env::keys: )), $num_keys, "Win32->tmpdir() shouldn't change the contents of \%ENV"

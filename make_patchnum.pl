@@ -47,7 +47,7 @@ Same terms as Perl itself.
 # very briefly ('cd -' works too).
 
 my ($subcd, $srcdir)
-our $opt_v = nelems( grep { $_ eq '-v' }, @ARGV )
+our $opt_v = nelems:  (grep: { $_ eq '-v' }, @ARGV) 
 
 BEGIN
     my $root="."
@@ -55,32 +55,32 @@ BEGIN
     $subcd = ''
     $srcdir = $root
     if (-l "./Configure")
-        $srcdir = readlink("./Configure")
+        $srcdir = readlink: "./Configure"
         $srcdir =~ s/Configure//
         $subcd = "cd $srcdir &&" # activate backtick fragment
 
-    while (!-e "$root/perl.c" and length($root) +< 100)
+    while (!-e "$root/perl.c" and (length: $root) +< 100)
         if ($root eq '.')
             $root=".."
         else
             $root.="/.."
 
-    die "Can't find toplevel" if !-e "$root/perl.c"
+    die: "Can't find toplevel" if !-e "$root/perl.c"
     sub path_to($v) { "$root/$v" } # use $v if this'd be placed in toplevel.
 
 sub read_file($filename)
-    my $file = path_to($filename)
+    my $file = path_to: $filename
     return "" unless -e $file
-    open my $fh, '<', $file
-        or die "Failed to open for read '$file':$^OS_ERROR"
+    open: my $fh, '<', $file
+        or die: "Failed to open for read '$file':$^OS_ERROR"
     return do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $fh }
 
 
 sub write_file($file, $content)
-    $file= path_to($file)
-    open my $fh, '>', $file
-        or die "Failed to open for write '$file':$^OS_ERROR"
-    print $fh, $content
+    $file= path_to: $file
+    open: my $fh, '>', $file
+        or die: "Failed to open for write '$file':$^OS_ERROR"
+    print: $fh, $content
     close $fh
 
 
@@ -89,63 +89,63 @@ sub backtick($command)
     # cd to src so git will work .  Probably a better way.
     my $result= `$subcd $command`
     $result="" if ! defined $result
-    warn "$subcd $command: \$^CHILD_ERROR=$^CHILD_ERROR\n" if $^CHILD_ERROR
-    print $^STDOUT, "#> $subcd $command ->\n $result\n" if !$^CHILD_ERROR and $opt_v
+    warn: "$subcd $command: \$^CHILD_ERROR=$^CHILD_ERROR\n" if $^CHILD_ERROR
+    print: $^STDOUT, "#> $subcd $command ->\n $result\n" if !$^CHILD_ERROR and $opt_v
     chomp $result
     return $result
 
 
 sub write_files(@< @args)
-    my %content= %+: map { m/WARNING: '([^']+)'/ || die "Bad mojo!"; %: $1 => $_ }, @args
-    my @files= sort keys %content
-    my $files= join " and ", map { "'$_'" }, @files
+    my %content= %+: map: { m/WARNING: '([^']+)'/ || (die: "Bad mojo!"); %: $1 => $_ }, @args
+    my @files= sort: keys %content
+    my $files= join: " and ", map: { "'$_'" }, @files
     foreach my $file (@files)
-        if (read_file($file) ne %content{$file})
-            print $^STDOUT, "Updating $files\n"
+        if ((read_file: $file) ne %content{$file})
+            print: $^STDOUT, "Updating $files\n"
             for (@files)
-                write_file($_,%content{$_})
+                write_file: $_,%content{$_}
             return 1
 
-    print $^STDOUT, "Reusing $files\n"
+    print: $^STDOUT, "Reusing $files\n"
     return 0
 
 
 my $unpushed_commits = '/*no-op*/'
 my @: $read, $branch, $snapshot_created, $commit_id, $describe = (@: "") x 5
 my @: $changed, $extra_info, $commit_title, $new_patchnum, $status = (@: "") x 5
-if (my $patch_file= read_file(".patch"))
-    @: $branch, $snapshot_created, $commit_id, $describe = split m/\s+/, $patch_file
+if (my $patch_file= (read_file: ".patch"))
+    @: $branch, $snapshot_created, $commit_id, $describe = split: m/\s+/, $patch_file
     $extra_info = "git_snapshot_date='$snapshot_created'"
     $commit_title = "Snapshot of:"
 elsif (-d "$srcdir/.git")
     # git branch | awk 'BEGIN{ORS=""} /\*/ { print $^STDOUT, $2 }'
-    @: ?$branch = grep { defined }, map { m/\* ([^(]\S*)/ ?? $1 !! undef },
-        split m/\n/, backtick("git branch")
+    @: ?$branch = grep: { defined }, map: { m/\* ([^(]\S*)/ ?? $1 !! undef },
+                                              split: m/\n/, backtick: "git branch"
     my ($remote,$merge)
     if (length $branch)
-        $merge= backtick("git config branch.$branch.merge")
+        $merge= backtick: "git config branch.$branch.merge"
         $merge = "" unless $^CHILD_ERROR == 0
         $merge =~ s!^refs/heads/!!
-        $remote= backtick("git config branch.$branch.remote")
+        $remote= backtick: "git config branch.$branch.remote"
         $remote = "" unless $^CHILD_ERROR == 0
 
-    $commit_id = backtick("git rev-parse HEAD")
-    $describe = backtick("git describe")
-    my $commit_created = backtick(q{git log -1 --pretty="format:%ci"})
+    $commit_id = backtick: "git rev-parse HEAD"
+    $describe = backtick: "git describe"
+    my $commit_created = backtick: q{git log -1 --pretty="format:%ci"}
     $new_patchnum = "describe: $describe"
     $extra_info = "git_commit_date='$commit_created'"
     if (length $branch && length $remote)
         # git cherry $remote/$branch | awk 'BEGIN{ORS=","} /\+/ {print $2}' | sed -e 's/,$//'
         my $unpushed_commit_list =
-            join ",", map { (split m/\s/, $_)[1] },
-            grep {m/\+/}, split m/\n/, backtick("git cherry $remote/$merge")
+            join: ",", map: { ((split: m/\s/, $_))[1] },
+                                grep: {m/\+/}, split: m/\n/, backtick: "git cherry $remote/$merge"
         # git cherry $remote/$branch | awk 'BEGIN{ORS="\t\\\\\n"} /\+/ {print ",\"" $2 "\""}'
         $unpushed_commits =
-            join "", map { ',"'.(split m/\s/, $_)[1]."\"\t\\\n" },
-            grep {m/\+/}, split m/\n/, backtick("git cherry $remote/$merge")
+            join: "", map: { ',"'.((split: m/\s/, $_))[1]."\"\t\\\n" },
+                               grep: {m/\+/}, split: m/\n/, backtick: "git cherry $remote/$merge"
         if (length $unpushed_commits)
             $commit_title = "Local Commit:"
-            my $ancestor = backtick("git rev-parse $remote/$merge")
+            my $ancestor = backtick: "git rev-parse $remote/$merge"
             $extra_info = "$extra_info
 git_ancestor='$ancestor'
 git_remote_branch='$remote/$merge'
@@ -162,7 +162,7 @@ git_unpushed='$unpushed_commit_list'"
 
 
 # we extract the filename out of the warning header, so dont mess with that
-write_files(<<"EOF_HEADER", <<"EOF_CONFIG")
+write_files: <<"EOF_HEADER", <<"EOF_CONFIG"
 /**************************************************************************
 * WARNING: 'git_version.h' is automatically generated by make_patchnum.pl
 *          DO NOT EDIT DIRECTLY - edit make_patchnum.pl instead

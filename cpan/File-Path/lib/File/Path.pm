@@ -534,16 +534,16 @@ sub _error
 
     if ($arg{?error})
         $object = '' unless defined $object
-        push $arg{error}->$->@, \%: $object => "$message: $^OS_ERROR"
+        push: $arg{error}->$->@, \%: $object => "$message: $^OS_ERROR"
     else
-        warn(defined($object) ?? "$message for $object: $^OS_ERROR" !! "$message: $^OS_ERROR")
+        warn: (defined: $object) ?? "$message for $object: $^OS_ERROR" !! "$message: $^OS_ERROR"
     
 
 
 sub mkpath
     my $old_style = (
-        UNIVERSAL::isa(@_[0],'ARRAY')
-        or ((nelems @_) == 2 and ((defined @_[1] && ! ref @_[1]) ?? @_[1] =~ m/\A\d+\z/ !! (! UNIVERSAL::isa(@_[1], 'HASH')) ))
+        UNIVERSAL::isa: @_[0],'ARRAY'
+        or ((nelems @_) == 2 and ((defined @_[1] && ! ref @_[1]) ?? @_[1] =~ m/\A\d+\z/ !! (! (UNIVERSAL::isa: @_[1], 'HASH')) ))
         or ((nelems @_) == 3
               and ((defined @_[1] && ! ref @_[1]) ?? @_[1] =~ m/\A\d+\z/ !! 1)
             and ((defined @_[2] && ! ref @_[2]) ?? @_[2] =~ m/\A\d+\z/ !! 1)
@@ -556,11 +556,11 @@ sub mkpath
     if ($old_style)
         my ($verbose, $mode)
         (@: $paths, ?$verbose, ?$mode) =  @_
-        $paths = \(@: $paths) unless UNIVERSAL::isa($paths,'ARRAY')
+        $paths = \(@: $paths) unless UNIVERSAL::isa: $paths,'ARRAY'
         $arg{+verbose} = defined $verbose ?? $verbose !! 0
         $arg{+mode}    = defined $mode    ?? $mode    !! 0777
     else
-        if ((nelems @_) +> 0 and UNIVERSAL::isa(@_[-1], 'HASH'))
+        if ((nelems @_) +> 0 and UNIVERSAL::isa: @_[-1], 'HASH')
             $arg = (pop @_)->%
             exists $arg{mask} and $arg{+mode} = delete $arg{mask}
             $arg{+mode} = 0777 unless exists $arg{mode}
@@ -570,27 +570,27 @@ sub mkpath
         
         $paths = \$: @_
     
-    return _mkpath($arg, $paths)
+    return _mkpath: $arg, $paths
 
 
 sub _mkpath($arg, $paths)
     my(@created)
     foreach my $path ( $paths->@)
-        next unless length($path)
+        next unless length: $path
         $path .= '/' if $^OS_NAME eq 'os2' and $path =~ m/^\w:\z/s # feature of CRT
         # Logic wants Unix paths, so go with the flow.
         if ($Is_VMS)
             next if $path eq '/'
-            $path = VMS::Filespec::unixify($path)
+            $path = VMS::Filespec::unixify: $path
         
         next if -d $path
-        my $parent = File::Basename::dirname($path)
+        my $parent = File::Basename::dirname: $path
         unless (-d $parent or $path eq $parent)
-            push(@created, <_mkpath($arg, \(@: $parent)))
+            push: @created, <(_mkpath: $arg, \(@: $parent))
         
-        print $^STDOUT, "mkdir $path\n" if $arg{?verbose}
-        if (mkdir($path,$arg{?mode}))
-            push(@created, $path)
+        print: $^STDOUT, "mkdir $path\n" if $arg{?verbose}
+        if ((mkdir: $path,$arg{?mode}))
+            push: @created, $path
         else
             my $save_bang = $^OS_ERROR
             my (@: $e, $e1) = @: $save_bang, $^EXTENDED_OS_ERROR
@@ -599,9 +599,9 @@ sub _mkpath($arg, $paths)
             if (!-d $path)
                 $^OS_ERROR = $save_bang
                 if ($arg{?error})
-                    push $arg{error}->$->@, \%: $path => $e
+                    push: $arg{error}->$->@, \%: $path => $e
                 else
-                    die("mkdir $path: $e")
+                    die: "mkdir $path: $e"
                 
             
         
@@ -610,15 +610,15 @@ sub _mkpath($arg, $paths)
 
 
 sub rmtree
-    my $old_style = (UNIVERSAL::isa(@_[0],'ARRAY')) ?? 1 !! 0
+    my $old_style = ((UNIVERSAL::isa: @_[0],'ARRAY')) ?? 1 !! 0
 
     my $arg
     my $paths
 
     if ($old_style)
-        die "old style rm-tree is obsolete"
+        die: "old style rm-tree is obsolete"
     else
-        if ((nelems @_) +> 0 and UNIVERSAL::isa(@_[-1],'HASH'))
+        if ((nelems @_) +> 0 and UNIVERSAL::isa: @_[-1],'HASH')
             $arg = (pop @_)->$
             $arg{error}->$  = \$@ if exists $arg{error}
             $arg{result}->$ = \$@ if exists $arg{result}
@@ -631,23 +631,23 @@ sub rmtree
     $arg{+prefix} = ''
     $arg{+depth}  = 0
 
-    $arg{+cwd} = getcwd() or do
-        _error($arg, "cannot fetch initial working directory")
+    $arg{+cwd} = (getcwd: ) or do
+        _error: $arg, "cannot fetch initial working directory"
         return 0
     
     for ((@: $arg{?cwd})) { m/\A(.*)\Z/; $_ = $1 } # untaint
     $arg{[qw(device inode)]} = (@: stat $arg{?cwd})[[0..1]] or do
-        _error($arg, "cannot stat initial working directory", $arg{?cwd})
+        _error: $arg, "cannot stat initial working directory", $arg{?cwd}
         return 0
     
 
-    return _rmtree($arg, $paths)
+    return _rmtree: $arg, $paths
 
 
 sub _rmtree($arg, $paths)
     my $count  = 0
-    my $curdir = File::Spec->curdir()
-    my $updir  = File::Spec->updir()
+    my $curdir = File::Spec->curdir
+    my $updir  = File::Spec->updir
 
     my (@files)
     :ROOT_DIR
@@ -666,7 +666,7 @@ sub _rmtree($arg, $paths)
         # opposed to being truly canonical, anchored from the root (/).
 
         my $canon = $arg{?prefix}
-            ?? File::Spec->catfile($arg{?prefix}, $root)
+            ?? File::Spec->catfile: $arg{?prefix}, $root
             !! $root
         
 
@@ -674,28 +674,28 @@ sub _rmtree($arg, $paths)
         $ldev or next ROOT_DIR
 
         if ( -d _ )
-            $root = VMS::Filespec::pathify($root) if $Is_VMS
-            if (!chdir($root))
+            $root = (VMS::Filespec::pathify: $root) if $Is_VMS
+            if (!(chdir: $root))
                 # see if we can escalate privileges to get in
                 # (e.g. funny protection mask such as -w- instead of rwx)
                 $perm ^&^= 07777
                 my $nperm = $perm ^|^ 0700
-                if (!($arg{?safe} or $nperm == $perm or chmod($nperm, $root)))
-                    _error($arg, "cannot make child directory read-write-exec", $canon)
+                if (!($arg{?safe} or $nperm == $perm or chmod: $nperm, $root))
+                    _error: $arg, "cannot make child directory read-write-exec", $canon
                     next ROOT_DIR
-                elsif (!chdir($root))
-                    _error($arg, "cannot chdir to child", $canon)
+                elsif (!(chdir: $root))
+                    _error: $arg, "cannot chdir to child", $canon
                     next ROOT_DIR
                 
             
 
             my (@: $device, $inode, $perm) =  (@: stat $curdir)[[0..2]] or do
-                _error($arg, "cannot stat current working directory", $canon)
+                _error: $arg, "cannot stat current working directory", $canon
                 next ROOT_DIR
             
 
             ($ldev eq $device and $lino eq $inode)
-                or die("directory $canon changed before chdir, expected dev=$ldev inode=$lino, actual dev=$device ino=$inode, aborting.")
+                or die: "directory $canon changed before chdir, expected dev=$ldev inode=$lino, actual dev=$device ino=$inode, aborting."
 
             $perm ^&^= 07777 # don't forget setuid, setgid, sticky bits
             my $nperm = $perm ^|^ 0700
@@ -705,14 +705,14 @@ sub _rmtree($arg, $paths)
             # to recurse in which case we are better than rm -rf for
             # subtrees with strange permissions
 
-            if (!($arg{?safe} or $nperm == $perm or chmod($nperm, $curdir)))
-                _error($arg, "cannot make directory read+writeable", $canon)
+            if (!($arg{?safe} or $nperm == $perm or chmod: $nperm, $curdir))
+                _error: $arg, "cannot make directory read+writeable", $canon
                 $nperm = $perm
             
 
             my $d
-            if (!opendir $d, $curdir)
-                _error($arg, "cannot opendir", $canon)
+            if (!(opendir: $d, $curdir))
+                _error: $arg, "cannot opendir", $canon
                 @files = $@
             else
                 @files = @:  readdir $d 
@@ -723,89 +723,89 @@ sub _rmtree($arg, $paths)
                 # Deleting large numbers of files from VMS Files-11
                 # filesystems is faster if done in reverse ASCIIbetical order.
                 # include '.' to '.;' from blead patch #31775
-                @files = map {$_ eq '.' ?? '.;' !! $_}, reverse @files
-                ($root = VMS::Filespec::unixify($root)) =~ s/\.dir\z//
+                @files = map: {$_ eq '.' ?? '.;' !! $_}, reverse: @files
+                ($root = (VMS::Filespec::unixify: $root)) =~ s/\.dir\z//
             
-            @files = grep {$_ ne $updir and $_ ne $curdir}, @files
+            @files = grep: {$_ ne $updir and $_ ne $curdir}, @files
 
             if ((nelems @files))
                 # remove the contained files before the directory itself
                 my $narg = $arg
                 $narg{[qw(device inode cwd prefix depth)]}
                     = @: $device, $inode, $updir, $canon, $arg{?depth}+1
-                $count += _rmtree($narg, \@files)
+                $count += _rmtree: $narg, \@files
             
 
             # restore directory permissions of required now (in case the rmdir
             # below fails), while we are still in the directory and may do so
             # without a race via '.'
-            if ($nperm != $perm and not chmod($perm, $curdir))
-                _error($arg, "cannot reset chmod", $canon)
+            if ($nperm != $perm and not (chmod: $perm, $curdir))
+                _error: $arg, "cannot reset chmod", $canon
             
 
             # don't leave the client code in an unexpected directory
-            chdir($arg{?cwd})
-                or die("cannot chdir to $arg{?cwd} from $canon: $^OS_ERROR, aborting.")
+            chdir: $arg{?cwd}
+                or die: "cannot chdir to $arg{?cwd} from $canon: $^OS_ERROR, aborting."
 
             # ensure that a chdir upwards didn't take us somewhere other
             # than we expected (see CVE-2002-0435)
             (@: $device, $inode) =  (@: stat $curdir)[[(@: 0,1)]]
-                or die("cannot stat prior working directory $arg{?cwd}: $^OS_ERROR, aborting.")
+                or die: "cannot stat prior working directory $arg{?cwd}: $^OS_ERROR, aborting."
 
             ($arg{?device} eq $device and $arg{?inode} eq $inode)
-                or die("previous directory $arg{?cwd} changed before entering $canon, expected dev=$ldev inode=$lino, actual dev=$device ino=$inode, aborting.")
+                or die: "previous directory $arg{?cwd} changed before entering $canon, expected dev=$ldev inode=$lino, actual dev=$device ino=$inode, aborting."
 
             if ($arg{?depth} or !$arg{?keep_root})
                 if ($arg{?safe} &&
-                    ($Is_VMS ?? !VMS::Filespec::candelete($root) !! !-w $root))
-                    print $^STDOUT, "skipped $root\n" if $arg{?verbose}
+                    ($Is_VMS ?? !(VMS::Filespec::candelete: $root) !! !-w $root))
+                    print: $^STDOUT, "skipped $root\n" if $arg{?verbose}
                     next ROOT_DIR
                 
-                if (!chmod $perm ^|^ 0700, $root)
+                if (!(chmod: $perm ^|^ 0700, $root))
                     if ($Force_Writeable)
-                        _error($arg, "cannot make directory writeable", $canon)
+                        _error: $arg, "cannot make directory writeable", $canon
                     
                 
-                print $^STDOUT, "rmdir $root\n" if $arg{?verbose}
+                print: $^STDOUT, "rmdir $root\n" if $arg{?verbose}
                 if (rmdir $root)
-                    push $arg{result}->$->@, $root if $arg{?result}
+                    push: $arg{result}->$->@, $root if $arg{?result}
                     ++$count
                 else
-                    _error($arg, "cannot remove directory", $canon)
-                    if (!chmod($perm, ($Is_VMS ?? < VMS::Filespec::fileify($root) !! $root))
+                    _error: $arg, "cannot remove directory", $canon
+                    if (!chmod: $perm, ($Is_VMS ?? < (VMS::Filespec::fileify: $root) !! $root)
                         )
-                        _error($arg, sprintf("cannot restore permissions to 0\%o",$perm), $canon)
+                        _error: $arg, (sprintf: "cannot restore permissions to 0\%o",$perm), $canon
                     
                 
             
         else
             # not a directory
 
-            $root = VMS::Filespec::vmsify("./$root")
-                if $Is_VMS && !File::Spec->file_name_is_absolute($root)
+            $root = VMS::Filespec::vmsify: "./$root"
+                if $Is_VMS && !File::Spec->file_name_is_absolute: $root
 
             if ($arg{?safe} &&
-                ($Is_VMS ?? !VMS::Filespec::candelete($root)
+                ($Is_VMS ?? !VMS::Filespec::candelete: $root
                  !! !(-l $root || -w $root)))
-                print $^STDOUT, "skipped $root\n" if $arg{?verbose}
+                print: $^STDOUT, "skipped $root\n" if $arg{?verbose}
                 next ROOT_DIR
             
 
             my $nperm = $perm ^&^ 07777 ^|^ 0600
-            if ($nperm != $perm and not chmod $nperm, $root)
+            if ($nperm != $perm and not (chmod: $nperm, $root))
                 if ($Force_Writeable)
-                    _error($arg, "cannot make file writeable", $canon)
+                    _error: $arg, "cannot make file writeable", $canon
                 
             
-            print $^STDOUT, "unlink $canon\n" if $arg{?verbose}
+            print: $^STDOUT, "unlink $canon\n" if $arg{?verbose}
             # delete all versions under VMS
             while (1)
-                if (unlink $root)
-                    push $arg{result}->$->@, $root if $arg{?result}
+                if ((unlink: $root))
+                    push: $arg{result}->$->@, $root if $arg{?result}
                 else
-                    _error($arg, "cannot unlink file", $canon)
-                    $Force_Writeable and chmod($perm, $root) or
-                        _error($arg, sprintf("cannot restore permissions to 0\%o",$perm), $canon)
+                    _error: $arg, "cannot unlink file", $canon
+                    $Force_Writeable and chmod: $perm, $root or
+                        _error: $arg, (sprintf: "cannot restore permissions to 0\%o",$perm), $canon
                     last
                 
                 ++$count

@@ -10,25 +10,25 @@ BEGIN
 
 
 chdir File::Spec->updir
-my $manifest = File::Spec->catfile('MANIFEST')
-open(my $manifestfh, "<", $manifest) or die "Can't open $manifest: $^OS_ERROR"
-my @modules = map { m{^lib/(\S+)}; $1 },
-    grep { m{^lib/ExtUtils/\S*\.pm} },
-    grep { !m{/t/} }, @:  ~< $manifestfh->*
+my $manifest = File::Spec->catfile: 'MANIFEST'
+open: my $manifestfh, "<", $manifest or die: "Can't open $manifest: $^OS_ERROR"
+my @modules = map: { m{^lib/(\S+)}; $1 },
+                       grep: { m{^lib/ExtUtils/\S*\.pm} },
+                                 grep: { !m{/t/} }, @:  ~< $manifestfh->*
 chomp @modules
 close $manifestfh
 
 chdir 'lib'
-plan tests => (nelems @modules) * 2
+plan: tests => (nelems @modules) * 2
 foreach my $file (@modules)
     # Make sure we look at the local files and do not reload them if
     # they're already loaded.  This avoids recompilation warnings.
     local $^INCLUDE_PATH = $^INCLUDE_PATH
-    unshift $^INCLUDE_PATH, "."
-    ok($: try { require($file); 1 }) or diag "require $file failed.\n$($^EVAL_ERROR->message)"
+    unshift: $^INCLUDE_PATH, "."
+    ok: $: try { require($file); 1 } or diag: "require $file failed.\n$($^EVAL_ERROR->message)"
 
     :SKIP do
-        skip "Test::Pod not installed", 1 unless $Has_Test_Pod
-        pod_file_ok($file)
+        skip: "Test::Pod not installed", 1 unless $Has_Test_Pod
+        pod_file_ok: $file
     
 

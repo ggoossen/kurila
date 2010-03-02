@@ -452,7 +452,7 @@ sub pod2usage
         $_ = ""
     elsif (ref $_)
         ## User passed a ref to a hash
-        %opts = (%:  < $_->% )  if (ref($_) eq 'HASH')
+        %opts = (%:  < $_->% )  if ((ref: $_) eq 'HASH')
     elsif (m/^[-+]?\d+$/)
         ## User passed in the exit value to use
         %opts{+"exitval"} =  $_
@@ -465,14 +465,14 @@ sub pod2usage
     ## options that were all uppercase words rather than ones that
     ## looked like Unix command-line options.
     ## to be uppercase keywords)
-    %opts = %+: map
+    %opts = %+: map: 
         sub ($_)
             my $val = %opts{?$_};
             s/^-//;
             m/^msg/i   and  $_ = 'message';
             m/^exit/i  and  $_ = 'exitval';
-            (%: lc($_) => $val);
-        , keys %opts
+            (%: (lc: $_) => $val);
+            , keys %opts
 
     ## Now determine default exitval and verbose values to use
     if ((! defined %opts{?"exitval"}) && (! defined %opts{?"verbose"}))
@@ -481,12 +481,12 @@ sub pod2usage
     elsif (! defined %opts{?"exitval"})
         %opts{+"exitval"} = (%opts{"verbose"} +> 0) ?? 1 !! 2
     elsif (! defined %opts{?"verbose"})
-        %opts{+"verbose"} = (lc(%opts{?"exitval"}) eq "noexit" ||
+        %opts{+"verbose"} = ((lc: %opts{?"exitval"}) eq "noexit" ||
                              %opts{?"exitval"} +< 2)
     
 
     ## Default the output file
-    %opts{+"output"} = (lc(%opts{?"exitval"}) eq "noexit" ||
+    %opts{+"output"} = ((lc: %opts{?"exitval"}) eq "noexit" ||
                         %opts{?"exitval"} +< 2) ?? $^STDOUT !! $^STDERR
         unless (defined %opts{?"output"})
     ## Default the input file
@@ -497,46 +497,46 @@ sub pod2usage
         my $basename = %opts{?"input"}
         my $pathsep = ($^OS_NAME =~ m/^(?:dos|os2|MSWin32)$/) ?? ";"
             !! (($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'VMS') ?? ',' !!  ":")
-        my $pathspec = %opts{?"pathlist"} || env::var('PATH') || env::var('PERL5LIB')
+        my $pathspec = %opts{?"pathlist"} || (env::var: 'PATH') || env::var: 'PERL5LIB'
 
-        my @paths = (ref $pathspec) ?? $pathspec->@ !! split($pathsep, $pathspec)
+        my @paths = (ref $pathspec) ?? $pathspec->@ !! split: $pathsep, $pathspec
         for my $dirname ( @paths)
-            local $_ = File::Spec->catfile($dirname, $basename) if length $dirname
+            local $_ = (File::Spec->catfile: $dirname, $basename) if length $dirname
             last if (-e $_) && (%opts{+"input"} = $_)
 
     ## Now create a pod reader and constrain it to the desired sections.
-    my $parser = Pod::Usage->new(USAGE_OPTIONS => \%opts)
+    my $parser = Pod::Usage->new: USAGE_OPTIONS => \%opts
     if (%opts{"verbose"} == 0)
-        $parser->select('SYNOPSIS\s*')
+        $parser->select: 'SYNOPSIS\s*'
     elsif (%opts{"verbose"} == 1)
         my $opt_re = '(?i)' .
             '(?:OPTIONS|ARGUMENTS)' .
             '(?:\s*(?:AND|\/)\s*(?:OPTIONS|ARGUMENTS))?'
-        $parser->select( 'SYNOPSIS', $opt_re, "DESCRIPTION/$opt_re" )
+        $parser->select:  'SYNOPSIS', $opt_re, "DESCRIPTION/$opt_re" 
     elsif (%opts{"verbose"} +>= 2 && %opts{"verbose"} != 99)
-        $parser->select('.*')
+        $parser->select: '.*'
     elsif (%opts{"verbose"} == 99)
-        $parser->select( %opts{"sections"} )
+        $parser->select:  %opts{"sections"} 
         %opts{"verbose"} = 1
     
 
     ## Now translate the pod document and then exit with the desired status
     if ( !%opts{?"noperldoc"}
            and  %opts{?"verbose"} +>= 2
-           and  !ref(%opts{?"input"})
+           and  !ref: %opts{?"input"}
         and  %opts{?"output"} \== $^STDOUT )
         ## spit out the entire PODs. Might as well invoke perldoc
-        my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc")
-        system($progpath, %opts{?"input"})
+        my $progpath = File::Spec->catfile: (config_value: 'scriptdir'), "perldoc"
+        system: $progpath, %opts{?"input"}
         if($^CHILD_ERROR)
             # RT16091: fall back to more if perldoc failed
-            system(env::var('PAGER') || 'more', %opts{?"input"})
+            system: (env::var: 'PAGER') || 'more', %opts{?"input"}
         
     else
-        $parser->parse_from_file(%opts{?"input"}, %opts{"output"})
+        $parser->parse_from_file: %opts{?"input"}, %opts{"output"}
     
 
-    exit(%opts{?"exitval"})  unless (lc(%opts{?"exitval"}) eq 'noexit')
+    exit: %opts{?"exitval"}  unless ((lc: %opts{?"exitval"}) eq 'noexit')
 
 
 ##---------------------------------------------------------------------------
@@ -547,22 +547,22 @@ sub pod2usage
 
 sub new
     my $this = shift
-    my $class = ref($this) || $this
+    my $class = (ref: $this) || $this
     my %params = %:  < @_ 
     my $self = \%: < %params
-    bless $self, $class
-    if ($self->can('initialize'))
-        $self->initialize()
+    bless: $self, $class
+    if (($self->can: 'initialize'))
+        $self->initialize
     else
-        $self = $self->SUPER::new()
+        $self = $self->SUPER::new: 
         $self->% = %: < $self->%, < %params
     
     return $self
 
 
 sub select($self, @< @res)
-    if (@ISA[0]->can('select'))
-        $self->SUPER::select(@res)
+    if (@ISA[0]->can: 'select'))
+        $self->SUPER::select: @res
     else
         $self->{+USAGE_SELECT} = \@res
 
@@ -600,7 +600,7 @@ sub _handle_element_end($self, $element)
         # a colon to end all headings.
         if($self->{USAGE_OPTIONS}->{?verbose} +< 2)
             local $_ = $self->%{PENDING}->[-1]->[1]
-            s{([A-Z])([A-Z]+)}{$(((length($2) +> 2) ?? $1 !! lc($1)) . lc($2))}g
+            s{([A-Z])([A-Z]+)}{$((((length: $2) +> 2) ?? $1 !! (lc: $1)) . (lc: $2))}g
             s/\s*$/:/  unless (m/:\s*$/)
             $_ .= "\n"
             $self->%{PENDING}->[-1]->[1] = $_
@@ -609,23 +609,23 @@ sub _handle_element_end($self, $element)
     if ($self->%{?USAGE_SKIPPING})
         pop  $self->%{PENDING}->@
     else
-        $self->SUPER::_handle_element_end($element)
+        $self->SUPER::_handle_element_end: $element
     
 
 
 sub start_document($self, ...)
-    $self->SUPER::start_document()
+    $self->SUPER::start_document: 
     my $msg = $self->{USAGE_OPTIONS}->{?message}  or  return 1
-    my $out_fh = $self->output_fh()
-    print $out_fh, "$msg\n"
+    my $out_fh = $self->output_fh
+    print: $out_fh, "$msg\n"
 
 
 sub begin_pod
     my $self = shift
-    $self->SUPER::begin_pod()  ## Have to call superclass
+     $self->SUPER::begin_pod:   ## Have to call superclass
     my $msg = $self->{USAGE_OPTIONS}->{?message}  or  return 1
-    my $out_fh = $self->output_handle()
-    print $out_fh, "$msg\n"
+    my $out_fh = $self->output_handle
+    print: $out_fh, "$msg\n"
 
 
 sub preprocess_paragraph
@@ -637,12 +637,12 @@ sub preprocess_paragraph
         ## Change the title of the SYNOPSIS section to USAGE
         s/^=head1\s+SYNOPSIS\s*$/=head1 USAGE/
         ## Try to do some lowercasing instead of all-caps in headings
-        s{([A-Z])([A-Z]+)}{$(((length($2) +> 2) ?? $1 !! lc($1)) . lc($2))}g
+        s{([A-Z])([A-Z]+)}{$((((length: $2) +> 2) ?? $1 !! (lc: $1)) . (lc: $2))}g
         ## Use a colon to end all headings
         s/\s*$/:/  unless (m/:\s*$/)
         $_ .= "\n"
     
-    return  $self->SUPER::preprocess_paragraph($_)
+    return  $self->SUPER::preprocess_paragraph: $_
 
 
 1 # keep require happy

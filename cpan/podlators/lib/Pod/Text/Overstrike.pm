@@ -42,54 +42,54 @@ $VERSION = 2.00
 # Make level one headings bold, overridding any existing formatting.
 sub cmd_head1($self, $attrs, $text)
     $text =~ s/\s+$//
-    $text = $self->strip_format ($text)
+    $text = $self->strip_format : $text
     $text =~ s/(.)/$1\b$1/g
-    return $self->SUPER::cmd_head1 ($attrs, $text)
+    return $self->SUPER::cmd_head1 : $attrs, $text
 
 
 # Make level two headings bold, overriding any existing formatting.
 sub cmd_head2($self, $attrs, $text)
     $text =~ s/\s+$//
-    $text = $self->strip_format ($text)
+    $text = $self->strip_format : $text
     $text =~ s/(.)/$1\b$1/g
-    return $self->SUPER::cmd_head2 ($attrs, $text)
+    return $self->SUPER::cmd_head2 : $attrs, $text
 
 
 # Make level three headings underscored, overriding any existing formatting.
 sub cmd_head3($self, $attrs, $text)
     $text =~ s/\s+$//
-    $text = $self->strip_format ($text)
+    $text = $self->strip_format : $text
     $text =~ s/(.)/_\b$1/g
-    return $self->SUPER::cmd_head3 ($attrs, $text)
+    return $self->SUPER::cmd_head3 : $attrs, $text
 
 
 # Level four headings look like level three headings.
 sub cmd_head4($self, $attrs, $text)
     $text =~ s/\s+$//
-    $text = $self->strip_format ($text)
+    $text = $self->strip_format : $text
     $text =~ s/(.)/_\b$1/g
-    return $self->SUPER::cmd_head4 ($attrs, $text)
+    return $self->SUPER::cmd_head4 : $attrs, $text
 
 
 # The common code for handling all headers.  We have to override to avoid
 # interpolating twice and because we don't want to honor alt.
 sub heading($self, $text, $indent, $marker)
-    $self->item ("\n\n") if defined $self->%{?ITEM}
+    $self->item : "\n\n" if defined $self->%{?ITEM}
     $text .= "\n" if $self->%{?opt_loose}
     my $margin = ' ' x ($self->%{?opt_margin} + $indent)
-    $self->output ($margin . $text . "\n")
+    $self->output : $margin . $text . "\n"
     return ''
 
 
 # Fix the various formatting codes.
-sub cmd_b { local $_ = @_[0]->strip_format (@_[2]); s/(.)/$1\b$1/g; $_ }
-sub cmd_f { local $_ = @_[0]->strip_format (@_[2]); s/(.)/_\b$1/g; $_ }
-sub cmd_i { local $_ = @_[0]->strip_format (@_[2]); s/(.)/_\b$1/g; $_ }
+sub cmd_b { local $_ = @_[0]->strip_format : @_[2]); s/(.)/$1\b$1/g; $_ }
+sub cmd_f { local $_ = @_[0]->strip_format : @_[2]); s/(.)/_\b$1/g; $_ }
+sub cmd_i { local $_ = @_[0]->strip_format : @_[2]); s/(.)/_\b$1/g; $_ }
 
 # Output any included code in bold.
 sub output_code($self, $code)
     $code =~ s/(.)/$1\b$1/g
-    $self->output ($code)
+    $self->output : $code
 
 
 # We unfortunately have to override the wrapping code here, since the normal

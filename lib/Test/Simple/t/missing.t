@@ -1,9 +1,9 @@
 BEGIN 
-    if( env::var('PERL_CORE') )
+    if( (env::var: 'PERL_CORE') )
         chdir 't'
         $^INCLUDE_PATH = @: '../lib', 'lib'
     else
-        unshift $^INCLUDE_PATH, 't/lib'
+        unshift: $^INCLUDE_PATH, 't/lib'
     
 
 
@@ -16,9 +16,9 @@ package My::Test
 # Test::Builder's own and the ending diagnostics don't come out right.
 require Test::Builder
 my $TB = Test::Builder->create
-$TB->plan(tests => 2)
+$TB->plan: tests => 2
 
-sub is { $TB->is_eq(< @_) }
+sub is { ($TB->is_eq: < @_) }
 
 
 package main
@@ -26,23 +26,23 @@ package main
 require Test::Simple
 
 require Test::Simple::Catch
-my(@: $out, $err) =  Test::Simple::Catch::caught()
-local env::var('HARNESS_ACTIVE' ) = 0;
+my(@: $out, $err) =  (Test::Simple::Catch::caught: )
+local (env::var: 'HARNESS_ACTIVE' ) = 0;
 
-Test::Simple->import(tests => 5);
+(Test::Simple->import: tests => 5);
 
 #line 30
-ok(1, 'Foo')
-ok(0, 'Bar')
+(ok: 1, 'Foo')
+ok: 0, 'Bar'
 
 END 
-    My::Test::is($out->$, <<OUT)
+    My::Test::is: $out->$, <<OUT
 1..5
 ok 1 - Foo
 not ok 2 - Bar
 OUT
 
-    My::Test::is($err->$, <<ERR)
+    My::Test::is: $err->$, <<ERR
 #   Failed test 'Bar'
 #   at $^PROGRAM_NAME line 31.
 # Looks like you planned 5 tests but only ran 2.

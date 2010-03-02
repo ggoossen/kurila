@@ -4,9 +4,9 @@ BEGIN
     require './test.pl'
 
 
-plan( tests => 1 )
+plan:  tests => 1 
 
 $_ = "foo"
 for (qw[a]) { }
 $_ = "bar"
-is( $_, "bar" )
+is:  $_, "bar" 

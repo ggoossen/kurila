@@ -10,7 +10,7 @@ use MakeMaker::Test::Utils
 
 my $Is_VMS = $^OS_NAME eq 'VMS'
 
-my %Files = %: 
+my %Files = %:
     'Big-Dummy/lib/Big/Dummy.pm'     => <<'END'
 package Big::Dummy;
 
@@ -95,17 +95,17 @@ END
 
 
 sub setup_recurs
-    setup_mm_test_root()
+    (setup_mm_test_root: )
     chdir 'MM_TEST_ROOT:[t]' if $Is_VMS
 
     while(my(@: ?$file, ?$text) =(@:  each %Files))
         # Convert to a relative, native file path.
-        $file = 'File::Spec'->catfile('File::Spec'->curdir, < split m{\/}, $file)
+        $file = 'File::Spec'->catfile: 'File::Spec'->curdir, < (split: m{\/}, $file)
 
-        my $dir = dirname($file)
-        mkpath $dir
-        open(my $fh, ">", "$file") || die "Can't create $file: $^OS_ERROR"
-        print $fh, $text
+        my $dir = dirname: $file
+        mkpath: $dir
+        (open: my $fh, ">", "$file") || die: "Can't create $file: $^OS_ERROR"
+        print: $fh, $text
         close $fh
     
 
@@ -114,9 +114,9 @@ sub setup_recurs
 
 sub teardown_recurs
     foreach my $file (keys %Files)
-        my $dir = dirname($file)
+        my $dir = dirname: $file
         if( -e $dir )
-            rmtree($dir) || return
+            (rmtree: $dir) || return
         
     
     return 1

@@ -2,9 +2,9 @@
 # Tests that all ops can be trapped by a Safe compartment
 
 BEGIN 
-    if (not env::var('PERL_CORE'))
+    if (not (env::var: 'PERL_CORE'))
         # this won't work outside of the core, so exit
-        print $^STDOUT, "1..0\n"; exit 0
+        (print: $^STDOUT, "1..0\n"); exit 0
     
 
 use Config
@@ -18,38 +18,38 @@ my %code
 
 while ( ~< $^DATA)
     chomp
-    die "Can't match $_" unless m/^([a-z_0-9]+)\t+(.*)/
+    die: "Can't match $_" unless m/^([a-z_0-9]+)\t+(.*)/
     %code{+$1} = $2
 
 
-open my $fh, '<', '../../opcode.pl' or die "Can't open opcode.pl: $^OS_ERROR"
+open: my $fh, '<', '../../opcode.pl' or die: "Can't open opcode.pl: $^OS_ERROR"
 while ( ~< $fh)
     last if m/^__END__/
 
 while ( ~< $fh)
     chomp
     next if !$_ or m/^#/
-    my (@: $op, $opname, ...) =  split m/\t+/
-    push @op, \@: $op, $opname, %code{?$op}
+    my (@: $op, $opname, ...) =  split: m/\t+/
+    push: @op, \@: $op, $opname, %code{?$op}
 
 close $fh
 
-plan(tests => nelems(@op))
+plan: tests => (nelems: @op)
 
 sub testop($op, $opname, $code)
-    pass("$op : skipped") and return if $code =~ m/^SKIP/
-    my $c = Safe->new()
-    $c->deny_only($op)
-    $c->reval($code)
-    like($^EVAL_ERROR->message, qr/'\Q$opname\E' trapped by operation mask/, $op)
+    pass: "$op : skipped" and return if $code =~ m/^SKIP/
+    my $c = Safe->new
+    $c->deny_only: $op
+    $c->reval: $code
+    like: $^EVAL_ERROR->message, qr/'\Q$opname\E' trapped by operation mask/, $op
 
 
 foreach (@op)
     if ($_->[2])
-        testop < $_->@
+        testop: < $_->@
     else
         local $TODO = "No test yet for $_->[1]"
-        fail()
+        (fail: )
     
 
 

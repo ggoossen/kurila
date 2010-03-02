@@ -10,36 +10,36 @@ sub tack_on
 
 
 sub as_string($lol)
-    return Pod::Simple::BlackBox::stringify_lol($lol)
+    return Pod::Simple::BlackBox::stringify_lol: $lol
 
 sub stringify($lol)
-    return Pod::Simple::BlackBox::stringify_lol($lol)
+    return Pod::Simple::BlackBox::stringify_lol: $lol
 
 
 sub new($class, @< @_)
-    $class = ref($class) || $class
+    $class = (ref: $class) || $class
     my $new
     if((nelems @_) == 1)
-        if (!ref(@_[0] || '')) # most common case: one bare string
-            return bless \(@: '', \$%, @_[0] ), $class
-        elsif( ref(@_[0] || '') eq 'ARRAY')
+        if (!(ref: @_[0] || '')) # most common case: one bare string
+            return bless: \(@: '', \$%, @_[0] ), $class
+        elsif( (ref: @_[0] || '') eq 'ARRAY')
             $new = \$:  @_[0]->@
         else
-            Carp::croak( "$class new() doesn't know to clone $new" )
+            Carp::croak:  "$class new() doesn't know to clone $new" 
         
     else # misc stuff
         $new = \@:  '', \$%, < @_
 
     # By now it's a treelet:  [ 'foo', {}, ... ]
     foreach my $x ( $new->@)
-        if(ref($x || '') eq 'ARRAY')
-            $x = $class->new($x) # recurse
-        elsif(ref($x || '') eq 'HASH')
+        if((ref: $x || '') eq 'ARRAY')
+            $x = $class->new: $x # recurse
+        elsif((ref: $x || '') eq 'HASH')
             $x = \%:  < $x->% 
 
     # otherwise leave it.
 
-    return bless $new, $class
+    return bless: $new, $class
 
 # Not much in this class is likely to be link-section specific --
 # but it just so happens that link-sections are about the only treelets

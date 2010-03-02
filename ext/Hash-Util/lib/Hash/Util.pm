@@ -28,7 +28,7 @@ our @EXPORT_OK  = qw(
 our $VERSION    = 0.07
 require DynaLoader
 local @ISA = qw(DynaLoader Exporter)
-Hash::Util->bootstrap($VERSION)
+Hash::Util->bootstrap: $VERSION
 
 =head1 NAME
 
@@ -121,25 +121,25 @@ Both routines return a reference to the hash operated on.
 =cut
 
 sub lock_ref_keys($hash, @< @keys)
-    Internals::hv_clear_placeholders(\$hash->%)
+    Internals::hv_clear_placeholders: \$hash->%
     if( (nelems @keys) )
-        my %keys = %:  < @+: map { (@: $_ => 1) }, @keys 
-        my %original_keys = %:  < @+: map { (@: $_ => 1) }, keys $hash->% 
+        my %keys = %:  < @+: map: { (@: $_ => 1) }, @keys 
+        my %original_keys = %:  < @+: map: { (@: $_ => 1) }, keys $hash->% 
         foreach my $k (keys %original_keys)
-            die "Hash has key '$k' which is not in the new key set"
+            die: "Hash has key '$k' which is not in the new key set"
                 unless %keys{?$k}
         
 
         foreach my $k ( @keys)
             $hash->{+$k} = undef unless exists $hash->{$k}
         
-        Internals::HvRESTRICTED(\$hash->%, 1)
+        Internals::HvRESTRICTED: \$hash->%, 1
 
         foreach my $k ( @keys)
             delete $hash->{$k} unless %original_keys{?$k}
         
     else
-        Internals::HvRESTRICTED $hash->%, 1
+        Internals::HvRESTRICTED:  $hash->%, 1
     
 
     return $hash
@@ -148,12 +148,12 @@ sub lock_ref_keys($hash, @< @keys)
 sub unlock_ref_keys
     my $hash = shift
 
-    Internals::HvRESTRICTED $hash->%, 0
+    Internals::HvRESTRICTED:  $hash->%, 0
     return $hash
 
 
-sub   lock_keys {   lock_ref_keys(< @_) }
-sub unlock_keys { unlock_ref_keys(< @_) }
+sub   lock_keys {   (lock_ref_keys: < @_) }
+sub unlock_keys { (unlock_ref_keys: < @_) }
 
 =item B<lock_keys_plus>
 
@@ -172,19 +172,19 @@ Returns a reference to %hash
 
 sub lock_ref_keys_plus($hash,@< @keys)
     my @delete
-    Internals::hv_clear_placeholders($hash->%)
+    Internals::hv_clear_placeholders: $hash->%
     foreach my $key ( @keys)
-        unless (exists($hash->{$key}))
+        unless ((exists: $hash->{$key}))
             $hash->{+$key}=undef
-            push @delete,$key
+            push: @delete,$key
         
     
-    Internals::HvRESTRICTED($hash->%,1)
+    Internals::HvRESTRICTED: $hash->%,1
     delete $hash->{[@delete]}
     return $hash
 
 
-sub lock_keys_plus { lock_ref_keys_plus(< @_) }
+sub lock_keys_plus { (lock_ref_keys_plus: < @_) }
 
 
 =item B<lock_value>
@@ -208,19 +208,19 @@ sub lock_ref_value($hash, $key)
     # I'm doubtful about this warning, as it seems not to be true.
     # Marking a value in the hash as RO is useful, regardless
     # of the status of the hash itself.
-    warn "Cannot usefully lock values in an unlocked hash"
-        if !Internals::HvRESTRICTED($hash->%) && warnings::enabled
-    Internals::SvREADONLY($hash->{?$key}, 1)
+    warn: "Cannot usefully lock values in an unlocked hash"
+        if !(Internals::HvRESTRICTED: $hash->%) && (warnings::enabled: )
+    Internals::SvREADONLY: $hash->{?$key}, 1
     return $hash
 
 
 sub unlock_ref_value($hash, $key)
-    Internals::SvREADONLY($hash->{?$key}, 0)
+    Internals::SvREADONLY: $hash->{?$key}, 0
     return $hash
 
 
-sub   lock_value {   lock_ref_value(< @_) }
-sub unlock_value { unlock_ref_value(< @_) }
+sub   lock_value {   (lock_ref_value: < @_) }
+sub unlock_value { (unlock_ref_value: < @_) }
 
 
 =item B<lock_hash>
@@ -245,10 +245,10 @@ Returns a reference to the %hash.
 sub lock_hashref
     my $hash = shift
 
-    lock_ref_keys($hash)
+    lock_ref_keys: $hash
 
     foreach my $value (values $hash->%)
-        Internals::SvREADONLY($value,1)
+        Internals::SvREADONLY: $value,1
     
 
     return $hash
@@ -258,16 +258,16 @@ sub unlock_hashref
     my $hash = shift
 
     foreach my $value (values $hash->%)
-        Internals::SvREADONLY($value, 0)
+        Internals::SvREADONLY: $value, 0
     
 
-    unlock_ref_keys($hash)
+    unlock_ref_keys: $hash
 
     return $hash
 
 
-sub   lock_hash {   lock_hashref(< @_) }
-sub unlock_hash { unlock_hashref(< @_) }
+sub   lock_hash {   (lock_hashref: < @_) }
+sub unlock_hash { (unlock_hashref: < @_) }
 
 =item B<lock_hash_recurse>
 
@@ -296,12 +296,12 @@ Returns a reference to the %hash.
 sub lock_hashref_recurse
     my $hash = shift
 
-    lock_ref_keys($hash)
+    lock_ref_keys: $hash
     foreach my $value (values $hash->%)
-        if (reftype($value) eq 'HASH')
-            lock_hashref_recurse($value)
+        if ((reftype: $value) eq 'HASH')
+            lock_hashref_recurse: $value
         
-        Internals::HvRESTRICTED($value,1)
+        Internals::HvRESTRICTED: $value,1
     
     return $hash
 
@@ -310,17 +310,17 @@ sub unlock_hashref_recurse
     my $hash = shift
 
     foreach my $value (values $hash->%)
-        if (reftype($value) eq 'HASH')
-            unlock_hashref_recurse($value)
+        if ((reftype: $value) eq 'HASH')
+            unlock_hashref_recurse: $value
         
-        Internals::HvRESTRICTED($value,1)
+        Internals::HvRESTRICTED: $value,1
     
-    unlock_ref_keys($hash)
+    unlock_ref_keys: $hash
     return $hash
 
 
-sub   lock_hash_recurse($hashref) {   lock_hashref_recurse($hashref) }
-sub unlock_hash_recurse($hashref) { unlock_hashref_recurse($hashref) }
+sub   lock_hash_recurse($hashref) {   (lock_hashref_recurse: $hashref) }
+sub unlock_hash_recurse($hashref) { (unlock_hashref_recurse: $hashref) }
 
 
 =item B<hash_unlocked>
@@ -333,10 +333,10 @@ Returns true if the hash and its keys are unlocked.
 
 sub hashref_unlocked
     my $hash=shift
-    return Internals::HvRESTRICTED($hash)
+    return Internals::HvRESTRICTED: $hash
 
 
-sub hash_unlocked($hashref) { hashref_unlocked($hashref) }
+sub hash_unlocked($hashref) { (hashref_unlocked: $hashref) }
 
 =for demerphqs_editor
 sub legal_ref_keys{}
@@ -345,8 +345,8 @@ sub all_keys{}
 
 =cut
 
-sub legal_keys($hashref) { legal_ref_keys($hashref)  }
-sub hidden_keys($hashref){ hidden_ref_keys($hashref) }
+sub legal_keys($hashref) { (legal_ref_keys: $hashref)  }
+sub hidden_keys($hashref){ (hidden_ref_keys: $hashref) }
 
 =item B<legal_keys>
 
@@ -413,7 +413,7 @@ See also L<perlrun/PERL_HASH_SEED_DEBUG>.
 =cut
 
 sub hash_seed ()
-    Internals::rehash_seed()
+    (Internals::rehash_seed: )
 
 
 =item B<hv_store>

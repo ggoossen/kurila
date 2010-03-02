@@ -35,12 +35,12 @@ $VERSION = 2.03
 # do all the stuff we normally do.
 sub new($self, @< @args)
     my ($ospeed, $term, $termios)
-    $self = $self->SUPER::new (< @args)
+    $self = $self->SUPER::new : < @args
 
     # $ENV{HOME} is usually not set on Windows.  The default Term::Cap path
     # may not work on Solaris.
-    my $home = defined env::var('HOME') ?? "$(env::var('HOME'))/.termcap:" !! ''
-    env::var('TERMPATH' ) = $home . '/etc/termcap:/usr/share/misc/termcap'
+    my $home = defined (env::var: 'HOME') ?? "$((env::var: 'HOME'))/.termcap:" !! ''
+    (env::var: 'TERMPATH' ) = $home . '/etc/termcap:/usr/share/misc/termcap'
         . ':/usr/share/lib/termcap'
 
     # Fall back on a hard-coded terminal speed if POSIX::Termios isn't
@@ -54,13 +54,13 @@ sub new($self, @< @args)
     
 
     # Fall back on the ANSI escape sequences if Term::Cap doesn't work.
-    $term = Term::Cap->Tgetent( \(%:  TERM => undef, OSPEED => $ospeed ))
+    $term = Term::Cap->Tgetent:  \(%:  TERM => undef, OSPEED => $ospeed )
     $self->{+BOLD} = $term->{?_md} || "\e[1m"
     $self->{+UNDL} = $term->{?_us} || "\e[4m"
     $self->{+NORM} = $term->{?_me} || "\e[m"
 
     unless (defined $self->{?width})
-        $self->{+opt_width} = env::var('COLUMNS') || $term->{?_co} || 80
+        $self->{+opt_width} = (env::var: 'COLUMNS') || $term->{?_co} || 80
         $self->{+opt_width} -= 2
     
 
@@ -70,13 +70,13 @@ sub new($self, @< @args)
 # Make level one headings bold.
 sub cmd_head1($self, $attrs, $text)
     $text =~ s/\s+$//
-    $self->SUPER::cmd_head1 ($attrs, "$self->{?BOLD}$text$self->{?NORM}")
+     $self->SUPER::cmd_head1 : $attrs, "$self->{?BOLD}$text$self->{?NORM}"
 
 
 # Make level two headings bold.
 sub cmd_head2($self, $attrs, $text)
     $text =~ s/\s+$//
-    $self->SUPER::cmd_head2 ($attrs, "$self->{?BOLD}$text$self->{?NORM}")
+     $self->SUPER::cmd_head2 : $attrs, "$self->{?BOLD}$text$self->{?NORM}"
 
 
 # Fix up B<> and I<>.  Note that we intentionally don't do F<>.
@@ -85,7 +85,7 @@ sub cmd_i { my $self = shift; return "$self->{?UNDL}@_[1]$self->{?NORM}" }
 
 # Output any included code in bold.
 sub output_code($self, $code)
-    $self->output ($self->{?BOLD} . $code . $self->{NORM})
+    $self->output : $self->{?BOLD} . $code . $self->{NORM}
 
 
 # Override the wrapping code to igore the special sequences.

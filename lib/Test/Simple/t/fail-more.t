@@ -1,19 +1,19 @@
 #!perl -w
 
 BEGIN 
-    if( env::var('PERL_CORE') )
+    if( (env::var: 'PERL_CORE') )
         chdir 't'
         $^INCLUDE_PATH = @: '../lib', 'lib'
     else
-        unshift $^INCLUDE_PATH, 't/lib'
+        unshift: $^INCLUDE_PATH, 't/lib'
     
 
 
 
 require Test::Simple::Catch
 use env
-my(@: $out, $err) =  Test::Simple::Catch::caught()
-local env::var('HARNESS_ACTIVE' ) = 0
+my(@: $out, $err) =  (Test::Simple::Catch::caught: )
+local (env::var: 'HARNESS_ACTIVE' ) = 0
 
 
 # Can't use Test.pm, that's a 5.005 thing.
@@ -23,21 +23,21 @@ package My::Test
 # Test::Builder's own and the ending diagnostics don't come out right.
 require Test::Builder
 my $TB = Test::Builder->create
-$TB->plan(tests => 16);
+($TB->plan: tests => 16);
 
 sub like
-    $TB->like(< @_)
+    $TB->like: < @_
 
 
 sub is
-    $TB->is_eq(< @_)
+    $TB->is_eq: < @_
 
 
 sub main::err_ok($expect)
     my $got = $err->$
     $err->$ = ""
 
-    return $TB->is_eq( $got, $expect )
+    return $TB->is_eq:  $got, $expect 
 
 
 
@@ -45,27 +45,27 @@ package main;
 
 require Test::More;
 my $Total = 27;
-Test::More->import(tests => $Total);
+(Test::More->import: tests => $Total);
 
 my $tb = Test::More->builder;
-$tb->use_numbers(0);
+($tb->use_numbers: 0);
 
 my $Filename = quotemeta $^PROGRAM_NAME;
 
 # Preserve the line numbers.
 #line 38
-ok( 0, 'failing' )
-err_ok( <<ERR )
+ok:  0, 'failing' 
+(err_ok:  <<ERR )
 #   Failed test 'failing'
 #   at $^PROGRAM_NAME line 38.
 ERR
 
 #line 40
-is( "foo", "bar", 'foo is bar?')
-is( undef, '',    'undef is empty string?')
-is( undef, 0,     'undef is 0?')
-is( '',    0,     'empty string is 0?' )
-err_ok( <<ERR )
+(is:  "foo", "bar", 'foo is bar?')
+is:  undef, '',    'undef is empty string?'
+is:  undef, 0,     'undef is 0?'
+is:  '',    0,     'empty string is 0?' 
+(err_ok:  <<ERR )
 #   Failed test 'foo is bar?'
 #   at $^PROGRAM_NAME line 40.
 #          got: 'foo'
@@ -85,9 +85,9 @@ err_ok( <<ERR )
 ERR
 
 #line 45
-isnt("foo", "foo", 'foo isnt foo?' )
-isnt(undef, undef, 'undef isnt undef?')
-err_ok( <<ERR )
+isnt: "foo", "foo", 'foo isnt foo?' 
+isnt: undef, undef, 'undef isnt undef?'
+(err_ok:  <<ERR )
 #   Failed test 'foo isnt foo?'
 #   at $^PROGRAM_NAME line 45.
 #     'foo'
@@ -101,9 +101,9 @@ err_ok( <<ERR )
 ERR
 
 #line 48
-like( "foo", '/that/',  'is foo like that' )
-unlike( "foo", '/foo/', 'is foo unlike foo' )
-err_ok( <<ERR )
+like:  "foo", '/that/',  'is foo like that' 
+unlike:  "foo", '/foo/', 'is foo unlike foo' 
+(err_ok:  <<ERR )
 #   Failed test 'is foo like that'
 #   at $^PROGRAM_NAME line 48.
 #                   'foo'
@@ -116,8 +116,8 @@ ERR
 
 # Nick Clark found this was a bug.  Fixed in 0.40.
 # line 60
-like( "bug", '/(%)/',   'regex with % in it' );
-err_ok( <<ERR );
+(like:  "bug", '/(%)/',   'regex with % in it' );
+(err_ok:  <<ERR );
 #   Failed test 'regex with \% in it'
 #   at $^PROGRAM_NAME line 60.
 #                   'bug'
@@ -125,18 +125,18 @@ err_ok( <<ERR );
 ERR
 
 #line 67
-fail('fail()');
-err_ok( <<ERR );
+(fail: 'fail()');
+(err_ok:  <<ERR );
 #   Failed test 'fail()'
 #   at $^PROGRAM_NAME line 67.
 ERR
 
 #line 52
-can_ok('Mooble::Hooble::Yooble', < qw(this that))
-can_ok('Mooble::Hooble::Yooble', ())
-can_ok(undef, undef)
-can_ok(\$@, "foo");
-err_ok( <<ERR );
+can_ok: 'Mooble::Hooble::Yooble', < qw(this that)
+(can_ok: 'Mooble::Hooble::Yooble', ())
+can_ok: undef, undef
+(can_ok: \$@, "foo");
+(err_ok:  <<ERR );
 #   Failed test 'Mooble::Hooble::Yooble->can(...)'
 #   at $^PROGRAM_NAME line 52.
 #     Mooble::Hooble::Yooble->can('this') failed
@@ -153,11 +153,11 @@ err_ok( <<ERR );
 ERR
 
 #line 55
-isa_ok(bless(\$@, "Foo"), "Wibble")
-isa_ok(42,    "Wibble", "My Wibble")
-isa_ok(undef, "Wibble", "Another Wibble")
-isa_ok(\$@,    "HASH")
-err_ok( <<ERR )
+isa_ok: (bless: \$@, "Foo"), "Wibble"
+isa_ok: 42,    "Wibble", "My Wibble"
+isa_ok: undef, "Wibble", "Another Wibble"
+isa_ok: \$@,    "HASH"
+(err_ok:  <<ERR )
 #   Failed test 'The object isa Wibble'
 #   at $^PROGRAM_NAME line 55.
 #     The object isn't a 'Wibble' it's a 'Foo'
@@ -173,11 +173,11 @@ err_ok( <<ERR )
 ERR
 
 #line 68
-cmp_ok( 'foo', 'eq', 'bar', 'cmp_ok eq' )
-cmp_ok( 42.1,  '==', 23,  , '       ==' )
-cmp_ok( 42,    '!=', 42   , '       !=' )
-cmp_ok( 1,     '&&', 0    , '       &&' )
-err_ok( <<ERR )
+cmp_ok:  'foo', 'eq', 'bar', 'cmp_ok eq' 
+cmp_ok:  42.1,  '==', 23,  , '       ==' 
+cmp_ok:  42,    '!=', 42   , '       !=' 
+cmp_ok:  1,     '&&', 0    , '       &&' 
+err_ok:  <<ERR 
 #   Failed test 'cmp_ok eq'
 #   at $^PROGRAM_NAME line 68.
 #          got: 'foo'
@@ -200,8 +200,8 @@ ERR
 
 
 # line 196
-cmp_ok( 42,    'eq', "foo", '       eq with numbers' );
-err_ok( <<ERR );
+(cmp_ok:  42,    'eq', "foo", '       eq with numbers' );
+(err_ok:  <<ERR );
 #   Failed test '       eq with numbers'
 #   at $^PROGRAM_NAME line 196.
 #          got: '42'
@@ -216,21 +216,21 @@ do
     local our $TODO = "Fix line numbers"
 
     # line 211
-    cmp_ok( 42,    '==', "foo", '       == with strings' )
-    err_ok( <<ERR )
+    cmp_ok:  42,    '==', "foo", '       == with strings' 
+    err_ok:  <<ERR 
 #   Failed test '       == with strings'
 #   at $^PROGRAM_NAME line 211.
 #          got: 42
 #     expected: 'foo'
 ERR
-    My::Test::like $warnings,
-                   qq[/^Argument "foo" isn't numeric in .*/]
+    My::Test::like:  $warnings
+                     qq[/^Argument "foo" isn't numeric in .*/]
 
 ;
 
 
 #line 84
-use_ok('Hooble::mooble::yooble')
+use_ok: 'Hooble::mooble::yooble'
 
 my $more_err_re = <<ERR;
 #   Failed test 'use Hooble::mooble::yooble;'
@@ -239,12 +239,12 @@ my $more_err_re = <<ERR;
 #     Error:  Can't locate Hooble.* in \\\$\\\^INCLUDE_PATH .*
 ERR
 
-My::Test::like($err->$, "/^$more_err_re/");
+(My::Test::like: $err->$, "/^$more_err_re/");
 $err->$ = "";
 
 
 #line 85
-require_ok('ALL::YOUR::BASE::ARE::BELONG::TO::US::wibble')
+require_ok: 'ALL::YOUR::BASE::ARE::BELONG::TO::US::wibble'
 $more_err_re = <<ERR
 #   Failed test 'require ALL::YOUR::BASE::ARE::BELONG::TO::US::wibble;'
 #   at $Filename line 85\\.
@@ -252,13 +252,13 @@ $more_err_re = <<ERR
 #     Error:  Can't locate ALL.* in \\\$\\\^INCLUDE_PATH .*
 ERR
 
-My::Test::like($err->$, "/^$more_err_re/");
+(My::Test::like: $err->$, "/^$more_err_re/");
 $err->$ = ""
 
 
 #line 88
 END 
-    $TB->is_eq($out->$, <<OUT, 'failing output')
+    $TB->is_eq: $out->$, <<OUT, 'failing output'
 1..$Total
 not ok - failing
 not ok - foo is bar?
@@ -289,9 +289,9 @@ not ok - use Hooble::mooble::yooble;
 not ok - require ALL::YOUR::BASE::ARE::BELONG::TO::US::wibble;
 OUT
 
-    err_ok( <<ERR )
+    err_ok:  <<ERR 
 # Looks like you failed $($Total-1) tests of $Total.
 ERR
 
-    exit(0)
+    exit: 0
 

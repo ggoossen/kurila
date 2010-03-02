@@ -1,1 +1,1 @@
-evalfile './hints/linux.pl' or die $^EVAL_ERROR
+evalfile './hints/linux.pl' or die: $^EVAL_ERROR

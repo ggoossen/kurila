@@ -108,15 +108,15 @@ $VERSION = "1.10"
 $VERSION = eval $VERSION
 
 sub seek($io, $pos, $whence)
-    seek($io, $pos, $whence)
+    seek: $io, $pos, $whence
 
 
 sub sysseek($io, $pos, $whence)
-    sysseek($io, $pos, $whence)
+    sysseek: $io, $pos, $whence
 
 
 sub tell($io)
-    tell($io)
+    tell: $io
 
 
 1

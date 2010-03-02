@@ -10,11 +10,11 @@ my $IsWin32 = $^OS_NAME eq 'MSWin32'
 my $Verbose = (nelems @ARGV) ?? 1 !! 0
 
 for (@Funcs)
-    use_ok( $Class,         $_ )
+    use_ok:  $Class,         $_ 
 for (@Funcs +@+ @Meths)
-    can_ok( $Class,         $_ )
+    can_ok:  $Class,         $_ 
 for (@Funcs)
-    can_ok( __PACKAGE__,    $_ )
+    can_ok:  __PACKAGE__,    $_ 
 
 my $Have_IPC_Run    = $Class->can_use_ipc_run
 my $Have_IPC_Open3  = $Class->can_use_ipc_open3
@@ -22,7 +22,7 @@ my $Have_IPC_Open3  = $Class->can_use_ipc_open3
 $IPC::Cmd::VERBOSE  = $IPC::Cmd::VERBOSE = $Verbose
 
 ### run tests in various configurations, based on what modules we have
-my @Prefs = @: 
+my @Prefs = @:
     \(@:  $Have_IPC_Run, $Have_IPC_Open3 )
     \(@:  0,             $Have_IPC_Open3 )
     \@:  0,             0 
@@ -30,22 +30,22 @@ my @Prefs = @:
 
 ### can_run tests
 do
-    ok( can_run('perl'),                q[Found 'perl' in your path] )
-    ok( !can_run('10283lkjfdalskfjaf'), q[Not found non-existant binary] )
+    ok:  (can_run: 'perl'),                q[Found 'perl' in your path] 
+    ok:  !(can_run: '10283lkjfdalskfjaf'), q[Not found non-existant binary] 
 
 
 ### run tests that print only to stdout
 do   ### list of commands and regexes matching output ###
-    my $map = \@: 
+    my $map = \@:
         # command                                    # output regex
         \(@:  "$^EXECUTABLE_NAME -v",                                  qr/gerard\s+goossen/i, )
         \(@:  \(@: $^EXECUTABLE_NAME, '-v'),                               qr/gerard\s+goossen/i, )
         
 
-    diag( "Running tests that print only to stdout" ) if $Verbose
+    diag:  "Running tests that print only to stdout"  if $Verbose
     ### for each configuarion
     for my $pref (  @Prefs )
-        diag( "Running config: IPC::Run: $pref->[0] IPC::Open3: $pref->[1]" )
+        diag:  "Running config: IPC::Run: $pref->[0] IPC::Open3: $pref->[1]" 
             if $Verbose
 
         $IPC::Cmd::USE_IPC_RUN    = $IPC::Cmd::USE_IPC_RUN      = $pref->[0]
@@ -56,51 +56,51 @@ do   ### list of commands and regexes matching output ###
             my $cmd                 = $aref->[0]
             my $regex               = $aref->[1]
 
-            my $pp_cmd = ref $cmd ?? "$(join ' ',$cmd->@)" !! "$cmd"
-            diag( "Running '$pp_cmd' as " . (ref $cmd ?? "ARRAY" !! "SCALAR") )
+            my $pp_cmd = ref $cmd ?? "$((join: ' ',$cmd->@))" !! "$cmd"
+            diag:  "Running '$pp_cmd' as " . (ref $cmd ?? "ARRAY" !! "SCALAR") 
                 if $Verbose
 
             ### in scalar mode
-            do {   diag( "Running scalar mode" ) if $Verbose;
+            do {   diag:  "Running scalar mode"  if $Verbose;
                 my $buffer;
-                my $ok = run( command => $cmd, buffer => \$buffer );
+                my $ok = (run:  command => $cmd, buffer => \$buffer );
 
-                ok( $ok,        "Ran command succesfully" );
+                ok:  $ok,        "Ran command succesfully" ;
 
                 :SKIP do
-                    skip "No buffers available", 1
+                    skip: "No buffers available", 1
                         unless $Class->can_capture_buffer
 
-                    like( $buffer, $regex,
-                          "   Buffer filled properly" )
+                    like:  $buffer, $regex
+                           "   Buffer filled properly" 
                 ;
             }
 
             ### in list mode
-            do {   diag( "Running list mode" ) if $Verbose;
-                my @list = run( command => $cmd );
-                ok( @list[0],   "Command ran successfully" );
-                ok( !@list[1],  "   No error code set" );
+            do {   diag:  "Running list mode"  if $Verbose;
+                my @list = (run:  command => $cmd );
+                ok:  @list[0],   "Command ran successfully" ;
+                ok:  !@list[1],  "   No error code set" ;
 
                 my $list_length = $Class->can_capture_buffer ?? 5 !! 2;
-                is( scalar(nelems @list), $list_length,
-                    "   Output list has $list_length entries" );
+                is:  (scalar: nelems @list), $list_length
+                     "   Output list has $list_length entries" ;
 
                 :SKIP do
-                    skip "No buffers available", 6
+                    skip: "No buffers available", 6
                         unless $Class->can_capture_buffer
 
                     ### the last 3 entries from the RV, are they array refs?
                     for (2..4)
-                        isa_ok( @list[$_], 'ARRAY' )
+                        isa_ok:  @list[$_], 'ARRAY' 
 
-                    like( "$(join ' ',@list[2]->@)", $regex,
-                          "   Combined buffer holds output" )
+                    like:  "$((join: ' ',@list[2]->@))", $regex
+                           "   Combined buffer holds output" 
 
-                    like( "$(join ' ',@list[3]->@)", qr/$regex/,
-                          "   Stdout buffer filled" )
-                    is( scalar( nelems @list[4]->@ ), 0,
-                        "   Stderr buffer empty" )
+                    like:  "$((join: ' ',@list[3]->@))", qr/$regex/
+                           "   Stdout buffer filled" 
+                    is:  (scalar:  nelems @list[4]->@ ), 0
+                         "   Stderr buffer empty" 
                 ;
             }
         
@@ -111,16 +111,16 @@ do   ### list of commands and regexes matching output ###
 ### XXX lots of duplication from stdout tests, only difference
 ### is buffer inspection
 do   ### list of commands and regexes matching output ###
-    my $map = \@: 
+    my $map = \@:
         # command                                    # output regex
         \(@:  "$^EXECUTABLE_NAME -e'warn 42'",                          qr/^42 /, )
         \(@:  \(@: $^EXECUTABLE_NAME, "-e'warn 42'"),                       qr/^42 /, )
         
 
-    diag( "Running tests that print only to stderr" ) if $Verbose
+    diag:  "Running tests that print only to stderr"  if $Verbose
     ### for each configuarion
     for my $pref (  @Prefs )
-        diag( "Running config: IPC::Run: $pref->[0] IPC::Open3: $pref->[1]" )
+        diag:  "Running config: IPC::Run: $pref->[0] IPC::Open3: $pref->[1]" 
             if $Verbose
 
         $IPC::Cmd::USE_IPC_RUN    = $IPC::Cmd::USE_IPC_RUN      = $pref->[0]
@@ -131,53 +131,53 @@ do   ### list of commands and regexes matching output ###
             my $cmd                 = $aref->[0]
             my $regex               = $aref->[1]
 
-            my $pp_cmd = ref $cmd ?? "$(join ' ',$cmd->@)" !! "$cmd"
-            diag( "Running '$pp_cmd' as " . (ref $cmd ?? "ARRAY" !! "SCALAR") )
+            my $pp_cmd = ref $cmd ?? "$((join: ' ',$cmd->@))" !! "$cmd"
+            diag:  "Running '$pp_cmd' as " . (ref $cmd ?? "ARRAY" !! "SCALAR") 
                 if $Verbose
 
             ### in scalar mode
-            do {   diag( "Running stderr command in scalar mode" ) if $Verbose;
+            do {   diag:  "Running stderr command in scalar mode"  if $Verbose;
                 my $buffer;
-                my $ok = run( command => $cmd, buffer => \$buffer );
+                my $ok = (run:  command => $cmd, buffer => \$buffer );
 
-                ok( $ok,        "Ran stderr command succesfully in scalar mode." );
+                ok:  $ok,        "Ran stderr command succesfully in scalar mode." ;
 
                 :SKIP do
                     # No buffers are expected if neither IPC::Run nor IPC::Open3 is used.
-                    skip "No buffers available", 1
+                    skip: "No buffers available", 1
                         unless $Class->can_capture_buffer
 
-                    like( $buffer, $regex,
-                          "   Buffer filled properly from stderr" )
+                    like:  $buffer, $regex
+                           "   Buffer filled properly from stderr" 
                 ;
             }
 
             ### in list mode
-            do {   diag( "Running stderr command in list mode" ) if $Verbose;
-                my @list = run( command => $cmd );
-                ok( @list[0],   "Ran stderr command successfully in list mode." );
-                ok( !@list[1],  "   No error code set" );
+            do {   diag:  "Running stderr command in list mode"  if $Verbose;
+                my @list = (run:  command => $cmd );
+                ok:  @list[0],   "Ran stderr command successfully in list mode." ;
+                ok:  !@list[1],  "   No error code set" ;
 
                 my $list_length = $Class->can_capture_buffer ?? 5 !! 2;
-                is( scalar(nelems @list), $list_length,
-                    "   Output list has $list_length entries" );
+                is:  (scalar: nelems @list), $list_length
+                     "   Output list has $list_length entries" ;
 
                 :SKIP do
                     # No buffers are expected if neither IPC::Run nor IPC::Open3 is used.
-                    skip "No buffers available", 6
+                    skip: "No buffers available", 6
                         unless $Class->can_capture_buffer
 
                     ### the last 3 entries from the RV, are they array refs?
                     for (2..4)
-                        isa_ok( @list[$_], 'ARRAY' )
+                        isa_ok:  @list[$_], 'ARRAY' 
 
-                    like( join(' ',@list[2]->@), $regex,
-                          "   Combined buffer holds output" )
+                    like:  (join: ' ',@list[2]->@), $regex
+                           "   Combined buffer holds output" 
 
-                    is( scalar( nelems @list[3]->@ ), 0,
-                        "   Stdout buffer empty" )
-                    like( join(' ',@list[4]->@), qr/$regex/,
-                          "   Stderr buffer filled" )
+                    is:  (scalar:  nelems @list[3]->@ ), 0
+                         "   Stdout buffer empty" 
+                    like:  (join: ' ',@list[4]->@), qr/$regex/
+                           "   Stderr buffer filled" 
                 ;
             }
         
@@ -187,14 +187,14 @@ do   ### list of commands and regexes matching output ###
 ### test failures
 do   ### for each configuarion
     for my $pref (  @Prefs )
-        diag( "Running config: IPC::Run: $pref->[0] IPC::Open3: $pref->[1]" )
+        diag:  "Running config: IPC::Run: $pref->[0] IPC::Open3: $pref->[1]" 
             if $Verbose
 
         $IPC::Cmd::USE_IPC_RUN    = $IPC::Cmd::USE_IPC_RUN      = $pref->[0]
         $IPC::Cmd::USE_IPC_OPEN3  = $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1]
 
-        my $ok = run( command => "$^EXECUTABLE_NAME -ledie" )
-        ok( !$ok[0],               "Failure caught" )
+        my $ok = run:  command => "$^EXECUTABLE_NAME -ledie" 
+        ok:  !$ok[0],               "Failure caught" 
     
     
 

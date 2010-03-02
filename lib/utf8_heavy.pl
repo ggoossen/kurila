@@ -21,7 +21,7 @@ sub SWASHNEW_real
     my (@: $class, $type, $list, $minbits, $none) =  @_
     local $^DEBUGGING = 0 if $^DEBUGGING
 
-    print $^STDERR, "SWASHNEW $(join ' ',@_)\n" if DEBUG
+    print: $^STDERR, "SWASHNEW $((join: ' ',@_))\n" if DEBUG: 
 
     ##
     ## Get the list of codepoints for the type.
@@ -59,7 +59,7 @@ sub SWASHNEW_real
         $type =~ s/^\s+//
         $type =~ s/\s+$//
 
-        print $^STDERR, "type = $type\n" if DEBUG
+        print: $^STDERR, "type = $type\n" if DEBUG: 
 
         :GETFILE
             do
@@ -67,12 +67,12 @@ sub SWASHNEW_real
             ## It could be a user-defined property.
             ##
 
-            my $caller1 = $type =~ s/(.+)::// ?? $1 !! caller(2)
+            my $caller1 = $type =~ s/(.+)::// ?? $1 !! caller: 2
 
             if (defined $caller1 && $type =~ m/^(?:\w+)$/)
-                my $prop = Symbol::fetch_glob("$($caller1)::$type")
+                my $prop = Symbol::fetch_glob: "$($caller1)::$type"
                 if (exists $prop->*->&)
-                    $list = $prop->*->( < @_ )
+                    $list = $prop->*->& <:  < @_ 
                     last GETFILE
                 
             
@@ -130,7 +130,7 @@ sub SWASHNEW_real
             ##
             my $canonical = lc $type
             $canonical =~ s/(?<=[a-z\d])(?:\s+|[-_])(?=[a-z\d])//g
-            print $^STDERR, "canonical = $canonical\n" if DEBUG
+            print: $^STDERR, "canonical = $canonical\n" if DEBUG: 
 
             require "unicore/Canonical.pl"
             do { no warnings "uninitialized";
@@ -144,13 +144,13 @@ sub SWASHNEW_real
             ## See if it's a user-level "To".
             ##
 
-            my $caller0 = caller(1)
+            my $caller0 = caller: 1
 
             if (defined $caller0 && $type =~ m/^To(?:\w+)$/)
                 my $map = $caller0 . "::" . $type
 
-                if (exists Symbol::fetch_glob($map)->*->&)
-                    $list = Symbol::fetch_glob($map)->*->( < @_ )
+                if (exists (Symbol::fetch_glob: $map)->*->&)
+                    $list = (Symbol::fetch_glob: $map)->*->& <:  < @_ 
                     last GETFILE
                 
             
@@ -175,7 +175,7 @@ sub SWASHNEW_real
             return $type
 
         if (defined $file)
-            print $^STDERR, "found it (file='$file')\n" if DEBUG
+            print: $^STDERR, "found it (file='$file')\n" if DEBUG: 
 
             ##
             ## If we reach here, it was due to a 'last GETFILE' above
@@ -185,13 +185,13 @@ sub SWASHNEW_real
             ## class and file to load.
             ##
             my $found = %Cache{?$class . "," . $file}
-            if ($found and ref($found) eq $class)
-                print $^STDERR, "Returning cached '$file' for \\p\{$type\}\n" if DEBUG
+            if ($found and (ref: $found) eq $class)
+                print: $^STDERR, "Returning cached '$file' for \\p\{$type\}\n" if DEBUG: 
                 return $found
             
             local $^EVAL_ERROR = undef
             local $^OS_ERROR = undef
-            $list = evalfile $file; die $^EVAL_ERROR if $^EVAL_ERROR
+            $list = evalfile $file; die: $^EVAL_ERROR if $^EVAL_ERROR
         
 
         $ListSorted = 1 ## we know that these lists are sorted
@@ -202,18 +202,18 @@ sub SWASHNEW_real
 
     my $ORIG = $list
     if ($list)
-        my @tmp = split(m/^/m, $list)
+        my @tmp = split: m/^/m, $list
         my %seen
         no warnings;
-        $extras = join '', grep { m/^[^0-9a-fA-F]/ }, @tmp
-        $list = join '', map  { $_->[1] },
-            sort { $a->[0] <+> $b->[0] },
-            map  { m/^([0-9a-fA-F]+)/; \(@:  CORE::hex($1), $_ ) },
-            grep { m/^([0-9a-fA-F]+)/ and not %seen{+$1}++ }, @tmp # XXX doesn't do ranges right
+        $extras = join: '', grep: { m/^[^0-9a-fA-F]/ }, @tmp
+        $list = join: '', map: { $_->[1] },
+                                   sort: { $a->[0] <+> $b->[0] }
+                                         map: { m/^([0-9a-fA-F]+)/; \(@:  (CORE::hex: $1), $_ ) },
+                                                  grep: { m/^([0-9a-fA-F]+)/ and not %seen{+$1}++ }, @tmp # XXX doesn't do ranges right
     
 
     if ($none)
-        my $hextra = sprintf "\%04x", $none + 1
+        my $hextra = sprintf: "\%04x", $none + 1
         $list =~ s/\tXXXX$/\t$hextra/mg
     
 
@@ -238,33 +238,33 @@ sub SWASHNEW_real
         while ($x =~ m/^([^0-9a-fA-F\n])(.*)/mg)
             my $char = $1
             my $name = $2
-            print $^STDERR, "$1 => $2\n" if DEBUG
+            print: $^STDERR, "$1 => $2\n" if DEBUG: 
             if ($char =~ m/[-+!&]/)
-                my (@: $c,?$t) =  split(m/::/, $name, 2)	# bogus use of ::, really
+                my (@: $c,?$t) =  split: m/::/, $name, 2	# bogus use of ::, really
                 my $subobj
                 if ($c eq 'utf8')
-                    $subobj = SWASHNEW_real('utf8', $t, "", $minbits, 0)
-                elsif (exists Symbol::fetch_glob($name)->*->&)
-                    $subobj = SWASHNEW_real('utf8', $name, "", $minbits, 0)
+                    $subobj = SWASHNEW_real: 'utf8', $t, "", $minbits, 0
+                elsif (exists (Symbol::fetch_glob: $name)->*->&)
+                    $subobj = SWASHNEW_real: 'utf8', $name, "", $minbits, 0
                 elsif ($c =~ m/^([0-9a-fA-F]+)/)
-                    $subobj = SWASHNEW_real('utf8', "", $c, $minbits, 0)
+                    $subobj = SWASHNEW_real: 'utf8', "", $c, $minbits, 0
                 
                 return $subobj unless ref $subobj
-                push @extras, $name => $subobj
+                push: @extras, $name => $subobj
                 $bits = $subobj->{?BITS} if $bits +< $subobj->{?BITS}
             
         
     
 
-    print $^STDERR, "CLASS = $class, TYPE => $type, BITS => $bits, NONE => $none\nEXTRAS =>\n$extras\nLIST =>\n$list\n" if DEBUG
+    print: $^STDERR, "CLASS = $class, TYPE => $type, BITS => $bits, NONE => $none\nEXTRAS =>\n$extras\nLIST =>\n$list\n" if DEBUG: 
 
-    my $SWASH = bless \(%: 
-        TYPE => $type
-        BITS => $bits
-        EXTRAS => $extras
-        LIST => $list
-        NONE => $none
-        < @extras
+    my $SWASH = bless: \(%:
+                             TYPE => $type
+                             BITS => $bits
+                             EXTRAS => $extras
+                             LIST => $list
+                             NONE => $none
+                             < @extras
         ) => $class
 
     if ($file)

@@ -16,15 +16,15 @@ our $VERSION = "1.01"
 #--------------------------------------------------------------------------
 
 sub new($class,$delay)
-    my $self = bless \(%: 'quiet_until' => 1),  ref($class) || $class
-    $self->to($^STDOUT{IO})
-    $self->delay(defined($delay) ?? $delay !! 5)
+    my $self = bless: \(%: 'quiet_until' => 1),  (ref: $class) || $class
+    $self->to: $^STDOUT{IO}
+    $self->delay: (defined: $delay) ?? $delay !! 5
     return $self
 
 
 sub copy
     my $orig = shift
-    bless \(%: < $orig->%, 'quiet_until' => 1), ref($orig)
+    bless: \(%: < $orig->%, 'quiet_until' => 1), ref: $orig
 
 #--------------------------------------------------------------------------
 
@@ -32,19 +32,19 @@ sub reach($self, $point, $note)
     if( (my $now = time) +>= $self->{?'quiet_until'})
         my $goal
         my    $to = $self->{?'to'}
-        print $to, join('', @: 
-            ($self->{?'quiet_until'} == 1) ?? () !! '... '
-            (defined $point) ?? (
-                '#',
-                ( ($goal = $self->{?'goal'}) ?? (
-                    ' ' x (length($goal) - length($point)),
-                    $point, '/', $goal
-                  ) !! $point ),
-                ( $note ?? ': ' !! () ),
-              ) !! ()
-            $note || ''
-            "\n"
-            )
+        print: $to, join: '', @:
+                              ($self->{?'quiet_until'} == 1) ?? () !! '... '
+                              (defined $point) ?? (
+                                  '#',
+                                  ( ($goal = $self->{?'goal'}) ?? (
+                                  ' ' x ((length: $goal) - (length: $point)),
+                                  $point, '/', $goal
+                                  ) !! $point ),
+                                  ( $note ?? ': ' !! () ),
+                                  ) !! ()
+                              $note || ''
+                              "\n"
+                              
         $self->{+'quiet_until'} = $now + $self->{?'delay'}
     
     return $self
@@ -54,7 +54,7 @@ sub reach($self, $point, $note)
 
 sub done($self, $note)
     $self->{+'quiet_until'} = 1
-    return $self->reach( undef, $note )
+    return $self->reach:  undef, $note 
 
 
 #--------------------------------------------------------------------------
@@ -70,17 +70,17 @@ sub to
 #--------------------------------------------------------------------------
 
 unless(caller) # Simple self-test:
-    my $p = __PACKAGE__->new->goal(5)
-    $p->reach(1, "Primus!")
+    my $p = __PACKAGE__->new->goal: 5
+    $p->reach: 1, "Primus!"
     sleep 1
-    $p->reach(2, "Secundus!")
+    $p->reach: 2, "Secundus!"
     sleep 3
-    $p->reach(3, "Tertius!")
+    $p->reach: 3, "Tertius!"
     sleep 5
-    $p->reach(4)
-    $p->reach(5, "Quintus!")
+    $p->reach: 4
+    $p->reach: 5, "Quintus!"
     sleep 1
-    $p->done("All done")
+    $p->done: "All done"
 
 
 #--------------------------------------------------------------------------

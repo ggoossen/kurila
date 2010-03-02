@@ -16,7 +16,7 @@ use Locale::Constants
 #	Public Global Variables
 #-----------------------------------------------------------------------
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK)
-$VERSION   = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/)
+$VERSION   = sprintf: "\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/
 @ISA       = qw(Exporter)
 @EXPORT    = qw(code2script script2code
                 all_script_codes all_script_names
@@ -37,7 +37,7 @@ my $COUNTRIES = \$@
 #=======================================================================
 sub code2script
     my $code = shift
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
+    my $codeset = (nelems @_) +> 0 ?? shift !! (LOCALE_CODE_DEFAULT: )
 
 
     return undef unless defined $code
@@ -48,11 +48,11 @@ sub code2script
     # We have to sprintf because the codes are given as 3-digits,
     # with leading 0's. Eg 070 for Egyptian demotic.
     #-------------------------------------------------------------------
-    if ($codeset == LOCALE_CODE_NUMERIC)
+    if ($codeset == (LOCALE_CODE_NUMERIC: ))
         return undef if ($code =~ m/\D/)
-        $code = sprintf("\%.3d", $code)
+        $code = sprintf: "\%.3d", $code
     else
-        $code = lc($code)
+        $code = lc: $code
     
 
     if (exists $CODES->[$codeset]{$code})
@@ -73,11 +73,11 @@ sub code2script
 #=======================================================================
 sub script2code
     my $script = shift
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
+    my $codeset = (nelems @_) +> 0 ?? shift !! (LOCALE_CODE_DEFAULT: )
 
 
     return undef unless defined $script
-    $script = lc($script)
+    $script = lc: $script
     if (exists $COUNTRIES->[$codeset]{$script})
         return $COUNTRIES->[$codeset]{?$script}
     else
@@ -100,9 +100,9 @@ sub script_code2code($code, $inset, $outset)
 
 
     return undef if $inset == $outset
-    $script = code2script($code, $inset)
+    $script = code2script: $code, $inset
     return undef if not defined $script
-    $outcode = script2code($script, $outset)
+    $outcode = script2code: $script, $outset
     return $outcode
 
 
@@ -113,7 +113,7 @@ sub script_code2code($code, $inset, $outset)
 #
 #=======================================================================
 sub all_script_codes
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
+    my $codeset = (nelems @_) +> 0 ?? shift !! (LOCALE_CODE_DEFAULT: )
 
     return keys  $CODES->[$codeset]
 
@@ -125,7 +125,7 @@ sub all_script_codes
 #
 #=======================================================================
 sub all_script_names
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
+    my $codeset = (nelems @_) +> 0 ?? shift !! (LOCALE_CODE_DEFAULT: )
 
     return values  $CODES->[$codeset]
 
@@ -145,24 +145,24 @@ do
     while ( ~< $^DATA)
         next unless m/\S/
         chop
-        (@: $alpha2, $alpha3, $numeric, $script) =  split(m/:/, $_, 4)
+        (@: $alpha2, $alpha3, $numeric, $script) =  split: m/:/, $_, 4
 
-        $CODES->[+LOCALE_CODE_ALPHA_2]{+$alpha2} = $script
-        $COUNTRIES->[+LOCALE_CODE_ALPHA_2]{+lc "$script"} = $alpha2
+        $CODES->[+(LOCALE_CODE_ALPHA_2: )]{+$alpha2} = $script
+        $COUNTRIES->[+(LOCALE_CODE_ALPHA_2: )]{+lc "$script"} = $alpha2
 
         if ($alpha3)
-            $CODES->[+LOCALE_CODE_ALPHA_3]{+$alpha3} = $script
-            $COUNTRIES->[+LOCALE_CODE_ALPHA_3]{+lc "$script"} = $alpha3
+            $CODES->[+(LOCALE_CODE_ALPHA_3: )]{+$alpha3} = $script
+            $COUNTRIES->[+(LOCALE_CODE_ALPHA_3: )]{+lc "$script"} = $alpha3
         
 
         if ($numeric)
-            $CODES->[+LOCALE_CODE_NUMERIC]{+$numeric} = $script
-            $COUNTRIES->[+LOCALE_CODE_NUMERIC]{+lc "$script"} = $numeric
+            $CODES->[+(LOCALE_CODE_NUMERIC: )]{+$numeric} = $script
+            $COUNTRIES->[+(LOCALE_CODE_NUMERIC: )]{+lc "$script"} = $numeric
         
 
     
 
-    close($^DATA)
+    close: $^DATA
 
 
 1

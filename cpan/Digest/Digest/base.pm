@@ -4,14 +4,14 @@ our ($VERSION)
 $VERSION = "1.00"
 
 # subclass is supposed to implement at least these
-sub new { die "not implemented by subclass" }
-sub clone { die "not implemented by subclass" }
-sub add { die "not implemented by subclass" }
-sub digest { die "not implemented by subclass" }
+sub new { (die: "not implemented by subclass") }
+sub clone { (die: "not implemented by subclass") }
+sub add { (die: "not implemented by subclass") }
+sub digest { (die: "not implemented by subclass") }
 
 sub reset
     my $self = shift
-    $self->new(< @_)  # ugly
+    $self->new: < @_  # ugly
 
 
 sub addfile($self, $handle)
@@ -19,12 +19,12 @@ sub addfile($self, $handle)
     my $n
     my $buf = ""
 
-    while (($n = read($handle, $buf, 4*1024)))
-        $self->add($buf)
+    while (($n = (read: $handle, $buf, 4*1024)))
+        $self->add: $buf
     
     unless (defined $n)
         require Carp
-        Carp::croak("Read failed: $^OS_ERROR")
+        Carp::croak: "Read failed: $^OS_ERROR"
     
 
     $self
@@ -36,27 +36,27 @@ sub add_bits
     my $nbits
     if ((nelems @_) == 1)
         my $arg = shift
-        $bits = pack("B*", $arg)
-        $nbits = length($arg)
+        $bits = pack: "B*", $arg
+        $nbits = length: $arg
     else
         (@: $bits, $nbits) =  @_
     
     if (($nbits % 8) != 0)
         require Carp
-        Carp::croak("Number of bits must be multiple of 8 for this algorithm")
+        Carp::croak: "Number of bits must be multiple of 8 for this algorithm"
     
-    return $self->add(substr($bits, 0, $nbits/8))
+    return $self->add: (substr: $bits, 0, $nbits/8)
 
 
 sub hexdigest
     my $self = shift
-    return unpack("H*", $self->digest(< @_))
+    return unpack: "H*", ($self->digest: < @_)
 
 
 sub b64digest
     my $self = shift
     require MIME::Base64
-    my $b64 = MIME::Base64::encode($self->digest(< @_), "")
+    my $b64 = MIME::Base64::encode: ($self->digest: < @_), ""
     $b64 =~ s/=+$//
     return $b64
 

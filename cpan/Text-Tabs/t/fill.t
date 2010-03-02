@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w -I.
 
 
-our @tests =split(m/\nEND\n/s, <<DONE)
+our @tests =split: m/\nEND\n/s, <<DONE
 TEST1
 Cyberdog Information
 
@@ -50,53 +50,53 @@ DONE
 
 $^OUTPUT_AUTOFLUSH = 1
 
-my $numtests = scalar(nelems @tests) / 2
-print $^STDOUT, "1..$numtests\n"
+my $numtests = (scalar: nelems @tests) / 2
+print: $^STDOUT, "1..$numtests\n"
 
 use Text::Wrap
 
 
-my $rerun = env::var('PERL_DL_NONLAZY') ?? 0 !! 1
+my $rerun = (env::var: 'PERL_DL_NONLAZY') ?? 0 !! 1
 
 my $tn = 1
 while ((nelems @tests))
-    my $in = shift(@tests)
-    my $out = shift(@tests)
+    my $in = shift: @tests
+    my $out = shift: @tests
 
     $in =~ s/^TEST(\d+)?\n//
 
-    my $back = fill('    ', ' ', $in)
+    my $back = fill: '    ', ' ', $in
 
     if ($back eq $out)
-        print $^STDOUT, "ok $tn\n"
+        print: $^STDOUT, "ok $tn\n"
     elsif ($rerun)
         my $oi = $in
-        write_file("#o", $back)
-        write_file("#e", $out)
+        write_file: "#o", $back
+        write_file: "#e", $out
         foreach ((@: $in, $back, $out))
             s/\t/^I\t/gs
             s/\n/\$\n/gs
         
-        print $^STDOUT, "------------ input ------------\n"
-        print $^STDOUT, $in
-        print $^STDOUT, "\n------------ output -----------\n"
-        print $^STDOUT, $back
-        print $^STDOUT, "\n------------ expected ---------\n"
-        print $^STDOUT, $out
-        print $^STDOUT, "\n-------------------------------\n"
+        print: $^STDOUT, "------------ input ------------\n"
+        print: $^STDOUT, $in
+        print: $^STDOUT, "\n------------ output -----------\n"
+        print: $^STDOUT, $back
+        print: $^STDOUT, "\n------------ expected ---------\n"
+        print: $^STDOUT, $out
+        print: $^STDOUT, "\n-------------------------------\n"
         $Text::Wrap::debug = 1
-        fill('    ', ' ', $oi)
-        exit(1)
+        fill: '    ', ' ', $oi
+        exit: 1
     else
-        print $^STDOUT, "not ok $tn\n"
+        print: $^STDOUT, "not ok $tn\n"
     
     $tn++
 
 
 sub write_file($f, @< @data)
 
-    open(my $fh, ">", "$f") || die "open >$f: $^OS_ERROR"
-    (print $fh, < @data) || die "write $f: $^OS_ERROR"
-    close($fh) || die "close $f: $^OS_ERROR"
+    (open: my $fh, ">", "$f") || die: "open >$f: $^OS_ERROR"
+    ((print: $fh, < @data)) || die: "write $f: $^OS_ERROR"
+    (close: $fh) || die: "close $f: $^OS_ERROR"
     return 1
 

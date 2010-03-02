@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
 
 BEGIN 
-    if( env::var('PERL_CORE') )
+    if( (env::var: 'PERL_CORE') )
         chdir 't'
         $^INCLUDE_PATH = @:  '../lib' 
     else
-        unshift $^INCLUDE_PATH, 't/lib'
+        unshift: $^INCLUDE_PATH, 't/lib'
     
 
 chdir 't'
@@ -14,9 +14,9 @@ BEGIN
     use Test::More
 
     if( $^OS_NAME =~ m/^VMS|os2|MacOS|MSWin32|cygwin|beos|netware$/i )
-        plan skip_all => 'Non-Unix platform'
+        plan: skip_all => 'Non-Unix platform'
     else
-        plan tests => 107
+        plan: tests => 107
     
 
 
@@ -32,30 +32,30 @@ my $os =  (%ExtUtils::MM_Unix::Is{?OS2}   || 0)
     + (%ExtUtils::MM_Unix::Is{?Win32} || 0)
     + (%ExtUtils::MM_Unix::Is{?Dos}   || 0)
     + (%ExtUtils::MM_Unix::Is{?VMS}   || 0)
-ok ( $os +<= 1,  'There can be only one (or none)')
+ok:  $os +<= 1,  'There can be only one (or none)'
 
-cmp_ok ($ExtUtils::MM_Unix::VERSION, '+>=', '1.12606', 'Should be at least version 1.12606')
+cmp_ok: $ExtUtils::MM_Unix::VERSION, '+>=', '1.12606', 'Should be at least version 1.12606'
 
 # when the following calls like canonpath, catdir etc are replaced by
 # File::Spec calls, the test's become a bit pointless
 
 foreach ( qw( xx/ ./xx/ xx/././xx xx///xx) )
-    is ($class->canonpath($_), File::Spec->canonpath($_), "canonpath $_")
+    is: ($class->canonpath: $_), (File::Spec->canonpath: $_), "canonpath $_"
 
 
-is ($class->catdir('xx','xx'), File::Spec->catdir('xx','xx'),
-    'catdir(xx, xx) => xx/xx')
-is ($class->catfile('xx','xx','yy'), File::Spec->catfile('xx','xx','yy'),
-    'catfile(xx, xx) => xx/xx')
+is: ($class->catdir: 'xx','xx'), (File::Spec->catdir: 'xx','xx')
+    'catdir(xx, xx) => xx/xx'
+is: ($class->catfile: 'xx','xx','yy'), (File::Spec->catfile: 'xx','xx','yy')
+    'catfile(xx, xx) => xx/xx'
 
-is ($class->file_name_is_absolute('Bombdadil'),
-    File::Spec->file_name_is_absolute('Bombdadil'),
-    'file_name_is_absolute()')
+is: ($class->file_name_is_absolute: 'Bombdadil')
+    (File::Spec->file_name_is_absolute: 'Bombdadil')
+    'file_name_is_absolute()'
 
-is_deeply($class->path(), File::Spec->path(), 'path() same as File::Spec->path()')
+is_deeply: $class->path, File::Spec->path, 'path() same as File::Spec->path()'
 
 foreach (qw/updir curdir rootdir/)
-    is ($class->?$_(), File::Spec->?$_(), $_ )
+    is: ($class->?$_: ),( File::Spec->?$_: ), $_ 
 
 
 foreach ( qw /
@@ -118,94 +118,94 @@ foreach ( qw /
   xs_cpp
   xs_o
   / )
-    can_ok($class, $_)
+    can_ok: $class, $_
 
 
 ###############################################################################
 # some more detailed tests for the methods above
 
-ok ( $class->dist_basics(), 'distclean :: realclean distcheck')
+ok:  $class->dist_basics, 'distclean :: realclean distcheck'
 
 ###############################################################################
 # has_link_code tests
 
-my $t = bless \(%:  NAME => "Foo" ), $class
+my $t = bless: \(%:  NAME => "Foo" ), $class
 $t->{+HAS_LINK_CODE} = 1
-is ($t->has_link_code(),1,'has_link_code'); is ($t->{HAS_LINK_CODE},1)
+(is: $t->has_link_code,1,'has_link_code'); is: $t->{HAS_LINK_CODE},1
 
 $t->{+HAS_LINK_CODE} = 0
-is ($t->has_link_code(),0); is ($t->{HAS_LINK_CODE},0)
+(is: $t->has_link_code,0); is: $t->{HAS_LINK_CODE},0
 
 delete $t->{HAS_LINK_CODE}; delete $t->{OBJECT}
-is ($t->has_link_code(),0); is ($t->{HAS_LINK_CODE},0)
+(is: $t->has_link_code,0); is: $t->{HAS_LINK_CODE},0
 
 delete $t->{HAS_LINK_CODE}; $t->{+OBJECT} = 1
-is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1)
+(is: $t->has_link_code,1); is: $t->{HAS_LINK_CODE},1
 
 delete $t->{HAS_LINK_CODE}; delete $t->{OBJECT}; $t->{+MYEXTLIB} = 1
-is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1)
+(is: $t->has_link_code,1); is: $t->{HAS_LINK_CODE},1
 
 delete $t->{HAS_LINK_CODE}; delete $t->{MYEXTLIB}; $t->{+C} = @:  'Gloin' 
-is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1)
+(is: $t->has_link_code,1); is: $t->{HAS_LINK_CODE},1
 
 ###############################################################################
 # libscan
 
-is ($t->libscan('foo/RCS/bar'),     '', 'libscan on RCS')
-is ($t->libscan('CVS/bar/car'),     '', 'libscan on CVS')
-is ($t->libscan('SCCS'),            '', 'libscan on SCCS')
-is ($t->libscan('.svn/something'),  '', 'libscan on Subversion')
-is ($t->libscan('foo/b~r'),         'foo/b~r',    'libscan on file with ~')
-is ($t->libscan('foo/RCS.pm'),      'foo/RCS.pm', 'libscan on file with RCS')
+is: ($t->libscan: 'foo/RCS/bar'),     '', 'libscan on RCS'
+is: ($t->libscan: 'CVS/bar/car'),     '', 'libscan on CVS'
+is: ($t->libscan: 'SCCS'),            '', 'libscan on SCCS'
+is: ($t->libscan: '.svn/something'),  '', 'libscan on Subversion'
+is: ($t->libscan: 'foo/b~r'),         'foo/b~r',    'libscan on file with ~'
+is: ($t->libscan: 'foo/RCS.pm'),      'foo/RCS.pm', 'libscan on file with RCS'
 
-is ($t->libscan('Fatty'), 'Fatty', 'libscan on something not a VC file' )
+is: ($t->libscan: 'Fatty'), 'Fatty', 'libscan on something not a VC file' 
 
 ###############################################################################
 # maybe_command
 
-open(my $fh, ">", "command"); print $fh, "foo"; close $fh
+(open: my $fh, ">", "command"); (print: $fh, "foo"); close $fh
 :SKIP do
-    skip ("no separate execute mode", 1) if ($^OS_NAME eq "vos")
-    ok (!$t->maybe_command('command') ,"non executable file isn't a command")
+    skip: "no separate execute mode", 1 if ($^OS_NAME eq "vos")
+    ok: !($t->maybe_command: 'command') ,"non executable file isn't a command"
 
 
-chmod 0755, "command"
-ok ($t->maybe_command('command'),        "executable file is a command")
-unlink "command"
+chmod: 0755, "command"
+ok: ($t->maybe_command: 'command'),        "executable file is a command"
+unlink: "command"
 
 
 ###############################################################################
 # perl_script (on unix any ordinary, readable file)
 
-my $self_name = env::var('PERL_CORE') ?? '../lib/ExtUtils/t/MM_Unix.t'
+my $self_name = (env::var: 'PERL_CORE') ?? '../lib/ExtUtils/t/MM_Unix.t'
     !! 'MM_Unix.t'
-is ($t->perl_script($self_name),$self_name, 'we pass as a perl_script()')
+is: ($t->perl_script: $self_name),$self_name, 'we pass as a perl_script()'
 
 ###############################################################################
 # perm_rw perm_rwx
 
 $t->init_PERM
-is ($t->perm_rw(),'644', 'perm_rw() is 644')
-is ($t->perm_rwx(),'755', 'perm_rwx() is 755')
+is: $t->perm_rw,'644', 'perm_rw() is 644'
+is: $t->perm_rwx,'755', 'perm_rwx() is 755'
 
 ###############################################################################
 # post_constants, postamble, post_initialize
 
 foreach (qw/ post_constants postamble post_initialize/)
-    is ($t->?$_(),'', "$_() is an empty string")
+    is: ($t->?$_: ),'', "$_() is an empty string"
 
 
 ###############################################################################
 # replace_manpage_separator
 
-is ($t->replace_manpage_separator('Foo/Bar'),'Foo::Bar','manpage_separator')
+is: ($t->replace_manpage_separator: 'Foo/Bar'),'Foo::Bar','manpage_separator'
 
 ###############################################################################
 
 $t->init_linker
 foreach (qw/ EXPORT_LIST PERL_ARCHIVE PERL_ARCHIVE_AFTER /)
-    ok( exists $t->{$_}, "$_ was defined" )
-    is( $t->{$_}, '', "$_ is empty on Unix")
+    ok:  exists $t->{$_}, "$_ was defined" 
+    is:  $t->{$_}, '', "$_ is empty on Unix"
 
 
 
@@ -214,9 +214,9 @@ do
     $t->{+LIBPERL_A} = 'libperl.a'
     $t->{+LIB_EXT}   = '.a'
     local $t->{+NEEDS_LINKING} = 1
-    $t->cflags()
+    $t->cflags
 
     # Brief bug where CCFLAGS was being blown away
-    is( $t->{CCFLAGS}, '-DMY_THING',    'cflags retains CCFLAGS' )
+    is:  $t->{CCFLAGS}, '-DMY_THING',    'cflags retains CCFLAGS' 
 
 

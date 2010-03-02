@@ -3,7 +3,7 @@
 
 use warnings
 
-require q(./test.pl); plan(tests => 4)
+require q(./test.pl); plan: tests => 4
 
 =pod
 
@@ -37,11 +37,11 @@ do
     use mro 'c3'
 
 
-ok(eq_array(
-    mro::get_linear_isa('Diamond_D'),
-    \ qw(Diamond_D Diamond_B Diamond_C Diamond_A)
-    ), '... got the right MRO for Diamond_D')
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Diamond_D')
+        \ qw(Diamond_D Diamond_B Diamond_C Diamond_A)
+        ), '... got the right MRO for Diamond_D'
 
-is(Diamond_D->hello, 'Diamond_C::hello', '... method resolved itself as expected')
-is(Diamond_D->can('hello')->(), 'Diamond_C::hello', '... can(method) resolved itself as expected')
-is(UNIVERSAL::can("Diamond_D", 'hello')->(), 'Diamond_C::hello', '... can(method) resolved itself as expected')
+is: Diamond_D->hello, 'Diamond_C::hello', '... method resolved itself as expected'
+is: ((Diamond_D->can: 'hello')->& <: ), 'Diamond_C::hello', '... can(method) resolved itself as expected'
+is: ((UNIVERSAL::can: "Diamond_D", 'hello')->& <: ), 'Diamond_C::hello', '... can(method) resolved itself as expected'

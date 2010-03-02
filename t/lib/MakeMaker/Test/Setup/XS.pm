@@ -10,7 +10,7 @@ use MakeMaker::Test::Utils
 
 my $Is_VMS = $^OS_NAME eq 'VMS'
 
-my %Files = %: 
+my %Files = %:
     'XS-Test/lib/XS/Test.pm'     => <<'END'
 package XS::Test;
 
@@ -66,17 +66,17 @@ END
 
 
 sub setup_xs
-    setup_mm_test_root()
+    (setup_mm_test_root: )
     chdir 'MM_TEST_ROOT:[t]' if $Is_VMS
 
     while(my(@: ?$file, ?$text) =(@:  each %Files))
         # Convert to a relative, native file path.
-        $file = File::Spec->catfile(File::Spec->curdir, < split m{\/}, $file)
+        $file = File::Spec->catfile: File::Spec->curdir, < (split: m{\/}, $file)
 
-        my $dir = dirname($file)
-        mkpath $dir
-        open(my $file, ">", $file) || die "Can't create $file: $^OS_ERROR"
-        print $file, $text
+        my $dir = dirname: $file
+        mkpath: $dir
+        (open: my $file, ">", $file) || die: "Can't create $file: $^OS_ERROR"
+        print: $file, $text
         close $file
     
 
@@ -85,9 +85,9 @@ sub setup_xs
 
 sub teardown_xs
     foreach my $file (keys %Files)
-        my $dir = dirname($file)
+        my $dir = dirname: $file
         if( -e $dir )
-            rmtree($dir) || return
+            (rmtree: $dir) || return
         
     
     return 1

@@ -6,7 +6,7 @@
 # security levels
 
 use Test::More
-BEGIN { plan tests => 13 }
+BEGIN { (plan: tests => 13) }
 
 use File::Spec
 
@@ -14,10 +14,10 @@ use File::Spec
 # File::Temp since this END block must be evaluated after the
 # END block configured by File::Temp
 my @files # list of files to remove
-END { foreach ( @files) { ok( !(-e $_) )} }
+END { foreach ( @files) { (ok:  !(-e $_) )} }
 
 use File::Temp < qw/ tempfile unlink0 /
-ok(1)
+ok: 1
 
 # The high security tests must currently be skipped on some platforms
 my $skipplat = ( (
@@ -31,34 +31,34 @@ if ($skipplat)
     $skip = "Skip Not supported on this platform"
 
 
-print $^STDOUT, "# We will be skipping some tests : $skip\n" if $skip
+print: $^STDOUT, "# We will be skipping some tests : $skip\n" if $skip
 
 # start off with basic checking
 
-File::Temp->safe_level( File::Temp::STANDARD )
+File::Temp->safe_level:  (File::Temp::STANDARD: ) 
 
-print $^STDOUT, "# Testing with STANDARD security...\n"
+print: $^STDOUT, "# Testing with STANDARD security...\n"
 
-test_security(0)
+test_security: 0
 
 # Try medium
 
-File::Temp->safe_level( File::Temp::MEDIUM )
+File::Temp->safe_level:  (File::Temp::MEDIUM: ) 
     unless $skip
 
-print $^STDOUT, "# Testing with MEDIUM security...\n"
+print: $^STDOUT, "# Testing with MEDIUM security...\n"
 
 # Now we need to start skipping tests
-test_security($skip)
+test_security: $skip
 
 # Try HIGH
 
-File::Temp->safe_level( File::Temp::HIGH )
+File::Temp->safe_level:  (File::Temp::HIGH: ) 
     unless $skip
 
-print $^STDOUT, "# Testing with HIGH security...\n"
+print: $^STDOUT, "# Testing with HIGH security...\n"
 
-test_security($skip)
+test_security: $skip
 
 exit
 
@@ -75,59 +75,59 @@ sub test_security
     # fail with MEDIUM/HIGH security before the skip() command would be run
     if ($skip)
 
-        skip($skip,1)
-        skip($skip,1)
+        skip: $skip,1
+        skip: $skip,1
 
         # plus we need an end block so the tests come out in the right order
-        eval q{ END { skip($skip,1); skip($skip,1)  } 1; } || die
+        eval q{ END { skip($skip,1); skip($skip,1)  } 1; } || die: 
 
         return
     
 
     # Create the tempfile
     my $template = "tmpXXXXX"
-    my (@: $fh1, $fname1) =  try { tempfile ( $template,
-                                            DIR => File::Spec->tmpdir,
-                                            UNLINK => 1,
+    my (@: $fh1, $fname1) =  try { (tempfile:  $template
+                                               DIR => File::Spec->tmpdir
+                                               UNLINK => 1
                                             );
     } || @: undef, undef
 
     if (defined $fname1)
-        print $^STDOUT, "# fname1 = $fname1\n"
-        ok( (-e $fname1) )
-        push(@files, $fname1) # store for end block
-    elsif (File::Temp->safe_level() != File::Temp::STANDARD)
+        print: $^STDOUT, "# fname1 = $fname1\n"
+        ok:  (-e $fname1) 
+        push: @files, $fname1 # store for end block
+    elsif (File::Temp->safe_level != (File::Temp::STANDARD: ))
         :SKIP
             do
-            my $skip2 = "Skip: " . File::Spec->tmpdir() . " possibly insecure:  $($^EVAL_ERROR && $^EVAL_ERROR->message).  " .
+            my $skip2 = "Skip: " . File::Spec->tmpdir . " possibly insecure:  $($^EVAL_ERROR && $^EVAL_ERROR->message).  " .
                 "See INSTALL under 'make test'"
-            skip($skip2, 2)
+            skip: $skip2, 2
         
     else
-        ok(0)
+        ok: 0
     
 
     # Explicitly
-    if ( $^UID +< File::Temp->top_system_uid() )
-        skip("Skip Test inappropriate for root", 1)
-        eval q{ END { skip($skip,1); } 1; } || die
+    if ( $^UID +< File::Temp->top_system_uid )
+        skip: "Skip Test inappropriate for root", 1
+        eval q{ END { skip($skip,1); } 1; } || die: 
         return
     
-    my (@: $fh2, $fname2) =  try { tempfile ($template,  UNLINK => 1 ); }
+    my (@: $fh2, $fname2) =  try { (tempfile: $template,  UNLINK => 1 ); }
     if (defined $fname2)
-        print $^STDOUT, "# fname2 = $fname2\n"
-        ok( (-e $fname2) )
-        push(@files, $fname2) # store for end block
-        close($fh2)
-    elsif (File::Temp->safe_level() != File::Temp::STANDARD)
-        chomp($^EVAL_ERROR)
+        print: $^STDOUT, "# fname2 = $fname2\n"
+        ok:  (-e $fname2) 
+        push: @files, $fname2 # store for end block
+        close: $fh2
+    elsif (File::Temp->safe_level != (File::Temp::STANDARD: ))
+        chomp: $^EVAL_ERROR
         my $skip2 = "Skip: current directory possibly insecure: $^EVAL_ERROR.  " .
             "See INSTALL under 'make test'"
-        skip($skip2, 1)
+        skip: $skip2, 1
         # plus we need an end block so the tests come out in the right order
-        eval q{ END { skip($skip2,1); } 1; } || die
+        eval q{ END { skip($skip2,1); } 1; } || die: 
     else
-        ok(0)
+        ok: 0
     
 
 

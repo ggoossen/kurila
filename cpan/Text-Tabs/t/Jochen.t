@@ -2,10 +2,10 @@
 
 use Text::Wrap
 
-print $^STDOUT, "1..1\n"
+print: $^STDOUT, "1..1\n"
 
 $Text::Wrap::columns = 1
-try { wrap('', '', ''); }
+try { (wrap: '', '', ''); }
 
-print $^STDOUT, $^EVAL_ERROR ?? "not ok 1\n" !! "ok 1\n"
+print: $^STDOUT, $^EVAL_ERROR ?? "not ok 1\n" !! "ok 1\n"
 

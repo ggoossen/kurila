@@ -130,7 +130,7 @@ handle (typically a file name).
 sub new
     ## Determine if we were called via an object-ref or a classname
     my $this = shift
-    my $class = ref($this) || $this
+    my $class = (ref: $this) || $this
 
     ## Any remaining arguments are treated as initial values for the
     ## hash that is used to represent this object. Note that we default
@@ -142,7 +142,7 @@ sub new
                     < @_ 
 
     ## Bless ourselves into the desired class and perform any initialization
-    bless $self, $class
+    bless: $self, $class
     return $self
 
 
@@ -258,13 +258,13 @@ beginning of the paragraph
 sub new
     ## Determine if we were called via an object-ref or a classname
     my $this = shift
-    my $class = ref($this) || $this
+    my $class = (ref: $this) || $this
 
     ## Any remaining arguments are treated as initial values for the
     ## hash that is used to represent this object. Note that we default
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
-    my $self = \%: 
+    my $self = \%:
         name       => undef
         text       => ((nelems @_) == 1) ?? shift !! undef
         file       => '<unknown-file>'
@@ -275,7 +275,7 @@ sub new
         < @_
 
     ## Bless ourselves into the desired class and perform any initialization
-    bless $self, $class
+    bless: $self, $class
     return $self
 
 
@@ -451,25 +451,25 @@ it may be a reference to a Pod::ParseTree object).
 sub new
     ## Determine if we were called via an object-ref or a classname
     my $this = shift
-    my $class = ref($this) || $this
+    my $class = (ref: $this) || $this
 
     ## See if first argument has no keyword
     if ((((nelems @_) +<= 2) or ((nelems @_) % 2)) and @_[0] !~ m/^-\w/)
         ## Yup - need an implicit 'name' before first parameter
-        unshift @_, 'name'
+        unshift: @_, 'name'
 
 
     ## See if odd number of args
     if (((nelems @_) % 2) != 0)
         ## Yup - need an implicit 'ptree' before the last parameter
-        splice @_, ((nelems @_)-1), 0, 'ptree'
+        splice: @_, ((nelems @_)-1), 0, 'ptree'
 
 
     ## Any remaining arguments are treated as initial values for the
     ## hash that is used to represent this object. Note that we default
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
-    my $self = \%: 
+    my $self = \%:
         name       => ((nelems @_) == 1) ?? @_[0] !! undef
         file       => '<unknown-file>'
         line       => 0
@@ -479,16 +479,16 @@ sub new
         
 
     ## Initialize contents if they havent been already
-    my $ptree = $self->{?'ptree'} || Pod::ParseTree->new()
+    my $ptree = $self->{?'ptree'} || Pod::ParseTree->new
     if ( (ref $ptree) =~ m/^(ARRAY)?$/ )
         ## We have an array-ref, or a normal scalar. Pass it as an
         ## an argument to the ptree-constructor
-        $ptree = Pod::ParseTree->new($1 ?? \(@: $ptree) !! $ptree)
+        $ptree = Pod::ParseTree->new: $1 ?? \(@: $ptree) !! $ptree
 
     $self->{+'ptree'} = $ptree
 
     ## Bless ourselves into the desired class and perform any initialization
-    bless $self, $class
+    bless: $self, $class
     return $self
 
 
@@ -519,9 +519,9 @@ sub _set_child2parent_links($self, @< @children)
     ## Make sure any sequences know who their parent is
     for ( @children)
         next  unless (ref  and  ref ne 'SCALAR')
-        if (UNIVERSAL::isa($_, 'Pod::InteriorSequence') or
-            UNIVERSAL::can($_, 'nested'))
-            $_->nested($self)
+        if (UNIVERSAL::isa: $_, 'Pod::InteriorSequence' or
+            UNIVERSAL::can: $_, 'nested')
+            $_->nested: $self
 
 
 
@@ -534,8 +534,8 @@ sub _unset_child2parent_links
     my $ptree = $self->{?'ptree'}
     for ( $ptree->@)
         next  unless (ref  and  ref ne 'SCALAR')
-        $_->_unset_child2parent_links()
-            if UNIVERSAL::isa($_, 'Pod::InteriorSequence')
+        $_->_unset_child2parent_links
+            if UNIVERSAL::isa: $_, 'Pod::InteriorSequence'
 
 
 
@@ -553,8 +553,8 @@ of this interior sequence.
 
 sub prepend
     my $self  = shift
-    $self->{?'ptree'}->prepend(< @_)
-    _set_child2parent_links($self, < @_)
+    $self->{?'ptree'}->prepend: < @_
+    _set_child2parent_links: $self, < @_
     return $self
 
 
@@ -572,8 +572,8 @@ of this interior sequence.
 
 sub append
     my $self = shift
-    $self->{?'ptree'}->append(< @_)
-    _set_child2parent_links($self, < @_)
+    $self->{?'ptree'}->append: < @_
+    _set_child2parent_links: $self, < @_
     return $self
 
 
@@ -709,7 +709,7 @@ sub DESTROY
     ## We need to get rid of all child->parent pointers throughout the
     ## tree so their reference counts will go to zero and they can be
     ## garbage-collected
-    _unset_child2parent_links(< @_)
+    _unset_child2parent_links: < @_
 
 
 ##---------------------------------------------------------------------------
@@ -750,12 +750,12 @@ it must be a reference to an array, and is used to initialize the root
 sub new
     ## Determine if we were called via an object-ref or a classname
     my $this = shift
-    my $class = ref($this) || $this
+    my $class = (ref: $this) || $this
 
     my $self = ((nelems @_) == 1  and  ref @_[0]) ?? @_[0] !! \$@
 
     ## Bless ourselves into the desired class and perform any initialization
-    bless $self, $class
+    bless: $self, $class
     return $self
 
 
@@ -827,7 +827,7 @@ sub prepend
         if ((nelems $self->@)  and  !(ref $self->@[0])  and  !(ref $_))
             $self->@[0] = $_ . $self->@[0]
         else
-            unshift $self->@, $_
+            unshift: $self->@, $_
 
 
 
@@ -849,13 +849,13 @@ sub append
     my $can_append = (nelems $self->@) && !(ref $self->@[-1])
     for ( @_)
         if (ref)
-            push $self->@, $_
+            push: $self->@, $_
         elsif(!length)
             next
         elsif ($can_append)
             $self->@[-1] .= $_
         else
-            push $self->@, $_
+            push: $self->@, $_
 
 
 
@@ -886,8 +886,8 @@ sub _unset_child2parent_links
     my $self = shift
     for ( $self->@)
         next  unless (defined and  ref  and  ref ne 'SCALAR')
-        $_->_unset_child2parent_links()
-            if UNIVERSAL::isa($_, 'Pod::InteriorSequence')
+        $_->_unset_child2parent_links
+            if UNIVERSAL::isa: $_, 'Pod::InteriorSequence'
 
 
 
@@ -908,7 +908,7 @@ sub DESTROY
     ## We need to get rid of all child->parent pointers throughout the
     ## tree so their reference counts will go to zero and they can be
     ## garbage-collected
-    _unset_child2parent_links(< @_)
+    _unset_child2parent_links: < @_
 
 
 #############################################################################

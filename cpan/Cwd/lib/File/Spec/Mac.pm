@@ -235,10 +235,10 @@ sub catdir
         my $arg = shift @args
         unless (($arg eq '') || ($arg eq ':'))
             if ($arg =~ m/^::+\Z(?!\n)/ ) # updir colon path like ':::'
-                my $updir_count = length($arg) - 1
+                my $updir_count = (length: $arg) - 1
                 while ((nelems @args) && (@args[0] =~ m/^::+\Z(?!\n)/) ) # while updir colon path
                     $arg = shift @args
-                    $updir_count += (length($arg) - 1)
+                    $updir_count += ((length: $arg) - 1)
                 
                 $arg = (':' x $updir_count)
             else
@@ -310,7 +310,7 @@ sub catfile
     return '' unless (nelems @_)
     my $file = pop @_
     return $file unless (nelems @_)
-    my $dir = $self->catdir(< @_)
+    my $dir = $self->catdir: < @_
     $file =~ s/^://s
     return $dir.$file
 
@@ -353,8 +353,8 @@ sub rootdir
     #  volume is returned, since that's the closest in concept.
     #
     return '' unless $macfiles
-    my $system = Mac::Files::FindFolder( <Mac::Files::kOnSystemDisk( < @_ ), <
-                                         Mac::Files::kSystemFolderType( < @_ ))
+    my $system = Mac::Files::FindFolder:  <(Mac::Files::kOnSystemDisk:  < @_ ), <
+                                                                               (Mac::Files::kSystemFolderType:  < @_ )
     $system =~ s/:.*\Z(?!\n)/:/s
     return $system
 
@@ -371,7 +371,7 @@ directory on your startup volume.
 my $tmpdir
 sub tmpdir
     return $tmpdir if defined $tmpdir
-    $tmpdir = @_[0]->_tmpdir( env::var('TMPDIR') )
+    $tmpdir = @_[0]->_tmpdir:  (env::var: 'TMPDIR') 
 
 
 =item updir
@@ -429,8 +429,8 @@ sub path
     #  The concept is meaningless under the MacPerl application.
     #  Under MPW, it has a meaning.
     #
-    return unless defined env::var('Commands')
-    returnsplit(m/,/, env::var('Commands'))
+    return unless defined env::var: 'Commands'
+    returnsplit: m/,/, (env::var: 'Commands')
 
 
 =item splitpath
@@ -470,16 +470,16 @@ sub splitpath($self,$path, ?$nofile)
         $file      = $3
     
 
-    $volume = '' unless defined($volume)
+    $volume = '' unless defined: $volume
     $directory = ":$directory" if ( $volume && $directory ) # take care of "HD::dir"
     if ($directory)
         # Make sure non-empty directories begin and end in ':'
-        $directory .= ':' unless (substr($directory,-1) eq ':')
-        $directory = ":$directory" unless (substr($directory,0,1) eq ':')
+        $directory .= ':' unless ((substr: $directory,-1) eq ':')
+        $directory = ":$directory" unless ((substr: $directory,0,1) eq ':')
     else
         $directory = ''
     
-    $file = '' unless defined($file)
+    $file = '' unless defined: $file
 
     return  @: $volume,$directory,$file
 
@@ -524,31 +524,31 @@ sub splitdir($self, ?$path)
     my @result = @:  () 
     my ($head, $sep, $tail, $volume, $directories)
 
-    return @result if ( (!defined($path)) || ($path eq '') )
+    return @result if ( (!(defined: $path)) || ($path eq '') )
     return  (@: ':') if ($path eq ':')
 
     (@:  $volume, $sep, $directories ) = @: $path =~ m|^((?:[^:]+:)?)(:*)(.*)|s
 
                                           # deprecated, but handle it correctly
     if ($volume)
-        push (@result, $volume)
+        push: @result, $volume
         $sep .= ':'
     
 
     while ($sep || $directories)
-        if (length($sep) +> 1)
-            my $updir_count = length($sep) - 1
+        if ((length: $sep) +> 1)
+            my $updir_count = (length: $sep) - 1
             for my $i (0 .. $updir_count -1)
                 # push '::' updir_count times;
                 # simulate Unix '..' updirs
-                push (@result, '::')
+                push: @result, '::'
             
         
         $sep = ''
         if ($directories)
             (@:  $head, $sep, $tail ) =
                 @: $directories =~ m|^((?:[^:]+)?)(:*)(.*)|s
-            push (@result, $head)
+            push: @result, $head
             $directories = $tail
         
     
@@ -580,17 +580,17 @@ sub catpath($self,$volume,$directory,$file)
 
     # We look for a volume in $volume, then in $directory, but not both
 
-    my (@: $dir_volume, $dir_dirs, _) =  $self->splitpath($directory, 1)
+    my (@: $dir_volume, $dir_dirs, _) =  $self->splitpath: $directory, 1
 
     $volume = $dir_volume unless length $volume
     my $path = $volume # may be ''
-    $path .= ':' unless (substr($path, -1) eq ':') # ensure trailing ':'
+    $path .= ':' unless ((substr: $path, -1) eq ':') # ensure trailing ':'
 
     if ($directory)
         $directory = $dir_dirs if $volume
         $directory =~ s/^:// # remove leading ':' if any
         $path .= $directory
-        $path .= ':' unless (substr($path, -1) eq ':') # ensure trailing ':'
+        $path .= ':' unless ((substr: $path, -1) eq ':') # ensure trailing ':'
     
 
     if ($file)
@@ -650,45 +650,45 @@ sub _resolve_updirs
 sub abs2rel($self,$path,$base)
 
     # Clean up $path
-    if ( ! $self->file_name_is_absolute( $path ) )
-        $path = $self->rel2abs( $path ) 
+    if ( ! ($self->file_name_is_absolute:  $path ) )
+        $path = $self->rel2abs:  $path  
     
 
     # Figure out the effective $base and clean it up.
-    if ( !defined( $base ) || $base eq '' )
-        $base = $self->_cwd()
-    elsif ( ! $self->file_name_is_absolute( $base ) )
-        $base = $self->rel2abs( $base ) 
-        $base = _resolve_updirs( $base ) # resolve updirs in $base
+    if ( !(defined:  $base ) || $base eq '' )
+        $base = $self->_cwd
+    elsif ( ! ($self->file_name_is_absolute:  $base ) )
+        $base = $self->rel2abs:  $base  
+        $base = _resolve_updirs:  $base  # resolve updirs in $base
     else
-        $base = _resolve_updirs( $base )
+        $base = _resolve_updirs:  $base 
     
 
     # Split up paths - ignore $base's file
-    my (@:  $path_vol, $path_dirs, $path_file ) =   $self->splitpath( $path )
-    my (@:  $base_vol, $base_dirs, _ )             =   $self->splitpath( $base )
+    my (@:  $path_vol, $path_dirs, $path_file ) =   $self->splitpath:  $path 
+    my (@:  $base_vol, $base_dirs, _ )             =   $self->splitpath:  $base 
 
-    return $path unless lc( $path_vol ) eq lc( $base_vol )
+    return $path unless (lc:  $path_vol ) eq lc:  $base_vol 
 
     # Now, remove all leading components that are the same
-    my @pathchunks = $self->splitdir( $path_dirs )
-    my @basechunks = $self->splitdir( $base_dirs )
+    my @pathchunks = $self->splitdir:  $path_dirs 
+    my @basechunks = $self->splitdir:  $base_dirs 
 
     while ( (nelems @pathchunks) &&
               nelems @basechunks &&
-              lc( @pathchunks[0] ) eq lc( @basechunks[0] ) )
+              (lc:  @pathchunks[0] ) eq (lc:  @basechunks[0] ) )
         shift @pathchunks 
         shift @basechunks 
     
 
     # @pathchunks now has the directories to descend in to.
     # ensure relative path, even if @pathchunks is empty
-    $path_dirs = $self->catdir( ':', < @pathchunks )
+    $path_dirs = $self->catdir:  ':', < @pathchunks 
 
     # @basechunks now contains the number of directories to climb out of.
     $base_dirs = (':' x nelems @basechunks) . ':' 
 
-    return $self->catpath( '', $self->catdir( $base_dirs, $path_dirs ), $path_file ) 
+    return $self->catpath:  '', ($self->catdir:  $base_dirs, $path_dirs ), $path_file  
 
 
 =item rel2abs
@@ -718,28 +718,28 @@ Based on code written by Shigio Yamaguchi.
 
 sub rel2abs($self,$path,?$base)
 
-    if ( ! $self->file_name_is_absolute($path) )
+    if ( ! ($self->file_name_is_absolute: $path) )
         # Figure out the effective $base and clean it up.
-        if ( !defined( $base ) || $base eq '' )
-            $base = $self->_cwd()
-        elsif ( ! $self->file_name_is_absolute($base) )
-            $base = $self->rel2abs($base) 
+        if ( !(defined:  $base ) || $base eq '' )
+            $base = $self->_cwd
+        elsif ( ! ($self->file_name_is_absolute: $base) )
+            $base = $self->rel2abs: $base 
         
 
         # Split up paths
 
         # igonore $path's volume
-        my (@:  $path_dirs, $path_file ) =  ($self->splitpath($path))[[1..2]] 
+        my (@:  $path_dirs, $path_file ) =  (($self->splitpath: $path))[[1..2]] 
 
         # ignore $base's file part
-        my (@:  $base_vol, $base_dirs, _ ) =  $self->splitpath($base) 
+        my (@:  $base_vol, $base_dirs, _ ) =  $self->splitpath: $base 
 
         # Glom them together
         $path_dirs = ':' if ($path_dirs eq '')
         $base_dirs =~ s/:$// # remove trailing ':', if any
         $base_dirs = $base_dirs . $path_dirs
 
-        $path = $self->catpath( $base_vol, $base_dirs, $path_file )
+        $path = $self->catpath:  $base_vol, $base_dirs, $path_file 
     
     return $path
 

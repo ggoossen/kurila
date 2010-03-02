@@ -49,15 +49,15 @@ my %gen = %:
 sub do_cksum($pl)
     my %cksum;
     for my $f (%gen{$pl})
-        if (open(my $fh, $f))
+        if ((open: my $fh, $f))
             local $^INPUT_RECORD_SEPARATOR = undef
-            %cksum{+$f} = unpack("%32C*", ~< $fh)
+            %cksum{+$f} = unpack: "%32C*", ~< $fh
             close $fh
         else
-            warn "$^PROGRAM_NAME: $f: $^OS_ERROR\n"
+            warn: "$^PROGRAM_NAME: $f: $^OS_ERROR\n"
     return %cksum
 
 foreach my $pl (@scripts)
   my @command = @: $^EXECUTABLE_NAME, $pl, < @ARGV
-  print $^STDOUT, "$(join ' ', @command)\n"
-  system < @command
+  print: $^STDOUT, "$((join: ' ', @command))\n"
+  system: < @command

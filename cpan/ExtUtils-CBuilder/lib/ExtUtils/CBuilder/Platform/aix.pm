@@ -13,7 +13,7 @@ sub link($self, %< %args)
     my $cf = $self->{?config}
 
     (my $baseext = %args{?module_name}) =~ s/.*:://
-    my $perl_inc = $self->perl_inc()
+    my $perl_inc = $self->perl_inc
 
     # Massage some very naughty bits in %Config
     local $cf->{+lddlflags} = $cf->{?lddlflags}
@@ -22,7 +22,7 @@ sub link($self, %< %args)
         s/\$ [(] PERL_INC [)] /$perl_inc/x
     
 
-    return $self->SUPER::link(< %args)
+    return $self->SUPER::link: < %args
 
 
 

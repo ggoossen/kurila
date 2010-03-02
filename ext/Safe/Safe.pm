@@ -18,8 +18,8 @@ sub lexless_anon_sub
     # Create anon sub ref in root of compartment.
     # Uses a closure (on $__ExPr__) to pass in the code to be executed.
     # (eval on one line to keep line numbers as expected by caller)
-    eval sprintf
-        'package %s; sub { @_= $@; eval q[my $__ExPr__;] . $__ExPr__; }',
+    eval sprintf: 
+        'package %s; sub { @_= $@; eval q[my $__ExPr__;] . $__ExPr__; }'
         @_[0]
 
 
@@ -80,10 +80,10 @@ my $default_share = \qw[
 
 sub new($class, ?$root, ?$mask)
     my $obj = \$%
-    bless $obj, $class
+    bless: $obj, $class
 
-    if (defined($root))
-        croak "Can't use \"$root\" as root name"
+    if ((defined: $root))
+        croak: "Can't use \"$root\" as root name"
             if $root =~ m/^main\b/ or $root !~ m/^\w+::\w[:\w]*$/
         $obj->{+Root}  = $root
         $obj->{+Erase} = 0
@@ -94,8 +94,8 @@ sub new($class, ?$root, ?$mask)
 
     # use permit/deny methods instead till interface issues resolved
     # XXX perhaps new Safe 'Root', mask => $mask, foo => bar, ...;
-    croak "Mask parameter to new no longer supported" if defined $mask
-    $obj->permit_only(':default')
+    croak: "Mask parameter to new no longer supported" if defined $mask
+    $obj->permit_only: ':default'
 
     # We must share $_ and @_ with the compartment or else ops such
     # as split, length and so on won't default to $_ properly, nor
@@ -103,18 +103,18 @@ sub new($class, ?$root, ?$mask)
     # for reasons I don't completely understand, we need to share
     # the whole glob *_ rather than $_ and @_ separately, otherwise
     # @_ in non default packages within the compartment don't work.
-    $obj->share_from('', $default_share)
-    Opcode::_safe_pkg_prep($obj->{?Root}) if($Opcode::VERSION +> 1.04)
+    $obj->share_from: '', $default_share
+    Opcode::_safe_pkg_prep: $obj->{?Root} if($Opcode::VERSION +> 1.04)
     return $obj
 
 
 sub DESTROY
     my $obj = shift
-    $obj->erase('DESTROY') if $obj->{?Erase}
+    $obj->erase: 'DESTROY' if $obj->{?Erase}
 
 
 sub erase($obj, $action)
-    my $pkg = $obj->root()
+    my $pkg = $obj->root
     my ($stem, $leaf)
 
     $pkg = "$($pkg)::"	# expand to full symbol table name
@@ -122,7 +122,7 @@ sub erase($obj, $action)
 
                          # The 'my $foo' is needed! Without it you get an
                          # 'Attempt to free unreferenced scalar' warning!
-    my $stem_symtab = Symbol::stash($stem)
+    my $stem_symtab = Symbol::stash: $stem
 
     #warn "erase($pkg) stem=$stem, leaf=$leaf";
     #warn " stem_symtab hash ".scalar(%$stem_symtab)."\n";
@@ -148,7 +148,7 @@ sub erase($obj, $action)
     if ($action and $action eq 'DESTROY')
         delete $stem_symtab->{$leaf}
     else
-        $obj->share_from('', $default_share)
+        $obj->share_from: '', $default_share
     
 
     1
@@ -163,7 +163,7 @@ sub reinit
 
 sub root
     my $obj = shift
-    croak("Safe root method now read-only") if (nelems @_)
+    croak: "Safe root method now read-only" if (nelems @_)
     return $obj->{?Root}
 
 
@@ -171,42 +171,42 @@ sub root
 sub mask
     my $obj = shift
     return $obj->{?Mask} unless (nelems @_)
-    $obj->deny_only(< @_)
+    $obj->deny_only: < @_
 
 
 # v1 compatibility methods
-sub trap   { shift->deny(< @_)   }
-sub untrap { shift->permit(< @_) }
+sub trap   {( shift->deny: < @_)   }
+sub untrap {( shift->permit: < @_) }
 
 sub deny
     my $obj = shift
-    $obj->{+Mask} ^|^= opset(< @_)
+    $obj->{+Mask} ^|^= opset: < @_
 
 sub deny_only
     my $obj = shift
-    $obj->{+Mask} = opset(< @_)
+    $obj->{+Mask} = opset: < @_
 
 
 sub permit
     my $obj = shift
     # XXX needs testing
-    $obj->{+Mask} ^&^= invert_opset opset(< @_)
+    $obj->{+Mask} ^&^= invert_opset: opset: < @_
 
 sub permit_only
     my $obj = shift
-    $obj->{+Mask} = invert_opset opset(< @_)
+    $obj->{+Mask} = invert_opset: opset: < @_
 
 
 
 sub dump_mask
     my $obj = shift
-    print $^STDOUT, < opset_to_hex($obj->{?Mask}),"\n"
+    print: $^STDOUT, < (opset_to_hex: $obj->{?Mask}),"\n"
 
 
 
 
 sub share($obj, @< @vars)
-    $obj->share_from(scalar(caller), \@vars)
+    $obj->share_from: (scalar: caller), \@vars
 
 
 sub share_from
@@ -214,8 +214,8 @@ sub share_from
     my $pkg = shift
     my $vars = shift
     my $no_record = shift || 0
-    my $root = $obj->root()
-    croak("vars not an array ref") unless ref $vars eq 'ARRAY'
+    my $root = $obj->root
+    croak: "vars not an array ref" unless ref $vars eq 'ARRAY'
     # Check that 'from' package actually exists
     #     croak("Package \"$pkg\" does not exist")
     # 	unless %{Symbol::stash("$pkg")};
@@ -224,15 +224,15 @@ sub share_from
         my ($var, $type)
         $type = $1 if ($var = $arg) =~ s/^(\W)//
         # warn "share_from $pkg $type $var";
-        Symbol::fetch_glob($root."::$var")->* = (!$type)       ?? \Symbol::fetch_glob($pkg."::$var")->*->&
-            !! ($type eq '&') ?? \Symbol::fetch_glob($pkg."::$var")->*->&
-            !! ($type eq '$') ?? \Symbol::fetch_glob($pkg."::$var")->*->$
-            !! ($type eq '@') ?? \Symbol::fetch_glob($pkg."::$var")->*->@
-            !! ($type eq '%') ?? \Symbol::fetch_glob($pkg."::$var")->*->%
-            !! ($type eq '*') ??  Symbol::fetch_glob($pkg."::$var")->*
-            !! croak(qq(Can't share "$type$var" of unknown type))
+        (Symbol::fetch_glob: $root."::$var")->* = (!$type)       ?? \(Symbol::fetch_glob: $pkg."::$var")->*->&
+            !! ($type eq '&') ?? \(Symbol::fetch_glob: $pkg."::$var")->*->&
+            !! ($type eq '$') ?? \(Symbol::fetch_glob: $pkg."::$var")->*->$
+            !! ($type eq '@') ?? \(Symbol::fetch_glob: $pkg."::$var")->*->@
+            !! ($type eq '%') ?? \(Symbol::fetch_glob: $pkg."::$var")->*->%
+            !! ($type eq '*') ??  (Symbol::fetch_glob: $pkg."::$var")->*
+            !! croak: qq(Can't share "$type$var" of unknown type)
     
-    $obj->share_record($pkg, $vars) unless $no_record or !$vars
+    $obj->share_record: $pkg, $vars unless $no_record or !$vars
 
 
 sub share_record
@@ -249,7 +249,7 @@ sub share_redo
     my($var, $pkg)
     while((@: $var, $pkg) =(@:  each $shares->%))
         # warn "share_redo $pkg\:: $var";
-        $obj->share_from($pkg,  \(@:  $var ), 1)
+        $obj->share_from: $pkg,  \(@:  $var ), 1
     
 
 sub share_forget($self)
@@ -257,23 +257,23 @@ sub share_forget($self)
 
 
 sub varglob($obj, $var)
-    return Symbol::fetch_glob($obj->root()."::$var")
+    return Symbol::fetch_glob: $obj->root."::$var"
 
 
 
 sub reval($obj, $expr, ?$strict)
     my $root = $obj->{?Root}
 
-    my $evalsub = lexless_anon_sub($root,$strict, $expr)
-    return Opcode::_safe_call_sv($root, $obj->{?Mask}, $evalsub)
+    my $evalsub = lexless_anon_sub: $root,$strict, $expr
+    return Opcode::_safe_call_sv: $root, $obj->{?Mask}, $evalsub
 
 
 sub rdo($obj, $file)
     my $root = $obj->{?Root}
 
     my $evalsub = eval
-        sprintf('package %s; sub { @_ = (); do $file }', $root)
-    return Opcode::_safe_call_sv($root, $obj->{?Mask}, $evalsub)
+        sprintf: 'package %s; sub { @_ = (); do $file }', $root
+    return Opcode::_safe_call_sv: $root, $obj->{?Mask}, $evalsub
 
 
 

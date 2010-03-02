@@ -8,8 +8,8 @@ sub PRINTF { }
 
 sub TIEHANDLE
     my $class = shift
-    open my $fh
-    return bless $fh, $class
+    open: my $fh
+    return bless: $fh, $class
 
 sub READ     { }
 sub READLINE { }

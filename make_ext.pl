@@ -3,7 +3,7 @@
 use warnings
 use Config
 BEGIN
-    unshift $^INCLUDE_PATH, $^OS_NAME eq 'MSWin32' ?? ('../cpan/Cwd', '../cpan/Cwd/lib') !! 'cpan/Cwd'
+    unshift: $^INCLUDE_PATH, $^OS_NAME eq 'MSWin32' ?? ('../cpan/Cwd', '../cpan/Cwd/lib') !! 'cpan/Cwd'
 use Cwd
 
 my $is_Win32 = $^OS_NAME eq 'MSWin32'
@@ -27,10 +27,10 @@ my @toolchain = qw(cpan/Cwd cpan/Cwd/lib
 		   )
 
 # Used only in ExtUtils::Liblist::Kid::_win32_ext()
-push @toolchain, 'cpan/Text-ParseWords/lib' if $is_Win32
+push: @toolchain, 'cpan/Text-ParseWords/lib' if $is_Win32
 
 my @ext_dirs = qw(cpan dist ext)
-my $ext_dirs_re = '(?:' . join('|', @ext_dirs) . ')'
+my $ext_dirs_re = '(?:' . (join: '|', @ext_dirs) . ')'
 
 # This script acts as a simple interface for building extensions.
 
@@ -83,16 +83,16 @@ foreach (@ARGV)
     elsif (m/^--([\w\-]+)$/)
         %opts{+$1} = 1
     elsif (m/^--([\w\-]+)=(.*)$/)
-        push %opts{+$1}, $2
+        push: %opts{+$1}, $2
     elsif (m/=/)
-        push @pass_through, $_
+        push: @pass_through, $_
     else
-        push @extspec, $_
+        push: @extspec, $_
 
 my $static = %opts{?static} || %opts{?all}
 my $dynamic = %opts{?dynamic} || %opts{?all}
 my $nonxs = %opts{?nonxs} || %opts{?all}
-my $dynaloader = %opts{?dynaloader} || %opts{?all};
+my $dynaloader = %opts{?dynaloader} || %opts{?all}
 
 # The Perl Makefile.SH will expand all extensions to
 #       lib/auto/X/X.a  (or lib/auto/X/Y/Y.a if nested)
@@ -118,7 +118,7 @@ foreach (@extspec)
         s/\..*o//
 
 my $makecmd  = shift @pass_through # Should be something like MAKE=make
-unshift @pass_through, 'PERL_CORE=1'
+unshift: @pass_through, 'PERL_CORE=1'
 
 my $dirs  = %opts{?dir} || @: 'cpan', 'ext'
 my $target   = %opts{?target}[?0] // 'all'
@@ -131,81 +131,81 @@ my $target   = %opts{?target}[?0] // 'all'
 # case third party users of this script (are there any?) don't have the
 # MAKE=$(MAKE) argument, which was added after 5.004_03.
 unless(defined $makecmd and $makecmd =~ m/^MAKE=(.*)$/)
-    die "$^PROGRAM_NAME:  WARNING:  Please include MAKE=\$(MAKE) in \@ARGV\n"
+    die: "$^PROGRAM_NAME:  WARNING:  Please include MAKE=\$(MAKE) in \@ARGV\n"
 
 # This isn't going to cope with anything fancy, such as spaces inside command
 # names, but neither did what it replaced. Once there is a use case that needs
 # it, please supply patches. Until then, I'm sticking to KISS
-my @make = split ' ', $1 || config_value('make') || env::var('MAKE')
+my @make = split: ' ', $1 || (config_value: 'make') || env::var: 'MAKE'
 # Using an array of 0 or 1 elements makes the subsequent code simpler.
-my @run = @: config_value('run')
-@run = $@ if not defined @run[?0] or @run[0] eq '';
+my @run = @: config_value: 'run'
+@run = $@ if not defined @run[?0] or @run[0] eq ''
 
 
 if ($target eq '')
-    die "make_ext: no make target specified (eg all or clean)\n"
+    die: "make_ext: no make target specified (eg all or clean)\n"
 elsif ($target !~ m/(?:^all|clean)$/)
     # for the time being we are strict about what make_ext is used for
-    die "$^PROGRAM_NAME: unknown make target '$target'\n"
+    die: "$^PROGRAM_NAME: unknown make target '$target'\n"
 
 if (!@extspec and !$static and !$dynamic and !$nonxs and !$dynaloader)
-    die "$^PROGRAM_NAME: no extension specified\n"
+    die: "$^PROGRAM_NAME: no extension specified\n"
 
 my $perl
 my %extra_passthrough
 
 if ($is_Win32)
-    (my $here = getcwd()) =~ s{/}{\\}g
+    (my $here = (getcwd: )) =~ s{/}{\\}g
     $perl = $^EXECUTABLE_NAME
     if ($perl =~ m#^\.\.#)
         $perl = "$here\\$perl"
     (my $topdir = $perl) =~ s/\\[^\\]+$//
     # miniperl needs to find perlglob and pl2bat
-    env::var('PATH') = "$topdir;$topdir\\win32\\bin;$(env::var('PATH'))"
+    (env::var: 'PATH') = "$topdir;$topdir\\win32\\bin;$((env::var: 'PATH'))"
     my $pl2bat = "$topdir\\win32\\bin\\pl2bat"
     unless (-f "$pl2bat.bat")
         my @args = @: $perl, "-I$topdir\\lib", < (@: "$pl2bat.pl") x 2
-        print $^STDOUT, "$(join ' ', @args)\n"
-        system(< @args) unless defined $::Cross::platform
+        print: $^STDOUT, "$((join: ' ', @args))\n"
+        system: < @args unless defined $::Cross::platform
 
-    my $build = getcwd()
-    print $^STDOUT, "In $build"
+    my $build = (getcwd: )
+    print: $^STDOUT, "In $build"
     for my $dir ($dirs)
-        chdir($dir) or die "Cannot cd to $dir: $^OS_ERROR\n"
-        (my $ext = getcwd()) =~ s{/}{\\}g
-        FindExt::scan_ext($ext)
-        FindExt::set_static_extensions(split ' ', config_value('static_ext'))
+        chdir: $dir or die: "Cannot cd to $dir: $^OS_ERROR\n"
+        (my $ext = (getcwd: )) =~ s{/}{\\}g
+        FindExt::scan_ext: $ext
+        FindExt::set_static_extensions: (split: ' ', (config_value: 'static_ext'))
         chdir $build
-            or die "Couldn't chdir to '$build': $^OS_ERROR"; # restore our start directory
+            or die: "Couldn't chdir to '$build': $^OS_ERROR"; # restore our start directory
 
     my @ext
-    push @ext, < FindExt::static_ext() if $static
-    push @ext, < FindExt::dynamic_ext() if $dynamic
-    push @ext, < FindExt::nonxs_ext() if $nonxs
-    push @ext, 'Dynaloader' if $dynaloader
+    push: @ext, < (FindExt::static_ext: ) if $static
+    push: @ext, < (FindExt::dynamic_ext: ) if $dynamic
+    push: @ext, < (FindExt::nonxs_ext: ) if $nonxs
+    push: @ext, 'Dynaloader' if $dynaloader
 
-    foreach (sort @ext)
+    foreach ((sort: @ext))
         if (%incl and !exists %incl{$_})
             #warn "Skipping extension $_, not in inclusion list\n";
             next
         if (exists %excl{$_})
-            warn "Skipping extension $_, not ported to current platform"
+            warn: "Skipping extension $_, not ported to current platform"
             next
-        push @extspec, $_
+        push: @extspec, $_
         if($_ eq 'DynaLoader')
             # No, we don't know why nmake can't work out the dependency chain
-            push %extra_passthrough{+$_}, 'DynaLoader.c';
-        elsif(FindExt::is_static($_))
-            push %extra_passthrough{+$_}, 'LINKTYPE=static'
+            push: %extra_passthrough{+$_}, 'DynaLoader.c';
+        elsif((FindExt::is_static: $_))
+            push: %extra_passthrough{+$_}, 'LINKTYPE=static'
 
     chdir '..'
-        or die "Couldn't chdir to build directory: $^OS_ERROR"; # now in the Perl build directory
+        or die: "Couldn't chdir to build directory: $^OS_ERROR"; # now in the Perl build directory
 elsif ($is_VMS)
     $perl = $^EXECUTABLE_NAME
-    push @extspec, (< split ' ', config_value('static_ext')) if $static
-    push @extspec, (< split ' ', config_value('dynamic_ext')) if $dynamic
-    push @extspec, (< split ' ', config_value('nonxs_ext')) if $nonxs
-    push @extspec, 'DynaLoader' if $dynaloader
+    push: @extspec, (< (split: ' ', (config_value: 'static_ext'))) if $static
+    push: @extspec, (< (split: ' ', (config_value: 'dynamic_ext'))) if $dynamic
+    push: @extspec, (< (split: ' ', (config_value: 'nonxs_ext'))) if $nonxs
+    push: @extspec, 'DynaLoader' if $dynaloader
 
 foreach my $spec (@extspec) 
     my $mname = $spec
@@ -223,24 +223,24 @@ foreach my $spec (@extspec)
                 $ext_pathname = "$dir/$copy"
                 last
         if (!defined $ext_pathname)
-            warn "Can't find extension $spec in any of @ext_dirs"
+            warn: "Can't find extension $spec in any of @ext_dirs"
             next
 
-    if (config_value('osname') eq 'catamount')
+    if ((config_value: 'osname') eq 'catamount')
         # Snowball's chance of building extensions.
-        die "This is $(config_value('osname')), not building $mname, sorry.\n"
+        die: "This is $((config_value: 'osname')), not building $mname, sorry.\n"
 
-    print $^STDOUT, "\tMaking $mname ($target)\n"
+    print: $^STDOUT, "\tMaking $mname ($target)\n"
 
-    build_extension($ext_pathname, $perl, $mname,
-                    @pass_through +@+ (%extra_passthrough{?$spec} || $@))
+    build_extension: $ext_pathname, $perl, $mname
+                     @pass_through +@+ (%extra_passthrough{?$spec} || $@)
 
 sub build_extension($ext_dir, $perl, $mname, $pass_through)
     my $up = $ext_dir
     $up =~ s![^/]+!..!g
 
     unless (chdir "$ext_dir")
-        warn "Cannot cd to $ext_dir: $^OS_ERROR"
+        warn: "Cannot cd to $ext_dir: $^OS_ERROR"
         return
 
     $perl ||= "$up/miniperl"
@@ -249,13 +249,13 @@ sub build_extension($ext_dir, $perl, $mname, $pass_through)
     # $lib_dir must be last, as we're copying files into it, and in a parallel
     # make there's a race condition if one process tries to open a module that
     # another process has half-written.
-    my @new_inc = map {"$up/$_"}, @: < @toolchain, $lib_dir
+    my @new_inc = map: {"$up/$_"}, @: < @toolchain, $lib_dir
     if ($is_Win32)
         require File::Spec::Functions
-        @new_inc = map {File::Spec::Functions::rel2abs($_)}, @new_inc
-    env::var('PERL5LIB')
-        = join config_value('path_sep'), @new_inc
-    env::var('PERL_CORE') = 1
+        @new_inc = map: {(File::Spec::Functions::rel2abs: $_)}, @new_inc
+    env::var: 'PERL5LIB'
+        = join: (config_value: 'path_sep'), @new_inc
+    (env::var: 'PERL_CORE') = 1
 
     my $makefile
     if ($is_VMS)
@@ -269,12 +269,12 @@ sub build_extension($ext_dir, $perl, $mname, $pass_through)
     
     if (!-f $makefile)
         if (!-f 'Makefile.PL')
-            print $^STDOUT, "\nCreating Makefile.PL in $ext_dir for $mname\n"
+            print: $^STDOUT, "\nCreating Makefile.PL in $ext_dir for $mname\n"
             # We need to cope well with various possible layouts
-            my @dirs = split m/::/, $mname
+            my @dirs = split: m/::/, $mname
             my $leaf = pop @dirs
             my $leafname = "$leaf.pm"
-            my $pathname = join '/', @dirs +@+ @: $leafname
+            my $pathname = join: '/', @dirs +@+ @: $leafname
             my @locations = @: $leafname, $pathname, "lib/$pathname"
             my $fromname
             foreach (@locations)
@@ -283,13 +283,13 @@ sub build_extension($ext_dir, $perl, $mname, $pass_through)
                     last
 
             unless ($fromname)
-                die "For $mname tried $(join ' ', @locations) in in $ext_dir but can't find source"
+                die: "For $mname tried $((join: ' ', @locations)) in in $ext_dir but can't find source"
             my $pod_name
             ($pod_name = $fromname) =~ s/\.pm\z/.pod/
             $pod_name = $fromname unless -e $pod_name
-            open my $fh, '>', 'Makefile.PL'
-                or die "Can't open Makefile.PL for writing: $^OS_ERROR"
-            print $fh, <<"EOM"
+            open: my $fh, '>', 'Makefile.PL'
+                or die: "Can't open Makefile.PL for writing: $^OS_ERROR"
+            print: $fh, <<"EOM"
 #-*- buffer-read-only: t -*-
 
 # This Makefile.PL was written by $^PROGRAM_NAME.
@@ -306,9 +306,9 @@ WriteMakefile(
 
 # ex: set ro:
 EOM
-            close $fh or die "Can't close Makefile.PL: $^OS_ERROR"
+            close $fh or die: "Can't close Makefile.PL: $^OS_ERROR"
 
-        print $^STDOUT, "\nRunning Makefile.PL in $ext_dir\n"
+        print: $^STDOUT, "\nRunning Makefile.PL in $ext_dir\n"
 
         # Presumably this can be simplified
         my @cross
@@ -321,16 +321,16 @@ EOM
             
         my @args = @: < @cross, 'Makefile.PL'
         if ($is_VMS)
-            my $libd = VMS::Filespec::vmspath($lib_dir)
-            push @args, "INST_LIB=$libd", "INST_ARCHLIB=$libd"
+            my $libd = VMS::Filespec::vmspath: $lib_dir
+            push: @args, "INST_LIB=$libd", "INST_ARCHLIB=$libd"
         else
-            push @args, 'INSTALLDIRS=perl', 'INSTALLMAN1DIR=none',
-                'INSTALLMAN3DIR=none'
-        push @args, < $pass_through
-        _quote_args(\@args) if $is_VMS
-        print $^STDOUT, join(' ', @: < @run, $perl, < @args), "\n"
-        my $code = system < @run, $perl, < @args
-        warn "$code from $ext_dir\'s Makefile.PL" if $code
+            push: @args, 'INSTALLDIRS=perl', 'INSTALLMAN1DIR=none'
+                  'INSTALLMAN3DIR=none'
+        push: @args, < $pass_through
+        _quote_args: \@args if $is_VMS
+        print: $^STDOUT, (join: ' ', @: < @run, $perl, < @args), "\n"
+        my $code = system: < @run, $perl, < @args
+        warn: "$code from $ext_dir\'s Makefile.PL" if $code
 
         # Right. The reason for this little hack is that we're sitting inside
         # a program run by ./miniperl, but there are tasks we need to perform
@@ -347,56 +347,56 @@ EOM
             my $suffix = '.sh'
             foreach my $clean_target (@: 'realclean', 'veryclean')
                 my $file = "$return_dir/$clean_target$suffix"
-                open my $fh, '>>', $file or die "open $file: $^OS_ERROR"
+                open: my $fh, '>>', $file or die: "open $file: $^OS_ERROR"
                 # Quite possible that we're being run in parallel here.
                 # Can't use Fcntl this early to get the LOCK_EX
-                flock $fh, 2 or warn "flock $file: $^OS_ERROR"
-                print $fh, <<"EOS"
+                flock: $fh, 2 or warn: "flock $file: $^OS_ERROR"
+                print: $fh, <<"EOS"
 cd $ext_dir
 if test ! -f Makefile -a -f Makefile.old; then
     echo "Note: Using Makefile.old"
-    make -f Makefile.old $clean_target MAKE='$(join ' ', @make)' $(join ' ', @pass_through)
+    make -f Makefile.old $clean_target MAKE='$((join: ' ', @make))' $((join: ' ', @pass_through))
 else
     if test ! -f Makefile ; then
         echo "Warning: No Makefile!"
     fi
-    make $clean_target MAKE='$(join ' ', @make)' $(join ' ', @pass_through)
+    make $clean_target MAKE='$((join: ' ', @make))' $((join: ' ', @pass_through))
 fi
 cd $return_dir
 EOS
-                close $fh or die "close $file: $^OS_ERROR"
+                close $fh or die: "close $file: $^OS_ERROR"
 
     if (not -f $makefile)
-        print $^STDOUT, "Warning: No Makefile!\n"
+        print: $^STDOUT, "Warning: No Makefile!\n"
 
     if ($is_VMS)
-        _macroify_passthrough(\$pass_through)
-        unshift $pass_through, "/DESCRIPTION=$makefile"
+        _macroify_passthrough: \$pass_through
+        unshift: $pass_through, "/DESCRIPTION=$makefile"
 
     if (!$target or $target !~ m/clean$/)
         # Give makefile an opportunity to rewrite itself.
         # reassure users that life goes on...
         my @args = @: 'config', < $pass_through
-        _quote_args(\@args) if $is_VMS
-        system(< @run, < @make, < @args) and print $^STDOUT, "$(join ' ', @run +@+ @make +@+ @args) failed, continuing anyway...\n"
+        _quote_args: \@args if $is_VMS
+        system: < @run, < @make, < @args and print: $^STDOUT, "$((join: ' ', @run +@+ @make +@+ @args)) failed, continuing anyway...\n"
 
     my @targ = @: $target, < $pass_through
-    _quote_args(\@targ) if $is_VMS
-    print $^STDOUT, "Making $target in $ext_dir\n$(join ' ', @: < @run, < @make, < @targ)\n"
-    my $code = system(< @run, < @make, < @targ)
-    die "Unsuccessful make($ext_dir): code=$code" if $code != 0
+    _quote_args: \@targ if $is_VMS
+    print: $^STDOUT, "Making $target in $ext_dir\n$((join: ' ', @: < @run, < @make, < @targ))\n"
+    my $code = system: < @run, < @make, < @targ
+    die: "Unsuccessful make($ext_dir): code=$code" if $code != 0
 
-    chdir $return_dir || die "Cannot cd to $return_dir: $^OS_ERROR"
+    chdir $return_dir || die: "Cannot cd to $return_dir: $^OS_ERROR"
 
 sub _quote_args($args)
 
     # Do not quote qualifiers that begin with '/'.
-    map { if (! m/^\//)
-             $_ =~ s/\"/""/g     # escape C<"> by doubling
-             $_ = q(").$_.q(")
-        }, $args->@
+    map: { if (! m/^\//)
+                 $_ =~ s/\"/""/g     # escape C<"> by doubling
+                 $_ = q(").$_.q(")
+             }, $args->@
 
 sub _macroify_passthrough($passthrough)
-    _quote_args($passthrough);
-    my $macro = '/MACRO=(' . join(',',$passthrough->@) . ')';
+    (_quote_args: $passthrough);
+    my $macro = '/MACRO=(' . (join: ',',$passthrough->@) . ')';
     $passthrough->$ = @: $macro

@@ -19,27 +19,27 @@ do
 
     use Class::Struct < qw(struct)
 
-    struct 'IPC::Msg::stat' => \@: 
-           uid  => '$'
-           gid  => '$'
-           cuid => '$'
-           cgid => '$'
-           mode => '$'
-           qnum => '$'
-           qbytes       => '$'
-           lspid        => '$'
-           lrpid        => '$'
-           stime        => '$'
-           rtime        => '$'
-           ctime        => '$'
+    struct: 'IPC::Msg::stat' => \@:
+                uid  => '$'
+                gid  => '$'
+                cuid => '$'
+                cgid => '$'
+                mode => '$'
+                qnum => '$'
+                qbytes       => '$'
+                lspid        => '$'
+                lrpid        => '$'
+                stime        => '$'
+                rtime        => '$'
+                ctime        => '$'
            
 
 
 sub new($class, $key, $flags)
-    my $id = msgget($key, $flags)
+    my $id = msgget: $key, $flags
 
-    defined($id)
-        ?? bless \$id, $class
+    defined: $id
+        ?? bless: \$id, $class
         !! undef
 
 
@@ -51,9 +51,9 @@ sub id
 sub stat
     my $self = shift
     my $data = ""
-    msgctl($self->$,IPC_STAT,$data) or
+    msgctl: $self->$,IPC_STAT,$data or
         return undef
-    IPC::Msg::stat->new->unpack($data)
+    IPC::Msg::stat->new->unpack: $data
 
 
 sub set
@@ -63,34 +63,34 @@ sub set
     if((nelems @_) == 1)
         $ds = shift
     else
-        croak 'Bad arg count' if (nelems @_) % 2
+        croak: 'Bad arg count' if (nelems @_) % 2
         my %arg = %:  < @_ 
         $ds = $self->stat
             or return undef
         my($key,$val)
-        $ds->?$key($val)
+         $ds->?$key: $val
             while((@: $key,$val) =(@:  each %arg))
     
 
-    msgctl($self->$,IPC_SET,$ds->pack)
+    msgctl: $self->$,IPC_SET,$ds->pack
 
 
 sub remove
     my $self = shift
-    (@: msgctl($self->$,IPC_RMID,0), undef $self->$)[0]
+    (@: (msgctl: $self->$,IPC_RMID,0), undef $self->$)[0]
 
 
 sub rcv($self, $buf, $len, ?$type, ?$flags)
     my $rcvbuf = ""
-    msgrcv($self->$,$rcvbuf, $len, $type || 0, $flags || 0) or
+    msgrcv: $self->$,$rcvbuf, $len, $type || 0, $flags || 0 or
         return
     my $type
-    (@: $type, $buf->$) = @: unpack("l! a*",$rcvbuf)
+    (@: $type, $buf->$) = @: unpack: "l! a*",$rcvbuf
     return $type
 
 
 sub snd($self, $type, $buf, ?$flags)
-    msgsnd($self->$,pack("l! a*", $type, $buf), $flags || 0)
+    msgsnd: $self->$,(pack: "l! a*", $type, $buf), $flags || 0
 
 
 

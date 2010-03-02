@@ -15,7 +15,7 @@ sub import
             $layer = "$($class)::$layer"
         
         eval "require $layer"
-        warn "failed loading $layer\: $($^EVAL_ERROR->message)" if $^EVAL_ERROR
+        warn: "failed loading $layer\: $($^EVAL_ERROR->message)" if $^EVAL_ERROR
     
 
 

@@ -11,7 +11,7 @@ $VERSION = '0.06'
 @ISA = @:  'ExtUtils::Constant::XS' 
 
 %type_to_struct =
-    %: 
+    %:
     IV => '{const char *name; I32 namelen; IV value;}'
     NV => '{const char *name; I32 namelen; NV value;}'
     UV => '{const char *name; I32 namelen; UV value;}'
@@ -24,7 +24,7 @@ $VERSION = '0.06'
     
 
 %type_from_struct =
-    %: 
+    %:
     IV => sub (@< @_) { (@:  @_[0] . '->value' ) }
     NV => sub (@< @_) { (@:  @_[0] . '->value' ) }
     UV => sub (@< @_) { (@:  @_[0] . '->value' ) }
@@ -37,7 +37,7 @@ $VERSION = '0.06'
     
 
 %type_to_sv =
-    %: 
+    %:
     IV => sub (@< @_) { "newSViv(@_[0])" }
     NV => sub (@< @_) { "newSVnv(@_[0])" }
     UV => sub (@< @_) { "newSVuv(@_[0])" }
@@ -51,7 +51,7 @@ $VERSION = '0.06'
     
 
 %type_to_C_value =
-    %: 
+    %:
     YES => sub (_) {}
     NO => sub (_) {}
     UNDEF => sub (_){}
@@ -60,20 +60,20 @@ $VERSION = '0.06'
 
 sub type_to_C_value
     my (@: $self, $type) =  @_
-    return %type_to_C_value{?$type} || sub (@< @_) {return @+: map {ref $_ ?? $_->@ !! (@: $_) }, @_ }
+    return %type_to_C_value{?$type} || sub (@< @_) {return @+: (map: {ref $_ ?? $_->@ !! (@: $_) }, @_) }
 
 
 # TODO - figure out if there is a clean way for the type_to_sv code to
 # attempt s/sv_2mortal// and if it succeeds tell type_to_sv not to add
 # SvREFCNT_inc
 %type_is_a_problem =
-    %: 
+    %:
     # The documentation says *mortal SV*, but we now need a non-mortal copy.
     SV => 1
     
 
 %type_temporary =
-    %: 
+    %:
     SV => \(@: 'SV *')
     PV => \(@: 'const char *')
     PVN => \(@: 'const char *', 'STRLEN')
@@ -101,19 +101,19 @@ sub partition_names($self, $default_type, @< @items)
             $default_item->{+post} = delete $item->{def_post}
             $default_item->{+type} = shift $default->@
             $default_item->{+value} = $default
-            push @items, $default_item
+            push: @items, $default_item
         else
             # It can be "not found" unless it's the default (invert the macro)
             # or the "macro" is an empty string (ie no macro)
-            push @notfound, $item unless $item->{?invert_macro}
-                or !$self->macro_to_ifdef( $self->macro_from_item($item))
+            push: @notfound, $item unless $item->{?invert_macro}
+                or !$self->macro_to_ifdef:  ($self->macro_from_item: $item)
         
 
         if ($item->{?pre} or $item->{?post} or $item->{?not_constant}
             or %type_is_a_problem{?$item->{?type}})
-            push @trouble, $item
+            push: @trouble, $item
         else
-            push %found{+$item->{?type}}, $item
+            push: %found{+$item->{?type}}, $item
         
     
     # use Data::Dumper; print Dumper \%found;
@@ -122,15 +122,15 @@ sub partition_names($self, $default_type, @< @items)
 
 sub boottime_iterator($self, $type, $iterator, $hash, $subname)
     my $extractor = %type_from_struct{?$type}
-    die "Can't find extractor code for type $type"
+    die: "Can't find extractor code for type $type"
         unless defined $extractor
     my $generator = %type_to_sv{?$type}
-    die "Can't find generator code for type $type"
+    die: "Can't find generator code for type $type"
         unless defined $generator
 
-    my $athx = $self->C_constant_prefix_param()
+    my $athx = $self->C_constant_prefix_param
 
-    return sprintf <<"EOBOOT", $generator->( < $extractor->($iterator))
+    return sprintf: <<"EOBOOT", $generator->& <:  <( $extractor->& <: $iterator)
         while ($iterator->name) \{
 	    $subname($athx $hash, $iterator->name,
 				$iterator->namelen, \%s);
@@ -145,9 +145,9 @@ sub name_len_value_macro($self, $item)
     $value = $item->{?name} unless defined $value
 
     my $namelen = length $name
-    $name = C_stringify($name)
+    $name = C_stringify: $name
 
-    my $macro = $self->macro_from_item($item)
+    my $macro = $self->macro_from_item: $item
     return @: $name, $namelen, $value, $macro
 
 
@@ -173,22 +173,22 @@ sub WriteConstants
     # A hash to lookup items with.
     my $items = \$%
 
-    my @items = $self->normalise_items (\(%: disable_utf8_duplication => 1),
-        $default_type, $what, $items,
-        < $ARGS->{NAMES}->@)
+    my @items = $self->normalise_items : \(%: disable_utf8_duplication => 1)
+                                         $default_type, $what, $items
+                                         < $ARGS->{NAMES}->@
 
     # Partition the values by type. Also include any defaults in here
     # Everything that doesn't have a default needs alternative code for
     # "I'm missing"
     # And everything that has pre or post code ends up in a private block
     my @: $found, $notfound, $trouble
-        =  $self->partition_names($default_type, < @items)
+        =  $self->partition_names: $default_type, < @items
 
-    my $pthx = $self->C_constant_prefix_param_defintion()
-    my $athx = $self->C_constant_prefix_param()
-    my $symbol_table = C_stringify($package)
+    my $pthx = $self->C_constant_prefix_param_defintion
+    my $athx = $self->C_constant_prefix_param
+    my $symbol_table = C_stringify: $package
 
-    print $c_fh, $self->header(), <<"EOADD"
+    print: $c_fh, $self->header, <<"EOADD"
 static void
 $($c_subname)_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *value) \{
         ENTER;
@@ -200,7 +200,7 @@ $($c_subname)_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *valu
 
 EOADD
 
-    print $c_fh, $explosives ?? <<"EXPLODE" !! "\n"
+    print: $c_fh, $explosives ?? <<"EXPLODE" !! "\n"
 
 static int
 Im_sorry_Dave(pTHX_ SV *sv, MAGIC *mg)
@@ -231,7 +231,7 @@ EXPLODE
         $key =~ s/::$//
         my $key_len = length $key
 
-        print $c_fh, <<"MISSING"
+        print: $c_fh, <<"MISSING"
 
 #ifndef SYMBIAN
 
@@ -270,7 +270,7 @@ MISSING
 
     
 
-    print $xs_fh, <<"EOBOOT"
+    print: $xs_fh, <<"EOBOOT"
 BOOT:
   \{
 #ifdef dTHX
@@ -285,20 +285,20 @@ EOBOOT
     my %iterator
 
     $found->{+''}
-        = map {\(%: < $_->%, type=>'', invert_macro => 1)}, $notfound->@
+        = map: {\(%: < $_->%, type=>'', invert_macro => 1)}, $notfound->@
 
-    foreach my $type (sort keys $found->%)
+    foreach my $type ((sort: keys $found->%))
         my $struct = %type_to_struct{?$type}
-        my $type_to_value = $self->type_to_C_value($type)
+        my $type_to_value = $self->type_to_C_value: $type
         my $number_of_args = %type_num_args{?$type}
-        die "Can't find structure definition for type $type"
+        die: "Can't find structure definition for type $type"
             unless defined $struct
 
-        my $struct_type = $type ?? lc($type) . '_s' !! 'notfound_s'
-        print $c_fh, "struct $struct_type $struct;\n"
+        my $struct_type = $type ?? (lc: $type) . '_s' !! 'notfound_s'
+        print: $c_fh, "struct $struct_type $struct;\n"
 
         my $array_name = 'values_for_' . ($type ?? lc $type !! 'notfound')
-        print $xs_fh, <<"EOBOOT"
+        print: $xs_fh, <<"EOBOOT"
 
     static const struct $struct_type $array_name\[] =
       \{
@@ -307,55 +307,55 @@ EOBOOT
 
         foreach my $item ( $found->{$type})
             my @: $name, $namelen, $value, $macro
-                =  $self->name_len_value_macro($item)
+                =  $self->name_len_value_macro: $item
 
-            my $ifdef = $self->macro_to_ifdef($macro)
+            my $ifdef = $self->macro_to_ifdef: $macro
             if (!$ifdef && $item->{?invert_macro})
-                carp("Attempting to supply a default for '$name' which has no conditional macro")
+                carp: "Attempting to supply a default for '$name' which has no conditional macro"
                 next
             
-            print $xs_fh, $ifdef
+            print: $xs_fh, $ifdef
             if ($item->{?invert_macro})
-                print $xs_fh,
-                    "        /* This is the default value: */\n" if $type
-                print $xs_fh, "#else\n"
+                print: $xs_fh
+                       "        /* This is the default value: */\n" if $type
+                print: $xs_fh, "#else\n"
             
-            print $xs_fh, "        \{ ", join (', ', (@:  "\"$name\"", $namelen
-                                                          < $type_to_value->($value))), " \},\n",
-                $self->macro_to_endif($macro)
+            print: $xs_fh, "        \{ ", (join: ', ', (@:  "\"$name\"", $namelen
+                                                            <( $type_to_value->& <: $value))), " \},\n"
+                   $self->macro_to_endif: $macro
         
 
 
         # Terminate the list with a NULL
-        print $xs_fh, "        \{ NULL, 0", (", 0" x $number_of_args), " \} \};\n"
+        print: $xs_fh, "        \{ NULL, 0", (", 0" x $number_of_args), " \} \};\n"
 
         %iterator{+$type} = "value_for_" . ($type ?? lc $type !! 'notfound')
 
-        print $xs_fh, <<"EOBOOT"
+        print: $xs_fh, <<"EOBOOT"
 	const struct $struct_type *%iterator{?$type} = $array_name;
 EOBOOT
     
 
     delete $found->{''}
 
-    print $xs_fh, <<"EOBOOT"
+    print: $xs_fh, <<"EOBOOT"
 #ifndef SYMBIAN
 	$($c_subname)_missing = get_missing_hash(aTHX);
 #endif
 EOBOOT
 
     my $add_symbol_subname = $c_subname . '_add_symbol'
-    foreach my $type (sort keys $found->%)
-        print $xs_fh, $self->boottime_iterator($type, %iterator{?$type},
-            'symbol_table',
-            $add_symbol_subname)
+    foreach my $type ((sort: keys $found->%))
+        print: $xs_fh, $self->boottime_iterator: $type, %iterator{?$type}
+                                                 'symbol_table'
+                                                 $add_symbol_subname
     
 
-    print $xs_fh, <<"EOBOOT"
+    print: $xs_fh, <<"EOBOOT"
 	while (value_for_notfound->name) \{
 EOBOOT
 
-    print $xs_fh, $explosives ?? <<"EXPLODE" !! << "DONT"
+    print: $xs_fh, $explosives ?? <<"EXPLODE" !! << "DONT"
 	    SV *tripwire = newSV(0);
 	    
 	    sv_magicext(tripwire, 0, PERL_MAGIC_ext, &not_defined_vtbl, 0, 0);
@@ -372,7 +372,7 @@ EOBOOT
 	    $add_symbol_subname($athx symbol_table, value_for_notfound->name,
 				value_for_notfound->namelen, tripwire);
 EXPLODE
-            SV* namesv = sv_2mortal(newSVpvn("$($symbol_table)::", $(length($symbol_table) + 2)));
+            SV* namesv = sv_2mortal(newSVpvn("$($symbol_table)::", $((length: $symbol_table) + 2)));
             sv_catpvn(namesv, value_for_notfound->name, value_for_notfound->namelen);
 	    GV *gv = gv_fetchsv(namesv, GV_ADD, SVt_PVCV);
 	    if (!gv) \{
@@ -391,7 +391,7 @@ EXPLODE
 #endif
 DONT
 
-    print $xs_fh, <<"EOBOOT"
+    print: $xs_fh, <<"EOBOOT"
 
 	    ++value_for_notfound;
 	\}
@@ -399,49 +399,49 @@ EOBOOT
 
     foreach my $item ( $trouble->@)
         my @: $name, $namelen, $value, $macro
-            =  $self->name_len_value_macro($item)
-        my $ifdef = $self->macro_to_ifdef($macro)
+            =  $self->name_len_value_macro: $item
+        my $ifdef = $self->macro_to_ifdef: $macro
         my $type = $item->{?type}
-        my $type_to_value = $self->type_to_C_value($type)
+        my $type_to_value = $self->type_to_C_value: $type
 
-        print $xs_fh, $ifdef
+        print: $xs_fh, $ifdef
         if ($item->{?invert_macro})
-            print $xs_fh,
-                "        /* This is the default value: */\n" if $type
-            print $xs_fh, "#else\n"
+            print: $xs_fh
+                   "        /* This is the default value: */\n" if $type
+            print: $xs_fh, "#else\n"
         
         my $generator = %type_to_sv{?$type}
-        die "Can't find generator code for type $type"
+        die: "Can't find generator code for type $type"
             unless defined $generator
 
-        print $xs_fh, "        \{\n"
+        print: $xs_fh, "        \{\n"
         # We need to use a temporary value because some really troublesome
         # items use C pre processor directives in their values, and in turn
         # these don't fit nicely in the macro-ised generator functions
         my $counter = 0
         foreach (%type_temporary{$type}->@)
-            printf $xs_fh, "            \%s temp\%d;\n", $_, $counter++
+            printf: $xs_fh, "            \%s temp\%d;\n", $_, $counter++
 
-        print $xs_fh, "            $item->{?pre}\n" if $item->{?pre}
+        print: $xs_fh, "            $item->{?pre}\n" if $item->{?pre}
 
         # And because the code in pre might be both declarations and
         # statements, we can't declare and assign to the temporaries in one.
         $counter = 0
-        foreach ($type_to_value->($value))
-            printf $xs_fh, "            temp\%d = \%s;\n", $counter++, $_
+        foreach (($type_to_value->& <: $value))
+            printf: $xs_fh, "            temp\%d = \%s;\n", $counter++, $_
 
-        my @tempvarnames = map {sprintf 'temp%d', $_}, 0 .. $counter - 1
-        printf $xs_fh, <<"EOBOOT", $name, $generator->(<@tempvarnames)
+        my @tempvarnames = map: {(sprintf: 'temp%d', $_)}, 0 .. $counter - 1
+        printf: $xs_fh, <<"EOBOOT", $name, $generator->& <: <@tempvarnames
 	    $($c_subname)_add_symbol($athx symbol_table, "\%s",
 				    $namelen, \%s);
 EOBOOT
-        print $xs_fh, "        $item->{?post}\n" if $item->{?post}
-        print $xs_fh, "        \}\n"
+        print: $xs_fh, "        $item->{?post}\n" if $item->{?post}
+        print: $xs_fh, "        \}\n"
 
-        print $xs_fh, $self->macro_to_endif($macro)
+        print: $xs_fh, $self->macro_to_endif: $macro
     
 
-    print $xs_fh, <<EOBOOT
+    print: $xs_fh, <<EOBOOT
     /* As we've been creating subroutines, we better invalidate any cached
        methods  */
     ++PL_sub_generation;
@@ -454,7 +454,7 @@ constant_not_found()
 
 EOBOOT
 
-    print $xs_fh, $explosives ?? <<"EXPLODE" !! <<"DONT"
+    print: $xs_fh, $explosives ?? <<"EXPLODE" !! <<"DONT"
 
 void
 $xs_subname(sv)

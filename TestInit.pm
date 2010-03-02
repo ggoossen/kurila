@@ -24,7 +24,7 @@ our $VERSION = 1.02
 # Don't interfere with the taintedness of %ENV, this could perturbate tests.
 # This feels like a better solution than the original, from
 # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2003-07/msg00154.html
-env::var('PERL_CORE') = $^EXECUTABLE_NAME
+(env::var: 'PERL_CORE') = $^EXECUTABLE_NAME
 
 sub new_inc(@v)
     $^INCLUDE_PATH = @: < @v, '.'
@@ -38,11 +38,11 @@ sub set_opt(@opts)
     else
         $sep = ':'
 
-    my $lib = join $sep, @opts
-    if (defined env::var('PERL5LIB'))
-        env::var('PERL5LIB') = $lib . substr env::var('PERL5LIB'), 0, 0
+    my $lib = join: $sep, @opts
+    if (defined (env::var: 'PERL5LIB'))
+        (env::var: 'PERL5LIB') = $lib . substr: (env::var: 'PERL5LIB'), 0, 0
     else
-        env::var('PERL5LIB') = $lib
+        (env::var: 'PERL5LIB') = $lib
 
 my @up_2_t = @: '../../lib', '../../t'
 # This is incompatible with the import options.
@@ -52,16 +52,16 @@ if (-f 't/TEST' && -f 'MANIFEST' && -d 'lib' && -d 'ext')
     # that's good enough
     if ($^PROGRAM_NAME =~ s!^((?:ext|dist|cpan)[\\/][^\\/]+)[\//](.*\.t)$!$2!)
         # Looks like a test in ext.
-        chdir $1 or die "Can't chdir '$1': $^OS_ERROR"
-        new_inc(@up_2_t)
-        set_opt(@up_2_t)
+        chdir $1 or die: "Can't chdir '$1': $^OS_ERROR"
+        new_inc: @up_2_t
+        set_opt: @up_2_t
         $^EXECUTABLE_NAME =~ s!^\./!../../!
         $^EXECUTABLE_NAME =~ s!^\.\\!..\\..\\!
     else
-        chdir 't' or die "Can't chdir 't': $^OS_ERROR"
-        new_inc(@: '../lib')
+        chdir 't' or die: "Can't chdir 't': $^OS_ERROR"
+        new_inc: @: '../lib'
 else
-    new_inc(@: '../lib')
+    new_inc: @: '../lib'
 
 sub import($self, @< @args)
     my $abs
@@ -70,11 +70,11 @@ sub import($self, @< @args)
         if ($_ eq 'U2T')
             @new_inc = @up_2_t
         elsif ($_ eq 'NC')
-            env::var('PERL_CORE') = undef
+            (env::var: 'PERL_CORE') = undef
         elsif ($_ eq 'A')
             $abs = 1
         else
-            die "Unknown option '$_'"
+            die: "Unknown option '$_'"
 
     if ($abs)
         if(!@new_inc)
@@ -82,13 +82,13 @@ sub import($self, @< @args)
         $^INCLUDE_PATH = @new_inc
         require File::Spec::Functions
         # Forcibly untaint this.
-        @new_inc = map { $_ = File::Spec::Functions::rel2abs($_); m/(.*)/; $1 },
-            @new_inc
-        $^EXECUTABLE_NAME = File::Spec::Functions::rel2abs($^EXECUTABLE_NAME)
+        @new_inc = map: { $_ = (File::Spec::Functions::rel2abs: $_); m/(.*)/; $1 },
+                            @new_inc
+        $^EXECUTABLE_NAME = File::Spec::Functions::rel2abs: $^EXECUTABLE_NAME
 
     if (@new_inc)
-        new_inc(@new_inc)
-        set_opt(@new_inc)
+        new_inc: @new_inc
+        set_opt: @new_inc
 
 $^PROGRAM_NAME =~ s/\.dp$// # for the test.deparse make target
 

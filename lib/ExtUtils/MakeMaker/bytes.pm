@@ -9,9 +9,9 @@ sub import
     return unless $Have_Bytes
 
     shift
-    unshift @_, 'bytes'
+    unshift: @_, 'bytes'
 
-    return bytes::import(< @_)
+    return bytes::import: < @_
 
 
 1

@@ -1,39 +1,39 @@
 use ExtUtils::MakeMaker
 use Config
 
-my $arch = config_value('archname') . "-" . config_value('osvers')
+my $arch = (config_value: 'archname') . "-" . config_value: 'osvers'
 my $got = ""
 if (-e 'arch.txt')
-    open my $in, "<", "arch.txt" or die "Can't read 'arch.txt': $^OS_ERROR"
+    open: my $in, "<", "arch.txt" or die: "Can't read 'arch.txt': $^OS_ERROR"
     $got = ~< $in
     close $in
 
 if ($got ne $arch)
     if (-e "Errno.pm")
-        print $^STDOUT, "Removing old 'Errno.pm'\n"
-        unlink "Errno.pm"
-            or die "Failed to remove out of date 'Errno.pm': $^OS_ERROR"
+        print: $^STDOUT, "Removing old 'Errno.pm'\n"
+        unlink: "Errno.pm"
+            or die: "Failed to remove out of date 'Errno.pm': $^OS_ERROR"
     
-    open my $out, ">", "arch.txt" or die "Can't write 'arch.txt': $^OS_ERROR"
-    print $out, $arch
+    open: my $out, ">", "arch.txt" or die: "Can't write 'arch.txt': $^OS_ERROR"
+    print: $out, $arch
     close $out
 
 
-WriteMakefile(
-    NAME         => 'Errno',
-    VERSION_FROM => 'Errno_pm.PL',
-    PL_FILES     => (%: 'Errno_pm.PL'=>'Errno.pm'),
-    PM           => (%: 'Errno.pm' => '$(INST_LIBDIR)/Errno.pm'),
-    'clean'      => (%: FILES => 'Errno.pm arch.txt'),
-    'dist'       => (%: 
-    COMPRESS => 'gzip -9f'
-    SUFFIX   => '.gz'
-    DIST_DEFAULT => 'd/Errno.pm tardist'
-    ),
+WriteMakefile: 
+    NAME         => 'Errno'
+    VERSION_FROM => 'Errno_pm.PL'
+    PL_FILES     => (%: 'Errno_pm.PL'=>'Errno.pm')
+    PM           => (%: 'Errno.pm' => '$(INST_LIBDIR)/Errno.pm')
+    'clean'      => (%: FILES => 'Errno.pm arch.txt')
+    'dist'       => (%:
+        COMPRESS => 'gzip -9f'
+        SUFFIX   => '.gz'
+        DIST_DEFAULT => 'd/Errno.pm tardist'
     )
+    
 
 sub MY::postamble
-    my $TARG = MM->catfile('d','Errno.pm')
+    my $TARG = MM->catfile: 'd','Errno.pm'
     qq!$TARG : Makefile
 	echo '#This is a dummy file so CPAN will find a VERSION' > $TARG
 	echo 'package Errno;' >> $TARG

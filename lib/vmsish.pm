@@ -128,12 +128,12 @@ sub import
     return unless $IsVMS
 
     shift
-    $^HINT_BITS ^|^= bits((nelems @_) ?? < @_ !! < qw(status time))
+    $^HINT_BITS ^|^= bits: (nelems @_) ?? < @_ !! < qw(status time)
     my $sememe
 
     foreach my $sememe ((@: (nelems @_) ?? < @_ !! < qw(exit hushed)))
         $^HINTS{+'vmsish_exit'}   = 1 if $sememe eq 'exit'
-        vmsish::hushed(1) if $sememe eq 'hushed'
+        vmsish::hushed: 1 if $sememe eq 'hushed'
     
 
 
@@ -141,11 +141,11 @@ sub unimport
     return unless $IsVMS
 
     shift
-    $^HINT_BITS ^&^= ^~^ bits((nelems @_) ?? < @_ !! < qw(status time))
+    $^HINT_BITS ^&^= ^~^ bits: (nelems @_) ?? < @_ !! < qw(status time)
 
     foreach my $sememe ((@: (nelems @_) ?? < @_ !! < qw(exit hushed)))
         $^HINTS{+'vmsish_exit'}   = 0 if $sememe eq 'exit'
-        vmsish::hushed(0) if $sememe eq 'hushed'
+        vmsish::hushed: 0 if $sememe eq 'hushed'
     
 
 

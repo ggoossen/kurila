@@ -14,10 +14,10 @@ $VERSION = "1.03"
 @ISA = $@
 use I18N::LangTags < qw(alternate_language_tags locale2language_tag)
 
-sub _uniq { my %seen; return grep( {!(%seen{+$_}++) }, @_); }
+sub _uniq { my %seen; return (grep:  {!(%seen{+$_}++) }, @_); }
 sub _normalize
-    my @languages = map { lc($_) }, grep { $_ }, @+: map { @: $_, < alternate_language_tags($_) }, @_
-    return _uniq(< @languages)
+    my @languages = map: { (lc: $_) }, grep: { $_ }, @+: map: { @: $_, < (alternate_language_tags: $_) }, @_
+    return _uniq: < @languages
 
 
 #---------------------------------------------------------------------------
@@ -31,35 +31,35 @@ sub ambient_langprefs # always returns things untainted
     my $base_class = @_[0]
 
     return $base_class->http_accept_langs
-        if length( env::var('REQUEST_METHOD') || '' ) # I'm a CGI
+        if length:  (env::var: 'REQUEST_METHOD') || ''  # I'm a CGI
     # it's off in its own routine because it's complicated
 
     # Not running as a CGI: try to puzzle out from the environment
     my @languages
 
     foreach my $envname (qw( LANGUAGE LC_ALL LC_MESSAGES LANG ))
-        next unless env::var($envname)
-        DEBUG and print $^STDOUT, "Noting \$$envname: $(env::var($envname))\n"
-        push @languages,
-            < map { locale2language_tag($_) },
+        next unless env::var: $envname
+        DEBUG: and print: $^STDOUT, "Noting \$$envname: $((env::var: $envname))\n"
+        push: @languages
+              < map: { (locale2language_tag: $_) },
             # if it's a lg tag, fine, pass thru (untainted)
             # if it's a locale ID, try converting to a lg tag (untainted),
             # otherwise nix it.
 
-            split m/[,:]/,
-            env::var($envname)
+                         split: m/[,:]/
+                                env::var: $envname
         
         last # first one wins
     
 
-    if(env::var('IGNORE_WIN32_LOCALE')) {
+    if((env::var: 'IGNORE_WIN32_LOCALE')) {
     # no-op
-    }elsif(_try_use('Win32::Locale'))
+    }elsif((_try_use: 'Win32::Locale'))
         # If we have that module installed...
-        push @languages, Win32::Locale::get_language() || ''
+        push: @languages, (Win32::Locale::get_language: ) || ''
             if exists &Win32::Locale::get_language
     
-    return _normalize < @languages
+    return _normalize: < @languages
 
 
 #---------------------------------------------------------------------------
@@ -70,7 +70,7 @@ sub http_accept_langs
     # Hm.  Should I just move this into I18N::LangTags at some point?
     no integer
 
-    my $in = ((nelems @_) +> 1) ?? @_[1] !! env::var('HTTP_ACCEPT_LANGUAGE')
+    my $in = ((nelems @_) +> 1) ?? @_[1] !! env::var: 'HTTP_ACCEPT_LANGUAGE'
     # (always ends up untainting)
 
     return() unless defined $in and length $in
@@ -79,10 +79,10 @@ sub http_accept_langs
 
     if( $in =~ m/^\s*([a-zA-Z][-a-zA-Z]+)\s*$/s )
         # Very common case: just one language tag
-        return _normalize $1
+        return _normalize: $1
     elsif( $in =~ m/^\s*[a-zA-Z][-a-zA-Z]+(?:\s*,\s*[a-zA-Z][-a-zA-Z]+)*\s*$/s )
         # Common case these days: just "foo, bar, baz"
-        return _normalize( $in =~ m/([a-zA-Z][-a-zA-Z]+)/g )
+        return _normalize:  $in =~ m/([a-zA-Z][-a-zA-Z]+)/g 
     
 
     # Else it's complicated...
@@ -109,15 +109,15 @@ sub http_accept_langs
         
         $q = (defined $2 and length $2) ?? $2 !! 1
         #print "$1 with q=$q\n";
-        push  %pref{+$q}, lc $1
+        push: %pref{+$q}, lc $1
     
 
-    return _normalize(
+    return _normalize: 
         # Read off %pref, in descending key order...
-        < @+: map { %pref{?$_} },
-        sort {$b <+> $a},
-        keys %pref
-        )
+        < @+: map: { %pref{?$_} },
+                       sort: {$b <+> $a}
+                             keys %pref
+        
 
 
 #===========================================================================
@@ -132,19 +132,19 @@ sub _try_use   # Basically a wrapper around "require Modulename"
     my $module = @_[0]   # ASSUME sane module name!
     do
         return @: ( %tried{+$module} = 1 )
-            if defined(Symbol::fetch_glob($module . "::Lexicon")->*->%) or defined(Symbol::fetch_glob($module . "::ISA")->*->@)
+            if defined: (Symbol::fetch_glob: $module . "::Lexicon")->*->% or defined: (Symbol::fetch_glob: $module . "::ISA")->*->@
     # weird case: we never use'd it, but there it is!
     
 
-    print $^STDOUT, " About to use $module ...\n" if DEBUG
+    print: $^STDOUT, " About to use $module ...\n" if DEBUG: 
     do
         eval "require $module" # used to be "use $module", but no point in that.
     
     if($^EVAL_ERROR)
-        print $^STDOUT, "Error using $module \: $^EVAL_ERROR\n" if DEBUG +> 1
+        print: $^STDOUT, "Error using $module \: $^EVAL_ERROR\n" if (DEBUG: )+> 1
         return (%tried{+$module} = 0)
     else
-        print $^STDOUT, " OK, $module is used\n" if DEBUG
+        print: $^STDOUT, " OK, $module is used\n" if DEBUG: 
         return (%tried{+$module} = 1)
     
 

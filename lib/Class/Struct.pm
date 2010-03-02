@@ -22,16 +22,16 @@ sub import
     my $self = shift
 
     if ( (nelems @_) == 0 )
-        $self->export_to_level( 1, $self, < @EXPORT )
+        $self->export_to_level:  1, $self, < @EXPORT 
     elsif ( (nelems @_) == 1 )
         # This is admittedly a little bit silly:
         # do we ever export anything else than 'struct'...?
-        $self->export_to_level( 1, $self, < @_ )
+        $self->export_to_level:  1, $self, < @_ 
     else
         if (not ref @_[1])
-            return struct( (@: caller)[0] => \@_)
+            return struct:  (@: caller)[0] => \@_
         else
-            return struct(< @_)
+            return struct: < @_
         
     
 
@@ -48,24 +48,24 @@ sub struct
     my $base_type = ref @_[1]
     if ( $base_type eq 'HASH' )
         $class = shift
-        @decls = @: %< shift()->%
-        _usage_error() if (nelems @_)
+        @decls = @: %< (shift: )->%
+        _usage_error:  if (nelems @_)
     elsif ( $base_type eq 'ARRAY' )
         $class = shift
-        @decls = shift()->@
-        _usage_error() if (nelems @_)
+        @decls = (shift: )->@
+        _usage_error:  if (nelems @_)
     else
         $base_type = 'ARRAY'
-        $class = (@: caller())[0]
+        $class = (@: (caller: ))[0]
         @decls = @_
     
 
-    _usage_error() if (nelems @decls) % 2 == 1
+    _usage_error:  if (nelems @decls) % 2 == 1
 
     # Create constructor.
 
-    die "function 'new' already defined in package $class"
-        if do { exists Symbol::fetch_glob($class . "::new")->& }
+    die: "function 'new' already defined in package $class"
+        if do { exists (Symbol::fetch_glob: $class . "::new")->& }
 
     my @methods = $@
     my %refs = $%
@@ -92,7 +92,7 @@ sub struct
     while( $idx +< nelems @decls )
         $name = @decls[$idx]
         $type = @decls[$idx+1]
-        push( @methods, $name )
+        push:  @methods, $name 
         if( $base_type eq 'HASH' )
             $elem = "\{+'$($class)::$name'\}"
         elsif( $base_type eq 'ARRAY' )
@@ -128,7 +128,7 @@ sub struct
             %classes{+$name} = $type
             $got_class = 1
         else
-            die "'$type' is not a valid struct element type"
+            die: "'$type' is not a valid struct element type"
         
         $idx += 2
     
@@ -139,8 +139,8 @@ sub struct
     my( $pre, $pst, $sel )
     $cnt = 0
     foreach my $name ( @methods)
-        if ( exists Symbol::fetch_glob($class . "::$name")->& )
-            warnings::warnif("function '$name' already defined, overrides struct accessor method")
+        if ( exists (Symbol::fetch_glob: $class . "::$name")->& )
+            warnings::warnif: "function '$name' already defined, overrides struct accessor method"
         else
             $pre = $pst = $cmt = $sel = ''
             if( defined %refs{?$name} )
@@ -175,17 +175,17 @@ sub struct
     
     $out .= "\};\n1;\n"
 
-    print $^STDOUT, $out if $print
+    print: $^STDOUT, $out if $print
     my $result = eval $out
-    warn $^EVAL_ERROR if $^EVAL_ERROR
+    warn: $^EVAL_ERROR if $^EVAL_ERROR
 
 
 sub _usage_error
-    die "struct usage error"
+    die: "struct usage error"
 
 
 sub _subclass_error
-    die 'struct class cannot be a subclass (@ISA not allowed)'
+    die: 'struct class cannot be a subclass (@ISA not allowed)'
 
 
 1 # for require

@@ -8,7 +8,7 @@ my ($BigWidth, $BigEnough, $RootWidth, $ItemFormat, @TestSizes, $WellSoaked)
 BEGIN 
     $BigWidth  = 6                              # Digits in $BigEnough-1
     $BigEnough = 10**$BigWidth                  # Largest array we'll attempt
-    $RootWidth = int(($BigWidth+1)/2)           # Digits in sqrt($BigEnough-1)
+    $RootWidth = int: ($BigWidth+1)/2           # Digits in sqrt($BigEnough-1)
     $ItemFormat = "\%0$($RootWidth)d\%0$($BigWidth)d"   # Array item format
     @TestSizes = @: 0, 1, 2                     # Small special cases
     # Testing all the way up to $BigEnough takes too long
@@ -17,7 +17,7 @@ BEGIN
     $WellSoaked = 10_000                        # <= $BigEnough
     my $ts = 3
     while ($ts +< $WellSoaked)
-        push(@TestSizes, int($ts))              # about 3 per decade
+        push: @TestSizes, (int: $ts)              # about 3 per decade
         $ts *= 10**(1/3)
     
 
@@ -38,15 +38,15 @@ use Test::More tests => (nelems @TestSizes) * 2 # sort() tests
 # and reconstruct the original array order.
 
 sub genarray
-    my $size = int(shift)               # fractions not welcome
+    my $size = int: shift               # fractions not welcome
     my ($items)
     my @a
 
     if    ($size +< 0) { $size = 0; }   # avoid complexity with sqrt
         elsif ($size +> $BigEnough) { $size = $BigEnough; }
-    $items = int(sqrt($size))           # number of distinct items
+    $items = int: (sqrt: $size)           # number of distinct items
     for my $i (0 .. $size -1)
-        @a[+$i] = sprintf($ItemFormat, int($items * rand()), $i)
+        @a[+$i] = sprintf: $ItemFormat, (int: $items * (rand: )), $i
     
     return \@a
 
@@ -59,11 +59,11 @@ sub checkorder
     my $status = ''                     # so far, so good
     my ($disorder)
 
-    for my $i (0 .. nelems($aref->@)-2)
+    for my $i (0 .. (nelems: $aref->@)-2)
         # Equality shouldn't happen, but catch it in the contents check
         next if ($aref->[$i] cmp $aref->[$i+1]) +<= 0
-        $disorder = (substr($aref->[$i],   0, $RootWidth) eq
-                     substr($aref->[$i+1], 0, $RootWidth)) ??
+        $disorder = ((substr: $aref->[$i],   0, $RootWidth) eq
+                     (substr: $aref->[$i+1], 0, $RootWidth)) ??
             "Instability" !! "Disorder"
         # Keep checking if merely unstable... disorder is much worse.
         $status =
@@ -79,10 +79,10 @@ sub checkorder
 sub checkequal($aref, $bref)
     my $status = ''
 
-    if (nelems($aref->@) != nelems($bref->@))
-        $status = "Sizes differ: " . nelems($aref->@) . " vs " . nelems($bref->@)
+    if ((nelems: $aref->@) != (nelems: $bref->@))
+        $status = "Sizes differ: " . (nelems: $aref->@) . " vs " . nelems: $bref->@
     else
-        for my $i (0 .. nelems($aref->@) -1)
+        for my $i (0 .. (nelems: $aref->@) -1)
             next if ($aref->[$i] eq $bref->[$i])
             $status = "Element $i differs: $aref->[$i] vs $bref->[$i]"
             last
@@ -99,56 +99,56 @@ sub main($dothesort, $expect_unstable)
     my $unstable_num = 0
 
     foreach my $ts (@TestSizes)
-        $unsorted = genarray($ts)
+        $unsorted = genarray: $ts
         # Sort only on item portion of each element.
         # There will typically be many repeated items,
         # and their order had better be preserved.
-        @sorted = $dothesort->(sub (@< @_) { substr($a, 0, $RootWidth)
-                                       cmp
-                                       substr($b, 0, $RootWidth) }, $unsorted)
-        $status = checkorder(\@sorted)
+        @sorted = $dothesort->& <: sub (@< @_) { substr: $a, 0, $RootWidth
+                                        cmp
+                                        (substr: $b, 0, $RootWidth) }, $unsorted
+        $status = checkorder: \@sorted
         # Put the items back into the original order.
         # The contents of the arrays had better be identical.
         if ($expect_unstable && $status =~ m/^Instability/)
             $status = ''
             ++$unstable_num
         
-        is($status, '', "order ok for size $ts")
-        @sorted = $dothesort->(sub (@< @_) { substr($a, $RootWidth)
-                                       cmp
-                                       substr($b, $RootWidth) }, \@sorted)
-        $status = checkequal(\@sorted, $unsorted)
-        is($status, '', "contents ok for size $ts")
+        is: $status, '', "order ok for size $ts"
+        @sorted = $dothesort->& <: sub (@< @_) { substr: $a, $RootWidth
+                                        cmp
+                                        (substr: $b, $RootWidth) }, \@sorted
+        $status = checkequal: \@sorted, $unsorted
+        is: $status, '', "contents ok for size $ts"
     
     # If the following test (#58) fails, see the comments in pp_sort.c
     # for Perl_sortsv().
     if ($expect_unstable)
-        ok($unstable_num +> 0, 'Instability ok')
+        ok: $unstable_num +> 0, 'Instability ok'
     
 
 
 # Test with no pragma still loaded -- stability expected (this is a mergesort)
-main(sub (@< @_) {sort {@_[0]->( < @_ )}, @_[1]->@ }, 0)
+main: sub (@< @_) {(sort: {(@_[0]->& <:  < @_ )}, @_[1]->@) }, 0
 
 do
     use sort < qw(_qsort)
-    my $sort_current; BEGIN { $sort_current = sort::current(); }
-    is($sort_current, 'quicksort', 'sort::current for _qsort')
-    main(sub (@< @_) {sort {@_[0]->( < @_ )}, @_[1]->@ }, 1)
+    my $sort_current; BEGIN { $sort_current = (sort::current: ); }
+    is: $sort_current, 'quicksort', 'sort::current for _qsort'
+    main: sub (@< @_) {(sort: {(@_[0]->& <:  < @_ )}, @_[1]->@) }, 1
 
 
 do
     use sort < qw(_mergesort)
-    my $sort_current; BEGIN { $sort_current = sort::current(); }
-    is($sort_current, 'mergesort', 'sort::current for _mergesort')
-    main(sub (@< @_) {sort {@_[0]->( < @_ )}, @_[1]->@ }, 0)
+    my $sort_current; BEGIN { $sort_current = (sort::current: ); }
+    is: $sort_current, 'mergesort', 'sort::current for _mergesort'
+    main: sub (@< @_) {(sort: {(@_[0]->& <:  < @_ )}, @_[1]->@) }, 0
 
 
 do
     use sort < qw(_qsort stable)
-    my $sort_current; BEGIN { $sort_current = sort::current(); }
-    is($sort_current, 'quicksort stable', 'sort::current for _qsort stable')
-    main(sub (@< @_) {sort {@_[0]->( < @_ )}, @_[1]->@ }, 0)
+    my $sort_current; BEGIN { $sort_current = (sort::current: ); }
+    is: $sort_current, 'quicksort stable', 'sort::current for _qsort stable'
+    main: sub (@< @_) {(sort: {(@_[0]->& <:  < @_ )}, @_[1]->@) }, 0
 
 
 # Tests added to check "defaults" subpragma, and "no sort"
@@ -156,21 +156,21 @@ do
 do
     use sort < qw(_qsort stable)
     no sort < qw(_qsort)
-    my $sort_current; BEGIN { $sort_current = sort::current(); }
-    is($sort_current, 'stable', 'sort::current after no _qsort')
-    main(sub (@< @_) {sort {@_[0]->( < @_ )}, @_[1]->@ }, 0)
+    my $sort_current; BEGIN { $sort_current = (sort::current: ); }
+    is: $sort_current, 'stable', 'sort::current after no _qsort'
+    main: sub (@< @_) {(sort: {(@_[0]->& <:  < @_ )}, @_[1]->@) }, 0
 
 
 do
     use sort < qw(defaults _qsort)
-    my $sort_current; BEGIN { $sort_current = sort::current(); }
-    is($sort_current, 'quicksort', 'sort::current after defaults _qsort')
+    my $sort_current; BEGIN { $sort_current = (sort::current: ); }
+    is: $sort_current, 'quicksort', 'sort::current after defaults _qsort'
 # Not expected to be stable, so don't test for stability here
 
 
 do
     use sort < qw(defaults stable)
-    my $sort_current; BEGIN { $sort_current = sort::current(); }
-    is($sort_current, 'stable', 'sort::current after defaults stable')
-    main(sub (@< @_) {sort {@_[0]->( < @_ )}, @_[1]->@ }, 0)
+    my $sort_current; BEGIN { $sort_current = (sort::current: ); }
+    is: $sort_current, 'stable', 'sort::current after defaults stable'
+    main: sub (@< @_) {(sort: {(@_[0]->& <:  < @_ )}, @_[1]->@) }, 0
 

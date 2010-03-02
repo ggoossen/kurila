@@ -26,21 +26,21 @@ $VERSION = "1.30_01"
 sub import
     my $pkg = shift
     if ((nelems @_) && @_[0] eq 'sockatmark') # not very extensible but for now, fast
-        Exporter::export_to_level('IO::Socket', 1, $pkg, 'sockatmark')
+        Exporter::export_to_level: 'IO::Socket', 1, $pkg, 'sockatmark'
     else
         my $callpkg = caller
-        Exporter::export 'Socket', $callpkg, < @_
+        Exporter::export:  'Socket', $callpkg, < @_
     
 
 
 sub new($class,%< %arg)
-    my $sock = $class->SUPER::new()
+    my $sock = $class->SUPER::new: 
 
-    $sock->autoflush(1)
+    $sock->autoflush: 1
 
     $sock->*->{+'io_socket_timeout'} = delete %arg{Timeout}
 
-    return scalar(%arg) ?? $sock->configure(\%arg)
+    return (scalar: %arg) ?? $sock->configure: \%arg
         !! $sock
 
 
@@ -53,22 +53,22 @@ sub register_domain($p,$d)
 sub configure($sock,$arg)
     my $domain = delete $arg->{Domain}
 
-    die 'IO::Socket: Cannot configure a generic socket'
+    die: 'IO::Socket: Cannot configure a generic socket'
         unless defined $domain
 
-    die "IO::Socket: Unsupported socket domain"
+    die: "IO::Socket: Unsupported socket domain"
         unless defined @domain2pkg[$domain]
 
-    die "IO::Socket: Cannot configure socket in domain '$domain'"
-        unless ref($sock) eq "IO::Socket"
+    die: "IO::Socket: Cannot configure socket in domain '$domain'"
+        unless (ref: $sock) eq "IO::Socket"
 
-    bless($sock, @domain2pkg[$domain])
-    $sock->configure($arg)
+    bless: $sock, @domain2pkg[$domain]
+    $sock->configure: $arg
 
 
 sub socket($sock,$domain,$type,$protocol)
 
-    socket($sock,$domain,$type,$protocol) or
+    socket: $sock,$domain,$type,$protocol or
         return undef
 
     $sock->*->{+'io_socket_domain'} = $domain
@@ -79,10 +79,10 @@ sub socket($sock,$domain,$type,$protocol)
 
 
 sub socketpair($class,$domain,$type,$protocol)
-    my $sock1 = $class->new()
-    my $sock2 = $class->new()
+    my $sock1 = $class->new
+    my $sock2 = $class->new
 
-    socketpair($sock1,$sock2,$domain,$type,$protocol) or
+    socketpair: $sock1,$sock2,$domain,$type,$protocol or
         return ()
 
     $sock1->*->{+'io_socket_type'}  = $sock2->*->{+'io_socket_type'}  = $type
@@ -96,19 +96,19 @@ sub connect($sock, $addr)
     my $err
     my $blocking
 
-    $blocking = $sock->blocking(0) if $timeout
-    if (!connect($sock, $addr))
-        if (defined $timeout && ($^OS_ERROR == EINPROGRESS || $^OS_ERROR == EWOULDBLOCK))
+    $blocking = ($sock->blocking: 0) if $timeout
+    if (!(connect: $sock, $addr))
+        if (defined $timeout && ($^OS_ERROR == (EINPROGRESS: )|| $^OS_ERROR == (EWOULDBLOCK: )))
             require IO::Select
 
-            my $sel = IO::Select->new( $sock)
+            my $sel = IO::Select->new:  $sock
 
             undef $^OS_ERROR
-            if (!$sel->can_write($timeout))
-                $err = $^OS_ERROR || (exists &Errno::ETIMEDOUT ?? Errno::ETIMEDOUT( < @_ ) !! 1)
+            if (!($sel->can_write: $timeout))
+                $err = $^OS_ERROR || (exists &Errno::ETIMEDOUT ?? (Errno::ETIMEDOUT:  < @_ ) !! 1)
                 $^EVAL_ERROR = "connect: timeout"
-            elsif (!connect($sock,$addr) &&
-                not ($^OS_ERROR == EISCONN || ($^OS_ERROR == 10022 && $^OS_NAME eq 'MSWin32'))
+            elsif (!(connect: $sock,$addr) &&
+                not: $^OS_ERROR == (EISCONN: )|| ($^OS_ERROR == 10022 && $^OS_NAME eq 'MSWin32')
                 )
                 # Some systems refuse to re-connect() to
                 # an already open socket and set errno to EISCONN.
@@ -116,13 +116,13 @@ sub connect($sock, $addr)
                 $err = $^OS_ERROR
                 $^EVAL_ERROR = "connect: $^OS_ERROR"
             
-        elsif ($blocking || !($^OS_ERROR == EINPROGRESS || $^OS_ERROR == EWOULDBLOCK))
+        elsif ($blocking || !($^OS_ERROR == (EINPROGRESS: )|| $^OS_ERROR == (EWOULDBLOCK: )))
             $err = $^OS_ERROR
             $^EVAL_ERROR = "connect: $^OS_ERROR"
         
     
 
-    $sock->blocking(1) if $blocking
+    $sock->blocking: 1 if $blocking
 
     $^OS_ERROR = $err if $err
 
@@ -138,7 +138,7 @@ sub connect($sock, $addr)
 sub blocking
     my $sock = shift
 
-    return $sock->SUPER::blocking(< @_)
+    return $sock->SUPER::blocking: < @_
         if $^OS_NAME ne 'MSWin32'
 
     # Windows handles blocking differently
@@ -164,7 +164,7 @@ sub blocking
 
     if ( !$block != !$orig )
         $sock->*->{+io_sock_nonblocking} = $block ?? 0 !! 1
-        ioctl($sock, 0x8004667e, pack("L!",$sock->*->{?io_sock_nonblocking}))
+        ioctl: $sock, 0x8004667e, (pack: "L!",$sock->*->{?io_sock_nonblocking})
             or return undef
     
 
@@ -174,11 +174,11 @@ sub blocking
 
 sub close($sock)
     $sock->*->{+'io_socket_peername'} = undef
-    $sock->SUPER::close()
+     $sock->SUPER::close: 
 
 
 sub bind($sock, $addr)
-    return bind($sock, $addr) ?? $sock
+    return (bind: $sock, $addr) ?? $sock
         !! undef
 
 
@@ -186,58 +186,58 @@ sub listen($sock,?$queue)
     $queue = 5
         unless $queue && $queue +> 0
 
-    return listen($sock, $queue) ?? $sock
+    return (listen: $sock, $queue) ?? $sock
         !! undef
 
 
 sub accept($sock, ?$pkg)
     $pkg ||= $sock
     my $timeout = $sock->*->{?'io_socket_timeout'}
-    my $new = $pkg->new(Timeout => $timeout)
+    my $new = $pkg->new: Timeout => $timeout
     my $peer = undef
 
     if(defined $timeout)
         require IO::Select
 
-        my $sel = IO::Select->new( $sock)
+        my $sel = IO::Select->new:  $sock
 
-        unless ( (@:  $sel->can_read($timeout) ) )
+        unless ( (@:  ($sel->can_read: $timeout) ) )
             $^EVAL_ERROR = 'accept: timeout'
-            $^OS_ERROR = (exists &Errno::ETIMEDOUT ?? Errno::ETIMEDOUT( < @_ ) !! 1)
+            $^OS_ERROR = (exists &Errno::ETIMEDOUT ?? (Errno::ETIMEDOUT:  < @_ ) !! 1)
             return
         
     
 
-    $peer = accept($new,$sock)
+    $peer = accept: $new,$sock
         or return
 
     return $new
 
 
 sub sockname($sock)
-    getsockname($sock)
+    getsockname: $sock
 
 
 sub peername($sock)
-    $sock->*->{+'io_socket_peername'} ||= getpeername($sock)
+    $sock->*->{+'io_socket_peername'} ||= getpeername: $sock
 
 
 sub connected($sock)
-    getpeername($sock)
+    getpeername: $sock
 
 
 sub send
-    nelems(@_) +>= 2 && (nelems @_) +<= 4 or croak 'usage: $sock->send(BUF, [FLAGS, [TO]])'
+    (nelems: @_) +>= 2 && (nelems @_) +<= 4 or croak: 'usage: $sock->send(BUF, [FLAGS, [TO]])'
     my $sock  = @_[0]
     my $flags = @_[?2] || 0
     my $peer  = @_[?3] || $sock->peername
 
-    croak 'send: Cannot determine peer address'
+    croak: 'send: Cannot determine peer address'
         unless(defined $peer)
 
-    my $r = defined(getpeername($sock))
-        ?? send($sock, @_[1], $flags)
-        !! send($sock, @_[1], $flags, $peer)
+    my $r = defined: (getpeername: $sock)
+        ?? send: $sock, @_[1], $flags
+        !! send: $sock, @_[1], $flags, $peer
 
     # remember who we send to, if it was successful
     $sock->*->{+'io_socket_peername'} = $peer
@@ -250,38 +250,38 @@ sub recv($sock, $buf, $len, ?$flags)
     $flags //= 0
 
     # remember who we recv'd from
-    $sock->*->{+'io_socket_peername'} = recv($sock, ($buf->$=''), $len, $flags)
+    $sock->*->{+'io_socket_peername'} = recv: $sock, ($buf->$=''), $len, $flags
 
 
 sub shutdown($sock, $how)
     $sock->*->{+'io_socket_peername'} = undef
-    shutdown($sock, $how)
+    shutdown: $sock, $how
 
 
 sub setsockopt
-    nelems(@_) == 4 or croak '$sock->setsockopt(LEVEL, OPTNAME, OPTVAL)'
-    setsockopt(@_[0],@_[1],@_[2],@_[3])
+    (nelems: @_) == 4 or croak: '$sock->setsockopt(LEVEL, OPTNAME, OPTVAL)'
+    setsockopt: @_[0],@_[1],@_[2],@_[3]
 
 
-my $intsize = length(pack("i",0))
+my $intsize = length: (pack: "i",0)
 
 sub getsockopt
-    nelems(@_) == 3 or croak '$sock->getsockopt(LEVEL, OPTNAME)'
-    my $r = getsockopt(@_[0],@_[1],@_[2])
+    (nelems: @_) == 3 or croak: '$sock->getsockopt(LEVEL, OPTNAME)'
+    my $r = getsockopt: @_[0],@_[1],@_[2]
     # Just a guess
-    $r = unpack("i", $r)
-        if(defined $r && length($r) == $intsize)
+    $r = unpack: "i", $r
+        if(defined $r && (length: $r) == $intsize)
     $r
 
 
 sub sockopt
     my $sock = shift
-    (nelems @_) == 1 ?? $sock->getsockopt(SOL_SOCKET,< @_)
-        !! $sock->setsockopt(SOL_SOCKET,< @_)
+    (nelems @_) == 1 ?? $sock->getsockopt: SOL_SOCKET,< @_
+        !! $sock->setsockopt: SOL_SOCKET,< @_
 
 
 sub atmark($sock)
-    sockatmark($sock)
+    sockatmark: $sock
 
 
 sub timeout($sock ?= $val)

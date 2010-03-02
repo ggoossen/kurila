@@ -46,9 +46,9 @@ sub _parse_section($link)
     # Split into page and section on slash, and then clean up quoting in the
     # section.  If there is no section and the name contains spaces, also
     # guess that it's an old section link.
-    my (@: $page, ?$section) =  split (m/\s*\/\s*/, $link, 2)
+    my (@: $page, ?$section) =  split: m/\s*\/\s*/, $link, 2
     $section =~ s/^"\s*(.*?)\s*"$/$1/ if $section
-    if ($page && $page =~ m/ / && !defined ($section))
+    if ($page && $page =~ m/ / && !(defined: $section))
         $section = $page
         $page = undef
     else
@@ -81,10 +81,10 @@ sub parselink($link)
     else
         my $text
         if ($link =~ m/\|/)
-            (@: $text, $link) =  split (m/\|/, $link, 2)
+            (@: $text, $link) =  split: m/\|/, $link, 2
         
-        my (@: $name, $section) =  _parse_section ($link)
-        my $inferred = $text || _infer_text ($name, $section)
+        my (@: $name, $section) =  _parse_section: $link
+        my $inferred = $text || _infer_text: $name, $section
         my $type = ($name && $name =~ m/\(\S*\)/) ?? 'man' !! 'pod'
         return  @: $text, $inferred, $name, $section, $type
 

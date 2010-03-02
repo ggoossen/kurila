@@ -4,10 +4,10 @@ use Test::More
 
 BEGIN
     use Config
-    unless (config_value("usedl"))
-        plan skip_all => "no usedl"
+    unless ((config_value: "usedl"))
+        plan: skip_all => "no usedl"
 
-plan "no_plan"
+plan: "no_plan"
 
 # use warnings;
 use ExtUtils::MakeMaker
@@ -21,17 +21,17 @@ $^OUTPUT_AUTOFLUSH = 1
 
 # Because were are going to be changing directory before running Makefile.PL
 my $perl = $^EXECUTABLE_NAME
-$perl = File::Spec->rel2abs ($perl)
+$perl = File::Spec->rel2abs : $perl
 # ExtUtils::Constant::C_constant uses $^X inside a comment, and we want to
 # compare output to ensure that it is the same. We were probably run as ./perl
 # whereas we will run the child with the full path in $perl. So make $^X for
 # us the same as our child will see.
 $^EXECUTABLE_NAME = $perl
-my $lib = env::var('PERL_CORE') ?? '../../../lib' !! '../../blib/lib'
+my $lib = (env::var: 'PERL_CORE') ?? '../../../lib' !! '../../blib/lib'
 my $runperl = "$perl \"-I$lib\""
-diag "perl=$perl"
+diag: "perl=$perl"
 
-my $make = env::var('MAKE') // config_value("make")
+my $make = (env::var: 'MAKE') // config_value: "make"
 if ($^OS_NAME eq 'MSWin32' && $make eq 'nmake') { $make .= " -nologo"; }
 
 # VMS may be using something other than MMS/MMK
@@ -51,59 +51,59 @@ my $dir = "ext-$^PID"
 my $subdir = 0
 # The real test counter.
 
-my $orig_cwd = cwd
+my $orig_cwd = (cwd: )
 my $updir = File::Spec->updir
-die "Can't get current directory: $^OS_ERROR" unless defined $orig_cwd
+die: "Can't get current directory: $^OS_ERROR" unless defined $orig_cwd
 
-diag "$dir being created..."
-mkdir $dir, 0777 or die "mkdir: $^OS_ERROR\n"
+diag: "$dir being created..."
+mkdir: $dir, 0777 or die: "mkdir: $^OS_ERROR\n"
 
 END
     if (defined $orig_cwd and length $orig_cwd)
-        chdir $orig_cwd or die "Can't chdir back to '$orig_cwd': $^OS_ERROR"
+        chdir $orig_cwd or die: "Can't chdir back to '$orig_cwd': $^OS_ERROR"
         use File::Path;
-        diag "$dir being removed..."
-        rmtree($dir) unless $keep_files
+        diag: "$dir being removed..."
+        rmtree: $dir unless $keep_files
     else
         # Can't get here.
-        die "cwd at start was empty, but directory '$dir' was created" if $dir
+        die: "cwd at start was empty, but directory '$dir' was created" if $dir
 
 
 
-chdir $dir or die $^OS_ERROR
-push $^INCLUDE_PATH, '../../lib', '../../../lib'
+chdir $dir or die: $^OS_ERROR
+push: $^INCLUDE_PATH, '../../lib', '../../../lib'
 
 package main
 
 sub check_for_bonus_files
     my $dir = shift
-    my %expect = %:  < @+: map { @: ($^OS_NAME eq 'VMS' ?? lc($_) !! $_), 1}, @_ 
+    my %expect = %:  < @+: map: { @: ($^OS_NAME eq 'VMS' ?? (lc: $_) !! $_), 1}, @_ 
 
     my $fail
-    opendir my $dh, $dir or die "opendir '$dir': $^OS_ERROR"
-    while (defined (my $entry = readdir $dh))
+    opendir: my $dh, $dir or die: "opendir '$dir': $^OS_ERROR"
+    while ((defined: (my $entry = readdir $dh)))
         $entry =~ s/\.$// if $^OS_NAME eq 'VMS'  # delete trailing dot that indicates no extension
         next if %expect{$entry}
-        diag "Extra file '$entry'"
+        diag: "Extra file '$entry'"
         $fail = 1
 
 
-    closedir $dh or warn "closedir '.': $^OS_ERROR"
-    ok( ! $fail )
+    closedir $dh or warn: "closedir '.': $^OS_ERROR"
+    ok:  ! $fail 
 
 
 sub build_and_run($tests, $files)
-    my $core = env::var('PERL_CORE') ?? ' PERL_CORE=1' !! ''
+    my $core = (env::var: 'PERL_CORE') ?? ' PERL_CORE=1' !! ''
     my @perlout = @:  `$runperl Makefile.PL $core` 
     if ($^CHILD_ERROR)
-        fail("$runperl Makefile.PL failed: $^CHILD_ERROR")
+        fail: "$runperl Makefile.PL failed: $^CHILD_ERROR"
         foreach (@perlout)
-            diag "$_"
-        exit($^CHILD_ERROR)
+            diag: "$_"
+        exit: $^CHILD_ERROR
     else
-        pass
+        (pass: )
 
-    ok(-f "$makefile$makefile_ext")
+    ok: -f "$makefile$makefile_ext"
 
     my @makeout
 
@@ -126,92 +126,92 @@ sub build_and_run($tests, $files)
     my $timewarp = (-M "Makefile.PL") - (-M "$makefile$makefile_ext")
     # Convert from days to seconds
     $timewarp *= 86400
-    diag "Makefile.PL is $timewarp second(s) older than $makefile$makefile_ext"
+    diag: "Makefile.PL is $timewarp second(s) older than $makefile$makefile_ext"
     if ($timewarp +< 0)
         # Sleep for a while to catch up.
         $timewarp = -$timewarp
         $timewarp+=2
         $timewarp = 10 if $timewarp +> 10
-        diag "Sleeping for $timewarp second(s) to try to resolve this"
+        diag: "Sleeping for $timewarp second(s) to try to resolve this"
         sleep $timewarp
 
-    diag "make = '$make'"
+    diag: "make = '$make'"
     @makeout = @:  `$make` 
     if ($^CHILD_ERROR)
-        fail("$make failed: $^CHILD_ERROR")
+        fail: "$make failed: $^CHILD_ERROR"
         foreach (@makeout)
-            diag "$_"
-        exit($^CHILD_ERROR)
+            diag: "$_"
+        exit: $^CHILD_ERROR
     else
-        pass()
+        (pass: )
 
     if ($^OS_NAME eq 'VMS') { $make =~ s{ all}{}; }
 
-    ok 1, "This is dynamic linking, so no need to make perl"
+    ok: 1, "This is dynamic linking, so no need to make perl"
 
     my $maketest = "$make test"
-    diag "make = '$maketest'"
+    diag: "make = '$maketest'"
 
     @makeout = @:  `$maketest` 
 
-    if (open my $outputfh, "<", "$output")
+    if (open: my $outputfh, "<", "$output")
         local $^INPUT_RECORD_SEPARATOR = undef # Slurp it - faster.
-        print $^STDOUT, ~< $outputfh->*
-        close $outputfh or print $^STDOUT, "# Close $output failed: $^OS_ERROR\n"
+        print: $^STDOUT, ~< $outputfh->*
+        close $outputfh or print: $^STDOUT, "# Close $output failed: $^OS_ERROR\n"
     else
         # Harness will report missing test results at this point.
-        print $^STDOUT, "# Open <$output failed: $^OS_ERROR\n"
+        print: $^STDOUT, "# Open <$output failed: $^OS_ERROR\n"
 
-    my $tb = Test::Builder->new()
+    my $tb = Test::Builder->new
     $tb->current_test += $tests
 
     if ($^CHILD_ERROR)
-        fail("$maketest failed: $^CHILD_ERROR")
+        fail: "$maketest failed: $^CHILD_ERROR"
         foreach (@makeout)
-            diag "$_"
+            diag: "$_"
     else
-        pass("maketest")
+        pass: "maketest"
 
 
     my $makeclean = "$make clean"
-    diag "make = '$makeclean'"
+    diag: "make = '$makeclean'"
     @makeout = @:  `$makeclean` 
     if ($^CHILD_ERROR)
-        fail("$make failed: $^CHILD_ERROR")
+        fail: "$make failed: $^CHILD_ERROR"
         foreach (@makeout)
-            diag "$_"
+            diag: "$_"
     else
-        pass
+        (pass: )
 
 
-    check_for_bonus_files ('.', < $files->@, $output, $makefile_rename, '.', '..')
+    check_for_bonus_files: '.', < $files->@, $output, $makefile_rename, '.', '..'
 
-    rename $makefile_rename, $makefile . $makefile_ext
-        or die "Can't rename '$makefile_rename' to '$makefile$makefile_ext': $^OS_ERROR"
+    rename: $makefile_rename, $makefile . $makefile_ext
+        or die: "Can't rename '$makefile_rename' to '$makefile$makefile_ext': $^OS_ERROR"
 
-    unlink $output or warn "Can't unlink '$output': $^OS_ERROR"
+    unlink: $output or warn: "Can't unlink '$output': $^OS_ERROR"
 
     # Need to make distclean to remove ../../lib/ExtTest.pm
     my $makedistclean = "$make distclean"
-    diag "make = '$makedistclean'"
+    diag: "make = '$makedistclean'"
     @makeout = @:  `$makedistclean` 
     if ($^CHILD_ERROR)
-        fail("$make failed: $^CHILD_ERROR")
+        fail: "$make failed: $^CHILD_ERROR"
         foreach (@makeout)
-            diag "$_"
+            diag: "$_"
     else
-        pass
+        (pass: )
 
 
-    check_for_bonus_files ('.', < $files->@, '.', '..')
+    check_for_bonus_files: '.', < $files->@, '.', '..'
 
     unless ($keep_files)
         foreach ( $files->@)
-            unlink $_ or warn "unlink $_: $^OS_ERROR"
+            unlink: $_ or warn: "unlink $_: $^OS_ERROR"
 
 
 
-    check_for_bonus_files ('.', '.', '..')
+    check_for_bonus_files: '.', '.', '..'
 
 
 sub Makefile_PL
@@ -220,8 +220,8 @@ sub Makefile_PL
     # We really need a Makefile.PL because make test for a no dynamic linking perl
     # will run Makefile.PL again as part of the "make perl" target.
     my $makefilePL = "Makefile.PL"
-    open my $fh, ">", "$makefilePL" or die "open >$makefilePL: $^OS_ERROR\n"
-    print $fh, <<"EOT"
+    open: my $fh, ">", "$makefilePL" or die: "open >$makefilePL: $^OS_ERROR\n"
+    print: $fh, <<"EOT"
 #!$perl -w
 use ExtUtils::MakeMaker;
 WriteMakefile(
@@ -232,7 +232,7 @@ WriteMakefile(
              );
 EOT
 
-    close $fh or die "close $makefilePL: $^OS_ERROR\n"
+    close $fh or die: "close $makefilePL: $^OS_ERROR\n"
     return $makefilePL
 
 
@@ -241,50 +241,50 @@ sub MANIFEST
     ################ MANIFEST
     # We really need a MANIFEST because make distclean checks it.
     my $manifest = "MANIFEST"
-    push @files, $manifest
-    open my $fh, ">", "$manifest" or die "open >$manifest: $^OS_ERROR\n"
+    push: @files, $manifest
+    open: my $fh, ">", "$manifest" or die: "open >$manifest: $^OS_ERROR\n"
     foreach (@files)
-        print $fh, "$_\n"
-    close $fh or die "close $manifest: $^OS_ERROR\n"
+        print: $fh, "$_\n"
+    close $fh or die: "close $manifest: $^OS_ERROR\n"
     return @files
 
 
 sub write_and_run_extension($name, $items, $export_names, $package, $header, $testfile, $num_tests, $wc_args)
 
     my $c = ''
-    open my $c_fh, '>>', \$c or die
+    open: my $c_fh, '>>', \$c or die: 
     my $xs = ''
-    open my $xs_fh, '>>', \$xs or die
+    open: my $xs_fh, '>>', \$xs or die: 
 
-    ExtUtils::Constant::WriteConstants(C_FH => $c_fh,
-                                           XS_FH => $xs_fh,
-                                           NAME => $package,
-                                           NAMES => $items,
-                                           PROXYSUBS => 1,
-                                           )
+    ExtUtils::Constant::WriteConstants: C_FH => $c_fh
+                                        XS_FH => $xs_fh
+                                        NAME => $package
+                                        NAMES => $items
+                                        PROXYSUBS => 1
+                                           
 
     my $C_code = $c
     my $XS_code = $xs
 
-    diag "$name\n$dir/$subdir being created..."
-    mkdir $subdir, 0777 or die "mkdir: $^OS_ERROR\n"
-    chdir $subdir or die $^OS_ERROR
+    diag: "$name\n$dir/$subdir being created..."
+    mkdir: $subdir, 0777 or die: "mkdir: $^OS_ERROR\n"
+    chdir $subdir or die: $^OS_ERROR
 
     my @files
 
     ################ Header
     my $header_name = "test.h"
-    push @files, $header_name
-    open my $fh, ">", "$header_name" or die "open >$header_name: $^OS_ERROR\n"
-    print $fh, $header or die $^OS_ERROR
-    close $fh or die "close $header_name: $^OS_ERROR\n"
+    push: @files, $header_name
+    open: my $fh, ">", "$header_name" or die: "open >$header_name: $^OS_ERROR\n"
+    print: $fh, $header or die: $^OS_ERROR
+    close $fh or die: "close $header_name: $^OS_ERROR\n"
 
     ################ XS
     my $xs_name = "$package.xs"
-    push @files, $xs_name
-    open $fh, ">", "$xs_name" or die "open >$xs_name: $^OS_ERROR\n"
+    push: @files, $xs_name
+    open: $fh, ">", "$xs_name" or die: "open >$xs_name: $^OS_ERROR\n"
 
-    print $fh, <<"EOT"
+    print: $fh, <<"EOT"
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -297,19 +297,19 @@ PROTOTYPES: ENABLE
 $XS_code;
 EOT
 
-    close $fh or die "close $xs: $^OS_ERROR\n"
+    close $fh or die: "close $xs: $^OS_ERROR\n"
 
     ################ PM
     my $pm = "$package.pm"
-    push @files, $pm
-    open $fh, ">", "$pm" or die "open >$pm: $^OS_ERROR\n"
-    print $fh, "package $package;\n"
+    push: @files, $pm
+    open: $fh, ">", "$pm" or die: "open >$pm: $^OS_ERROR\n"
+    print: $fh, "package $package;\n"
 
-    print $fh, <<'EOT'
+    print: $fh, <<'EOT'
 
 EOT
-    printf $fh, "use warnings;\n"
-    print $fh, <<'EOT'
+    printf: $fh, "use warnings;\n"
+    print: $fh, <<'EOT'
 
 require Exporter;
 require DynaLoader;
@@ -320,36 +320,36 @@ $VERSION = '0.01';
 EOT
     # Having this qw( in the here doc confuses cperl mode far too much to be
     # helpful. And I'm using cperl mode to edit this, even if you're not :-)
-    print $fh, "\@EXPORT_OK = qw(\n"
+    print: $fh, "\@EXPORT_OK = qw(\n"
 
     # Print the names of all our autoloaded constants
     foreach ($export_names->@)
-        print $fh, "\t$_\n"
-    print $fh, ");\n"
-    print $fh, "$package->bootstrap(\$VERSION);\n1;\n__END__\n"
-    close $fh or die "close $pm: $^OS_ERROR\n"
+        print: $fh, "\t$_\n"
+    print: $fh, ");\n"
+    print: $fh, "$package->bootstrap(\$VERSION);\n1;\n__END__\n"
+    close $fh or die: "close $pm: $^OS_ERROR\n"
 
     ################ test.pl
     my $testpl = "test.pl"
-    push @files, $testpl
-    open $fh, ">", "$testpl" or die "open >$testpl: $^OS_ERROR\n"
+    push: @files, $testpl
+    open: $fh, ">", "$testpl" or die: "open >$testpl: $^OS_ERROR\n"
     # Standard test header (need an option to suppress this?)
-    print $fh, <<"EOT" or die $^OS_ERROR
-use $package < qw($(join ' ',$export_names->@));
+    print: $fh, <<"EOT" or die: $^OS_ERROR
+use $package < qw($((join: ' ',$export_names->@)));
 
 print \$^STDOUT, "1..1\n";
 print \$^STDOUT, "ok 1\n";
 open \$^STDOUT, ">", "$output" or die "Failed to open '$output': \$^OS_ERROR";
 EOT
-    print $fh, $testfile or die $^OS_ERROR
-    close $fh or die "close $testpl: $^OS_ERROR\n"
+    print: $fh, $testfile or die: $^OS_ERROR
+    close $fh or die: "close $testpl: $^OS_ERROR\n"
 
-    push @files, Makefile_PL($package)
-    @files = MANIFEST (< @files)
+    push: @files, Makefile_PL: $package
+    @files = MANIFEST: < @files
 
-    build_and_run ($num_tests, \@files)
+    build_and_run: $num_tests, \@files
 
-    chdir $updir or die "chdir '$updir': $^OS_ERROR"
+    chdir $updir or die: "chdir '$updir': $^OS_ERROR"
     ++$subdir
 
 
@@ -366,17 +366,17 @@ sub start_tests
     $here = $dummytest
 
 sub end_tests($name, $items, $export_names, $header, $testfile, ?$args)
-    push @tests, @: $name, $items, $export_names, $package, $header, $testfile
-                    $dummytest - $here, $args
+    push: @tests, @: $name, $items, $export_names, $package, $header, $testfile
+                     $dummytest - $here, $args
     $dummytest += $after_tests
 
 
 use utf8
 
 my $pound
-$pound = "pound" . chr(163) # A pound sign. (Currency)
+$pound = "pound" . chr: 163 # A pound sign. (Currency)
 
-my @common_items = @: 
+my @common_items = @:
                     \%: name=>"perl", type=>"PV"
                     \%: name=>"*/", type=>"PV", value=>'"CLOSE"', macro=>1
                     \%: name=>"/*", type=>"PV", value=>'"OPEN"', macro=>1
@@ -385,11 +385,11 @@ my @common_items = @:
 my @args = @:  undef 
 foreach my $args ( @args)
     # Simple tests
-    start_tests()
+    (start_tests: )
     my $parent_rfc1149 =
         'A Standard for the Transmission of IP Datagrams on Avian Carriers'
     # Test the code that generates 1 and 2 letter name comparisons.
-    my %compass = %: 
+    my %compass = %:
         N => 0, 'NE' => 45, E => 90, SE => 135
         S => 180, SW => 225, W => 270, NW => 315
         
@@ -433,14 +433,14 @@ EOT
                            . "SvIV_set(temp_sv, 1149);"
 
     foreach (keys %compass)
-        push @items, $_
+        push: @items, $_
 
     # Automatically compile the list of all the macro names, and make them
     # exported constants.
-    my @export_names = map {(ref $_) ?? $_->{name} !! $_}, @items
+    my @export_names = map: {(ref $_) ?? $_->{name} !! $_}, @items
 
     # Exporter::Heavy (currently) isn't able to export the last 3 of these:
-    push @items, < @common_items
+    push: @items, < @common_items
 
     my $test_body = <<"EOT"
 
@@ -646,8 +646,8 @@ $test++;
 EOT
     $dummytest+=18
 
-    end_tests("Simple tests", \@items, \@export_names, $header, $test_body,
-              $args)
+    end_tests: "Simple tests", \@items, \@export_names, $header, $test_body
+               $args
 
 
 # XXX I think that I should merge this into the utf8 test above.
@@ -686,7 +686,7 @@ EOT
 
 # Simple tests to verify bits of the switch generation system work.
 sub simple
-    start_tests()
+    (start_tests: )
     # Deliberately leave $name in @_, so that it is indexed from 1.
     my (@: $name, @< @items) =  @_
     my $test_header
@@ -706,36 +706,36 @@ EOT
         # Yes, the last time round the loop appends a z to the string.
         for my $i (0 .. length $thisname)
             my $copyname = $thisname
-            substr ($copyname, $i, 1, 'z')
-            $test_body .= explict_call_constant ($copyname,
+            substr: $copyname, $i, 1, 'z'
+            $test_body .= explict_call_constant: $copyname
                                                  $copyname eq $thisname
-                                                 ?? $thisname !! undef)
+                                                                                      ?? $thisname !! undef
 
 
     # Ho. This seems to be buggy in 5.005_03:
     # # Now remove $name from @_:
     # shift @_;
-    end_tests($name, \@items, \@items, $test_header, $test_body)
+    end_tests: $name, \@items, \@items, $test_header, $test_body
 
 
 # Check that the memeq clauses work correctly when there isn't a switch
 # statement to bump off a character
-simple ("Singletons", "A", "AB", "ABC", "ABCD", "ABCDE")
+simple: "Singletons", "A", "AB", "ABC", "ABCD", "ABCDE"
 # Check the three code.
-simple ("Three start", < qw(Bea kea Lea lea nea pea rea sea tea Wea yea Zea))
+simple: "Three start", < qw(Bea kea Lea lea nea pea rea sea tea Wea yea Zea)
 # There were 162 2 letter words in /usr/share/dict/words on FreeBSD 4.6, which
 # I felt was rather too many. So I used words with 2 vowels.
-simple ("Twos and three middle", < qw(aa ae ai ea eu ie io oe era eta))
+simple: "Twos and three middle", < qw(aa ae ai ea eu ie io oe era eta)
 # Given the choice go for the end, else the earliest point
-simple ("Three end and four symetry", < qw(ean ear eat barb marm tart))
+simple: "Three end and four symetry", < qw(ean ear eat barb marm tart)
 
 foreach (@tests)
-    write_and_run_extension < $_
+    write_and_run_extension: < $_
 
 # This was causing an assertion failure (a C<confess>ion)
 # Any single byte > 128 should do it.
-C_constant ($package, undef, undef, undef, undef, undef, chr 255)
-pass
+C_constant: $package, undef, undef, undef, undef, undef, chr 255
+(pass: )
 
-print $^STDERR, "# You were running with \$keep_files set to $keep_files\n"
+print: $^STDERR, "# You were running with \$keep_files set to $keep_files\n"
     if $keep_files

@@ -8,7 +8,7 @@ use File::Path
 use File::Basename
 use MakeMaker::Test::Utils
 
-my %Files = %: 
+my %Files = %:
     'Recurs/Makefile.PL'          => <<'END'
 use ExtUtils::MakeMaker;
 
@@ -37,17 +37,17 @@ END
     
 
 sub setup_recurs
-    setup_mm_test_root()
+    (setup_mm_test_root: )
     chdir 'MM_TEST_ROOT:[t]' if $^OS_NAME eq 'VMS'
 
     while(my(@: ?$file, ?$text) =(@:  each %Files))
         # Convert to a relative, native file path.
-        $file = 'File::Spec'->catfile('File::Spec'->curdir, < split m{\/}, $file)
+        $file = 'File::Spec'->catfile: 'File::Spec'->curdir, < (split: m{\/}, $file)
 
-        my $dir = dirname($file)
-        mkpath $dir
-        open(my $fh, ">", "$file") || die "Can't create $file: $^OS_ERROR"
-        print $fh, $text
+        my $dir = dirname: $file
+        mkpath: $dir
+        (open: my $fh, ">", "$file") || die: "Can't create $file: $^OS_ERROR"
+        print: $fh, $text
         close $fh
     
 
@@ -56,9 +56,9 @@ sub setup_recurs
 
 sub teardown_recurs
     foreach my $file (keys %Files)
-        my $dir = dirname($file)
+        my $dir = dirname: $file
         if( -e $dir )
-            rmtree($dir) || return
+            (rmtree: $dir) || return
         
     
     return 1

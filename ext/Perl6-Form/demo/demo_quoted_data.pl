@@ -5,8 +5,8 @@ my $bullet = "<>"
 my @items = @:  ~< $^DATA 
 
 for my $item ( @items)
-    print $^STDOUT, < form "\{'\{*\}'\} \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
-                           $bullet,      $item
+    print: $^STDOUT, < form: "\{'\{*\}'\} \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}"
+                             $bullet,      $item
 
 
 __DATA__

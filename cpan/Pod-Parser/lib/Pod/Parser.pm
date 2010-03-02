@@ -260,7 +260,7 @@ method with the command paragraph).
 
 sub command($self, $cmd, $text, $line_num, $pod_para)
     ## Just treat this like a textblock
-    $self->textblock( $pod_para->raw_text(), $line_num, $pod_para)
+    $self->textblock:  $pod_para->raw_text, $line_num, $pod_para
 
 
 ##---------------------------------------------------------------------------
@@ -298,7 +298,7 @@ The base class implementation of this method simply prints the textblock
 
 sub verbatim($self, $text, $line_num, $pod_para)
     my $out_fh = $self->{?_OUTPUT}
-    print $out_fh, $text
+    print: $out_fh, $text
 
 
 ##---------------------------------------------------------------------------
@@ -343,7 +343,7 @@ as it occurred in the input stream).
 
 sub textblock($self, $text, $line_num, $pod_para)
     my $out_fh = $self->{?_OUTPUT}
-    print $out_fh, $self->interpolate($text, $line_num)
+    print: $out_fh, $self->interpolate: $text, $line_num
 
 
 ##---------------------------------------------------------------------------
@@ -378,7 +378,7 @@ in the input) to the caller.
 
 sub interior_sequence($self, $seq_cmd, $seq_arg, $pod_seq)
     ## Just return the raw text of the interior sequence
-    return  $pod_seq->raw_text()
+    return  $pod_seq->raw_text
 
 
 #############################################################################
@@ -434,14 +434,14 @@ subclasses returns a blessed reference to the initialized object (hash-table).
 sub new
     ## Determine if we were called via an object-ref or a classname
     my $this = shift
-    my $class = ref($this) || $this
+    my $class = (ref: $this) || $this
     ## Any remaining arguments are treated as initial values for the
     ## hash that is used to represent this object.
     my %params = %:  < @_ 
     my $self = \%:  < %params 
     ## Bless ourselves into the desired class and perform any initialization
-    bless $self, $class
-    $self->initialize()
+    bless: $self, $class
+    $self->initialize
     return $self
 
 
@@ -724,14 +724,14 @@ sub parse_text
     local $_ = ''
 
     ## Get options and set any defaults
-    my %opts = %:  (ref @_[0]) ?? <  shift()->% !! () 
+    my %opts = %:  (ref @_[0]) ?? <  (shift: )->% !! () 
     my $expand_seq   = %opts{?'expand_seq'}   || undef
     my $expand_text  = %opts{?'expand_text'}  || undef
     my $expand_ptree = %opts{?'expand_ptree'} || undef
 
     my $text = shift
     my $line = shift
-    my $file = $self->input_file()
+    my $file = $self->input_file
     my $cmd  = ""
 
     ## Convert method calls into closures, for our convenience
@@ -743,12 +743,12 @@ sub parse_text
         ## more than just the sequence object, we also need to pass the
         ## sequence name and text.
         $xseq_sub = sub ($self, $iseq)
-            my $args = join("", $iseq->parse_tree->children)
-            return  $self->interior_sequence( $iseq->name, $args, $iseq)
+            my $args = join: "", $iseq->parse_tree->children
+            return  $self->interior_sequence:  $iseq->name, $args, $iseq
     
-    ref::svtype($xseq_sub) eq 'CODE'    or  $xseq_sub   = sub ($self, @< @args) { $self->?$expand_seq(< @args) }
-    ref::svtype($xtext_sub) eq 'CODE'   or  $xtext_sub  = sub ($self, @< @args) { $self->?$expand_text(< @args) }
-    defined $xptree_sub  or  $xptree_sub = sub ($self, @< @args) { $self->?$expand_ptree(< @args) }
+    (ref::svtype: $xseq_sub) eq 'CODE'    or  $xseq_sub   = sub ($self, @< @args) {( $self->?$expand_seq: < @args) }
+    (ref::svtype: $xtext_sub) eq 'CODE'   or  $xtext_sub  = sub ($self, @< @args) {( $self->?$expand_text: < @args) }
+    defined $xptree_sub  or  $xptree_sub = sub ($self, @< @args) {( $self->?$expand_ptree: < @args) }
 
     ## Keep track of the "current" interior sequence, and maintain a stack
     ## of "in progress" sequences.
@@ -759,14 +759,14 @@ sub parse_text
     ## and strings we parse. Thus, by the end of our parsing, it should be
     ## the only thing left on our stack and all we have to do is return it!
     ##
-    my $seq       = Pod::ParseTree->new()
+    my $seq       = Pod::ParseTree->new
     my @seq_stack = @: $seq
     my @: $ldelim, $rdelim = @: '', ''
 
     ## Iterate over all sequence starts text (NOTE: split with
     ## capturing parens keeps the delimiters)
     $_ = $text
-    my @tokens = split m/([A-Z]<(?:<+\s)?)/
+    my @tokens = split: m/([A-Z]<(?:<+\s)?)/
     while ( (nelems @tokens) )
         $_ = shift @tokens
         ## Look for the beginning of a sequence
@@ -776,13 +776,13 @@ sub parse_text
             @: $cmd, $ldelim_orig = @: $1, $2
             ($ldelim = $ldelim_orig) =~ s/\s+$//
             ($rdelim = $ldelim) =~ s/</>/g
-            $seq = Pod::InteriorSequence->new(
-                name   => $cmd,
-                ldelim => $ldelim_orig,  rdelim => $rdelim,
+            $seq = Pod::InteriorSequence->new: 
+                name   => $cmd
+                ldelim => $ldelim_orig,  rdelim => $rdelim
                 file   => $file,    line   => $line
-                )
-            ((nelems @seq_stack) +> 1)  and  $seq->nested(@seq_stack[-1])
-            push @seq_stack, $seq
+                
+            ((nelems @seq_stack) +> 1)  and  $seq->nested: @seq_stack[-1]
+            push: @seq_stack, $seq
         elsif ( (nelems @seq_stack) +> 1 )
             ## Make sure we match the right kind of closing delimiter
             my @: $seq_end, $post_seq = @: "", ""
@@ -791,24 +791,24 @@ sub parse_text
                 ## Found end-of-sequence, capture the interior and the
                 ## closing the delimiter, and put the rest back on the
                 ## token-list
-                $post_seq = substr($_, length($1) + length($2))
+                $post_seq = substr: $_, (length: $1) + (length: $2)
                 @: $_, $seq_end = @: $1, $2
-                (length $post_seq)  and  unshift @tokens, $post_seq
+                (length $post_seq)  and  unshift: @tokens, $post_seq
 
             if (length)
                 ## In the middle of a sequence, append this text to it, and
                 ## dont forget to "expand" it if that's what the caller wanted
-                $seq->append($expand_text ?? $xtext_sub->($self,$_,$seq) !! $_)
+                $seq->append: $expand_text ??( $xtext_sub->& <: $self,$_,$seq) !! $_
                 $_ .= $seq_end
             
             if (length $seq_end)
                 ## End of current sequence, record terminating delimiter
-                $seq->rdelim($seq_end)
+                $seq->rdelim: $seq_end
                 ## Pop it off the stack of "in progress" sequences
                 pop @seq_stack
                 ## Append result to its parent in current parse tree
-                @seq_stack[-1]->append($expand_seq ?? $xseq_sub->($self,$seq)
-                    !! $seq)
+                @seq_stack[-1]->append: $expand_seq ?? $xseq_sub->& <: $self,$seq
+                                            !! $seq
                 ## Remember the current cmd-name and left-delimiter
                 if((nelems @seq_stack) +> 1)
                     $cmd = @seq_stack[-1]->name
@@ -821,7 +821,7 @@ sub parse_text
         elsif (length)
             ## In the middle of a sequence, append this text to it, and
             ## dont forget to "expand" it if that's what the caller wanted
-            $seq->append($expand_text ?? $xtext_sub->($self,$_,$seq) !! $_)
+            $seq->append: $expand_text ??( $xtext_sub->& <: $self,$_,$seq) !! $_
         
         ## Keep track of line count
         $line += s/\r*\n//
@@ -830,7 +830,7 @@ sub parse_text
     
 
     ## Handle unterminated sequences
-    my $errorsub = ((nelems @seq_stack) +> 1) ?? $self->errorsub() !! undef
+    my $errorsub = ((nelems @seq_stack) +> 1) ?? $self->errorsub !! undef
     while ((nelems @seq_stack) +> 1)
         @: $cmd, $file, $line = @: $seq->name, < $seq->file_line
         $ldelim  = $seq->ldelim
@@ -839,16 +839,16 @@ sub parse_text
         pop @seq_stack
         my $errmsg = "*** ERROR: unterminated $($cmd)$($ldelim)...$($rdelim)".
             " at line $line in file $file\n"
-        (ref $errorsub) and $errorsub->($errmsg)
-            or (defined $errorsub) and $self->?$errorsub($errmsg)
-            or  warn($errmsg)
-        @seq_stack[-1]->append($expand_seq ?? < $xseq_sub->($self,$seq) !! $seq)
+        (ref $errorsub) and $errorsub->& <: $errmsg
+            or (defined $errorsub) and $self->?$errorsub: $errmsg
+            or  warn: $errmsg
+        @seq_stack[-1]->append: $expand_seq ?? <( $xseq_sub->& <: $self,$seq) !! $seq
         $seq = @seq_stack[-1]
     
 
     ## Return the resulting parse-tree
     my $ptree = (pop @seq_stack)->parse_tree
-    return  $expand_ptree ?? $xptree_sub->($self, $ptree) !! $ptree
+    return  $expand_ptree ??( $xptree_sub->& <: $self, $ptree) !! $ptree
 
 
 ##---------------------------------------------------------------------------
@@ -871,8 +871,8 @@ some alternate order, use B<parse_text> instead.
 
 sub interpolate($self, $text, ?$line_num)
     my %parse_opts = %:  expand_seq => 'interior_sequence' 
-    my $ptree = $self->parse_text( \%parse_opts, $text, $line_num )
-    return  join "", $ptree->children()
+    my $ptree = $self->parse_text:  \%parse_opts, $text, $line_num 
+    return  join: "", $ptree->children
 
 
 ##---------------------------------------------------------------------------
@@ -905,7 +905,7 @@ sub parse_paragraph($self, $text, $line_num)
     $self->%{+_CUTTING} = 0 if $text =~ m/^={1,2}\S/
 
     ## Perform any desired preprocessing if we wanted it this early
-    $wantNonPods  and  $text = $self->preprocess_paragraph($text, $line_num)
+    $wantNonPods  and  $text = $self->preprocess_paragraph: $text, $line_num
 
     ## Ignore up until next POD directive if we are cutting
     return if $self->%{?_CUTTING}
@@ -923,12 +923,12 @@ sub parse_paragraph($self, $text, $line_num)
 
     ## Ignore this block if it isnt in one of the selected sections
     if (exists $self->%{_SELECTED_SECTIONS})
-        $self->is_selected($text)  or  return @: ($self->%{+_CUTTING} = 1)
+        $self->is_selected: $text  or  return @: ($self->%{+_CUTTING} = 1)
 
     ## If we havent already, perform any desired preprocessing and
     ## then re-check the "cutting" state
     unless ($wantNonPods)
-        $text = $self->preprocess_paragraph($text, $line_num)
+        $text = $self->preprocess_paragraph: $text, $line_num
         return 1  unless ((defined $text) and (length $text))
         return 1  if ($self->%{?_CUTTING})
     
@@ -941,8 +941,8 @@ sub parse_paragraph($self, $text, $line_num)
         ## ("=" or "=="), as well as the command-name, its paragraph text,
         ## and whatever sequence of characters was used to separate them
         $pfx = $1
-        $_ = substr($text, length $pfx)
-        (@: $cmd, $sep, $text) =  split m/(\s+)/, $_, 2
+        $_ = substr: $text, length $pfx
+        (@: $cmd, $sep, $text) =  split: m/(\s+)/, $_, 2
         ## If this is a "cut" directive then we dont need to do anything
         ## except return to "cutting" mode.
         if ($cmd eq 'cut')
@@ -951,13 +951,13 @@ sub parse_paragraph($self, $text, $line_num)
         
     
     ## Save the attributes indicating how the command was specified.
-    $pod_para = Pod::Paragraph->new(
-        name      => $cmd,
-        text      => $text,
-        prefix    => $pfx,
-        separator => $sep,
-        file      => $self->%{?_INFILE},
-        line      => $line_num)
+    $pod_para = Pod::Paragraph->new: 
+        name      => $cmd
+        text      => $text
+        prefix    => $pfx
+        separator => $sep
+        file      => $self->%{?_INFILE}
+        line      => $line_num
     # ## Invoke appropriate callbacks
     # if (exists $$self{_CALLBACKS}) {
     #    ## Look through the callback list, invoke callbacks,
@@ -967,13 +967,13 @@ sub parse_paragraph($self, $text, $line_num)
     # }
     if (length $cmd)
         ## A command paragraph
-        $self->command($cmd, $text, $line_num, $pod_para)
+        $self->command: $cmd, $text, $line_num, $pod_para
     elsif ($text =~ m/^\s+/)
         ## Indented text - must be a verbatim paragraph
-        $self->verbatim($text, $line_num, $pod_para)
+        $self->verbatim: $text, $line_num, $pod_para
     else
         ## Looks like an ordinary block of text
-        $self->textblock($text, $line_num, $pod_para)
+        $self->textblock: $text, $line_num, $pod_para
     
     return  1
 
@@ -1015,7 +1015,7 @@ This method does I<not> usually need to be overridden by subclasses.
 
 sub parse_from_filehandle
     my $self = shift
-    my %opts = %:  (ref @_[0] eq 'HASH') ?? <  shift()->% !! () 
+    my %opts = %:  (ref @_[0] eq 'HASH') ?? <  (shift: )->% !! () 
     my (@: $in_fh, ?$out_fh) =  @_
     $in_fh = $^STDIN  unless ($in_fh)
     my %myOpts = $self->%{+_PARSEOPTS} || %:   ## get parse-options
@@ -1023,8 +1023,8 @@ sub parse_from_filehandle
 
     ## Put this stream at the top of the stack and do beginning-of-input
     ## processing. NOTE that $in_fh might be reset during this process.
-    my $topstream = $self->_push_input_stream($in_fh, $out_fh)
-    (exists %opts{cutting})  and  $self->cutting( %opts{cutting} )
+    my $topstream = $self->_push_input_stream: $in_fh, $out_fh
+    (exists %opts{cutting})  and  $self->cutting:  %opts{cutting} 
 
     ## Initialize line/paragraph
     my (@: $textline, $paragraph) = @: '', ''
@@ -1035,8 +1035,8 @@ sub parse_from_filehandle
     my $tied_fh = (m/^(?:GLOB|FileHandle|IO::\w+)$/)
 
     ## Read paragraphs line-by-line
-    while (defined ($textline = $tied_fh ?? ~< $in_fh !! $in_fh->getline))
-        $textline = $self->preprocess_line($textline, ++$nlines)
+    while ((defined: ($textline = $tied_fh ?? ~< $in_fh !! $in_fh->getline)))
+        $textline = $self->preprocess_line: $textline, ++$nlines
         next  unless ((defined $textline)  &&  (length $textline))
 
         if ((! length $paragraph) && ($textline =~ m/^==/))
@@ -1056,28 +1056,28 @@ sub parse_from_filehandle
                      && (length $paragraph))
 
         ## Issue a warning about any non-empty blank lines
-        if (length($1) +> 0 and %myOpts{?'warnings'} and ! $self->%{?_CUTTING})
-            my $errorsub = $self->errorsub()
-            my $file = $self->input_file()
+        if ((length: $1) +> 0 and %myOpts{?'warnings'} and ! $self->%{?_CUTTING})
+            my $errorsub = $self->errorsub
+            my $file = $self->input_file
             my $errmsg = "*** WARNING: line containing nothing but whitespace".
                 " in paragraph at line $nlines in file $file\n"
-            (ref $errorsub) and $errorsub->($errmsg)
-                or (defined $errorsub) and $self->?$errorsub($errmsg)
-                or  warn($errmsg)
+            (ref $errorsub) and $errorsub->& <: $errmsg
+                or (defined $errorsub) and $self->?$errorsub: $errmsg
+                or  warn: $errmsg
         
 
         ## Now process the paragraph
-        parse_paragraph($self, $paragraph, ($nlines - $plines) + 1)
+        parse_paragraph: $self, $paragraph, ($nlines - $plines) + 1
         $paragraph = ''
         $plines = 0
     
     ## Dont forget about the last paragraph in the file
     if (length $paragraph)
-        parse_paragraph($self, $paragraph, ($nlines - $plines) + 1)
+        parse_paragraph: $self, $paragraph, ($nlines - $plines) + 1
     
 
     ## Now pop the input stream off the top of the input stack.
-    $self->_pop_input_stream()
+    $self->_pop_input_stream
 
 
 ##---------------------------------------------------------------------------
@@ -1126,21 +1126,21 @@ This method does I<not> usually need to be overridden by subclasses.
 
 sub parse_from_file
     my $self = shift
-    my %opts = %:  (ref @_[0] eq 'HASH') ?? <  shift()->% !! () 
+    my %opts = %:  (ref @_[0] eq 'HASH') ?? <  (shift: )->% !! () 
     my (@: $infile, ?$outfile) =  @_
     my ($in_fh,  $out_fh)
     my (@: $close_input, $close_output) = @: 0, 0
 
     ## Is $infile a filename or a (possibly implied) filehandle
     if (defined $infile && ref $infile)
-        if (ref($infile) =~ m/^(SCALAR|ARRAY|HASH|CODE|REF)$/)
-            die "Input from $1 reference not supported!\n"
+        if ((ref: $infile) =~ m/^(SCALAR|ARRAY|HASH|CODE|REF)$/)
+            die: "Input from $1 reference not supported!\n"
         
         ## Must be a filehandle-ref (or else assume its a ref to an object
         ## that supports the common IO read operations).
         $self->%{+_INFILE} = $infile->$
         $in_fh = $infile
-    elsif (!defined($infile) || !length($infile) || ($infile eq '-')
+    elsif (!(defined: $infile) || !(length: $infile) || ($infile eq '-')
         || ($infile =~ m/^<&(?:STDIN|0)$/i))
         ## Not a filename, just a string implying STDIN
         $infile ||= '-'
@@ -1149,8 +1149,8 @@ sub parse_from_file
     else
         ## We have a filename, open it for reading
         $self->%{+_INFILE} = $infile
-        open($in_fh, "<", "$infile")  or
-            die "Can't open $infile for reading: $^OS_ERROR\n"
+        open: $in_fh, "<", "$infile"  or
+            die: "Can't open $infile for reading: $^OS_ERROR\n"
         $close_input = 1
     
 
@@ -1163,22 +1163,22 @@ sub parse_from_file
     ## Is $outfile a filename, a (possibly implied) filehandle, maybe a ref?
     if (ref $outfile)
         ## we need to check for ref() first, as other checks involve reading
-        if (ref($outfile) =~ m/^(ARRAY|HASH|CODE)$/)
-            die "Output to $1 reference not supported!\n"
-        elsif (ref($outfile) eq 'SCALAR')
+        if ((ref: $outfile) =~ m/^(ARRAY|HASH|CODE)$/)
+            die: "Output to $1 reference not supported!\n"
+        elsif ((ref: $outfile) eq 'SCALAR')
             #           # NOTE: IO::String isn't a part of the perl distribution,
             #           #       so probably we shouldn't support this case...
             #           require IO::String;
             #           $$self{_OUTFILE} = "$outfile";
             #           $out_fh = IO::String->new($outfile);
-            die "Output to SCALAR reference not supported!\n"
+            die: "Output to SCALAR reference not supported!\n"
         else
             ## Must be a filehandle-ref (or else assume its a ref to an
             ## object that supports the common IO write operations).
             $self->%{+_OUTFILE} = $outfile
             $out_fh = $outfile
         
-    elsif (!defined($outfile) || !length($outfile) || ($outfile eq '-')
+    elsif (!(defined: $outfile) || !(length: $outfile) || ($outfile eq '-')
         || ($outfile =~ m/^>&?(?:STDOUT|1)$/i))
         if (defined $self->%{?_TOP_STREAM})
             $out_fh = $self->%{?_OUTPUT}
@@ -1195,21 +1195,21 @@ sub parse_from_file
     else
         ## We have a filename, open it for writing
         $self->%{+_OUTFILE} = $outfile
-        (-d $outfile) and die "$outfile is a directory, not POD input!\n"
-        open($out_fh, ">", "$outfile")  or
-            die "Can't open $outfile for writing: $^OS_ERROR\n"
+        (-d $outfile) and die: "$outfile is a directory, not POD input!\n"
+        open: $out_fh, ">", "$outfile"  or
+            die: "Can't open $outfile for writing: $^OS_ERROR\n"
         $close_output = 1
     
 
     ## Whew! That was a lot of work to set up reasonably/robust behavior
     ## in the case of a non-filename for reading and writing. Now we just
     ## have to parse the input and close the handles when we're finished.
-    $self->parse_from_filehandle(\%opts, $in_fh, $out_fh)
+    $self->parse_from_filehandle: \%opts, $in_fh, $out_fh
 
     $close_input  and
-        close($in_fh) || die "Can't close $infile after reading: $^OS_ERROR\n"
+        (close: $in_fh) || die: "Can't close $infile after reading: $^OS_ERROR\n"
     $close_output  and
-        close($out_fh) || die "Can't close $outfile after writing: $^OS_ERROR\n"
+        (close: $out_fh) || die: "Can't close $outfile after writing: $^OS_ERROR\n"
 
 
 #############################################################################
@@ -1317,7 +1317,7 @@ sub parseopts
     return %myOpts  if ((nelems @_) == 0)
     if ((nelems @_) == 1)
         my $_ = shift
-        return  ref($_)  ??  ($self->%{+_PARSEOPTS} = $_)  !!  %myOpts{?$_}
+        return  (ref: $_)  ??  ($self->%{+_PARSEOPTS} = $_)  !!  %myOpts{?$_}
     
     $self->%{+_PARSEOPTS} = %myOpts +%+ %:< @_
 
@@ -1501,17 +1501,17 @@ sub _push_input_stream($self, $in_fh, $out_fh)
     $self->%{+_INFILE}  = '(unknown)'  unless (defined  $self->%{?_INFILE})
     $self->%{+_INPUT}   = $in_fh
     my $input_top     = $self->%{+_TOP_STREAM}
-        = Pod::InputSource->new(
-        name        => $self->%{?_INFILE},
-        handle      => $in_fh,
+        = Pod::InputSource->new: 
+        name        => $self->%{?_INFILE}
+        handle      => $in_fh
         was_cutting => $self->%{_CUTTING}
-        )
+        
     my $input_stack = $self->%{?_INPUT_STREAMS}
-    push($input_stack->@, $input_top)
+    push: $input_stack->@, $input_top
 
     ## Perform beginning-of-document and/or beginning-of-input processing
-    $self->begin_pod()  if (nelems $input_stack->@) == 1
-    $self->begin_input()
+    $self->begin_pod  if (nelems $input_stack->@) == 1
+    $self->begin_input
 
     return  $input_top
 
@@ -1539,20 +1539,20 @@ sub _pop_input_stream($self)
     my $input_stack = $self->%{?_INPUT_STREAMS}
 
     ## Perform end-of-input and/or end-of-document processing
-    $self->end_input()  if ((nelems $input_stack->@) +> 0)
-    $self->end_pod()    if ((nelems $input_stack->@) == 1)
+    $self->end_input  if ((nelems $input_stack->@) +> 0)
+    $self->end_pod    if ((nelems $input_stack->@) == 1)
 
     ## Restore cutting state to whatever it was before we started
     ## parsing this file.
-    my $old_top = pop($input_stack->@)
-    $self->%{+_CUTTING} = $old_top->was_cutting()
+    my $old_top = pop: $input_stack->@
+    $self->%{+_CUTTING} = $old_top->was_cutting
 
     ## Dont forget to reset the input indicators
     my $input_top = undef
     if ((nelems $input_stack->@) +> 0)
         $input_top = $self->%{+_TOP_STREAM} = $input_stack->@[-1]
-        $self->%{+_INFILE}  = $input_top->name()
-        $self->%{+_INPUT}   = $input_top->handle()
+        $self->%{+_INFILE}  = $input_top->name
+        $self->%{+_INPUT}   = $input_top->handle
     else
         delete $self->%{_TOP_STREAM}
         delete $self->%{_INPUT_STREAMS}

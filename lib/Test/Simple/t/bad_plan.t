@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN 
-    if( env::var('PERL_CORE') )
+    if( (env::var: 'PERL_CORE') )
         chdir 't'
         $^INCLUDE_PATH = @:  '../lib' 
     
@@ -15,7 +15,7 @@ sub ok($test, $name)
     $ok .= "ok $test_num"
     $ok .= " - $name" if defined $name
     $ok .= "\n"
-    print $^STDOUT, $ok
+    print: $^STDOUT, $ok
     $test_num++
 
     return $test
@@ -25,13 +25,13 @@ sub ok($test, $name)
 use Test::Builder
 my $Test = Test::Builder->new
 
-print $^STDOUT, "1..2\n"
+print: $^STDOUT, "1..2\n"
 
-try { $Test->plan(7); }
-ok( $^EVAL_ERROR->{?description} =~ m/^plan\(\) doesn't understand 7/, 'bad plan()' ) ||
-    print $^STDERR, "# $^EVAL_ERROR"
+try { ($Test->plan: 7); }
+(ok:  $^EVAL_ERROR->{?description} =~ m/^plan\(\) doesn't understand 7/, 'bad plan()' ) ||
+    print: $^STDERR, "# $^EVAL_ERROR"
 
-try { $Test->plan(wibble => 7); }
-ok( $^EVAL_ERROR->{?description} =~ m/^plan\(\) doesn't understand wibble 7/, 'bad plan()' ) ||
-    print $^STDERR, "# $^EVAL_ERROR"
+try { ($Test->plan: wibble => 7); }
+(ok:  $^EVAL_ERROR->{?description} =~ m/^plan\(\) doesn't understand wibble 7/, 'bad plan()' ) ||
+    print: $^STDERR, "# $^EVAL_ERROR"
 

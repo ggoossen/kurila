@@ -14,7 +14,7 @@ sub compile
     # it's mistakenly in Config.pm as both.  Make the correction here.
     local $cf->{+ccflags} = $cf->{?ccflags}
     $cf->{+ccflags} =~ s/-flat_namespace//
-    $self->SUPER::compile(< @_)
+     $self->SUPER::compile: < @_
 
 
 

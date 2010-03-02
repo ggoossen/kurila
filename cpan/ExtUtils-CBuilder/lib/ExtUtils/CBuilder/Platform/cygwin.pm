@@ -12,15 +12,15 @@ sub link_executable
     # $Config{ld} is set up as a special script for building
     # perl-linkable libraries.  We don't want that here.
     local $self->{config}->{+ld} = 'gcc'
-    return $self->SUPER::link_executable(< @_)
+    return $self->SUPER::link_executable: < @_
 
 
 sub link($self, %< %args)
 
     %args{+extra_linker_flags} = \@:  <
-                                          File::Spec->catdir( <$self->perl_inc(), 'libperl.dll.a'), <
-                                          $self->split_like_shell(%args{extra_linker_flags})
+                                          (File::Spec->catdir:  <$self->perl_inc, 'libperl.dll.a'), <
+                                          $self->split_like_shell: %args{extra_linker_flags}
         
 
-    return $self->SUPER::link(< %args)
+    return $self->SUPER::link: < %args
 

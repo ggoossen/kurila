@@ -52,38 +52,38 @@ sub import
         # That means that it would not be possible to run `make test`
         # for the Win32 module because blib.pm would always load the
         # installed version before $^INCLUDE_PATH gets updated with the blib path.
-        chomp($dir = `cd`)
+        chomp: ($dir = `cd`)
     else
-        $dir = getcwd
+        $dir = (getcwd: )
     
-    if ($^OS_NAME eq 'VMS') { ($dir = VMS::Filespec::unixify($dir)) =~ s-/\z--; }
+    if ($^OS_NAME eq 'VMS') { ($dir = (VMS::Filespec::unixify: $dir)) =~ s-/\z--; }
     if ((nelems @_))
         $dir = shift
         $dir =~ s/blib\z//
         $dir =~ s,/+\z,,
         $dir = File::Spec->curdir unless ($dir)
-        die "$dir is not a directory\n" unless (-d $dir)
+        die: "$dir is not a directory\n" unless (-d $dir)
     
     my $i = 5
     my($blib, $blib_lib, $blib_arch)
     while ($i--)
-        $blib = File::Spec->catdir($dir, "blib")
-        $blib_lib = File::Spec->catdir($blib, "lib")
+        $blib = File::Spec->catdir: $dir, "blib"
+        $blib_lib = File::Spec->catdir: $blib, "lib"
 
         if ($^OS_NAME eq 'MacOS')
-            $blib_arch = File::Spec->catdir($blib_lib, $MacPerl::Architecture)
+            $blib_arch = File::Spec->catdir: $blib_lib, $MacPerl::Architecture
         else
-            $blib_arch = File::Spec->catdir($blib, "arch")
+            $blib_arch = File::Spec->catdir: $blib, "arch"
         
 
         if (-d $blib && -d $blib_arch && -d $blib_lib)
-            unshift($^INCLUDE_PATH,$blib_arch,$blib_lib)
-            warn "Using $blib\n" if $Verbose
+            unshift: $^INCLUDE_PATH,$blib_arch,$blib_lib
+            warn: "Using $blib\n" if $Verbose
             return
         
-        $dir = File::Spec->catdir($dir, File::Spec->updir)
+        $dir = File::Spec->catdir: $dir, File::Spec->updir
     
-    die "Cannot find blib even in $dir\n"
+    die: "Cannot find blib even in $dir\n"
 
 
 1

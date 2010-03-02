@@ -31,7 +31,7 @@ use XSLoader ()
     GLOB_TILDE
 )
 
-%EXPORT_TAGS = %: 
+%EXPORT_TAGS = %:
     'glob' => qw(
                         GLOB_ABEND
 	GLOB_ALPHASORT
@@ -60,9 +60,9 @@ sub import
     my $i = 1
     while ($i +< nelems @_)
         if (@_[$i] =~ m/^:(case|nocase|globally)$/)
-            splice(@_, $i, 1)
-            $DEFAULT_FLAGS ^&^= ^~^GLOB_NOCASE() if $1 eq 'case'
-            $DEFAULT_FLAGS ^|^= GLOB_NOCASE() if $1 eq 'nocase'
+            splice: @_, $i, 1
+            $DEFAULT_FLAGS ^&^= ^~^(GLOB_NOCASE: ) if $1 eq 'case'
+            $DEFAULT_FLAGS ^|^= (GLOB_NOCASE: ) if $1 eq 'nocase'
             if ($1 eq 'globally')
                 local $^WARNING = undef
                 *CORE::GLOBAL::glob = \&File::Glob::csh_glob
@@ -72,30 +72,30 @@ sub import
         ++$i
     
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1
-    return Exporter::import(< @_)
+    return Exporter::import: < @_
 
 
-XSLoader::load 'File::Glob', $VERSION
+XSLoader::load:  'File::Glob', $VERSION
 
 # Preloaded methods go here.
 
 sub GLOB_CSH ()
-    GLOB_BRACE()
-        ^|^ GLOB_NOMAGIC()
-        ^|^ GLOB_QUOTE()
-        ^|^ GLOB_TILDE()
-        ^|^ GLOB_ALPHASORT()
+    (GLOB_BRACE: )
+        ^|^ (GLOB_NOMAGIC: )
+        ^|^ (GLOB_QUOTE: )
+        ^|^ (GLOB_TILDE: )
+        ^|^ (GLOB_ALPHASORT: )
 
 
-$DEFAULT_FLAGS = GLOB_CSH()
+$DEFAULT_FLAGS = (GLOB_CSH: )
 if ($^OS_NAME =~ m/^(?:MSWin32|VMS|os2|dos|riscos|MacOS)$/)
-    $DEFAULT_FLAGS ^|^= GLOB_NOCASE()
+    $DEFAULT_FLAGS ^|^= (GLOB_NOCASE: )
 
 
 sub bsd_glob
     my (@: $pat,?$flags) =  @_
     $flags = $DEFAULT_FLAGS if (nelems @_) +< 2
-    return doglob($pat,$flags)
+    return doglob: $pat,$flags
 
 
 ## borrowed heavily from gsar's File::DosGlob
@@ -119,7 +119,7 @@ sub csh_glob
         # implementation in Perl.  Need to support a flag
         # to disable this behavior.
         require Text::ParseWords
-        @pat = Text::ParseWords::parse_line('\s+',0,$pat)
+        @pat = Text::ParseWords::parse_line: '\s+',0,$pat
     
 
     # assume global context if not provided one
@@ -129,9 +129,9 @@ sub csh_glob
     # if we're just beginning, do it all first
     if (%iter{?$cxix} == 0)
         if ((nelems @pat))
-            %entries{+$cxix} = \ @+: map { doglob($_, $DEFAULT_FLAGS) }, @pat
+            %entries{+$cxix} = \ @+: map: { (doglob: $_, $DEFAULT_FLAGS) }, @pat
         else
-            %entries{+$cxix} = \ doglob($pat, $DEFAULT_FLAGS)
+            %entries{+$cxix} = \ doglob: $pat, $DEFAULT_FLAGS
         
     
 

@@ -21,29 +21,29 @@ my %versions = %: q[$VERSION = '1.00']        => '1.00'
                   q[our $VERSION = '1.23';]       => '1.23'
     
 
-plan tests => (2 * nkeys %versions) + 8
+plan: tests => (2 * nkeys %versions) + 8
 
 while( my(@: ?$code, ?$expect) =(@:  each %versions) )
-    is( parse_version_string($code), $expect, $code )
+    is:  (parse_version_string: $code), $expect, $code 
 
 
 for my $v (@: @: q[use version; $VERSION = v1.2.3;], v1.2.3
               (@: q[$VERSION = v1.2.3], v1.2.3))
-    is( parse_version_string($v[0]), $v[1]->stringify, $v[0])
+    is:  (parse_version_string: $v[0]), $v[1]->stringify, $v[0]
 
 
 sub parse_version_string
     my $code = shift
 
-    open(my $fh, ">", "VERSION.tmp") || die $^OS_ERROR
-    print $fh, "$code\n"
+    (open: my $fh, ">", "VERSION.tmp") || die: $^OS_ERROR
+    print: $fh, "$code\n"
     close $fh
 
     $_ = 'foo'
-    my $version = MM->parse_version('VERSION.tmp')
-    is( $_, 'foo', '$_ not leaked by parse_version' )
+    my $version = MM->parse_version: 'VERSION.tmp'
+    is:  $_, 'foo', '$_ not leaked by parse_version' 
 
-    unlink "VERSION.tmp"
+    unlink: "VERSION.tmp"
 
     return $version
 
@@ -53,8 +53,8 @@ sub parse_version_string
 # declaration confuses later calls to the version class.
 # [rt.cpan.org 30747]
 do
-    is parse_version_string(q[ $VERSION = '1.00'; sub version { $VERSION } ]),
-       '1.00'
-    is parse_version_string(q[ use version; $VERSION = version->new("1.2.3") ]),
-       qv("1.2.3")->stringify
+    is: (parse_version_string: q[ $VERSION = '1.00'; sub version { $VERSION } ])
+        '1.00'
+    is: (parse_version_string: q[ use version; $VERSION = version->new("1.2.3") ])
+        (qv: "1.2.3")->stringify
 

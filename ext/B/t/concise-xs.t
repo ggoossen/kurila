@@ -96,8 +96,8 @@ Looking at ../foo2, you'll see 34 occurrences of the following error:
 
 BEGIN 
     require Config
-    unless (Config::config_value("useperlio"))
-        print $^STDOUT, "1..0 # Skip -- Perl configured without perlio\n"
+    unless ((Config::config_value: "useperlio"))
+        print: $^STDOUT, "1..0 # Skip -- Perl configured without perlio\n"
         exit 0
     
 
@@ -106,7 +106,7 @@ use Getopt::Std
 use Carp
 use Test::More 'no_plan'
 
-require_ok("B::Concise")
+require_ok: "B::Concise"
 
 my %matchers =
     %:  constant => qr{ (?-x: is a constant sub, optimized to a \w+)
@@ -116,11 +116,11 @@ my %matchers =
         noSTART     => qr/coderef .* has no START/
     
 
-my $testpkgs = \ %: 
+my $testpkgs = \ %:
     # packages to test, with expected types for named funcs
 
     'Data::Dumper' => (%:  dflt => 'perl' )
-    B => %: 
+    B => %:
         dflt => 'constant'         # all but 47/297
         skip => (@:  'regex_padav' ) # threaded only
         perl => qw(
@@ -219,9 +219,9 @@ my $testpkgs = \ %:
 
 ############
 
-B::Concise::compile('-nobanner')        # set a silent default
-getopts('vaVcr:', \my %opts) or
-    die <<EODIE
+B::Concise::compile: '-nobanner'        # set a silent default
+getopts: 'vaVcr:', \my %opts or
+    die: <<EODIE
 
 usage: PERL_CORE=1 ./perl ext/B/t/concise-xs.t [-av] [module-list]
     tests ability to discern XS funcs using Digest::MD5 package
@@ -238,7 +238,7 @@ EODIE
 
 if (%opts)
     require Data::Dumper
-    Data::Dumper->import('Dumper')
+    Data::Dumper->import: 'Dumper'
     $Data::Dumper::Sortkeys = 1
 
 my @argpkgs = @ARGV
@@ -252,29 +252,29 @@ if (%opts{?r})
 
 unless (%opts{?a})
     unless (nelems @argpkgs)
-        foreach my $pkg (sort keys $testpkgs->%)
-            test_pkg($pkg, $testpkgs->{?$pkg})
+        foreach my $pkg ((sort: keys $testpkgs->%))
+            test_pkg: $pkg, $testpkgs->{?$pkg}
     else
         foreach my $pkg ( @argpkgs)
-            test_pkg($pkg, $testpkgs->{?$pkg})
+            test_pkg: $pkg, $testpkgs->{?$pkg}
 else
-    corecheck()
+    (corecheck: )
 
 ############
 
 sub test_pkg($pkg, ?$fntypes)
-    require_ok($pkg)
+    require_ok: $pkg
 
     # build %stash: keys are func-names, vals filled in below
-    my %stash = %+: map
+    my %stash = %+: map: 
         { %: $_ => 0 },
-        grep { exists Symbol::fetch_glob("$pkg\::$_")->*->&     # grab CODE symbols
-             },
-        grep { !m/__ANON__/ }, keys Symbol::fetch_glob($pkg.'::')->*->%         # from symbol table
+            grep: { exists (Symbol::fetch_glob: "$pkg\::$_")->*->&     # grab CODE symbols
+                      },
+                      grep: { !m/__ANON__/ }, keys (Symbol::fetch_glob: $pkg.'::')->*->%         # from symbol table
 
     for my $type (keys %matchers)
         foreach my $fn ( $fntypes{?$type})
-            carp "$fn can only be one of $type, %stash{?$fn}\n"
+            carp: "$fn can only be one of $type, %stash{?$fn}\n"
                 if %stash{?$fn}
             %stash{+$fn} = $type
     
@@ -287,23 +287,23 @@ sub test_pkg($pkg, ?$fntypes)
         %stash{+$_} = 'skip'
 
     if (%opts{?v})
-        diag("fntypes: " => < Dumper($fntypes))
-        diag("$pkg stash: " => < Dumper(\%stash))
+        diag: "fntypes: " => < (Dumper: $fntypes)
+        diag: "$pkg stash: " => < (Dumper: \%stash)
     
-    foreach my $fn (reverse sort keys %stash)
+    foreach my $fn ((reverse: (sort: keys %stash)))
         next if %stash{?$fn} eq 'skip'
-        my $res = checkXS("$($pkg)::$fn", %stash{?$fn})
+        my $res = checkXS: "$($pkg)::$fn", %stash{?$fn}
         if ($res ne '1')
-            push %report{$pkg}->{$res}->@, $fn
+            push: %report{$pkg}->{$res}->@, $fn
 
 
 sub checkXS($func_name, $want)
 
-    croak "unknown type $want: $func_name\n"
+    croak: "unknown type $want: $func_name\n"
         unless defined %matchers{?$want}
 
-    my (@: $buf, $err) =  render($func_name)
-    my $res = like($buf, %matchers{?$want}, "$want sub:\t $func_name")
+    my (@: $buf, $err) =  render: $func_name
+    my $res = like: $buf, %matchers{?$want}, "$want sub:\t $func_name"
 
     unless ($res)
         # test failed. return type that would give success
@@ -316,13 +316,13 @@ sub checkXS($func_name, $want)
 
 sub render($func_name)
 
-    B::Concise::reset_sequence()
-    B::Concise::walk_output(\my $buf)
+    (B::Concise::reset_sequence: )
+    B::Concise::walk_output: \my $buf
 
-    my $walker = B::Concise::compile($func_name)
-    try { $walker->() }
-    diag("err: $($^EVAL_ERROR->message) $buf") if $^EVAL_ERROR
-    diag("verbose: $buf") if %opts{?V}
+    my $walker = B::Concise::compile: $func_name
+    try {( $walker->& <: ) }
+    diag: "err: $($^EVAL_ERROR->message) $buf" if $^EVAL_ERROR
+    diag: "verbose: $buf" if %opts{?V}
 
     return  @: $buf, $^EVAL_ERROR
 
@@ -330,26 +330,26 @@ sub render($func_name)
 sub corecheck
     try { require Module::CoreList }
     if ($^EVAL_ERROR)
-        warn "Module::CoreList not available on $^PERL_VERSION\n"
+        warn: "Module::CoreList not available on $^PERL_VERSION\n"
         return
     
     my $mods = %Module::CoreList::version{?'5.009002'}
-    $mods = \ sort keys $mods->%
-    print $^STDOUT, < Dumper($mods)
+    $mods = \ sort: keys $mods->%
+    print: $^STDOUT, < Dumper: $mods
 
     foreach my $pkgnm ( $mods->@)
-        test_pkg($pkgnm)
+        test_pkg: $pkgnm
     
 
 
 END 
     if (%opts{?c})
         $Data::Dumper::Indent = 1
-        print $^STDOUT, "Corrections: ", < Dumper(\%report)
+        print: $^STDOUT, "Corrections: ", < Dumper: \%report
 
-        foreach my $pkg (sort keys %report)
+        foreach my $pkg ((sort: keys %report))
             for my $type (keys %matchers)
-                print $^STDOUT, "$pkg: $type: $(join ' ',%report{$pkg}->{?$type}->@)\n"
+                print: $^STDOUT, "$pkg: $type: $((join: ' ',%report{$pkg}->{?$type}->@))\n"
                     if (nelems %report{$pkg}->{?$type}->@)
             
         

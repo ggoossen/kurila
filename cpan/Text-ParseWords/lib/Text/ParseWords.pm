@@ -16,10 +16,10 @@ sub shellwords
 
     foreach my $line ( @lines)
         $line =~ s/^\s+//
-        my @words = parse_line('\s+', 0, $line)
+        my @words = parse_line: '\s+', 0, $line
         pop @words if (nelems @words) and !defined @words[-1]
-        return $@ unless ((nelems @words) || !length($line))
-        push(@allwords, < @words)
+        return $@ unless ((nelems @words) || !(length: $line))
+        push: @allwords, < @words
     
     return @allwords
 
@@ -30,9 +30,9 @@ sub quotewords($delim, $keep, @< @lines)
     my(@words, @allwords)
 
     foreach my $line ( @lines)
-        @words = parse_line($delim, $keep, $line)
-        return() unless ((nelems @words) || !length($line))
-        push(@allwords, < @words)
+        @words = parse_line: $delim, $keep, $line
+        return() unless ((nelems @words) || !(length: $line))
+        push: @allwords, < @words
     
     return @allwords
 
@@ -42,9 +42,9 @@ sub quotewords($delim, $keep, @< @lines)
 sub nested_quotewords($delim, $keep, @< @lines)
     my(@allwords)
 
-    for my $i (0 .. nelems(@lines) -1)
-        @allwords[+$i] = parse_line($delim, $keep, @lines[$i])
-        return() unless (nelems @allwords[$i]) || !length(@lines[$i])
+    for my $i (0 .. (nelems: @lines) -1)
+        @allwords[+$i] = parse_line: $delim, $keep, @lines[$i]
+        return() unless (nelems @allwords[$i]) || !length: @lines[$i]
     
     return @allwords
 
@@ -56,7 +56,7 @@ sub parse_line($delimiter, $keep, $line)
 
     no warnings 'uninitialized';	# we will be testing undef strings
 
-    while (length($line))
+    while ((length: $line))
         # This pattern is optimised to be stack conservative on older perls.
         # Do not refactor without being careful and testing it on very long strings.
         # See Perl bug #42980 for an example of a stack busting input.
@@ -86,7 +86,7 @@ sub parse_line($delimiter, $keep, $line)
         my (@: $quote, $quoted, $unquoted, $delim) = @: ($1 ?? ($1,$2) !! ($3,$4)), $5, $6
 
 
-        return $@ unless( defined($quote) || length($unquoted) || length($delim))
+        return $@ unless( (defined: $quote) || (length: $unquoted) || (length: $delim))
 
         if ($keep)
             $quoted = "$quote$quoted$quote"
@@ -96,16 +96,16 @@ sub parse_line($delimiter, $keep, $line)
                 $quoted =~ s/\\(.)/$1/sg if ($quote eq '"')
             
         
-        $word .= substr($line, 0, 0)	# leave results tainted
+        $word .= substr: $line, 0, 0	# leave results tainted
         $word .= defined $quote ?? $quoted !! $unquoted
 
-        if (length($delim))
-            push(@pieces, $word)
-            push(@pieces, $delim) if ($keep eq 'delimiters')
+        if ((length: $delim))
+            push: @pieces, $word
+            push: @pieces, $delim if ($keep eq 'delimiters')
             undef $word
         
-        if (!length($line))
-            push(@pieces, $word)
+        if (!(length: $line))
+            push: @pieces, $word
         
     
     return @pieces
@@ -124,24 +124,24 @@ sub old_shellwords
     #	@words = old_shellwords();	# defaults to $_ (and clobbers it)
 
     no warnings 'uninitialized'	# we will be testing undef strings
-    my $_ = join('', @_) if (nelems @_)
+    my $_ = (join: '', @_) if (nelems @_)
     my (@words, $snippet)
 
     s/\A\s+//
     while ($_ ne '')
-        my $field = substr($_, 0, 0)	# leave results tainted
+        my $field = substr: $_, 0, 0	# leave results tainted
         while (1)
             if (s/\A"(([^"\\]|\\.)*)"//s)
                 ($snippet = $1) =~ s#\\(.)#$1#sg
             elsif (m/\A"/)
                 require Carp
-                Carp::carp("Unmatched double quote: $_")
+                Carp::carp: "Unmatched double quote: $_"
                 return()
             elsif (s/\A'(([^'\\]|\\.)*)'//s)
                 ($snippet = $1) =~ s#\\(.)#$1#sg
             elsif (m/\A'/)
                 require Carp
-                Carp::carp("Unmatched single quote: $_")
+                Carp::carp: "Unmatched single quote: $_"
                 return()
             elsif (s/\A\\(.?)//s)
                 $snippet = $1
@@ -153,7 +153,7 @@ sub old_shellwords
             
             $field .= $snippet
         
-        push(@words, $field)
+        push: @words, $field
     
     return @words
 

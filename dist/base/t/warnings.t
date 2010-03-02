@@ -18,6 +18,6 @@ do
     use base < qw(Foo)
 
 
-main::like $warnings,
-           '/^Bar is inheriting from Foo but already has its own fields!/',
-           'Inheriting from a base with protected fields warns'
+main::like:  $warnings
+             '/^Bar is inheriting from Foo but already has its own fields!/'
+             'Inheriting from a base with protected fields warns'

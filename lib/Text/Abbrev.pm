@@ -49,8 +49,8 @@ sub abbrev
     $hashref->% = $%
 
     :WORD foreach my $word ( @_)
-        for my $len ( reverse( 1 .. (length $word) - 1 ) )
-            my $abbrev = substr($word,0,$len)
+        for my $len ( (reverse:  1 .. (length $word) - 1 ) )
+            my $abbrev = substr: $word,0,$len
             my $seen = ++%table{+$abbrev}
             if ($seen == 1)         # We're the first word so far to have
                 # this abbreviation.

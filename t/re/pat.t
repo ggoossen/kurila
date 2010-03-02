@@ -43,127 +43,127 @@ BEGIN
     require "./test.pl"
 
 
-plan 1633
+plan: 1633
 
 our ($x, %XXX, @XXX, $foo, @x, $null, @words)
 our ($TODO)
 
-run_tests() unless caller
+run_tests:  unless caller
 
 sub run_tests
 
     $x = "abc\ndef\n"
 
-    ok($x =~ m/^abc/)
-    ok($x !~ m/^def/)
+    ok: $x =~ m/^abc/
+    ok: $x !~ m/^def/
 
     # used to be a test for $*
-    ok($x =~ m/^def/m)
+    ok: $x =~ m/^def/m
 
     $_ = '123'
-    ok(m/^([0-9][0-9]*)/)
+    ok: m/^([0-9][0-9]*)/
 
-    ok( not $x =~ m/^xxx/ )
-    ok( not $x !~ m/^abc/ )
+    ok:  not $x =~ m/^xxx/ 
+    ok:  not $x !~ m/^abc/ 
 
-    ok($x =~ m/def/)
-    ok(not $x !~ m/def/)
+    ok: $x =~ m/def/
+    ok: not $x !~ m/def/
 
-    ok($x !~ m/.def/)
-    ok( not $x =~ m/.def/)
+    ok: $x !~ m/.def/
+    ok:  not $x =~ m/.def/
 
-    ok($x =~ m/\ndef/)
-    ok( not $x !~ m/\ndef/)
+    ok: $x =~ m/\ndef/
+    ok:  not $x !~ m/\ndef/
 
     $_ = 'aaabbbccc'
-    ok(m/(a*b*)(c*)/ && $1 eq 'aaabbb' && $2 eq 'ccc')
-    ok(m/(a+b+c+)/ && $1 eq 'aaabbbccc')
+    ok: m/(a*b*)(c*)/ && $1 eq 'aaabbb' && $2 eq 'ccc'
+    ok: m/(a+b+c+)/ && $1 eq 'aaabbbccc'
 
-    ok( not m/a+b?c+/)
+    ok:  not m/a+b?c+/
 
     $_ = 'aaabccc'
-    ok(m/a+b?c+/)
-    ok(m/a*b+c*/)
+    ok: m/a+b?c+/
+    ok: m/a*b+c*/
 
     $_ = 'aaaccc'
-    ok(m/a*b?c*/)
-    ok(not m/a*b+c*/)
+    ok: m/a*b?c*/
+    ok: not m/a*b+c*/
 
     $_ = 'abcdef'
-    ok(m/bcd|xyz/)
-    ok(m/xyz|bcd/)
+    ok: m/bcd|xyz/
+    ok: m/xyz|bcd/
 
-    ok(m|bc/*d|)
+    ok: m|bc/*d|
 
-    ok(m/^$_$/)
+    ok: m/^$_$/
 
     # used to be a test for $*
-    ok("ab\ncd\n" =~ m/^cd/m)
+    ok: "ab\ncd\n" =~ m/^cd/m
 
     # once pattern has been removed.
     for (25..27)
-        ok 1
+        ok: 1
     
 
     'cde' =~ m/[^ab]*/
     'xyz' =~ m//p
-    ok($^MATCH eq 'xyz')
+    ok: $^MATCH eq 'xyz'
 
     $foo = '[^ab]*'
     'cde' =~ m/$foo/
     'xyz' =~ m//p
-    ok($^MATCH eq 'xyz')
+    ok: $^MATCH eq 'xyz'
 
     $foo = '[^ab]*'
     'cde' =~ m/$foo/
     'xyz' =~ m/$null/p
-    ok($^MATCH eq 'xyz')
+    ok: $^MATCH eq 'xyz'
 
     $_ = 'abcdefghi'
     m/def/p		# optimized up to cmd
-    ok("$^PREMATCH:$^MATCH:$^POSTMATCH" eq 'abc:def:ghi')
+    ok: "$^PREMATCH:$^MATCH:$^POSTMATCH" eq 'abc:def:ghi'
 
     m/cde/p + 0	# optimized only to spat
-    ok("$^PREMATCH:$^MATCH:$^POSTMATCH" eq 'ab:cde:fghi')
+    ok: "$^PREMATCH:$^MATCH:$^POSTMATCH" eq 'ab:cde:fghi'
 
     m/[d][e][f]/p	# not optimized
-    ok("$^PREMATCH:$^MATCH:$^POSTMATCH" eq 'abc:def:ghi')
+    ok: "$^PREMATCH:$^MATCH:$^POSTMATCH" eq 'abc:def:ghi'
 
     $_ = 'now is the {time for all} good men to come to.'
     m/ {([^}]*)}/
-    ok($1 eq 'time for all')
+    ok: $1 eq 'time for all'
 
     $_ = 'xxx {3,4}  yyy   zzz'
-    ok( m/( {3,4})/ )
-    ok( $1 eq '   ' )
-    ok( not m/( {4,})/ )
-    ok( m/( {2,3}.)/ )
-    ok( $1 eq '  y' )
-    ok( m/(y{2,3}.)/ )
-    ok( $1 eq 'yyy ' )
-    ok( not m/x {3,4}/ )
-    ok( not m/^xxx {3,4}/ )
+    ok:  m/( {3,4})/ 
+    ok:  $1 eq '   ' 
+    ok:  not m/( {4,})/ 
+    ok:  m/( {2,3}.)/ 
+    ok:  $1 eq '  y' 
+    ok:  m/(y{2,3}.)/ 
+    ok:  $1 eq 'yyy ' 
+    ok:  not m/x {3,4}/ 
+    ok:  not m/^xxx {3,4}/ 
 
     $_ = "now is the time for all good men to come to."
     @words = @:  m/(\w+)/g 
-    ok( join(':', @words) eq "now:is:the:time:for:all:good:men:to:come:to" )
+    ok:  (join: ':', @words) eq "now:is:the:time:for:all:good:men:to:come:to" 
 
     @words = $@
     while (m/\w+/gp)
-        push(@words, $^MATCH)
+        push: @words, $^MATCH
     
-    ok( join(':', @words) eq "now:is:the:time:for:all:good:men:to:come:to" )
+    ok:  (join: ':', @words) eq "now:is:the:time:for:all:good:men:to:come:to" 
 
     @words = $@
-    pos($_, 0)
+    pos: $_, 0
     while (m/to/gp)
-        push(@words, $^MATCH)
+        push: @words, $^MATCH
     
-    ok( join(':', @words) eq "to:to" )
+    ok:  (join: ':', @words) eq "to:to" 
 
-    pos($_, 0)
+    pos: $_, 0
     @words = @:  m/to/g 
-    ok( join(':', @words) eq "to:to" )
+    ok:  (join: ':', @words) eq "to:to" 
 
     $_ = "abcdefghi"
 
@@ -192,59 +192,59 @@ sub run_tests
     
 
     $x = "$t1$t2$t3$t4$t5$t6$t7$t8$t9"
-    ok( $x eq '505550555' )
+    ok:  $x eq '505550555' 
 
     my $xyz = 'xyz'
-    ok( "abc" =~ m/^abc$|$xyz/ )
+    ok:  "abc" =~ m/^abc$|$xyz/ 
 
     # perl 4.009 says "unmatched ()"
     our $result
     eval '"abc" =~ m/a(bc$)|$xyz/p; $result = "$^MATCH:$1"'
-    ok( $^EVAL_ERROR eq "" )
-    ok( $result eq "abc:bc" )
+    ok:  $^EVAL_ERROR eq "" 
+    ok:  $result eq "abc:bc" 
 
 
     $_="abcfooabcbar"
     $x=m/abc/gp
-    ok( $x and $^PREMATCH eq "" )
+    ok:  $x and $^PREMATCH eq "" 
     $x=m/abc/gp
-    ok( $x and $^PREMATCH eq "abcfoo" )
+    ok:  $x and $^PREMATCH eq "abcfoo" 
     $x=m/abc/gp
-    ok( $x == 0 )
-    pos($_, 0)
+    ok:  $x == 0 
+    pos: $_, 0
     $x=m/ABC/gip
-    ok( $x and $^PREMATCH eq "" )
+    ok:  $x and $^PREMATCH eq "" 
     $x=m/ABC/gip
-    ok( $x and $^PREMATCH eq "abcfoo" )
+    ok:  $x and $^PREMATCH eq "abcfoo" 
     $x=m/ABC/gi
-    ok( $x == 0 )
-    pos($_, 0)
+    ok:  $x == 0 
+    pos: $_, 0
     $x=m/abc/gp
-    ok( $x and $^POSTMATCH eq "fooabcbar" )
+    ok:  $x and $^POSTMATCH eq "fooabcbar" 
     $x=m/abc/gp
-    ok( $x and $^POSTMATCH eq "bar" )
+    ok:  $x and $^POSTMATCH eq "bar" 
     $_ .= ''
     @x= @: m/abc/g 
-    ok( scalar nelems @x == 2 )
+    ok:  scalar nelems @x == 2 
 
     $_ = "abdc"
-    pos($_, 2)
+    pos: $_, 2
     m/\Gc/gc
-    ok( (pos $_) == 2 )
+    ok:  ((pos: $_)) == 2 
     m/\Gc/g
-    ok( not defined pos $_ )
+    ok:  not defined (pos: $_) 
 
     our $out = 1
     'abc' =~ m'a(?{ $out = 2 })b'
-    ok( $out == 2 )
+    ok:  $out == 2 
 
     $out = 1
     'abc' =~ m'a(?{ $out = 3 })c'
-    ok($out == 1)
+    ok: $out == 1
 
     $_ = 'foobar1 bar2 foobar3 barfoobar5 foobar6'
     our @out = @:  m/(?<!foo)bar./g 
-    ok("$(join ' ',@out)" eq 'bar2 barf')
+    ok: "$((join: ' ',@out))" eq 'bar2 barf'
 
     # Tests which depend on REG_INFTY
     our $reg_infty = defined %Config{?reg_infty} ?? %Config{?reg_infty} !! 32767
@@ -256,41 +256,41 @@ sub run_tests
     # default value for $reg_infty from Config.pm, but have not.
 
     undef $^EVAL_ERROR
-    ok( eval q((@: 'aaa' =~ m/(a{1,$reg_infty_m})/)[0] eq 'aaa') ); die if $^EVAL_ERROR
+    (ok:  eval q((@: 'aaa' =~ m/(a{1,$reg_infty_m})/)[0] eq 'aaa') ); die: if $^EVAL_ERROR
 
     undef $^EVAL_ERROR
-    ok( not eval q(('a' x $reg_infty_m) !~ m/a{$reg_infty_m}/) ); die if $^EVAL_ERROR
+    (ok:  not eval q(('a' x $reg_infty_m) !~ m/a{$reg_infty_m}/) ); die: if $^EVAL_ERROR
 
     undef $^EVAL_ERROR
-    ok( not eval q(('a' x ($reg_infty_m - 1)) =~ m/a{$reg_infty_m}/) ); die if $^EVAL_ERROR
+    (ok:  not eval q(('a' x ($reg_infty_m - 1)) =~ m/a{$reg_infty_m}/) ); die: if $^EVAL_ERROR
 
-    eval_dies_like( "'aaa' =~ m/a\{1,$reg_infty\}/",
-                    qr%^\QQuantifier in {,} bigger than% )
+    eval_dies_like:  "'aaa' =~ m/a\{1,$reg_infty\}/"
+                     qr%^\QQuantifier in {,} bigger than% 
 
-    eval_dies_like( "'aaa' =~ m/a\{1,$reg_infty_p\}/",
-                    qr%^\QQuantifier in {,} bigger than% )
+    eval_dies_like:  "'aaa' =~ m/a\{1,$reg_infty_p\}/"
+                     qr%^\QQuantifier in {,} bigger than% 
 
     # Poke a couple more parse failures
 
     undef $^EVAL_ERROR
     our $context = 'x' x 256
-    eval_dies_like( qq("$($context)y" =~ m/(?<=$context)y/),
-                    qr%^\QLookbehind longer than 255 not% )
+    eval_dies_like:  qq("$($context)y" =~ m/(?<=$context)y/)
+                     qr%^\QLookbehind longer than 255 not% 
 
     # removed test
-    ok(1)
+    ok: 1
 
     # Long Monsters
     for my $l ((@: 125, 140, 250, 270, 300000, 30)) # Ordered to free memory
         $a = 'a' x $l
-        ok("ba$a=" =~ m/a$a=/)
+        ok: "ba$a=" =~ m/a$a=/
 
-        ok( not "b$a=" =~ m/a$a=/ )
+        ok:  not "b$a=" =~ m/a$a=/ 
     
 
     # 20000 nodes, each taking 3 words per string, and 1 per branch
-    my $long_constant_len = join '|', 12120 .. 32645
-    my $long_var_len = join '|', 8120 .. 28645
+    my $long_constant_len = join: '|', 12120 .. 32645
+    my $long_var_len = join: '|', 8120 .. 28645
     my %ans = %:  'ax13876y25677lbc' => 1
                   'ax13876y25677mcb' => 0 # not b.
                   'ax13876y35677nbc' => 0 # Num too big
@@ -302,8 +302,8 @@ sub run_tests
         
 
     for ( keys %ans )
-        ok( not ( %ans{?$_} xor m/a(?=([yx]($long_constant_len)){2,4}[k-o]).*b./o ))
-        ok( not ( %ans{?$_} xor m/a(?=([yx]($long_var_len)){2,4}[k-o]).*b./o ))
+        ok:  (not:  %ans{?$_} xor m/a(?=([yx]($long_constant_len)){2,4}[k-o]).*b./o )
+        ok:  (not:  %ans{?$_} xor m/a(?=([yx]($long_var_len)){2,4}[k-o]).*b./o )
     
 
     $_ = " a (bla()) and x(y b((l)u((e))) and b(l(e)e)e"
@@ -343,63 +343,63 @@ sub run_tests
     
 
     our (@ans, $res, @ans1)
-    push @ans, $res while $res = matchit
+    (push: @ans, $res) while $res = (matchit: )
 
-    ok("$(join ' ',@ans)" eq "1 1 1")
+    ok: "$((join: ' ',@ans))" eq "1 1 1"
 
-    ok( "abc" =~ m/^(??{"a"})b/ )
+    ok:  "abc" =~ m/^(??{"a"})b/ 
 
     my $matched
     $matched = qr/\((?:(?>[^()]+)|(??{$matched}))*\)/
 
     @ans = (@ans1 = $@)
-    push(@ans, $res), push(@ans1, $^MATCH) while $res = m/$matched/gp
+    (push: @ans, $res), (push: @ans1, $^MATCH) while $res = m/$matched/gp
 
-    ok( "$(join ' ',@ans)" eq "1 1 1" )
+    ok:  "$((join: ' ',@ans))" eq "1 1 1" 
 
-    ok( "$(join ' ',@ans1)" eq $expect )
+    ok:  "$((join: ' ',@ans1))" eq $expect 
 
     @ans = @:  m/$matched/g 
 
-    ok( "$(join ' ',@ans)" eq $expect )
+    ok:  "$((join: ' ',@ans))" eq $expect 
 
     @ans = @: 'a/b' =~ m%(.*/)?(.*)%	# Stack may be bad
-    ok( "$(join ' ',@ans)" eq 'a/ b' )
+    ok:  "$((join: ' ',@ans))" eq 'a/ b' 
 
     my $code = '{$blah = 45}'
     my $blah = 12
-    dies_like( sub (@< @_) { m/(?$code)/ },
-               qr/not allowed at runtime/)
-    ok( $blah == 12 , "blah not changed by the eval" )
+    dies_like:  sub (@< @_) { m/(?$code)/ }
+                qr/not allowed at runtime/
+    ok:  $blah == 12 , "blah not changed by the eval" 
 
     for my $code ((@: '{$blah = 45}','=xx'))
         $blah = 12
         if ($code eq '=xx')
-            $res = try { "xx" =~ m/(?$code)/o }; die if $^EVAL_ERROR
-            ok( not $^EVAL_ERROR )
-            ok( $res )
+            $res = try { "xx" =~ m/(?$code)/o }; die: if $^EVAL_ERROR
+            ok:  not $^EVAL_ERROR 
+            ok:  $res 
         else
-            $res = dies_like( sub (@< @_) { "xx" =~ m/(?$code)/o },
-                              qr/not allowed at runtime/ )
-            ok( $blah == 12, "blah not chagned by not allowed eval" )
+            $res = dies_like:  sub (@< @_) { "xx" =~ m/(?$code)/o }
+                               qr/not allowed at runtime/ 
+            ok:  $blah == 12, "blah not chagned by not allowed eval" 
         
     
 
     $code = '{$blah = 45}'
     $blah = 12
-    eval "m/(?$code)/"; die if $^EVAL_ERROR
-    ok($blah == 45, "match with executable code inside an eval")
+    eval "m/(?$code)/"; die: if $^EVAL_ERROR
+    ok: $blah == 45, "match with executable code inside an eval"
 
     $blah = 12
     m/(?{$blah = 45})/
-    ok($blah == 45)
+    ok: $blah == 45
 
     $x = 'banana'
     $x =~ m/.a/g
-    ok(pos($x) == 2)
+    ok: (pos: $x) == 2
 
     $x =~ m/.z/gc
-    ok(pos($x) == 2)
+    ok: (pos: $x) == 2
 
     sub f
         my $p = @_[0]
@@ -407,71 +407,71 @@ sub run_tests
     
 
     $x =~ m/.a/g
-    ok(f(pos($x)) == 4)
+    ok: (f: (pos: $x)) == 4
 
-    ok(qr/\b\v$/i eq '(?iu-xsm:\b\v$)')
-    ok(qr/\b\v$/s eq '(?su-xim:\b\v$)')
-    ok(qr/\b\v$/m eq '(?mu-xis:\b\v$)')
-    ok(qr/\b\v$/x eq '(?xu-ism:\b\v$)')
-    ok(qr/\b\v$/xism eq '(?msixu:\b\v$)')
-    ok(qr/\b\v$/ eq '(?u-xism:\b\v$)')
+    ok: qr/\b\v$/i eq '(?iu-xsm:\b\v$)'
+    ok: qr/\b\v$/s eq '(?su-xim:\b\v$)'
+    ok: qr/\b\v$/m eq '(?mu-xis:\b\v$)'
+    ok: qr/\b\v$/x eq '(?xu-ism:\b\v$)'
+    ok: qr/\b\v$/xism eq '(?msixu:\b\v$)'
+    ok: qr/\b\v$/ eq '(?u-xism:\b\v$)'
 
     $_ = 'xabcx'
     foreach my $ans ((@: '', 'c'))
         use bytes
         m/(?<=(?=a)..)((?=c)|.)/g
-        ok($1 eq $ans)
+        ok: $1 eq $ans
     
 
     $_ = 'a'
     foreach my $ans ((@: '', 'a', ''))
         m/^|a|$/gp
-        ok( $^MATCH eq $ans )
+        ok:  $^MATCH eq $ans 
     
 
     sub prefixify
         my(@: $v,$a,$b,$res) =  @_
         $v =~ s/\Q$a\E/$b/
-        ok($res eq $v)
+        ok: $res eq $v
     
-    prefixify('/a/b/lib/arch', "/a/b/lib", 'X/lib', 'X/lib/arch')
-    prefixify('/a/b/man/arch', "/a/b/man", 'X/man', 'X/man/arch')
+    prefixify: '/a/b/lib/arch', "/a/b/lib", 'X/lib', 'X/lib/arch'
+    prefixify: '/a/b/man/arch', "/a/b/man", 'X/man', 'X/man/arch'
 
     $_ = 'var="foo"'
     m/(\")/
-    ok( ( $1 and m/$1/ ) )
+    ok:  ( $1 and m/$1/ ) 
 
     $a=qr/(?{++$b})/
     $b = 7
     m/$a$a/
-    ok($b eq '9')
+    ok: $b eq '9'
 
     do
         $c="$a"
         m/$a$a/
-        is($b, '11')
+        is: $b, '11'
     
 
     our $lex_a
     do
         use re "eval"
         m/$a$c$a/
-        is($b, '14')
+        is: $b, '14'
 
         local $lex_a = 2
         my $lex_a = 43
         my $lex_b = 17
         my $lex_c = 27
         my $lex_res = ($lex_b =~ qr/$lex_b(?{ $lex_c = $lex_a++ })/)
-        ok($lex_res eq '1')
-        ok($lex_a eq '44')
-        ok($lex_c eq '43')
+        ok: $lex_res eq '1'
+        ok: $lex_a eq '44'
+        ok: $lex_c eq '43'
 
 
         no re "eval";
-        dies_like( sub (@< @_) { m/$a$c$a/ },
-                   qr/Eval-group not allowed/ )
-        ok($b eq '14')
+        dies_like:  sub (@< @_) { m/$a$c$a/ }
+                    qr/Eval-group not allowed/ 
+        ok: $b eq '14'
     
 
     do
@@ -480,9 +480,9 @@ sub run_tests
         my $lex_b = 17
         my $lex_c = 27
         my $lex_res = ($lex_b =~ qr/17(?{ $lex_c = $lex_a++ })/)
-        ok($lex_res eq '1')
-        ok($lex_a eq '44')
-        ok($lex_c eq '43')
+        ok: $lex_res eq '1'
+        ok: $lex_a eq '44'
+        ok: $lex_c eq '43'
     
 
     do
@@ -490,158 +490,158 @@ sub run_tests
         $c = 2
         $::c = 3
         '' =~ m/(?{ $c = 4 })/
-        main::ok($c == 4)
+        main::ok: $c == 4
     
     do
         local $TODO = "lexical scope?"
-        ok($c == 3, "lexical scope?")
+        ok: $c == 3, "lexical scope?"
     
 
-    eval_dies_like('q(a:[b]:) =~ m/[x[:foo:]]/',
-                   qr/POSIX class \[:foo:\] unknown in regex/)
+    eval_dies_like: 'q(a:[b]:) =~ m/[x[:foo:]]/'
+                    qr/POSIX class \[:foo:\] unknown in regex/
 
     #&$for_future('q(a=[b]=) =~ m/[x[=foo=]]/');
-    ok( 1 ) # now a fatal croak
+    ok:  1  # now a fatal croak
 
     #&$for_future('q(a.[b].) =~ m/[x[.foo.]]/');
-    ok( 1 ) # now a fatal croak
+    ok:  1  # now a fatal croak
 
     # test if failure of patterns returns empty list
     $_ = 'aaa'
     @_ = @:  m/bbb/ 
-    ok( ! nelems @_ )
+    ok:  ! nelems @_ 
 
     @_ = @:  m/bbb/g 
-    ok( not nelems @_ )
+    ok:  not nelems @_ 
 
     @_ = @:  m/(bbb)/ 
-    ok( not nelems @_ )
+    ok:  not nelems @_ 
 
     @_ = @:  m/(bbb)/g 
-    ok( not nelems @_ )
+    ok:  not nelems @_ 
 
     $_ = 'aaa'
-    pos($_, 1)
+    pos: $_, 1
     my @a = @:  m/\Ga/g 
-    ok("$(join ' ',@a)" eq "a a")
+    ok: "$((join: ' ',@a))" eq "a a"
 
     my $str = 'abcde'
-    pos($str, 2)
+    pos: $str, 2
 
-    ok( not ($str =~ m/^\G/ ))
+    ok:  (not: $str =~ m/^\G/ )
 
-    ok( not ($str =~ m/^.\G/ ))
+    ok:  (not: $str =~ m/^.\G/ )
 
-    ok( $str =~ m/^..\G/ )
+    ok:  $str =~ m/^..\G/ 
 
-    ok( not ( $str =~ m/^...\G/ ))
+    ok:  (not:  $str =~ m/^...\G/ )
 
     do
         local $TODO = $::running_as_thread
-        ok($str =~ m/.\G./p and $^MATCH eq 'bc')
+        ok: $str =~ m/.\G./p and $^MATCH eq 'bc'
     
 
-    ok( $str =~ m/\G../p and $^MATCH eq 'cd' )
+    ok:  $str =~ m/\G../p and $^MATCH eq 'cd' 
 
     our ($foo, $bar)
     undef $foo; undef $bar
-    ok( $str =~ m/b(?{$foo = $_; $bar = pos})c/
-          and $foo eq 'abcde' and $bar eq 2 )
+    ok:  $str =~ m/b(?{$foo = $_; $bar = pos})c/
+           and $foo eq 'abcde' and $bar eq 2 
 
     undef $foo; undef $bar
-    pos($str, undef)
-    ok( $str =~ m/b(?{$foo = $_; $bar = pos})c/g
-          and $foo eq 'abcde' and $bar eq 2 and pos($str) eq 3 )
+    pos: $str, undef
+    ok:  $str =~ m/b(?{$foo = $_; $bar = pos})c/g
+           and $foo eq 'abcde' and $bar eq 2 and (pos: $str) eq 3 
 
     $_ = $str
 
     undef $foo; undef $bar
-    ok( m/b(?{$foo = $_; $bar = pos})c/
-          and $foo eq 'abcde' and $bar eq 2 )
+    ok:  m/b(?{$foo = $_; $bar = pos})c/
+           and $foo eq 'abcde' and $bar eq 2 
 
     undef $foo; undef $bar
-    ok(  m/b(?{$foo = $_; $bar = pos})c/g
-           and $foo eq 'abcde' and $bar eq 2 and pos eq 3 )
+    ok:   m/b(?{$foo = $_; $bar = pos})c/g
+            and $foo eq 'abcde' and $bar eq 2 and (pos: )eq 3 
 
     undef $foo; undef $bar
-    pos($_, undef)
+    pos: $_, undef
     1 while m/b(?{$foo = $_; $bar = pos})c/g
-    ok(  $foo eq 'abcde' and $bar eq 2 and not defined pos )
+    ok:   $foo eq 'abcde' and $bar eq 2 and not defined (pos: )
 
     undef $foo; undef $bar
     $_ = 'abcde|abcde'
-    ok(  s/b(?{$foo = $_; $bar = pos})c/x/g and $foo eq 'abcde|abcde'
-           and $bar eq 8 and $_ eq 'axde|axde' )
+    ok:   s/b(?{$foo = $_; $bar = pos})c/x/g and $foo eq 'abcde|abcde'
+             and $bar eq 8 and $_ eq 'axde|axde' 
 
     our @res = $@
     # List context:
     $_ = 'abcde|abcde'
     our @dummy = @:  m/([ace]).(?{push @res, $1,$2})([ce])(?{push @res, $1,$2})/g 
-    @res = map {defined $_ ?? "'$_'" !! 'undef'}, @res
-    $res = "$(join ' ',@res)"
-    ok(  "$(join ' ',@res)" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" )
+    @res = map: {defined $_ ?? "'$_'" !! 'undef'}, @res
+    $res = "$((join: ' ',@res))"
+    ok:   "$((join: ' ',@res))" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" 
 
     @res = $@
     @dummy = @:  m/([ace]).(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})([ce])(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})/gp 
-    @res = map {defined $_ ?? "'$_'" !! 'undef'}, @res
-    $res = "$(join ' ',@res)"
-    ok(  "$(join ' ',@res)" eq
-         "'' 'ab' 'cde|abcde' " .
-         "'' 'abc' 'de|abcde' " .
-         "'abcd' 'e|' 'abcde' " .
-         "'abcde|' 'ab' 'cde' " .
-         "'abcde|' 'abc' 'de'" )
+    @res = map: {defined $_ ?? "'$_'" !! 'undef'}, @res
+    $res = "$((join: ' ',@res))"
+    ok:   "$((join: ' ',@res))" eq
+               "'' 'ab' 'cde|abcde' " .
+               "'' 'abc' 'de|abcde' " .
+               "'abcd' 'e|' 'abcde' " .
+               "'abcde|' 'ab' 'cde' " .
+               "'abcde|' 'abc' 'de'" 
 
     #Some more \G anchor checks
     $foo='aabbccddeeffgg'
 
-    pos($foo, 1)
+    pos: $foo, 1
 
     $foo =~ m/.\G(..)/g
     do
         local $TODO = $::running_as_thread
-        is($1,'ab')
+        is: $1,'ab'
     
 
-    pos($foo, pos($foo) + 1)
+    pos: $foo, (pos: $foo) + 1
     $foo =~ m/.\G(..)/g
     do
         local $TODO = $::running_as_thread
-        is($1, 'cc')
+        is: $1, 'cc'
     
 
-    pos($foo, pos($foo) + 1)
+    pos: $foo, (pos: $foo) + 1
     $foo =~ m/.\G(..)/g
     do
         local $TODO = $::running_as_thread
-        is($1, 'de')
+        is: $1, 'de'
     
 
     do
         local $TODO = $::running_as_thread
-        ok($foo =~ m/\Gef/g)
+        ok: $foo =~ m/\Gef/g
     
 
-    pos($foo, undef)
+    pos: $foo, undef
 
     $foo=~m/\G(..)/g
-    ok($1  eq 'aa')
+    ok: $1  eq 'aa'
 
     $foo=~m/\G(..)/g
-    ok($1  eq 'bb')
+    ok: $1  eq 'bb'
 
-    pos($foo, 5)
+    pos: $foo, 5
     $foo=~m/\G(..)/g
-    ok($1  eq 'cd')
+    ok: $1  eq 'cd'
 
     $_='123x123'
     @res = @:  m/(\d*|x)/g 
-    ok( ('123||x|123|' eq join '|', @res) )
+    ok:  ('123||x|123|' eq (join: '|', @res)) 
 
     # see if matching against temporaries (created via pp_helem()) is safe
     my $x = "abc"
     (%:  foo => "ok $x\n".$^EXECUTABLE_NAME ){?foo} =~ m/^(.*)\n/g
-    ok( $1 eq "ok abc" )
+    ok:  $1 eq "ok abc" 
 
     # See if $i work inside (?{}) in the presense of saved substrings and
     # changing $_
@@ -650,9 +650,9 @@ sub run_tests
     for (@a)
         s/(\w)(?{push @b, $1})/,$1,/g
 
-    ok("$(join ' ',@b)" eq "f o o b a r")
+    ok: "$((join: ' ',@b))" eq "f o o b a r"
 
-    ok("$(join ' ',@a)" eq ",f,,o,,o, ,b,,a,,r,")
+    ok: "$((join: ' ',@a))" eq ",f,,o,,o, ,b,,a,,r,"
 
     my $brackets
     $brackets = qr{
@@ -660,96 +660,96 @@ sub run_tests
 	      }x
 
     "\{\{\}" =~ $brackets
-    ok(1) # Did we survive?
+    ok: 1 # Did we survive?
 
     "something \{ long \{ and \} hairy" =~ $brackets
-    ok(1) # Did we survive?
+    ok: 1 # Did we survive?
 
     "something \{ long \{ and \} hairy" =~ m/((??{ $brackets }))/
-    ok( $1 eq "\{ and \}" )
+    ok:  $1 eq "\{ and \}" 
 
     $_ = "a-a\nxbb"
-    pos($_, 1)
-    ok( not m/^-.*bb/mg )
+    pos: $_, 1
+    ok:  not m/^-.*bb/mg 
 
     our $text = "aaXbXcc"
-    pos($text, 0)
-    ok( not $text =~ m/\GXb*X/g )
+    pos: $text, 0
+    ok:  not $text =~ m/\GXb*X/g 
 
     $text = "xA\n" x 500
-    ok( not $text =~ m/^\s*A/m )
+    ok:  not $text =~ m/^\s*A/m 
 
     $text = "abc dbf"
     @res = @: $text =~ m/.*?(b).*?\b/g
-    ok("$(join ' ',@res)" eq 'b b')
+    ok: "$((join: ' ',@res))" eq 'b b'
 
     do
         use bytes
-        @a = map { chr },0..255
+        @a = map: { chr },0..255
 
-        @b = grep( {m/\S/ }, @a)
-        our @c = grep( {m/[^\s]/ }, @a)
-        ok("$(join ' ',@b)" eq "$(join ' ',@c)")
+        @b = grep:  {m/\S/ }, @a
+        our @c = grep:  {m/[^\s]/ }, @a
+        ok: "$((join: ' ',@b))" eq "$((join: ' ',@c))"
 
-        @b = grep( {m/\S/ }, @a)
-        @c = grep( {m/[\S]/ }, @a)
-        ok( "$(join ' ',@b)" eq "$(join ' ',@c)")
+        @b = grep:  {m/\S/ }, @a
+        @c = grep:  {m/[\S]/ }, @a
+        ok:  "$((join: ' ',@b))" eq "$((join: ' ',@c))"
 
-        @b = grep( {m/\s/ }, @a)
-        @c = grep( {m/[^\S]/ }, @a)
-        ok( "$(join ' ',@b)" eq "$(join ' ',@c)")
+        @b = grep:  {m/\s/ }, @a
+        @c = grep:  {m/[^\S]/ }, @a
+        ok:  "$((join: ' ',@b))" eq "$((join: ' ',@c))"
 
-        @b = grep( {m/\s/ }, @a)
-        @c = grep( {m/[\s]/ }, @a)
-        ok( "$(join ' ',@b)" eq "$(join ' ',@c)")
+        @b = grep:  {m/\s/ }, @a
+        @c = grep:  {m/[\s]/ }, @a
+        ok:  "$((join: ' ',@b))" eq "$((join: ' ',@c))"
 
-        @b = grep( {m/\D/ }, @a)
-        @c = grep( {m/[^\d]/ }, @a)
-        ok( "$(join ' ',@b)" eq "$(join ' ',@c)")
+        @b = grep:  {m/\D/ }, @a
+        @c = grep:  {m/[^\d]/ }, @a
+        ok:  "$((join: ' ',@b))" eq "$((join: ' ',@c))"
 
-        @b = grep( {m/\D/ }, @a)
-        @c = grep( {m/[\D]/ }, @a)
-        ok( "$(join ' ',@b)" eq "$(join ' ',@c)")
+        @b = grep:  {m/\D/ }, @a
+        @c = grep:  {m/[\D]/ }, @a
+        ok:  "$((join: ' ',@b))" eq "$((join: ' ',@c))"
 
-        @b = grep( {m/\d/ }, @a)
-        @c = grep( {m/[^\D]/ }, @a)
-        ok( "$(join ' ',@b)" eq "$(join ' ',@c)")
+        @b = grep:  {m/\d/ }, @a
+        @c = grep:  {m/[^\D]/ }, @a
+        ok:  "$((join: ' ',@b))" eq "$((join: ' ',@c))"
 
-        @b = grep( {m/\d/ }, @a)
-        @c = grep( {m/[\d]/ }, @a)
-        ok( "$(join ' ',@b)" eq "$(join ' ',@c)")
+        @b = grep:  {m/\d/ }, @a
+        @c = grep:  {m/[\d]/ }, @a
+        ok:  "$((join: ' ',@b))" eq "$((join: ' ',@c))"
 
-        @b = grep( {m/\W/ }, @a)
-        @c = grep( {m/[^\w]/ }, @a)
-        ok( "$(join ' ',@b)" eq "$(join ' ',@c)")
+        @b = grep:  {m/\W/ }, @a
+        @c = grep:  {m/[^\w]/ }, @a
+        ok:  "$((join: ' ',@b))" eq "$((join: ' ',@c))"
 
-        @b = grep( {m/\W/ }, @a)
-        @c = grep( {m/[\W]/ }, @a)
-        ok( "$(join ' ',@b)" eq "$(join ' ',@c)")
+        @b = grep:  {m/\W/ }, @a
+        @c = grep:  {m/[\W]/ }, @a
+        ok:  "$((join: ' ',@b))" eq "$((join: ' ',@c))"
 
-        @b = grep( {m/\w/ }, @a)
-        @c = grep( {m/[^\W]/ }, @a)
-        ok( "$(join ' ',@b)" eq "$(join ' ',@c)")
+        @b = grep:  {m/\w/ }, @a
+        @c = grep:  {m/[^\W]/ }, @a
+        ok:  "$((join: ' ',@b))" eq "$((join: ' ',@c))"
 
-        @b = grep( {m/\w/ }, @a)
-        @c = grep( {m/[\w]/ }, @a)
-        is("$(join ' ',@b)","$(join ' ',@c)")
+        @b = grep:  {m/\w/ }, @a
+        @c = grep:  {m/[\w]/ }, @a
+        is: "$((join: ' ',@b))","$((join: ' ',@c))"
     
 
     # see if backtracking optimization works correctly
-    ok("\n\n" =~ m/\n  $ \n/x)
+    ok: "\n\n" =~ m/\n  $ \n/x
 
-    ok("\n\n" =~ m/\n* $ \n/x)
+    ok: "\n\n" =~ m/\n* $ \n/x
 
-    ok("\n\n" =~ m/\n+ $ \n/x)
+    ok: "\n\n" =~ m/\n+ $ \n/x
 
-    dies_like( sub (@< @_) { \$@ =~ m/^ARRAY/ },
-               qr/Tried to use reference as string/)
+    dies_like:  sub (@< @_) { \$@ =~ m/^ARRAY/ }
+                qr/Tried to use reference as string/
 
     # test result of match used as match (!)
-    ok( 'a1b' =~ ('xyz' =~ m/y/) )
+    ok:  'a1b' =~ ('xyz' =~ m/y/) 
 
-    ok( 'a1b' =~ ('xyz' =~ m/t/) )
+    ok:  'a1b' =~ ('xyz' =~ m/t/) 
 
     our $w = 0
     do
@@ -757,7 +757,7 @@ sub run_tests
         local $^WARNING = 1
         $w = 1 if ("1\n" x 102) =~ m/^\s*\n/m
     
-    ok( not $w )
+    ok:  not $w 
 
     my %space = %:  spc   => " "
                     tab   => "\t"
@@ -766,77 +766,77 @@ sub run_tests
                     ff    => "\f"
                     # There's no \v but the vertical tabulator seems miraculously
                     # be 11 both in ASCII and EBCDIC.
-                    vt    => chr(11)
+                    vt    => chr: 11
                     false => "space" 
 
-    my @space0 = sort grep { %space{?$_} =~ m/\s/ },          keys %space
-    my @space1 = sort grep { %space{?$_} =~ m/[[:space:]]/ }, keys %space
-    my @space2 = sort grep { %space{?$_} =~ m/[[:blank:]]/ }, keys %space
+    my @space0 = sort: grep: { %space{?$_} =~ m/\s/ },          keys %space
+    my @space1 = sort: grep: { %space{?$_} =~ m/[[:space:]]/ }, keys %space
+    my @space2 = sort: grep: { %space{?$_} =~ m/[[:blank:]]/ }, keys %space
 
-    ok( "$(join ' ',@space0)" eq "cr ff lf spc tab" )
+    ok:  "$((join: ' ',@space0))" eq "cr ff lf spc tab" 
 
-    ok( "$(join ' ',@space1)" eq "cr ff lf spc tab vt" )
+    ok:  "$((join: ' ',@space1))" eq "cr ff lf spc tab vt" 
 
-    ok( "$(join ' ',@space2)" eq "spc tab" )
+    ok:  "$((join: ' ',@space2))" eq "spc tab" 
 
     # bugid 20001021.005 - this caused a SEGV
-    ok($: undef =~ m/^([^\/]*)(.*)$/ )
+    ok: $: undef =~ m/^([^\/]*)(.*)$/ 
 
     # unicode.
     do
         use utf8
         my $x = "\x{65e5}"
         no utf8;
-        ok($x =~ m/^...$/, "wide is three bytes")
-        ok($x =~ m/^\w$/u, "wide is extactly one unicode \\w ")
-        ok($x =~ m/^.$/u, "wide is extactly one .")
+        ok: $x =~ m/^...$/, "wide is three bytes"
+        ok: $x =~ m/^\w$/u, "wide is extactly one unicode \\w "
+        ok: $x =~ m/^.$/u, "wide is extactly one ."
         my $y = qr/^.$/u
-        ok("$y" eq "(?u-xism:^.\$)", "unicode-modifier stringified.")
-        eval_dies_like( q|no utf8; $x =~ m/\x{65e5}/|,
-                        qr/\\x\{\} not allowed outside Unicode match/)
+        ok: "$y" eq "(?u-xism:^.\$)", "unicode-modifier stringified."
+        eval_dies_like:  q|no utf8; $x =~ m/\x{65e5}/|
+                         qr/\\x\{\} not allowed outside Unicode match/
     
 
     use utf8
 
     # bugid 20000731.001
 
-    ok( "A \x{263a} B z C" =~ m/A . B (??{ "z" }) C/ )
+    ok:  "A \x{263a} B z C" =~ m/A . B (??{ "z" }) C/ 
 
-    my $ordA = ord('A')
+    my $ordA = ord: 'A'
 
     $_ = "a\x{100}b"
     if (m/(.)(\C)(\C)(.)/)
-        ok(1)
-        ok($1 eq "a")
-        ok($2 eq "\x[C4]")
-        ok($3 eq "\x[80]")
-        ok($4 eq "b")
+        ok: 1
+        ok: $1 eq "a"
+        ok: $2 eq "\x[C4]"
+        ok: $3 eq "\x[80]"
+        ok: $4 eq "b"
     else
         for (232..236)
-            ok(0)
+            ok: 0
     
     $_ = "\x{100}"
     if (m/(\C)/g)
-        ok(1)
-        ok ($1 eq "\x[C4]")
+        ok: 1
+        ok: $1 eq "\x[C4]"
     else
-        ok(0)
-        ok(0)
+        ok: 0
+        ok: 0
     
     if (m/(\C)/g)
-        ok(1)
+        ok: 1
         # currently \C are still tagged as UTF-8
-        ok($1 eq "\x[80]")
+        ok: $1 eq "\x[80]"
     else
-        ok(0)
-        ok(0)
+        ok: 0
+        ok: 0
     
 
     do
         # japhy -- added 03/03/2001
         (@: _) = @: (my $str = "abc") =~ m/(...)/
         $str = "def"
-        ok($1 eq "abc")
+        ok: $1 eq "abc"
     
 
     # The 242 and 243 go with the 244 and 245.
@@ -845,13 +845,13 @@ sub run_tests
 
     do
         no utf8
-        ok("\x[8e]" =~ m/[\x[89]-\x[91]]/)
-        ok("\x[ce]" =~ m/[\x[c9]-\x[d1]]/)
+        ok: "\x[8e]" =~ m/[\x[89]-\x[91]]/
+        ok: "\x[ce]" =~ m/[\x[c9]-\x[d1]]/
     
 
-    ok("\x{ab}" =~ m/\x{ab}/)
+    ok: "\x{ab}" =~ m/\x{ab}/
 
-    ok("\x{abcd}" =~ m/\x{abcd}/)
+    ok: "\x{abcd}" =~ m/\x{abcd}/
 
     do
         # bug id 20001008.001
@@ -860,7 +860,7 @@ sub run_tests
         for ( @x)
             s/(\d+)\s*([\w\-]+)/$($1 . uc $2)/
             my (@: $latin) = @: m/^(.+)(?:\s+\d)/
-            ok($latin eq "stra\x{DF}e")
+            ok: $latin eq "stra\x{DF}e"
             $latin =~ s/stra\x{DF}e/straße/ # \303\237 after the 2nd a
             use utf8; # needed for the raw UTF-8
             $latin =~ s!(s)tr(?:aß|s+e)!$1tr.! # \303\237 after the a
@@ -873,7 +873,7 @@ sub run_tests
         # intentional so that in non-Latin-1 places we test the native
         # characters, not the Unicode code points.
 
-        my %s = %: 
+        my %s = %:
             "a" 				=> 'Ll'
             "\N{CYRILLIC SMALL LETTER A}"	=> 'Ll'
             "A" 				=> 'Lu'
@@ -888,114 +888,114 @@ sub run_tests
             "\0"				=> 'Cc'
             
 
-        for my $char ( map { s/^\S+ //; $_ },
-            sort map { sprintf("\%06x", ord($_))." $_" }, keys %s)
+        for my $char ( (map: { s/^\S+ //; $_ },
+                                 (sort: (map: { (sprintf: "\%06x", (ord: $_))." $_" }, keys %s))))
             my $class = %s{?$char}
-            my $code  = sprintf("\%06x", ord($char))
-            printf $^STDOUT, "#\n# 0x$code  $char\n#\n"
-            print $^STDOUT, "# IsAlpha\n"
+            my $code  = sprintf: "\%06x", (ord: $char)
+            printf: $^STDOUT, "#\n# 0x$code  $char\n#\n"
+            print: $^STDOUT, "# IsAlpha\n"
             if ($class =~ m/^[LM]/)
-                ok( $char =~ m/\p{IsAlpha}/ )
-                ok( not $char =~ m/\P{IsAlpha}/ )
+                ok:  $char =~ m/\p{IsAlpha}/ 
+                ok:  not $char =~ m/\P{IsAlpha}/ 
             else
-                ok( not $char =~ m/\p{IsAlpha}/ )
-                ok( $char =~ m/\P{IsAlpha}/ )
+                ok:  not $char =~ m/\p{IsAlpha}/ 
+                ok:  $char =~ m/\P{IsAlpha}/ 
             
-            print $^STDOUT, "# IsAlnum\n"
+            print: $^STDOUT, "# IsAlnum\n"
             if ($class =~ m/^[LMN]/ && $char ne "_")
-                ok( $char =~ m/\p{IsAlnum}/)
-                ok( not $char =~ m/\P{IsAlnum}/)
+                ok:  $char =~ m/\p{IsAlnum}/
+                ok:  not $char =~ m/\P{IsAlnum}/
             else
-                ok( not $char =~ m/\p{IsAlnum}/)
-                ok( $char =~ m/\P{IsAlnum}/)
+                ok:  not $char =~ m/\p{IsAlnum}/
+                ok:  $char =~ m/\P{IsAlnum}/
             
-            print $^STDOUT, "# IsASCII\n"
+            print: $^STDOUT, "# IsASCII\n"
             if (($code cmp '00007f') +<= 0)
-                ok( $char =~ m/\p{IsASCII}/)
-                ok( not $char =~ m/\P{IsASCII}/)
+                ok:  $char =~ m/\p{IsASCII}/
+                ok:  not $char =~ m/\P{IsASCII}/
             else
-                ok( not $char =~ m/\p{IsASCII}/)
-                ok( $char =~ m/\P{IsASCII}/)
+                ok:  not $char =~ m/\p{IsASCII}/
+                ok:  $char =~ m/\P{IsASCII}/
             
-            print $^STDOUT, "# IsCntrl\n"
+            print: $^STDOUT, "# IsCntrl\n"
             if ($class =~ m/^C/)
-                ok( $char =~ m/\p{IsCntrl}/)
-                ok( not $char =~ m/\P{IsCntrl}/)
+                ok:  $char =~ m/\p{IsCntrl}/
+                ok:  not $char =~ m/\P{IsCntrl}/
             else
-                ok( not $char =~ m/\p{IsCntrl}/)
-                ok( $char =~ m/\P{IsCntrl}/)
+                ok:  not $char =~ m/\p{IsCntrl}/
+                ok:  $char =~ m/\P{IsCntrl}/
             
-            print $^STDOUT, "# IsBlank\n"
+            print: $^STDOUT, "# IsBlank\n"
             if ($class =~ m/^Z[lp]/ || $char eq " ")
-                ok( $char =~ m/\p{IsBlank}/)
-                ok( not $char =~ m/\P{IsBlank}/)
+                ok:  $char =~ m/\p{IsBlank}/
+                ok:  not $char =~ m/\P{IsBlank}/
             else
-                ok( not $char =~ m/\p{IsBlank}/)
-                ok( $char =~ m/\P{IsBlank}/)
+                ok:  not $char =~ m/\p{IsBlank}/
+                ok:  $char =~ m/\P{IsBlank}/
             
-            print $^STDOUT, "# IsDigit\n"
+            print: $^STDOUT, "# IsDigit\n"
             if ($class =~ m/^Nd$/)
-                ok( $char =~ m/\p{IsDigit}/)
-                ok( not $char =~ m/\P{IsDigit}/)
+                ok:  $char =~ m/\p{IsDigit}/
+                ok:  not $char =~ m/\P{IsDigit}/
             else
-                ok( not $char =~ m/\p{IsDigit}/)
-                ok( $char =~ m/\P{IsDigit}/)
+                ok:  not $char =~ m/\p{IsDigit}/
+                ok:  $char =~ m/\P{IsDigit}/
             
-            print $^STDOUT, "# IsGraph\n"
+            print: $^STDOUT, "# IsGraph\n"
             if ($class =~ m/^([LMNPS])|Co/)
-                ok( $char =~ m/\p{IsGraph}/)
-                ok( not $char =~ m/\P{IsGraph}/)
+                ok:  $char =~ m/\p{IsGraph}/
+                ok:  not $char =~ m/\P{IsGraph}/
             else
-                ok( not $char =~ m/\p{IsGraph}/)
-                ok( $char =~ m/\P{IsGraph}/)
+                ok:  not $char =~ m/\p{IsGraph}/
+                ok:  $char =~ m/\P{IsGraph}/
             
-            print $^STDOUT, "# IsLower\n"
+            print: $^STDOUT, "# IsLower\n"
             if ($class =~ m/^Ll$/)
-                ok( $char =~ m/\p{IsLower}/)
-                ok( not $char =~ m/\P{IsLower}/)
+                ok:  $char =~ m/\p{IsLower}/
+                ok:  not $char =~ m/\P{IsLower}/
             else
-                ok( not $char =~ m/\p{IsLower}/)
-                ok( $char =~ m/\P{IsLower}/)
+                ok:  not $char =~ m/\p{IsLower}/
+                ok:  $char =~ m/\P{IsLower}/
             
-            print $^STDOUT, "# IsPrint\n"
+            print: $^STDOUT, "# IsPrint\n"
             if ($class =~ m/^([LMNPS])|Co|Zs/)
-                ok( $char =~ m/\p{IsPrint}/)
-                ok( not $char =~ m/\P{IsPrint}/)
+                ok:  $char =~ m/\p{IsPrint}/
+                ok:  not $char =~ m/\P{IsPrint}/
             else
-                ok( not $char =~ m/\p{IsPrint}/)
-                ok( $char =~ m/\P{IsPrint}/)
+                ok:  not $char =~ m/\p{IsPrint}/
+                ok:  $char =~ m/\P{IsPrint}/
             
-            print $^STDOUT, "# IsPunct\n"
+            print: $^STDOUT, "# IsPunct\n"
             if ($class =~ m/^P/ || $char eq "_")
-                ok( $char =~ m/\p{IsPunct}/)
-                ok( not $char =~ m/\P{IsPunct}/)
+                ok:  $char =~ m/\p{IsPunct}/
+                ok:  not $char =~ m/\P{IsPunct}/
             else
-                ok( not $char =~ m/\p{IsPunct}/)
-                ok( $char =~ m/\P{IsPunct}/)
+                ok:  not $char =~ m/\p{IsPunct}/
+                ok:  $char =~ m/\P{IsPunct}/
             
-            print $^STDOUT, "# IsSpace\n"
+            print: $^STDOUT, "# IsSpace\n"
             if ($class =~ m/^Z/ || ($code =~ m/^(0009|000A|000B|000C|000D)$/))
-                ok( $char =~ m/\p{IsSpace}/)
-                ok( not $char =~ m/\P{IsSpace}/)
+                ok:  $char =~ m/\p{IsSpace}/
+                ok:  not $char =~ m/\P{IsSpace}/
             else
-                ok( not $char =~ m/\p{IsSpace}/)
-                ok( $char =~ m/\P{IsSpace}/)
+                ok:  not $char =~ m/\p{IsSpace}/
+                ok:  $char =~ m/\P{IsSpace}/
             
-            print $^STDOUT, "# IsUpper\n"
+            print: $^STDOUT, "# IsUpper\n"
             if ($class =~ m/^L[ut]/)
-                ok( $char =~ m/\p{IsUpper}/)
-                ok( not $char =~ m/\P{IsUpper}/)
+                ok:  $char =~ m/\p{IsUpper}/
+                ok:  not $char =~ m/\P{IsUpper}/
             else
-                ok( not $char =~ m/\p{IsUpper}/)
-                ok( $char =~ m/\P{IsUpper}/)
+                ok:  not $char =~ m/\p{IsUpper}/
+                ok:  $char =~ m/\P{IsUpper}/
             
-            print $^STDOUT, "# IsWord\n"
+            print: $^STDOUT, "# IsWord\n"
             if ($class =~ m/^[LMN]/ || $char eq "_")
-                ok( $char =~ m/\p{IsWord}/)
-                ok( not $char =~ m/\P{IsWord}/)
+                ok:  $char =~ m/\p{IsWord}/
+                ok:  not $char =~ m/\P{IsWord}/
             else
-                ok( not $char =~ m/\p{IsWord}/)
-                ok( $char =~ m/\P{IsWord}/)
+                ok:  not $char =~ m/\p{IsWord}/
+                ok:  $char =~ m/\P{IsWord}/
             
         
     
@@ -1004,13 +1004,13 @@ sub run_tests
         $_ = "abc\x{100}\x{200}\x{300}\x{380}\x{400}defg"
 
         if (m/(.\x{300})./p)
-            ok(1)
-            ok( $^PREMATCH eq "abc\x{100}" && length($^PREMATCH) == 4 )
-            ok( $^MATCH eq "\x{200}\x{300}\x{380}" && length($^MATCH) == 3 )
-            ok( $^POSTMATCH eq "\x{400}defg" && length($^POSTMATCH) == 5 )
-            ok( $1 eq "\x{200}\x{300}" && length($1) == 2 )
+            ok: 1
+            ok:  $^PREMATCH eq "abc\x{100}" && (length: $^PREMATCH) == 4 
+            ok:  $^MATCH eq "\x{200}\x{300}\x{380}" && (length: $^MATCH) == 3 
+            ok:  $^POSTMATCH eq "\x{400}defg" && (length: $^POSTMATCH) == 5 
+            ok:  $1 eq "\x{200}\x{300}" && (length: $1) == 2 
         else
-            for (576..580) { ok(0); }
+            for (576..580) { ok: 0; }
         
     
 
@@ -1021,12 +1021,12 @@ sub run_tests
         # The original bug report had 'no utf8' here but that was irrelevant.
         $a =~ m/\w/ # used to core dump
 
-        ok(1)
+        ok: 1
     
 
     do
         # bugid 20010410.006
-        for my $rx (@: 
+        for my $rx (@:
             'm/(.*?)\{(.*?)\}/csg'
             'm/(.*?)\{(.*?)\}/cg'
             'm/(.*?)\{(.*?)\}/sg'
@@ -1037,66 +1037,66 @@ sub run_tests
 
             $i = 0
             $input = "a\{b\}c\{d\}"
-            eval <<EOT; die if $^EVAL_ERROR
+            eval <<EOT; die: if $^EVAL_ERROR
         while (eval \$input =~ $rx) \{
             die if \$^EVAL_ERROR;
             diag "\\\$1 = '\$1' \\\$2 = '\$2'";
             ++\$i;
         \}
 EOT
-            ok( $i == 2 )
+            ok:  $i == 2 
 
     do
         # from Robin Houston
 
         my $x = "\x{10FFFD}"
         $x =~ s/(.)/$1/g
-        ok( ord($x) == 0x10FFFD && length($x) == 1 )
+        ok:  (ord: $x) == 0x10FFFD && (length: $x) == 1 
 
     do
         my $x = "\x{7f}"
 
-        ok( not $x =~ m/[\x{80}-\x{ff}]/ )
-        ok( not $x =~ m/[\x{80}-\x{100}]/ )
-        ok( not $x =~ m/[\x{100}]/ )
-        ok( not $x =~ m/\p{InLatin1Supplement}/ )
-        ok( $x =~ m/\P{InLatin1Supplement}/ )
-        ok( not $x =~ m/\p{InLatinExtendedA}/ )
-        ok( $x =~ m/\P{InLatinExtendedA}/ )
+        ok:  not $x =~ m/[\x{80}-\x{ff}]/ 
+        ok:  not $x =~ m/[\x{80}-\x{100}]/ 
+        ok:  not $x =~ m/[\x{100}]/ 
+        ok:  not $x =~ m/\p{InLatin1Supplement}/ 
+        ok:  $x =~ m/\P{InLatin1Supplement}/ 
+        ok:  not $x =~ m/\p{InLatinExtendedA}/ 
+        ok:  $x =~ m/\P{InLatinExtendedA}/ 
 
     do
         my $x = "\x{80}"
 
-        ok( $x =~ m/[\x{80}-\x{ff}]/ )
-        ok( $x =~ m/[\x{80}-\x{100}]/ )
-        ok( not $x =~ m/[\x{100}]/ )
-        ok( $x =~ m/\p{InLatin1Supplement}/ )
-        ok( not$x =~ m/\P{InLatin1Supplement}/ )
-        ok( not $x =~ m/\p{InLatinExtendedA}/ )
-        ok( $x =~ m/\P{InLatinExtendedA}/ )
+        ok:  $x =~ m/[\x{80}-\x{ff}]/ 
+        ok:  $x =~ m/[\x{80}-\x{100}]/ 
+        ok:  not $x =~ m/[\x{100}]/ 
+        ok:  $x =~ m/\p{InLatin1Supplement}/ 
+        ok:  not$x =~ m/\P{InLatin1Supplement}/ 
+        ok:  not $x =~ m/\p{InLatinExtendedA}/ 
+        ok:  $x =~ m/\P{InLatinExtendedA}/ 
 
     do
         my $x = "\x{ff}"
 
-        ok( $x =~ m/[\x{80}-\x{ff}]/ )
-        ok( $x =~ m/[\x{80}-\x{100}]/ )
-        ok( not $x =~ m/[\x{100}]/ )
-        ok( $x =~ m/\p{InLatin1Supplement}/ )
-        ok( not $x =~ m/\P{InLatin1Supplement}/ )
-        ok( not $x =~ m/\p{InLatinExtendedA}/ )
-        ok( $x =~ m/\P{InLatinExtendedA}/ )
+        ok:  $x =~ m/[\x{80}-\x{ff}]/ 
+        ok:  $x =~ m/[\x{80}-\x{100}]/ 
+        ok:  not $x =~ m/[\x{100}]/ 
+        ok:  $x =~ m/\p{InLatin1Supplement}/ 
+        ok:  not $x =~ m/\P{InLatin1Supplement}/ 
+        ok:  not $x =~ m/\p{InLatinExtendedA}/ 
+        ok:  $x =~ m/\P{InLatinExtendedA}/ 
     
 
     do
         my $x = "\x{100}"
 
-        ok( not $x =~ m/[\x{80}-\x{ff}]/ )
-        ok( $x =~ m/[\x{80}-\x{100}]/ )
-        ok( $x =~ m/[\x{100}]/ )
-        ok( not $x =~ m/\p{InLatin1Supplement}/ )
-        ok( $x =~ m/\P{InLatin1Supplement}/ )
-        ok( $x =~ m/\p{InLatinExtendedA}/ )
-        ok( not $x =~ m/\P{InLatinExtendedA}/ )
+        ok:  not $x =~ m/[\x{80}-\x{ff}]/ 
+        ok:  $x =~ m/[\x{80}-\x{100}]/ 
+        ok:  $x =~ m/[\x{100}]/ 
+        ok:  not $x =~ m/\p{InLatin1Supplement}/ 
+        ok:  $x =~ m/\P{InLatin1Supplement}/ 
+        ok:  $x =~ m/\p{InLatinExtendedA}/ 
+        ok:  not $x =~ m/\P{InLatinExtendedA}/ 
     
 
     do
@@ -1106,46 +1106,46 @@ EOT
         local $^WARN_HOOK = sub ($e) { $w .= $e->{?description} . "\n" }
 
         $w = ""
-        eval 'qr/(?c)/'; die if $^EVAL_ERROR
-        ok( $w =~ m/^Useless \(\?c\)/ )
+        eval 'qr/(?c)/'; die: if $^EVAL_ERROR
+        ok:  $w =~ m/^Useless \(\?c\)/ 
 
         $w = ""
-        eval 'qr/(?-c)/'; die if $^EVAL_ERROR
-        ok( $w =~ m/^Useless \(\?-c\)/ )
+        eval 'qr/(?-c)/'; die: if $^EVAL_ERROR
+        ok:  $w =~ m/^Useless \(\?-c\)/ 
 
         $w = ""
-        eval 'qr/(?g)/'; die if $^EVAL_ERROR
-        ok( $w =~ m/^Useless \(\?g\)/ )
+        eval 'qr/(?g)/'; die: if $^EVAL_ERROR
+        ok:  $w =~ m/^Useless \(\?g\)/ 
 
         $w = ""
-        eval 'qr/(?-g)/'; die if $^EVAL_ERROR
-        ok( $w =~ m/^Useless \(\?-g\)/ )
+        eval 'qr/(?-g)/'; die: if $^EVAL_ERROR
+        ok:  $w =~ m/^Useless \(\?-g\)/ 
 
         $w = ""
-        eval 'qr/(?o)/'; die if $^EVAL_ERROR
-        ok( $w =~ m/^Useless \(\?o\)/ )
+        eval 'qr/(?o)/'; die: if $^EVAL_ERROR
+        ok:  $w =~ m/^Useless \(\?o\)/ 
 
         $w = ""
-        eval 'qr/(?-o)/'; die if $^EVAL_ERROR
-        ok( $w =~ m/^Useless \(\?-o\)/ )
+        eval 'qr/(?-o)/'; die: if $^EVAL_ERROR
+        ok:  $w =~ m/^Useless \(\?-o\)/ 
 
         # now test multi-error regexes
 
         $w = ""
-        eval 'qr/(?g-o)/'; die if $^EVAL_ERROR
-        ok( $w =~ m/^Useless \(\?g\).*\nUseless \(\?-o\)/ )
+        eval 'qr/(?g-o)/'; die: if $^EVAL_ERROR
+        ok:  $w =~ m/^Useless \(\?g\).*\nUseless \(\?-o\)/ 
 
         $w = ""
-        eval 'qr/(?g-c)/'; die if $^EVAL_ERROR
-        ok( $w =~ m/^Useless \(\?g\).*\nUseless \(\?-c\)/ )
+        eval 'qr/(?g-c)/'; die: if $^EVAL_ERROR
+        ok:  $w =~ m/^Useless \(\?g\).*\nUseless \(\?-c\)/ 
 
         $w = ""
-        eval 'qr/(?o-cg)/'; die if $^EVAL_ERROR  # (?c) means (?g) error won't be thrown
-        ok( $w =~ m/^Useless \(\?o\).*\nUseless \(\?-c\)/ )
+        eval 'qr/(?o-cg)/'; die: if $^EVAL_ERROR  # (?c) means (?g) error won't be thrown
+        ok:  $w =~ m/^Useless \(\?o\).*\nUseless \(\?-c\)/ 
 
         $w = ""
-        eval 'qr/(?ogc)/'; die if $^EVAL_ERROR
-        ok( $w =~ m/^Useless \(\?o\).*\nUseless \(\?g\).*\nUseless \(\?c\)/ )
+        eval 'qr/(?ogc)/'; die: if $^EVAL_ERROR
+        ok:  $w =~ m/^Useless \(\?o\).*\nUseless \(\?g\).*\nUseless \(\?c\)/ 
     
 
     # More Unicode "class" tests
@@ -1153,16 +1153,16 @@ EOT
     do
         use charnames ':full'
 
-        ok( "\N{LATIN CAPITAL LETTER A}" =~ m/\p{InBasicLatin}/ )
-        ok( "\N{LATIN CAPITAL LETTER A WITH GRAVE}" =~ m/\p{InLatin1Supplement}/ )
-        ok( "\N{LATIN CAPITAL LETTER A WITH MACRON}" =~ m/\p{InLatinExtendedA}/ )
-        ok( "\N{LATIN SMALL LETTER B WITH STROKE}" =~ m/\p{InLatinExtendedB}/ )
-        ok( "\N{KATAKANA LETTER SMALL A}" =~ m/\p{InKatakana}/ )
+        ok:  "\N{LATIN CAPITAL LETTER A}" =~ m/\p{InBasicLatin}/ 
+        ok:  "\N{LATIN CAPITAL LETTER A WITH GRAVE}" =~ m/\p{InLatin1Supplement}/ 
+        ok:  "\N{LATIN CAPITAL LETTER A WITH MACRON}" =~ m/\p{InLatinExtendedA}/ 
+        ok:  "\N{LATIN SMALL LETTER B WITH STROKE}" =~ m/\p{InLatinExtendedB}/ 
+        ok:  "\N{KATAKANA LETTER SMALL A}" =~ m/\p{InKatakana}/ 
     
 
     $_ = "foo"
 
-    ok( eval <<"EOT" ); die if $^EVAL_ERROR
+    (ok:  eval <<"EOT" ); die: if $^EVAL_ERROR
   m/f
    o\r
    o
@@ -1170,7 +1170,7 @@ EOT
   /x && 1;
 EOT
 
-    ok( eval <<"EOT" ); die if $^EVAL_ERROR
+    (ok:  eval <<"EOT" ); die: if $^EVAL_ERROR
   m/f
    o
    o
@@ -1180,77 +1180,77 @@ EOT
 
     #test /o feature
     sub test_o { @_[0] =~m/@_[1]/o; return $1}
-    ok(test_o('abc','(.)..') eq 'a')
-    ok(test_o('abc','..(.)') eq 'a')
+    ok: (test_o: 'abc','(.)..') eq 'a'
+    ok: (test_o: 'abc','..(.)') eq 'a'
 
     # 635..639: ID 20010619.003 (only the space character is
     # supposed to be [:print:], not the whole isprint()).
 
     do
         use bytes
-        ok( not "\n"     =~ m/[[:print:]]/ )
-        ok( not "\t"     =~ m/[[:print:]]/ )
+        ok:  not "\n"     =~ m/[[:print:]]/ 
+        ok:  not "\t"     =~ m/[[:print:]]/ 
 
         # Amazingly vertical tabulator is the same in ASCII and EBCDIC.
-        ok( not "\014"  =~ m/[[:print:]]/ )
-        ok( not "\r"    =~ m/[[:print:]]/ )
-        ok( " " =~ m/[[:print:]]/ )
+        ok:  not "\014"  =~ m/[[:print:]]/ 
+        ok:  not "\r"    =~ m/[[:print:]]/ 
+        ok:  " " =~ m/[[:print:]]/ 
     
 
     ##
     ## Test basic $^N usage outside of a regex
     ##
     $x = "abcdef"
-    ok($x =~ m/cde/ and not defined $^LAST_SUBMATCH_RESULT)
-    ok($x =~ m/(cde)/          and $^LAST_SUBMATCH_RESULT eq "cde")
-    ok($x =~ m/(c)(d)(e)/      and $^LAST_SUBMATCH_RESULT eq   "e")
-    ok($x =~ m/(c(d)e)/        and $^LAST_SUBMATCH_RESULT eq "cde")
-    ok($x =~ m/(foo)|(c(d)e)/  and $^LAST_SUBMATCH_RESULT eq "cde")
-    ok($x =~ m/(c(d)e)|(foo)/  and $^LAST_SUBMATCH_RESULT eq "cde")
-    ok($x =~ m/(c(d)e)|(abc)/  and $^LAST_SUBMATCH_RESULT eq "abc")
-    ok($x =~ m/(c(d)e)|(abc)x/ and $^LAST_SUBMATCH_RESULT eq "cde")
-    ok($x =~ m/(c(d)e)(abc)?/  and $^LAST_SUBMATCH_RESULT eq "cde")
-    ok($x =~ m/(?:c(d)e)/      and $^LAST_SUBMATCH_RESULT eq  "d" )
-    ok($x =~ m/(?:c(d)e)(?:f)/ and $^LAST_SUBMATCH_RESULT eq  "d" )
-    ok($x =~ m/(?:([abc])|([def]))*/ and $^LAST_SUBMATCH_RESULT eq  "f" )
-    ok($x =~ m/(?:([ace])|([bdf]))*/ and $^LAST_SUBMATCH_RESULT eq  "f" )
-    ok($x =~ m/(([ace])|([bd]))*/    and $^LAST_SUBMATCH_RESULT eq  "e" )
+    ok: $x =~ m/cde/ and not defined $^LAST_SUBMATCH_RESULT
+    ok: $x =~ m/(cde)/          and $^LAST_SUBMATCH_RESULT eq "cde"
+    ok: $x =~ m/(c)(d)(e)/      and $^LAST_SUBMATCH_RESULT eq   "e"
+    ok: $x =~ m/(c(d)e)/        and $^LAST_SUBMATCH_RESULT eq "cde"
+    ok: $x =~ m/(foo)|(c(d)e)/  and $^LAST_SUBMATCH_RESULT eq "cde"
+    ok: $x =~ m/(c(d)e)|(foo)/  and $^LAST_SUBMATCH_RESULT eq "cde"
+    ok: $x =~ m/(c(d)e)|(abc)/  and $^LAST_SUBMATCH_RESULT eq "abc"
+    ok: $x =~ m/(c(d)e)|(abc)x/ and $^LAST_SUBMATCH_RESULT eq "cde"
+    ok: $x =~ m/(c(d)e)(abc)?/  and $^LAST_SUBMATCH_RESULT eq "cde"
+    ok: $x =~ m/(?:c(d)e)/      and $^LAST_SUBMATCH_RESULT eq  "d" 
+    ok: $x =~ m/(?:c(d)e)(?:f)/ and $^LAST_SUBMATCH_RESULT eq  "d" 
+    ok: $x =~ m/(?:([abc])|([def]))*/ and $^LAST_SUBMATCH_RESULT eq  "f" 
+    ok: $x =~ m/(?:([ace])|([bdf]))*/ and $^LAST_SUBMATCH_RESULT eq  "f" 
+    ok: $x =~ m/(([ace])|([bd]))*/    and $^LAST_SUBMATCH_RESULT eq  "e" 
     do
-        ok($x =~ m/(([ace])|([bdf]))*/   and $^LAST_SUBMATCH_RESULT eq  "f" )
+        ok: $x =~ m/(([ace])|([bdf]))*/   and $^LAST_SUBMATCH_RESULT eq  "f" 
     
     ## test to see if $^N is automatically localized -- it should now
     ## have the value set in test 653
-    ok($^LAST_SUBMATCH_RESULT eq  "e" )
+    ok: $^LAST_SUBMATCH_RESULT eq  "e" 
 
     ##
     ## Now test inside (?{...})
     ##
     our ($y, $z)
-    ok($x =~ m/a([abc])(?{$y=$^LAST_SUBMATCH_RESULT})c/      and $y eq "b" )
-    ok($x =~ m/a([abc]+)(?{$y=$^LAST_SUBMATCH_RESULT})d/     and $y eq "bc")
-    ok($x =~ m/a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})d/ and $y eq "bc")
-    ok($x =~ m/(a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})d)(?{$z=$^LAST_SUBMATCH_RESULT})e/ and $y eq "bc" and $z eq "abcd")
-    ok($x =~ m/(a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})de)(?{$z=$^LAST_SUBMATCH_RESULT})/ and $y eq "bc" and $z eq "abcde")
+    ok: $x =~ m/a([abc])(?{$y=$^LAST_SUBMATCH_RESULT})c/      and $y eq "b" 
+    ok: $x =~ m/a([abc]+)(?{$y=$^LAST_SUBMATCH_RESULT})d/     and $y eq "bc"
+    ok: $x =~ m/a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})d/ and $y eq "bc"
+    ok: $x =~ m/(a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})d)(?{$z=$^LAST_SUBMATCH_RESULT})e/ and $y eq "bc" and $z eq "abcd"
+    ok: $x =~ m/(a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})de)(?{$z=$^LAST_SUBMATCH_RESULT})/ and $y eq "bc" and $z eq "abcde"
 
     # Test the Unicode script classes
 
-    ok( chr(0x100) =~ m/\p{IsLatin}/ ) # outside Latin-1
-    ok( chr(0x212b) =~ m/\p{IsLatin}/ ) # Angstrom sign, very outside
-    ok( chr(0x5d0) =~ m/\p{IsHebrew}/ ) # inside InHebrew
-    ok( chr(0xfb4f) =~ m/\p{IsHebrew}/ ) # outside InHebrew
+    ok:  (chr: 0x100) =~ m/\p{IsLatin}/  # outside Latin-1
+    ok:  (chr: 0x212b) =~ m/\p{IsLatin}/  # Angstrom sign, very outside
+    ok:  (chr: 0x5d0) =~ m/\p{IsHebrew}/  # inside InHebrew
+    ok:  (chr: 0xfb4f) =~ m/\p{IsHebrew}/  # outside InHebrew
 
     # # singleton (not in a range, this test must be ignored on EBCDIC)
     # print "not " unless chr(0xb5) =~ m/\p{IsGreek}/ or ord("A") == 193;
     # print "ok 665\n";
-    ok( 1 ) # 0xb5 moved from Greek to Common with Unicode 4.0.1\n";
+    ok:  1  # 0xb5 moved from Greek to Common with Unicode 4.0.1\n";
 
-    ok( chr(0x37a) =~ m/\p{IsGreek}/ ) # singleton
-    ok( chr(0x386) =~ m/\p{IsGreek}/ ) # singleton
-    ok( chr(0x387) =~ m/\P{IsGreek}/ ) # not there
-    ok( chr(0x388) =~ m/\p{IsGreek}/ ) # range
-    ok( chr(0x38a) =~ m/\p{IsGreek}/ ) # range
-    ok( chr(0x38b) =~ m/\P{IsGreek}/ ) # not there
-    ok( chr(0x38c) =~ m/\p{IsGreek}/ ) # singleton
+    ok:  (chr: 0x37a) =~ m/\p{IsGreek}/  # singleton
+    ok:  (chr: 0x386) =~ m/\p{IsGreek}/  # singleton
+    ok:  (chr: 0x387) =~ m/\P{IsGreek}/  # not there
+    ok:  (chr: 0x388) =~ m/\p{IsGreek}/  # range
+    ok:  (chr: 0x38a) =~ m/\p{IsGreek}/  # range
+    ok:  (chr: 0x38b) =~ m/\P{IsGreek}/  # not there
+    ok:  (chr: 0x38c) =~ m/\p{IsGreek}/  # singleton
 
     do
         ##
@@ -1260,12 +1260,12 @@ EOT
         ## guarantee a specific locale......
         ##
         use bytes
-        our $AllBytes = join('', map { chr($_) }, 0..255)
+        our $AllBytes = join: '', (map: { (chr: $_) }, 0..255)
         ($x = $AllBytes) =~ s/[[:cntrl:]]//g
-        ok($x eq join('', map { chr($_) }, (@:  < 0x20..0x7E, < 0x80..0xFF)))
+        ok: $x eq (join: '', (map: { (chr: $_) }, (@:  < 0x20..0x7E, < 0x80..0xFF)))
 
         ($x = $AllBytes) =~ s/[^[:cntrl:]]//g
-        ok($x eq join('', map { chr($_) }, (@:  < 0..0x1F, 0x7F)))
+        ok: $x eq (join: '', (map: { (chr: $_) }, (@:  < 0..0x1F, 0x7F)))
     
 
     # With /s modifier UTF8 chars were interpreted as bytes
@@ -1274,41 +1274,41 @@ EOT
 
         my @a = @: $a =~ m/./gs
 
-        ok( (nelems @a) == 13 )
+        ok:  (nelems @a) == 13 
     
 
     @a = @: "foo\nbar" =~ m/./g
-    ok( (nelems @a) == 6 && "$(join ' ',@a)" eq "f o o b a r" )
+    ok:  (nelems @a) == 6 && "$((join: ' ',@a))" eq "f o o b a r" 
 
     @a = @: "foo\nbar" =~ m/./gs
-    ok( (nelems @a) == 7 && "$(join ' ',@a)" eq "f o o \n b a r" )
+    ok:  (nelems @a) == 7 && "$((join: ' ',@a))" eq "f o o \n b a r" 
 
     @a = @: "foo\nbar" =~ m/\C/g
-    ok( (nelems @a) == 7 && "$(join ' ',@a)" eq "f o o \n b a r" )
+    ok:  (nelems @a) == 7 && "$((join: ' ',@a))" eq "f o o \n b a r" 
 
     @a = @: "foo\nbar" =~ m/\C/gs
-    ok( (nelems @a) == 7 && "$(join ' ',@a)" eq "f o o \n b a r" )
+    ok:  (nelems @a) == 7 && "$((join: ' ',@a))" eq "f o o \n b a r" 
 
     @a = @: "foo\n\x{100}bar" =~ m/./g
-    ok( (nelems @a) == 7 && "$(join ' ',@a)" eq "f o o \x{100} b a r" )
+    ok:  (nelems @a) == 7 && "$((join: ' ',@a))" eq "f o o \x{100} b a r" 
 
     @a = @: "foo\n\x{100}bar" =~ m/./gs
-    ok( (nelems @a) == 8 && "$(join ' ',@a)" eq "f o o \n \x{100} b a r" )
+    ok:  (nelems @a) == 8 && "$((join: ' ',@a))" eq "f o o \n \x{100} b a r" 
 
     (@: $a, $b) = @: "\x[c4]", "\x[80]"
     @a = @: "foo\n\x{100}bar" =~ m/\C/g
-    ok( scalar( (nelems @a) == 9 && "$(join ' ',@a)" eq "f o o \n $a $b b a r" ) )
+    ok:  (scalar:  (nelems @a) == 9 && "$((join: ' ',@a))" eq "f o o \n $a $b b a r" ) 
 
     @a = @: "foo\n\x{100}bar" =~ m/\C/gs
-    ok(  (nelems @a) == 9 && "$(join ' ',@a)" eq "f o o \n $a $b b a r" )
+    ok:   (nelems @a) == 9 && "$((join: ' ',@a))" eq "f o o \n $a $b b a r" 
 
     do
         # [ID 20010814.004] pos() doesn't work when using =~m// in list context
         $_ = "ababacadaea"
-        $a = join ":", @:  m/b./gc
-        $b = join ":", @:  m/a./gc
-        $c = pos
-        ok("$a $b $c" eq 'ba:ba ad:ae 10', "$a $b $c")
+        $a = join: ":", @:  m/b./gc
+        $b = join: ":", @:  m/a./gc
+        $c = pos: 
+        ok: "$a $b $c" eq 'ba:ba ad:ae 10', "$a $b $c"
     
 
     do
@@ -1320,14 +1320,14 @@ EOT
             "a\x{1234}"
         
 
-        my $x = x
+        my $x = (x: )
         my $y
 
         $x =~ m/(..)/; $y = $1
-        main::ok( length($y) == 2 && $y eq $x )
+        main::ok:  (length: $y) == 2 && $y eq $x 
 
-        x  =~ m/(..)/; $y = $1
-        main::ok( length($y) == 2 && $y eq $x )
+        (x: )=~ m/(..)/; $y = $1
+        main::ok:  (length: $y) == 2 && $y eq $x 
     
 
 
@@ -1335,48 +1335,48 @@ EOT
         # Check that \x## works. 5.6.1 and 5.005_03 fail some of these.
         no utf8
         $x = "\x[4e]" . "E"
-        ok ($x =~ m/^\x4EE$/, "Check only 2 bytes of hex are matched.")
+        ok: $x =~ m/^\x4EE$/, "Check only 2 bytes of hex are matched."
 
         $x = "\x[4e]" . "i"
-        ok ($x =~ m/^\x4Ei$/, "Check that invalid hex digit stops it (2)")
+        ok: $x =~ m/^\x4Ei$/, "Check that invalid hex digit stops it (2)"
 
         $x = "\x[04]" . "j"
-        ok ($x =~ m/^\x4j$/,  "Check that invalid hex digit stops it (1)")
+        ok: $x =~ m/^\x4j$/,  "Check that invalid hex digit stops it (1)"
 
         $x = "\0" . "k"
-        ok ($x =~ m/^\xk$/,   "Check that invalid hex digit stops it (0)")
+        ok: $x =~ m/^\xk$/,   "Check that invalid hex digit stops it (0)"
 
         $x = "\0" . "x"
-        ok ($x =~ m/^\xx$/, "\\xx isn't to be treated as \\0")
+        ok: $x =~ m/^\xx$/, "\\xx isn't to be treated as \\0"
 
         $x = "\0" . "xa"
-        ok ($x =~ m/^\xxa$/, "\\xxa isn't to be treated as \\xa")
+        ok: $x =~ m/^\xxa$/, "\\xxa isn't to be treated as \\xa"
 
         $x = "\x[09]" . "_b"
-        ok ($x =~ m/^\x9_b$/, "\\x9_b isn't to be treated as \\x9b")
+        ok: $x =~ m/^\x9_b$/, "\\x9_b isn't to be treated as \\x9b"
 
-        print $^STDOUT, "# and now again in [] ranges\n"
+        print: $^STDOUT, "# and now again in [] ranges\n"
 
         $x = "\x[4e]" . "E"
-        ok ($x =~ m/^[\x[4E]E]{2}$/, "Check only 2 bytes of hex are matched.")
+        ok: $x =~ m/^[\x[4E]E]{2}$/, "Check only 2 bytes of hex are matched."
 
         $x = "\x[4e]" . "i"
-        ok ($x =~ m/^[\x[4E]i]{2}$/, "Check that invalid hex digit stops it (2)")
+        ok: $x =~ m/^[\x[4E]i]{2}$/, "Check that invalid hex digit stops it (2)"
 
         $x = "\x[04]" . "j"
-        ok ($x =~ m/^[\x[04]j]{2}$/,  "Check that invalid hex digit stops it (1)")
+        ok: $x =~ m/^[\x[04]j]{2}$/,  "Check that invalid hex digit stops it (1)"
 
         $x = "\0" . "k"
-        ok ($x =~ m/^[\x[00]k]{2}$/,   "Check that invalid hex digit stops it (0)")
+        ok: $x =~ m/^[\x[00]k]{2}$/,   "Check that invalid hex digit stops it (0)"
 
         $x = "\0" . "x"
-        ok ($x =~ m/^[\x[00]x]{2}$/, "\\xx isn't to be treated as \\0")
+        ok: $x =~ m/^[\x[00]x]{2}$/, "\\xx isn't to be treated as \\0"
 
         $x = "\0" . "xa"
-        ok ($x =~ m/^[\x[00]xa]{3}$/, "\\xxa isn't to be treated as \\xa")
+        ok: $x =~ m/^[\x[00]xa]{3}$/, "\\xxa isn't to be treated as \\xa"
 
         $x = "\x[09]" . "_b"
-        ok ($x =~ m/^[\x[09]_b]{3}$/, "\\x9_b isn't to be treated as \\x9b")
+        ok: $x =~ m/^[\x[09]_b]{3}$/, "\\x9_b isn't to be treated as \\x9b"
 
     
 
@@ -1384,284 +1384,284 @@ EOT
         # high bit bug -- japhy
         no utf8
         my $x = "ab\200d"
-        ok( $x =~ m/.*?\200/ )
+        ok:  $x =~ m/.*?\200/ 
     
 
-    print $^STDOUT, "# some Unicode properties\n"
+    print: $^STDOUT, "# some Unicode properties\n"
 
     do
         # Dashes, underbars, case.
-        ok( "\x{80}" =~ m/\p{in-latin1_SUPPLEMENT}/ )
+        ok:  "\x{80}" =~ m/\p{in-latin1_SUPPLEMENT}/ 
 
         # Complement, leading and trailing whitespace.
-        ok( "\x{80}" =~ m/\P{  ^  In Latin 1 Supplement  }/ )
+        ok:  "\x{80}" =~ m/\P{  ^  In Latin 1 Supplement  }/ 
 
         # No ^In, dashes, case, dash, any intervening (word-break) whitespace.
         # (well, newlines don't work...)
-        ok( "\x{80}" =~ m/\p{latin-1   supplement}/ )
+        ok:  "\x{80}" =~ m/\p{latin-1   supplement}/ 
     
 
     do
-        ok( "a" =~ m/\pL/ )
-        ok( "a" =~ m/\p{IsLl}/ )
-        ok( not "a" =~ m/\p{IsLu}/ )
-        ok( "a" =~ m/\p{Ll}/ )
-        ok( not "a" =~ m/\p{Lu}/ )
-        ok( "A" =~ m/\pL/ )
-        ok( "A" =~ m/\p{IsLu}/ )
-        ok( not "A" =~ m/\p{IsLl}/ )
-        ok( "A" =~ m/\p{Lu}/ )
-        ok( not "A" =~ m/\p{Ll}/ )
-        ok( not "a" =~ m/\PL/ )
-        ok( not "a" =~ m/\P{IsLl}/ )
-        ok( "a" =~ m/\P{IsLu}/ )
-        ok( not "a" =~ m/\P{Ll}/ )
-        ok( "a" =~ m/\P{Lu}/ )
-        ok( not "A" =~ m/\PL/ )
-        ok( not "A" =~ m/\P{IsLu}/ )
-        ok( "A" =~ m/\P{IsLl}/ )
-        ok( not "A" =~ m/\P{Lu}/ )
-        ok( "A" =~ m/\P{Ll}/ )
+        ok:  "a" =~ m/\pL/ 
+        ok:  "a" =~ m/\p{IsLl}/ 
+        ok:  not "a" =~ m/\p{IsLu}/ 
+        ok:  "a" =~ m/\p{Ll}/ 
+        ok:  not "a" =~ m/\p{Lu}/ 
+        ok:  "A" =~ m/\pL/ 
+        ok:  "A" =~ m/\p{IsLu}/ 
+        ok:  not "A" =~ m/\p{IsLl}/ 
+        ok:  "A" =~ m/\p{Lu}/ 
+        ok:  not "A" =~ m/\p{Ll}/ 
+        ok:  not "a" =~ m/\PL/ 
+        ok:  not "a" =~ m/\P{IsLl}/ 
+        ok:  "a" =~ m/\P{IsLu}/ 
+        ok:  not "a" =~ m/\P{Ll}/ 
+        ok:  "a" =~ m/\P{Lu}/ 
+        ok:  not "A" =~ m/\PL/ 
+        ok:  not "A" =~ m/\P{IsLu}/ 
+        ok:  "A" =~ m/\P{IsLl}/ 
+        ok:  not "A" =~ m/\P{Lu}/ 
+        ok:  "A" =~ m/\P{Ll}/ 
     
 
     do
-        ok( not "a" =~ m/\p{Common}/ )
-        ok( "1" =~ m/\p{Common}/ )
+        ok:  not "a" =~ m/\p{Common}/ 
+        ok:  "1" =~ m/\p{Common}/ 
     
 
     do
-        ok( not "a"       =~ m/\p{Inherited}/ )
-        ok( "\x{300}" =~ m/\p{Inherited}/ )
+        ok:  not "a"       =~ m/\p{Inherited}/ 
+        ok:  "\x{300}" =~ m/\p{Inherited}/ 
     
 
     do
         # L& and LC are the same
-        ok( "a" =~ m/\p{LC}/ and "a" =~ m/\p{L&}/ )
-        ok( not "1" =~ m/\p{LC}/ or "1" =~ m/\p{L&}/ )
+        ok:  "a" =~ m/\p{LC}/ and "a" =~ m/\p{L&}/ 
+        ok:  not "1" =~ m/\p{LC}/ or "1" =~ m/\p{L&}/ 
 
     do
-        ok( "a" =~ m/\p{Lowercase Letter}/ )
-        ok( not "A" =~ m/\p{lowercaseletter}/ )
+        ok:  "a" =~ m/\p{Lowercase Letter}/ 
+        ok:  not "A" =~ m/\p{lowercaseletter}/ 
 
     do
-        ok( "\x{AC00}" =~ m/\p{HangulSyllables}/ )
+        ok:  "\x{AC00}" =~ m/\p{HangulSyllables}/ 
 
     do
         # Script=, Block=, Category=
 
-        ok( "\x{0100}" =~ m/\p{Script=Latin}/ )
-        ok( "\x{0100}" =~ m/\p{Block=LatinExtendedA}/ )
-        ok( "\x{0100}" =~ m/\p{Category=UppercaseLetter}/ )
+        ok:  "\x{0100}" =~ m/\p{Script=Latin}/ 
+        ok:  "\x{0100}" =~ m/\p{Block=LatinExtendedA}/ 
+        ok:  "\x{0100}" =~ m/\p{Category=UppercaseLetter}/ 
 
     do
-        print $^STDOUT, "# folding matches and Unicode\n"
+        print: $^STDOUT, "# folding matches and Unicode\n"
 
-        ok( "a\x{100}" =~ m/A/i )
-        ok( "A\x{100}" =~ m/a/i )
-        ok( "a\x{100}" =~ m/a/i )
-        ok( "A\x{100}" =~ m/A/i )
-        ok( "\x{101}a" =~ m/\x{100}/i )
-        ok( "\x{100}a" =~ m/\x{100}/i )
-        ok( "\x{101}a" =~ m/\x{101}/i )
-        ok( "\x{100}a" =~ m/\x{101}/i )
-        ok( "a\x{100}" =~ m/A\x{100}/i )
-        ok( "A\x{100}" =~ m/a\x{100}/i )
-        ok( "a\x{100}" =~ m/a\x{100}/i )
-        ok( "A\x{100}" =~ m/A\x{100}/i )
-        ok( "a\x{100}" =~ m/[A]/i )
-        ok( "A\x{100}" =~ m/[a]/i )
-        ok( "a\x{100}" =~ m/[a]/i )
-        ok( "A\x{100}" =~ m/[A]/i )
-        ok( "\x{101}a" =~ m/[\x{100}]/i )
-        ok( "\x{100}a" =~ m/[\x{100}]/i )
-        ok( "\x{101}a" =~ m/[\x{101}]/i )
-        ok( "\x{100}a" =~ m/[\x{101}]/i )
+        ok:  "a\x{100}" =~ m/A/i 
+        ok:  "A\x{100}" =~ m/a/i 
+        ok:  "a\x{100}" =~ m/a/i 
+        ok:  "A\x{100}" =~ m/A/i 
+        ok:  "\x{101}a" =~ m/\x{100}/i 
+        ok:  "\x{100}a" =~ m/\x{100}/i 
+        ok:  "\x{101}a" =~ m/\x{101}/i 
+        ok:  "\x{100}a" =~ m/\x{101}/i 
+        ok:  "a\x{100}" =~ m/A\x{100}/i 
+        ok:  "A\x{100}" =~ m/a\x{100}/i 
+        ok:  "a\x{100}" =~ m/a\x{100}/i 
+        ok:  "A\x{100}" =~ m/A\x{100}/i 
+        ok:  "a\x{100}" =~ m/[A]/i 
+        ok:  "A\x{100}" =~ m/[a]/i 
+        ok:  "a\x{100}" =~ m/[a]/i 
+        ok:  "A\x{100}" =~ m/[A]/i 
+        ok:  "\x{101}a" =~ m/[\x{100}]/i 
+        ok:  "\x{100}a" =~ m/[\x{100}]/i 
+        ok:  "\x{101}a" =~ m/[\x{101}]/i 
+        ok:  "\x{100}a" =~ m/[\x{101}]/i 
 
     do
         use charnames ':full'
 
         use utf8
 
-        print $^STDOUT, "# LATIN LETTER A WITH GRAVE\n"
+        print: $^STDOUT, "# LATIN LETTER A WITH GRAVE\n"
         my $lower = "\N{LATIN SMALL LETTER A WITH GRAVE}"
         my $UPPER = "\N{LATIN CAPITAL LETTER A WITH GRAVE}"
 
-        ok( $lower =~ m/$UPPER/i   )
-        ok( $UPPER =~ m/$lower/i   )
-        ok( $lower =~ m/[$UPPER]/i )
-        ok( $UPPER =~ m/[$lower]/i )
+        ok:  $lower =~ m/$UPPER/i   
+        ok:  $UPPER =~ m/$lower/i   
+        ok:  $lower =~ m/[$UPPER]/i 
+        ok:  $UPPER =~ m/[$lower]/i 
 
-        print $^STDOUT, "# GREEK LETTER ALPHA WITH VRACHY\n"
+        print: $^STDOUT, "# GREEK LETTER ALPHA WITH VRACHY\n"
 
         $lower = "\N{GREEK CAPITAL LETTER ALPHA WITH VRACHY}"
         $UPPER = "\N{GREEK SMALL LETTER ALPHA WITH VRACHY}"
 
-        ok( $lower =~ m/$UPPER/i   )
-        ok( $UPPER =~ m/$lower/i   )
-        ok( $lower =~ m/[$UPPER]/i )
-        ok( $UPPER =~ m/[$lower]/i )
+        ok:  $lower =~ m/$UPPER/i   
+        ok:  $UPPER =~ m/$lower/i   
+        ok:  $lower =~ m/[$UPPER]/i 
+        ok:  $UPPER =~ m/[$lower]/i 
 
-        print $^STDOUT, "# LATIN LETTER Y WITH DIAERESIS\n"
+        print: $^STDOUT, "# LATIN LETTER Y WITH DIAERESIS\n"
 
         $lower = "\N{LATIN CAPITAL LETTER Y WITH DIAERESIS}"
         $UPPER = "\N{LATIN SMALL LETTER Y WITH DIAERESIS}"
-        ok( $lower =~ m/$UPPER/i   )
-        ok( $UPPER =~ m/$lower/i   )
-        ok( $lower =~ m/[$UPPER]/i )
-        ok( $UPPER =~ m/[$lower]/i )
+        ok:  $lower =~ m/$UPPER/i   
+        ok:  $UPPER =~ m/$lower/i   
+        ok:  $lower =~ m/[$UPPER]/i 
+        ok:  $UPPER =~ m/[$lower]/i 
     
 
     do
         use warnings
         use charnames ':full'
 
-        print $^STDOUT, "# GREEK CAPITAL LETTER SIGMA vs COMBINING GREEK PERISPOMENI\n"
+        print: $^STDOUT, "# GREEK CAPITAL LETTER SIGMA vs COMBINING GREEK PERISPOMENI\n"
 
         my $SIGMA = "\N{GREEK CAPITAL LETTER SIGMA}"
         my $char  = "\N{COMBINING GREEK PERISPOMENI}"
 
         # Before #13843 this was failing by matching falsely.
-        ok( not "_:$char:_" =~ m/_:$SIGMA:_/i )
+        ok:  not "_:$char:_" =~ m/_:$SIGMA:_/i 
     
 
     do
-        print $^STDOUT, "# \\X\n"
+        print: $^STDOUT, "# \\X\n"
 
         use charnames ':full';
 
-        ok( "a!"              =~ m/^(\X)!/ && $1 eq "a" )
-        ok( "\x{DF}!"           =~ m/^(\X)!/ && $1 eq "\x{DF}" )
-        ok( "\x{100}!"        =~ m/^(\X)!/ && $1 eq "\x{100}" )
-        ok( "\x{100}\x{300}!" =~ m/^(\X)!/ && $1 eq "\x{100}\x{300}" )
-        ok( "\N{LATIN CAPITAL LETTER E}!" =~ m/^(\X)!/ &&
-            $1 eq "\N{LATIN CAPITAL LETTER E}" )
-        ok( "\N{LATIN CAPITAL LETTER E}\N{COMBINING GRAVE ACCENT}!" =~
-              m/^(\X)!/ &&
-            $1 eq "\N{LATIN CAPITAL LETTER E}\N{COMBINING GRAVE ACCENT}" )
+        ok:  "a!"              =~ m/^(\X)!/ && $1 eq "a" 
+        ok:  "\x{DF}!"           =~ m/^(\X)!/ && $1 eq "\x{DF}" 
+        ok:  "\x{100}!"        =~ m/^(\X)!/ && $1 eq "\x{100}" 
+        ok:  "\x{100}\x{300}!" =~ m/^(\X)!/ && $1 eq "\x{100}\x{300}" 
+        ok:  "\N{LATIN CAPITAL LETTER E}!" =~ m/^(\X)!/ &&
+                 $1 eq "\N{LATIN CAPITAL LETTER E}" 
+        ok:  "\N{LATIN CAPITAL LETTER E}\N{COMBINING GRAVE ACCENT}!" =~
+               m/^(\X)!/ &&
+                 $1 eq "\N{LATIN CAPITAL LETTER E}\N{COMBINING GRAVE ACCENT}" 
     
 
     do
-        print $^STDOUT, "#\\C and \\X\n"
+        print: $^STDOUT, "#\\C and \\X\n"
 
-        ok( "!abc!" =~ m/a\Cc/ )
-        ok( "!abc!" =~ m/a\Xc/ )
+        ok:  "!abc!" =~ m/a\Cc/ 
+        ok:  "!abc!" =~ m/a\Xc/ 
     
 
     do
-        print $^STDOUT, "# FINAL SIGMA\n"
+        print: $^STDOUT, "# FINAL SIGMA\n"
 
         my $SIGMA = "\x{03A3}" # CAPITAL
         my $Sigma = "\x{03C2}" # SMALL FINAL
         my $sigma = "\x{03C3}" # SMALL
 
-        ok( $SIGMA =~ m/$SIGMA/i )
-        ok( $SIGMA =~ m/$Sigma/i )
-        ok( $SIGMA =~ m/$sigma/i )
+        ok:  $SIGMA =~ m/$SIGMA/i 
+        ok:  $SIGMA =~ m/$Sigma/i 
+        ok:  $SIGMA =~ m/$sigma/i 
 
-        ok( $Sigma =~ m/$SIGMA/i )
-        ok( $Sigma =~ m/$Sigma/i )
-        ok( $Sigma =~ m/$sigma/i )
+        ok:  $Sigma =~ m/$SIGMA/i 
+        ok:  $Sigma =~ m/$Sigma/i 
+        ok:  $Sigma =~ m/$sigma/i 
 
-        ok( $sigma =~ m/$SIGMA/i )
-        ok( $sigma =~ m/$Sigma/i )
-        ok( $sigma =~ m/$sigma/i )
+        ok:  $sigma =~ m/$SIGMA/i 
+        ok:  $sigma =~ m/$Sigma/i 
+        ok:  $sigma =~ m/$sigma/i 
 
-        ok( $SIGMA =~ m/[$SIGMA]/i )
-        ok( $SIGMA =~ m/[$Sigma]/i )
-        ok( $SIGMA =~ m/[$sigma]/i )
+        ok:  $SIGMA =~ m/[$SIGMA]/i 
+        ok:  $SIGMA =~ m/[$Sigma]/i 
+        ok:  $SIGMA =~ m/[$sigma]/i 
 
-        ok( $Sigma =~ m/[$SIGMA]/i )
-        ok( $Sigma =~ m/[$Sigma]/i )
-        ok( $Sigma =~ m/[$sigma]/i )
+        ok:  $Sigma =~ m/[$SIGMA]/i 
+        ok:  $Sigma =~ m/[$Sigma]/i 
+        ok:  $Sigma =~ m/[$sigma]/i 
 
-        ok( $sigma =~ m/[$SIGMA]/i )
-        ok( $sigma =~ m/[$Sigma]/i )
-        ok( $sigma =~ m/[$sigma]/i )
+        ok:  $sigma =~ m/[$SIGMA]/i 
+        ok:  $sigma =~ m/[$Sigma]/i 
+        ok:  $sigma =~ m/[$sigma]/i 
     
 
     do
-        print $^STDOUT, "# parlez-vous?\n"
+        print: $^STDOUT, "# parlez-vous?\n"
 
         use charnames ':full';
 
-        ok( "fran\N{LATIN SMALL LETTER C}ais" =~
-              m/fran.ais/p &&
-            $^MATCH eq "francais" )
+        ok:  "fran\N{LATIN SMALL LETTER C}ais" =~
+               m/fran.ais/p &&
+                 $^MATCH eq "francais" 
 
-        ok( "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
-              m/fran.ais/p &&
-            $^MATCH eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" )
+        ok:  "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
+               m/fran.ais/p &&
+                 $^MATCH eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" 
 
-        ok( "fran\N{LATIN SMALL LETTER C}ais" =~
-              m/fran\Cais/p &&
-            $^MATCH eq "francais" )
+        ok:  "fran\N{LATIN SMALL LETTER C}ais" =~
+               m/fran\Cais/p &&
+                 $^MATCH eq "francais" 
 
-        ok( "franc\N{COMBINING CEDILLA}ais" =~
-            m/franc\C\Cais/ ) # COMBINING CEDILLA is two bytes when encoded
+        ok:  "franc\N{COMBINING CEDILLA}ais" =~
+                 m/franc\C\Cais/  # COMBINING CEDILLA is two bytes when encoded
 
-        ok( "fran\N{LATIN SMALL LETTER C}ais" =~
-              m/fran\Xais/p &&
-            $^MATCH eq "francais" )
+        ok:  "fran\N{LATIN SMALL LETTER C}ais" =~
+               m/fran\Xais/p &&
+                 $^MATCH eq "francais" 
 
-        ok( "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
-              m/fran\Xais/p  &&
-            $^MATCH eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" )
+        ok:  "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
+               m/fran\Xais/p  &&
+                 $^MATCH eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" 
 
-        ok( "franc\N{COMBINING CEDILLA}ais" =~
-              m/fran\Xais/p &&
-            $^MATCH eq "franc\N{COMBINING CEDILLA}ais" )
+        ok:  "franc\N{COMBINING CEDILLA}ais" =~
+               m/fran\Xais/p &&
+                 $^MATCH eq "franc\N{COMBINING CEDILLA}ais" 
 
-        ok( "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
-              m/fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais/p  &&
-            $^MATCH eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" )
+        ok:  "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
+               m/fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais/p  &&
+                 $^MATCH eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" 
 
-        ok( "franc\N{COMBINING CEDILLA}ais" =~
-              m/franc\N{COMBINING CEDILLA}ais/p  &&
-            $^MATCH eq "franc\N{COMBINING CEDILLA}ais" )
+        ok:  "franc\N{COMBINING CEDILLA}ais" =~
+               m/franc\N{COMBINING CEDILLA}ais/p  &&
+                 $^MATCH eq "franc\N{COMBINING CEDILLA}ais" 
 
-        ok( "fran\N{LATIN SMALL LETTER C}ais" =~
-              m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
-            $^MATCH eq "francais" )
+        ok:  "fran\N{LATIN SMALL LETTER C}ais" =~
+               m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
+                 $^MATCH eq "francais" 
 
-        ok( "fran\N{LATIN SMALL LETTER C}ais" =~
-              m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
-            $^MATCH eq "francais" )
+        ok:  "fran\N{LATIN SMALL LETTER C}ais" =~
+               m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
+                 $^MATCH eq "francais" 
 
-        ok( "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
-              m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
-            $^MATCH eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" )
+        ok:  "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
+               m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
+                 $^MATCH eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" 
 
-        ok( "franc\N{COMBINING CEDILLA}ais" =~
-              m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
-            $^MATCH eq "franc\N{COMBINING CEDILLA}ais" )
+        ok:  "franc\N{COMBINING CEDILLA}ais" =~
+               m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
+                 $^MATCH eq "franc\N{COMBINING CEDILLA}ais" 
     
 
     do
-        print $^STDOUT, "# Does lingering (and useless) UTF8 flag mess up /i matching?\n"
+        print: $^STDOUT, "# Does lingering (and useless) UTF8 flag mess up /i matching?\n"
 
         do
             my $regex  = "ABcde"
             my $string = "abcDE\x{100}"
-            chop($string)
-            ok($string =~ m/$regex/i)
+            chop: $string
+            ok: $string =~ m/$regex/i
         
 
         do
             my $regex  = "ABcde\x{100}"
             my $string = "abcDE"
-            chop($regex)
-            ok($string =~ m/$regex/i)
+            chop: $regex
+            ok: $string =~ m/$regex/i
         
 
         do
             my $regex  = "ABcde\x{100}"
             my $string = "abcDE\x{100}"
-            chop($regex)
-            chop($string)
-            ok($string =~ m/$regex/i)
+            chop: $regex
+            chop: $string
+            ok: $string =~ m/$regex/i
 
     do
-        print $^STDOUT, "# more SIGMAs\n"
+        print: $^STDOUT, "# more SIGMAs\n"
 
         my $SIGMA = "\x{03A3}" # CAPITAL
         my $Sigma = "\x{03C2}" # SMALL FINAL
@@ -1669,51 +1669,51 @@ EOT
 
         my $S3 = "$SIGMA$Sigma$sigma"
 
-        ok( ":$S3:" =~ m/:(($SIGMA)+):/i   && $1 eq $S3 && $2 eq $sigma )
-        ok( ":$S3:" =~ m/:(($Sigma)+):/i   && $1 eq $S3 && $2 eq $sigma )
-        ok( ":$S3:" =~ m/:(($sigma)+):/i   && $1 eq $S3 && $2 eq $sigma )
+        ok:  ":$S3:" =~ m/:(($SIGMA)+):/i   && $1 eq $S3 && $2 eq $sigma 
+        ok:  ":$S3:" =~ m/:(($Sigma)+):/i   && $1 eq $S3 && $2 eq $sigma 
+        ok:  ":$S3:" =~ m/:(($sigma)+):/i   && $1 eq $S3 && $2 eq $sigma 
 
-        ok( ":$S3:" =~ m/:(([$SIGMA])+):/i && $1 eq $S3 && $2 eq $sigma )
-        ok( ":$S3:" =~ m/:(([$Sigma])+):/i && $1 eq $S3 && $2 eq $sigma )
-        ok( ":$S3:" =~ m/:(([$sigma])+):/i && $1 eq $S3 && $2 eq $sigma )
+        ok:  ":$S3:" =~ m/:(([$SIGMA])+):/i && $1 eq $S3 && $2 eq $sigma 
+        ok:  ":$S3:" =~ m/:(([$Sigma])+):/i && $1 eq $S3 && $2 eq $sigma 
+        ok:  ":$S3:" =~ m/:(([$sigma])+):/i && $1 eq $S3 && $2 eq $sigma 
     
 
     do
-        print $^STDOUT, "# LATIN SMALL LETTER SHARP S\n"
+        print: $^STDOUT, "# LATIN SMALL LETTER SHARP S\n"
 
         use charnames ':full';
 
         local $TODO = "sharp S case folding"
-        ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/\N{LATIN SMALL LETTER SHARP S}/)
-        ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/\N{LATIN SMALL LETTER SHARP S}/i)
+        ok: $: "\N{LATIN SMALL LETTER SHARP S}" =~ m/\N{LATIN SMALL LETTER SHARP S}/
+        ok: $: "\N{LATIN SMALL LETTER SHARP S}" =~ m/\N{LATIN SMALL LETTER SHARP S}/i
 
-        ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/)
-        ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/i)
+        ok: $: "\N{LATIN SMALL LETTER SHARP S}" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/
+        ok: $: "\N{LATIN SMALL LETTER SHARP S}" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/i
 
-        ok($: "ss" =~ m/\N{LATIN SMALL LETTER SHARP S}/i)
-        ok($: "SS" =~ m/\N{LATIN SMALL LETTER SHARP S}/i)
-        ok($: "ss" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/i)
-        ok($: "SS" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/i)
+        ok: $: "ss" =~ m/\N{LATIN SMALL LETTER SHARP S}/i
+        ok: $: "SS" =~ m/\N{LATIN SMALL LETTER SHARP S}/i
+        ok: $: "ss" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/i
+        ok: $: "SS" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/i
 
-        ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/ss/i)
-        ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/SS/i)
+        ok: $: "\N{LATIN SMALL LETTER SHARP S}" =~ m/ss/i
+        ok: $: "\N{LATIN SMALL LETTER SHARP S}" =~ m/SS/i
 
     do
-        print $^STDOUT, "# . with /s should work on characters, as opposed to bytes\n"
+        print: $^STDOUT, "# . with /s should work on characters, as opposed to bytes\n"
 
         my $s = "\x{e4}\x{100}"
 
         # This is not expected to match: the point is that
         # neither should we get "Malformed UTF-8" warnings
-        ok( not $s =~ m/\G(.+?)\n/gcs )
+        ok:  not $s =~ m/\G(.+?)\n/gcs 
 
         my @c
 
         while ($s =~ m/\G(.)/gs)
-            push @c, $1
+            push: @c, $1
         
 
-        ok( join("", @c) eq $s )
+        ok:  (join: "", @c) eq $s 
 
         my $t1 = "Q003\n\n\x{e4}\x{f6}\n\nQ004\n\n\x{e7}" # test only chars < 256
         my $r1 = ""
@@ -1727,15 +1727,15 @@ EOT
             $r2 .= $1 . $2
         
         $r2 =~ s/\x{100}//
-        ok( $r1 eq $r2 )
+        ok:  $r1 eq $r2 
     
 
     do
-        print $^STDOUT, "# Unicode lookbehind\n"
+        print: $^STDOUT, "# Unicode lookbehind\n"
 
         local $TODO = "variable length lookbehehind"
         for (851 .. 854)
-            ok(0)
+            ok: 0
     #print "A\x{100}B"        =~ m/(?<=A.)B/  ? "ok 851\n" : "not ok 851\n";
     #print "A\x{200}\x{300}B" =~ m/(?<=A..)B/ ? "ok 852\n" : "not ok 852\n";
     #print "\x{400}AB"        =~ m/(?<=\x{400}.)B/ ? "ok 853\n" : "not ok 853\n";
@@ -1743,22 +1743,22 @@ EOT
     
 
     do
-        print $^STDOUT, "# UTF-8 hash keys and /\$/\n"
+        print: $^STDOUT, "# UTF-8 hash keys and /\$/\n"
         # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-01/msg01327.html
 
         my $u = "a\x{100}"
-        my $v = substr($u,0,1)
-        my $w = substr($u,1,1)
+        my $v = substr: $u,0,1
+        my $w = substr: $u,1,1
         my %u = %:  $u => $u, $v => $v, $w => $w 
         for (keys %u)
             my $m1 = m/^\w*$/ ?? 1 !! 0
             my $m2 = %u{?$_}=~m/^\w*$/ ?? 1 !! 0
-            ok( $m1 == $m2 )
+            ok:  $m1 == $m2 
         
     
 
     do
-        print $^STDOUT, "# [ID 20020124.005]\n"
+        print: $^STDOUT, "# [ID 20020124.005]\n"
         # Fixed by #14795.
         for my $char ((@: "a", "\x{df}", "\x{100}"))
             $x = "$char b $char"
@@ -1766,73 +1766,73 @@ EOT
                 "c" =~ m/c/;
                 "x";
             })}g
-            ok( substr($x,0,1) eq substr($x,-1,1) )
+            ok:  (substr: $x,0,1) eq (substr: $x,-1,1) 
 
     do
-        print $^STDOUT, "# UTF-8 bug (maybe alreayd known?)\n"
+        print: $^STDOUT, "# UTF-8 bug (maybe alreayd known?)\n"
         my $u
 
         $u = "foo"
         $u =~ s/./\x{100}/g
-        ok( $u eq "\x{100}\x{100}\x{100}" )
+        ok:  $u eq "\x{100}\x{100}\x{100}" 
 
         $u = "foobar"
         $u =~ s/[ao]/\x{100}/g
-        ok( $u eq "f\x{100}\x{100}b\x{100}r" )
+        ok:  $u eq "f\x{100}\x{100}b\x{100}r" 
 
         $u =~ s/\x{100}/e/g
-        ok( $u eq "feeber" )
+        ok:  $u eq "feeber" 
     
 
     do
-        print $^STDOUT, "# UTF-8 bug with s///\n"
+        print: $^STDOUT, "# UTF-8 bug with s///\n"
         # check utf8/non-utf8 mixtures
         # try to force all float/anchored check combinations
         my $c = "\x{100}"
         my $subst
-        for my $re (@: 
+        for my $re (@:
             "xx.*$c", "x.*$c$c", "$c.*xx", "$c$c.*x", "xx.*(?=$c)", "(?=$c).*xx"
             )
-            ok( not "xxx" =~ m/$re/ )
-            ok( not( ($subst = "xxx") =~ s/$re// ))
+            ok:  not "xxx" =~ m/$re/ 
+            ok:  (not:  ($subst = "xxx") =~ s/$re// )
         
         for my $re ((@: "xx.*$c*", "$c*.*xx"))
-            ok( "xxx" =~ m/$re/ )
+            ok:  "xxx" =~ m/$re/ 
             ($subst = "xxx") =~ s/$re//
-            ok( $subst eq '' )
+            ok:  $subst eq '' 
         
         for my $re ((@: "xxy*", "y*xx"))
-            ok( "xx$c" =~ m/$re/ )
+            ok:  "xx$c" =~ m/$re/ 
             ($subst = "xx$c") =~ s/$re//
-            ok( $subst eq $c )
-            ok( not "xy$c" =~ m/$re/ )
-            ok( not (($subst = "xy$c") =~ m/$re/ ))
+            ok:  $subst eq $c 
+            ok:  not "xy$c" =~ m/$re/ 
+            ok:  (not: ($subst = "xy$c") =~ m/$re/ )
         
         for my $re ((@: "xy$c*z", "x$c*yz"))
-            ok( "xyz" =~ m/$re/ )
+            ok:  "xyz" =~ m/$re/ 
             ($subst = "xyz") =~ s/$re//
-            ok( $subst eq '' )
+            ok:  $subst eq '' 
         
     
 
     do
-        print $^STDOUT, "# qr/.../x\n"
+        print: $^STDOUT, "# qr/.../x\n"
 
         my $R = qr/ A B C # D E/x
 
-        ok( try {"ABCDE" =~ $R} ); die if $^EVAL_ERROR
-        ok( try {"ABCDE" =~ m/$R/} ); die if $^EVAL_ERROR
-        ok( try {"ABCDE" =~ m/($R)/} ); die if $^EVAL_ERROR
+        (ok:  try {"ABCDE" =~ $R} ); die: if $^EVAL_ERROR
+        (ok:  try {"ABCDE" =~ m/$R/} ); die: if $^EVAL_ERROR
+        (ok:  try {"ABCDE" =~ m/($R)/} ); die: if $^EVAL_ERROR
     
 
     do
-        print $^STDOUT, "# illegal Unicode properties\n"
+        print: $^STDOUT, "# illegal Unicode properties\n"
 
-        ok( not eval qq* "a" =~ m/\pq / *      ); die if $^EVAL_ERROR
-        ok( not eval qq* "a" =~ m/\p\{qrst\} / * ); die if $^EVAL_ERROR
+        (ok:  not eval qq* "a" =~ m/\pq / *      ); die: if $^EVAL_ERROR
+        (ok:  not eval qq* "a" =~ m/\p\{qrst\} / * ); die: if $^EVAL_ERROR
     
 
-    print $^STDOUT, "# user-defined character properties\n"
+    print: $^STDOUT, "# user-defined character properties\n"
 
     sub InKana1
         return <<'END'
@@ -1864,17 +1864,17 @@ END
 END
     
 
-    ok( "\x{3040}" =~ m/\p{InKana1}/ )
-    ok( "\x{303F}" =~ m/\P{InKana1}/ )
+    ok:  "\x{3040}" =~ m/\p{InKana1}/ 
+    ok:  "\x{303F}" =~ m/\P{InKana1}/ 
 
-    ok( "\x{3040}" =~ m/\p{InKana2}/ )
-    ok( "\x{303F}" =~ m/\P{InKana2}/ )
+    ok:  "\x{3040}" =~ m/\p{InKana2}/ 
+    ok:  "\x{303F}" =~ m/\P{InKana2}/ 
 
-    ok( "\x{3041}" =~ m/\p{InKana3}/ )
-    ok( "\x{3040}" =~ m/\P{InKana3}/ )
+    ok:  "\x{3041}" =~ m/\p{InKana3}/ 
+    ok:  "\x{3040}" =~ m/\P{InKana3}/ 
 
-    ok( "\x{3040}" =~ m/\p{InNotKana}/ )
-    ok( "\x{3041}" =~ m/\P{InNotKana}/ )
+    ok:  "\x{3040}" =~ m/\p{InNotKana}/ 
+    ok:  "\x{3041}" =~ m/\P{InNotKana}/ 
 
     sub InConsonant # Not EBCDIC-aware.
         return <<EOF
@@ -1887,50 +1887,50 @@ END
 EOF
     
 
-    ok( "d" =~ m/\p{InConsonant}/ )
-    ok( "e" =~ m/\P{InConsonant}/ )
+    ok:  "d" =~ m/\p{InConsonant}/ 
+    ok:  "e" =~ m/\P{InConsonant}/ 
 
-    if (!env::var('PERL_SKIP_PSYCHO_TEST'))
-        print $^STDOUT, "# [ID 20020630.002] utf8 regex only matches 32k\n"
+    if (!(env::var: 'PERL_SKIP_PSYCHO_TEST'))
+        print: $^STDOUT, "# [ID 20020630.002] utf8 regex only matches 32k\n"
         for ((@: \(@:  'byte', "\x{ff}" ), \(@:  'utf8', "\x{1ff}" )))
             my(@: $type, $char) =  $_->@
             for my $len ((@: 32000, 32768, 33000))
                 my $s = $char . "f" x $len
                 my $r = $s =~ m/$char([f]*)/gc
-                ok($r, " # TODO <$type x $len>")
-                ok((!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos $( pos($s) )")
+                ok: $r, " # TODO <$type x $len>"
+                ok: (!$r or (pos: $s) == $len + 1), " # TODO <$type x $len> pos $( (pos: $s) )"
     else
         for (1..12)
-            ok(1,'Skipped Psycho')
+            ok: 1,'Skipped Psycho'
 
-    $a = bless qr/foo/, 'Foo'
-    ok('goodfood' =~ $a)
-    ok($a eq '(?u-xism:foo)')
+    $a = bless: qr/foo/, 'Foo'
+    ok: 'goodfood' =~ $a
+    ok: $a eq '(?u-xism:foo)'
 
     $x = "\x{3fe}"
 
     $a = qr/$x/
-    ok($x =~ $a , "utf8 interpolation in qr//")
+    ok: $x =~ $a , "utf8 interpolation in qr//"
 
-    ok("a$a" =~ $x , "st - stringifed qr// preserves utf8")
+    ok: "a$a" =~ $x , "st - stringifed qr// preserves utf8"
 
-    ok("a$x" =~ m/^a$a\z/ ,
-       "interpolated qr// preserves utf8")
+    ok: "a$x" =~ m/^a$a\z/ 
+        "interpolated qr// preserves utf8"
 
-    ok("a$x" =~ m/^a(??{$a})\z/ ,
-       "postponed interpolation of qr// preserves utf8")
+    ok: "a$x" =~ m/^a(??{$a})\z/ 
+        "postponed interpolation of qr// preserves utf8"
 
-    ok(length(qr/##/x) == 13 ,
-       "## in qr// doesn't corrupt memory [perl #17776]")
+    ok: (length: qr/##/x) == 13 
+        "## in qr// doesn't corrupt memory [perl #17776]"
 
     do { use re 'eval';
 
-        ok("$x$x" =~ m/^$x(??{$x})\z/ ,
-           "postponed utf8 string in utf8 re matches utf8");
+        ok: "$x$x" =~ m/^$x(??{$x})\z/ 
+            "postponed utf8 string in utf8 re matches utf8";
 
     } # no re 'eval'
 
-    print $^STDOUT, "# more user-defined character properties\n"
+    print: $^STDOUT, "# more user-defined character properties\n"
 
     sub IsSyriac1
         return <<'END'
@@ -1939,8 +1939,8 @@ EOF
 END
     
 
-    ok("\x{0712}" =~ m/\p{IsSyriac1}/, '\x{0712}, \p{IsSyriac1}')
-    ok("\x{072F}" =~ m/\P{IsSyriac1}/, '\x{072F}, \P{IsSyriac1}')
+    ok: "\x{0712}" =~ m/\p{IsSyriac1}/, '\x{0712}, \p{IsSyriac1}'
+    ok: "\x{072F}" =~ m/\P{IsSyriac1}/, '\x{072F}, \P{IsSyriac1}'
 
     sub Syriac1
         return <<'END'
@@ -1949,17 +1949,17 @@ END
 END
     
 
-    ok("\x{0712}" =~ m/\p{Syriac1}/, '\x{0712}, \p{Syriac1}')
-    ok("\x{072F}" =~ m/\P{Syriac1}/, '\x{072F}, \p{Syriac1}')
+    ok: "\x{0712}" =~ m/\p{Syriac1}/, '\x{0712}, \p{Syriac1}'
+    ok: "\x{072F}" =~ m/\P{Syriac1}/, '\x{072F}, \p{Syriac1}'
 
-    print $^STDOUT, "# user-defined character properties may lack \\n at the end\n"
+    print: $^STDOUT, "# user-defined character properties may lack \\n at the end\n"
     sub InGreekSmall   { return "03B1\t03C9" }
     sub InGreekCapital { return "0391\t03A9\n-03A2" }
 
-    ok("\x{03C0}" =~ m/\p{InGreekSmall}/,   "Small pi")
-    ok("\x{03C2}" =~ m/\p{InGreekSmall}/,   "Final sigma")
-    ok("\x{03A0}" =~ m/\p{InGreekCapital}/, "Capital PI")
-    ok("\x{03A2}" =~ m/\P{InGreekCapital}/, "Reserved")
+    ok: "\x{03C0}" =~ m/\p{InGreekSmall}/,   "Small pi"
+    ok: "\x{03C2}" =~ m/\p{InGreekSmall}/,   "Final sigma"
+    ok: "\x{03A0}" =~ m/\p{InGreekCapital}/, "Capital PI"
+    ok: "\x{03A2}" =~ m/\P{InGreekCapital}/, "Reserved"
 
     sub AsciiHexAndDash
         return <<'END'
@@ -1968,104 +1968,104 @@ END
 END
     
 
-    ok("-" =~ m/\p{Dash}/,            "'-' is Dash")
-    ok("A" =~ m/\p{ASCII_Hex_Digit}/, "'A' is ASCII_Hex_Digit")
-    ok("-" =~ m/\p{AsciiHexAndDash}/, "'-' is AsciiHexAndDash")
-    ok("A" =~ m/\p{AsciiHexAndDash}/, "'A' is AsciiHexAndDash")
+    ok: "-" =~ m/\p{Dash}/,            "'-' is Dash"
+    ok: "A" =~ m/\p{ASCII_Hex_Digit}/, "'A' is ASCII_Hex_Digit"
+    ok: "-" =~ m/\p{AsciiHexAndDash}/, "'-' is AsciiHexAndDash"
+    ok: "A" =~ m/\p{AsciiHexAndDash}/, "'A' is AsciiHexAndDash"
 
     do
-        print $^STDOUT, "# Change #18179\n"
+        print: $^STDOUT, "# Change #18179\n"
         # previously failed with "panic: end_shift
         my $s = "\x{100}" x 5
         my $ok = $s =~ m/(\x{100}{4})/
         my(@: $ord, $len) = @: ord $1, length $1
-        ok($ok && $ord == 0x100 && $len == 4, "[#18179] $ok/$ord/$len")
+        ok: $ok && $ord == 0x100 && $len == 4, "[#18179] $ok/$ord/$len"
     
 
     do
-        print $^STDOUT, "# [perl #15763]\n"
+        print: $^STDOUT, "# [perl #15763]\n"
 
         $a = "x\x{100}"
         chop $a # but leaves the UTF-8 flag
         $a .= "y" # 1 byte before "y"
 
-        ok($a =~ m/^\C/,      'match one \C on 1-byte UTF-8')
-        ok($a =~ m/^\C{1}/,   'match \C{1}')
+        ok: $a =~ m/^\C/,      'match one \C on 1-byte UTF-8'
+        ok: $a =~ m/^\C{1}/,   'match \C{1}'
 
-        ok($a =~ m/^\Cy/,      'match \Cy')
-        ok($a =~ m/^\C{1}y/,   'match \C{1}y')
+        ok: $a =~ m/^\Cy/,      'match \Cy'
+        ok: $a =~ m/^\C{1}y/,   'match \C{1}y'
 
         $a = "\x{100}y" # 2 bytes before "y"
 
-        ok($a =~ m/^\C/,       'match one \C on 2-byte UTF-8')
-        ok($a =~ m/^\C{1}/,    'match \C{1}')
-        ok($a =~ m/^\C\C/,     'match two \C')
-        ok($a =~ m/^\C{2}/,    'match \C{2}')
+        ok: $a =~ m/^\C/,       'match one \C on 2-byte UTF-8'
+        ok: $a =~ m/^\C{1}/,    'match \C{1}'
+        ok: $a =~ m/^\C\C/,     'match two \C'
+        ok: $a =~ m/^\C{2}/,    'match \C{2}'
 
-        ok($a =~ m/^\C\C\C/,    'match three \C on 2-byte UTF-8 and a byte')
-        ok($a =~ m/^\C{3}/,     'match \C{3}')
+        ok: $a =~ m/^\C\C\C/,    'match three \C on 2-byte UTF-8 and a byte'
+        ok: $a =~ m/^\C{3}/,     'match \C{3}'
 
-        ok($a =~ m/^\C\Cy/,     'match two \C')
-        ok($a =~ m/^\C{2}y/,    'match \C{2}')
+        ok: $a =~ m/^\C\Cy/,     'match two \C'
+        ok: $a =~ m/^\C{2}y/,    'match \C{2}'
 
-        ok($a !~ m/^\C\C\Cy/,    q{don't match three \Cy})
-        ok($a !~ m/^\C{2}\Cy/,   q{don't match \C{3}y})
+        ok: $a !~ m/^\C\C\Cy/,    q{don't match three \Cy}
+        ok: $a !~ m/^\C{2}\Cy/,   q{don't match \C{3}y}
 
         $a = "\x{1000}y" # 3 bytes before "y"
 
-        ok($a =~ m/^\C/,         'match one \C on three-byte UTF-8')
-        ok($a =~ m/^\C{1}/,      'match \C{1}')
-        ok($a =~ m/^\C\C/,       'match two \C')
-        ok($a =~ m/^\C{2}/,      'match \C{2}')
-        ok($a =~ m/^\C\C\C/,     'match three \C')
-        ok($a =~ m/^\C{3}/,      'match \C{3}')
+        ok: $a =~ m/^\C/,         'match one \C on three-byte UTF-8'
+        ok: $a =~ m/^\C{1}/,      'match \C{1}'
+        ok: $a =~ m/^\C\C/,       'match two \C'
+        ok: $a =~ m/^\C{2}/,      'match \C{2}'
+        ok: $a =~ m/^\C\C\C/,     'match three \C'
+        ok: $a =~ m/^\C{3}/,      'match \C{3}'
 
-        ok($a =~ m/^\C\C\C\C/,   'match four \C on three-byte UTF-8 and a byte')
-        ok($a =~ m/^\C{4}/,      'match \C{4}')
+        ok: $a =~ m/^\C\C\C\C/,   'match four \C on three-byte UTF-8 and a byte'
+        ok: $a =~ m/^\C{4}/,      'match \C{4}'
 
-        ok($a =~ m/^\C\C\Cy/,    'match three \Cy')
-        ok($a =~ m/^\C{3}y/,     'match \C{3}y')
+        ok: $a =~ m/^\C\C\Cy/,    'match three \Cy'
+        ok: $a =~ m/^\C{3}y/,     'match \C{3}y'
 
-        ok($a !~ m/^\C\C\C\C\y/, q{don't match four \Cy})
-        ok($a !~ m/^\C{4}y/,     q{don't match \C{4}y})
+        ok: $a !~ m/^\C\C\C\C\y/, q{don't match four \Cy}
+        ok: $a !~ m/^\C{4}y/,     q{don't match \C{4}y}
     
 
     do
         $_ = 'aaaaaaaaaa'
         chop $_
-        ok(m/[^\s]+/, "m/[^\s]/ utf8")
-        ok(m/[^\d]+/, "m/[^\d]/ utf8")
-        ok(do {$a = $_; $_ =~ s/[^\s]+/./g}, "s/[^\s]/ utf8")
-        ok(do {$a = $_; $a =~ s/[^\d]+/./g}, "s/[^\s]/ utf8")
+        ok: m/[^\s]+/, "m/[^\s]/ utf8"
+        ok: m/[^\d]+/, "m/[^\d]/ utf8"
+        ok: do {$a = $_; $_ =~ s/[^\s]+/./g}, "s/[^\s]/ utf8"
+        ok: do {$a = $_; $a =~ s/[^\d]+/./g}, "s/[^\s]/ utf8"
     
 
-    ok("\x{100}" =~ m/\x{100}/, "[perl #15397]")
-    ok("\x{100}" =~ m/(\x{100})/, "[perl #15397]")
-    ok("\x{100}" =~ m/(\x{100}){1}/, "[perl #15397]")
-    ok("\x{100}\x{100}" =~ m/(\x{100}){2}/, "[perl #15397]")
-    ok("\x{100}\x{100}" =~ m/(\x{100})(\x{100})/, "[perl #15397]")
+    ok: "\x{100}" =~ m/\x{100}/, "[perl #15397]"
+    ok: "\x{100}" =~ m/(\x{100})/, "[perl #15397]"
+    ok: "\x{100}" =~ m/(\x{100}){1}/, "[perl #15397]"
+    ok: "\x{100}\x{100}" =~ m/(\x{100}){2}/, "[perl #15397]"
+    ok: "\x{100}\x{100}" =~ m/(\x{100})(\x{100})/, "[perl #15397]"
 
     $x = "CD"
     $x =~ m/(AB)*?CD/
-    ok(!defined $1, "[perl #7471]")
+    ok: !defined $1, "[perl #7471]"
 
     $x = "CD"
     $x =~ m/(AB)*CD/
-    ok(!defined $1, "[perl #7471]")
+    ok: !defined $1, "[perl #7471]"
 
     my $pattern = "^(b+?|a)\{1,2\}c"
-    ok("bac"    =~ m/$pattern/ && $1 eq 'a', "[perl #3547]")
-    ok("bbac"   =~ m/$pattern/ && $1 eq 'a', "[perl #3547]")
-    ok("bbbac"  =~ m/$pattern/ && $1 eq 'a', "[perl #3547]")
-    ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]")
+    ok: "bac"    =~ m/$pattern/ && $1 eq 'a', "[perl #3547]"
+    ok: "bbac"   =~ m/$pattern/ && $1 eq 'a', "[perl #3547]"
+    ok: "bbbac"  =~ m/$pattern/ && $1 eq 'a', "[perl #3547]"
+    ok: "bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]"
 
     do
         # [perl #18232]
         "\x{100}" =~ m/(.)/
-        ok( $1 eq "\x{100}", '$1 is utf-8 [perl #18232]' )
+        ok:  $1 eq "\x{100}", '$1 is utf-8 [perl #18232]' 
         do { 'a' =~ m/./; }
-        ok( $1 eq "\x{100}", '$1 is still utf-8' )
-        ok( $1 eq "\x[C4]\x[80]", '$1 is also non-utf-8' )
+        ok:  $1 eq "\x{100}", '$1 is still utf-8' 
+        ok:  $1 eq "\x[C4]\x[80]", '$1 is also non-utf-8' 
     
 
     do
@@ -2077,13 +2077,13 @@ END
         my $PredNameHyphen      = qr/^$NormalWord(\-$NormalWord)*?$/
 
         $attr =~ m/^$/
-        ok( $attr =~ $PredNameHyphen, "[perl #19767] original test" )
+        ok:  $attr =~ $PredNameHyphen, "[perl #19767] original test" 
     
 
     do
         use utf8
         "a" =~ m/[b]/
-        ok ( "0" =~ m/\p{N}+\z/, "[perl #19767] variant test" )
+        ok:  "0" =~ m/\p{N}+\z/, "[perl #19767] variant test" 
     
 
     do
@@ -2094,79 +2094,79 @@ END
         # To: perl-unicode@perl.org
 
         $x = "\x{2019}\nk"; $x =~ s/(\S)\n(\S)/$1 $2/sg
-        ok($x eq "\x{2019} k", "Markus Kuhn 2003-02-26")
+        ok: $x eq "\x{2019} k", "Markus Kuhn 2003-02-26"
 
         $x = "b\nk"; $x =~ s/(\S)\n(\S)/$1 $2/sg
-        ok($x eq "b k", "Markus Kuhn 2003-02-26")
+        ok: $x eq "b k", "Markus Kuhn 2003-02-26"
 
-        ok("\x{2019}" =~ m/\S/, "Markus Kuhn 2003-02-26")
+        ok: "\x{2019}" =~ m/\S/, "Markus Kuhn 2003-02-26"
 
     do
         my $i
-        ok('-1-3-5-' eq join('', split m/((??{$i++}))/, '-1-3-5-'),
-           "[perl #21411] (??\{ .. \}) corrupts split's stack")
-        ok('a|b|c' eq join ('|', split m/(?{'WOW'})/, 'abc'),
-           "[perl #21411] (?\{ .. \}) version of the above")
+        ok: '-1-3-5-' eq (join: '', (split: m/((??{$i++}))/, '-1-3-5-'))
+            "[perl #21411] (??\{ .. \}) corrupts split's stack"
+        ok: 'a|b|c' eq (join: '|', (split: m/(?{'WOW'})/, 'abc'))
+            "[perl #21411] (?\{ .. \}) version of the above"
 
     do
         # XXX DAPM 13-Apr-06. Recursive split is still broken. It's only luck it
         # hasn't been crashing. Disable this test until it is fixed properly.
         # XXX also check what it returns rather than just doing ok(1,...)
         # split /(?{ split "" })/, "abc";
-        ok(1,'cache_re & "(?{": it dumps core in 5.6.1 & 5.8.0')
+        ok: 1,'cache_re & "(?{": it dumps core in 5.6.1 & 5.8.0'
     
 
     do
-        ok("\x{100}\n" =~ m/\x{100}\n$/, "UTF8 length cache and fbm_compile")
+        ok: "\x{100}\n" =~ m/\x{100}\n$/, "UTF8 length cache and fbm_compile"
     
 
     do
         $_ = "code:   'x' \{ '...' \}\n"; study
 
         $_ = "code:   'x' \{ '...' \}\n"; study
-        my @x; push @x, $^MATCH while m/'[^\']*'/gxp
-        ok(join(":", @x) eq "'x':'...'",
-           "[perl #17757] Parse::RecDescent triggers infinite loop")
+        my @x; (push: @x, $^MATCH) while m/'[^\']*'/gxp
+        ok: (join: ":", @x) eq "'x':'...'"
+            "[perl #17757] Parse::RecDescent triggers infinite loop"
     
 
     do
         my $re = qq/^([^X]*)X/
-        ok("\x{100}X" =~ m/$re/, "S_cl_and ANYOF_UNICODE & ANYOF_INVERTED")
+        ok: "\x{100}X" =~ m/$re/, "S_cl_and ANYOF_UNICODE & ANYOF_INVERTED"
     
 
     # bug #22354
     sub func($name)
-        ok( "a\nb" !~ m/^b/, $name )
-        ok( "a\nb" =~ m/^b/m, "$name - with /m" )
+        ok:  "a\nb" !~ m/^b/, $name 
+        ok:  "a\nb" =~ m/^b/m, "$name - with /m" 
     
-    func "standalone"
-    $_ = "x"; s/x/$(func "in subst")/
-    $_ = "x"; s/x/$(func "in multiline subst")/m
+    func: "standalone"
+    $_ = "x"; s/x/$(func: "in subst")/
+    $_ = "x"; s/x/$(func: "in multiline subst")/m
     #$_ = "x"; /x(?{func "in regexp"})/;
     #$_ = "x"; /x(?{func "in multiline regexp"})/m;
 
     # bug RT#19049
     $_="abcdef\n"
     @x = @:  m/./gp 
-    ok("abcde" eq "$^PREMATCH", 'RT#19049 - global match not setting $^PREMATCH')
+    ok: "abcde" eq "$^PREMATCH", 'RT#19049 - global match not setting $^PREMATCH'
 
-    ok("123\x{100}" =~ m/^.*1.*23\x{100}$/, 'uft8 + multiple floating substr')
+    ok: "123\x{100}" =~ m/^.*1.*23\x{100}$/, 'uft8 + multiple floating substr'
 
     # LATIN SMALL/CAPITAL LETTER A WITH MACRON
-    ok("  \x{101}" =~ qr/\x{100}/i,
-       '<20030808193656.5109.1@llama.ni-s.u-net.com>')
+    ok: "  \x{101}" =~ qr/\x{100}/i
+        '<20030808193656.5109.1@llama.ni-s.u-net.com>'
 
     # LATIN SMALL/CAPITAL LETTER A WITH RING BELOW
-    ok("  \x{1E01}" =~ qr/\x{1E00}/i,
-       '<20030808193656.5109.1@llama.ni-s.u-net.com>')
+    ok: "  \x{1E01}" =~ qr/\x{1E00}/i
+        '<20030808193656.5109.1@llama.ni-s.u-net.com>'
 
     # DESERET SMALL/CAPITAL LETTER LONG I
-    ok("  \x{10428}" =~ qr/\x{10400}/i,
-       '<20030808193656.5109.1@llama.ni-s.u-net.com>')
+    ok: "  \x{10428}" =~ qr/\x{10400}/i
+        '<20030808193656.5109.1@llama.ni-s.u-net.com>'
 
     # LATIN SMALL/CAPITAL LETTER A WITH RING BELOW + 'X'
-    ok("  \x{1E01}x" =~ qr/\x{1E00}X/i,
-       '<20030808193656.5109.1@llama.ni-s.u-net.com>')
+    ok: "  \x{1E01}x" =~ qr/\x{1E00}X/i
+        '<20030808193656.5109.1@llama.ni-s.u-net.com>'
 
     do
         # [perl #23769] Unicode regex broken on simple example
@@ -2174,90 +2174,90 @@ END
 
         my $s = "\x{a0}\x{a0}\x{a0}\x{100}"; chop $s
 
-        ok($s =~ m/\x{a0}/,       "[perl #23769]")
-        ok($s =~ m/\x{a0}+/,      "[perl #23769]")
-        ok($s =~ m/\x{a0}\x{a0}/, "[perl #23769]")
+        ok: $s =~ m/\x{a0}/,       "[perl #23769]"
+        ok: $s =~ m/\x{a0}+/,      "[perl #23769]"
+        ok: $s =~ m/\x{a0}\x{a0}/, "[perl #23769]"
 
-        ok("aaa\x{100}" =~ m/(a+)/, "[perl #23769] easy invariant")
-        ok($1 eq "aaa", "[perl #23769]")
+        ok: "aaa\x{100}" =~ m/(a+)/, "[perl #23769] easy invariant"
+        ok: $1 eq "aaa", "[perl #23769]"
 
-        ok("\x{a0}\x{a0}\x{a0}\x{100}" =~ m/(\x{a0}+)/, "[perl #23769] regrepeat invariant")
-        ok($1 eq "\x{a0}\x{a0}\x{a0}", "[perl #23769]")
+        ok: "\x{a0}\x{a0}\x{a0}\x{100}" =~ m/(\x{a0}+)/, "[perl #23769] regrepeat invariant"
+        ok: $1 eq "\x{a0}\x{a0}\x{a0}", "[perl #23769]"
 
-        ok("ababab\x{100}  " =~ m/((?:ab)+)/, "[perl #23769] hard invariant")
-        ok($1 eq "ababab", "[perl #23769]")
+        ok: "ababab\x{100}  " =~ m/((?:ab)+)/, "[perl #23769] hard invariant"
+        ok: $1 eq "ababab", "[perl #23769]"
 
-        ok("\x{a0}\x{a1}\x{a0}\x{a1}\x{a0}\x{a1}\x{100}" =~ m/((?:\x{a0}\x{a1})+)/, "[perl #23769] hard variant")
-        ok($1 eq "\x{a0}\x{a1}\x{a0}\x{a1}\x{a0}\x{a1}", "[perl #23769]")
+        ok: "\x{a0}\x{a1}\x{a0}\x{a1}\x{a0}\x{a1}\x{100}" =~ m/((?:\x{a0}\x{a1})+)/, "[perl #23769] hard variant"
+        ok: $1 eq "\x{a0}\x{a1}\x{a0}\x{a1}\x{a0}\x{a1}", "[perl #23769]"
 
-        ok("aaa\x{100}     " =~ m/(a+?)/, "[perl #23769] easy invariant")
-        ok($1 eq "a", "[perl #23769]")
+        ok: "aaa\x{100}     " =~ m/(a+?)/, "[perl #23769] easy invariant"
+        ok: $1 eq "a", "[perl #23769]"
 
-        ok("\x{a0}\x{a0}\x{a0}\x{100}    " =~ m/(\x{a0}+?)/, "[perl #23769] regrepeat variant")
-        ok($1 eq "\x{a0}", "[perl #23769]")
+        ok: "\x{a0}\x{a0}\x{a0}\x{100}    " =~ m/(\x{a0}+?)/, "[perl #23769] regrepeat variant"
+        ok: $1 eq "\x{a0}", "[perl #23769]"
 
-        ok("ababab\x{100}  " =~ m/((?:ab)+?)/, "[perl #23769] hard invariant")
-        ok($1 eq "ab", "[perl #23769]")
+        ok: "ababab\x{100}  " =~ m/((?:ab)+?)/, "[perl #23769] hard invariant"
+        ok: $1 eq "ab", "[perl #23769]"
 
-        ok("\x{a0}\x{a1}\x{a0}\x{a1}\x{a0}\x{a1}\x{100}" =~ m/((?:\x{a0}\x{a1})+?)/, "[perl #23769] hard variant")
-        ok($1 eq "\x{a0}\x{a1}", "[perl #23769]")
+        ok: "\x{a0}\x{a1}\x{a0}\x{a1}\x{a0}\x{a1}\x{100}" =~ m/((?:\x{a0}\x{a1})+?)/, "[perl #23769] hard variant"
+        ok: $1 eq "\x{a0}\x{a1}", "[perl #23769]"
 
-        ok("\x{c4}\x{c4}\x{c4}" !~ m/(\x{100}+)/, "[perl #23769] don't match first byte of utf8 representation")
-        ok("\x{c4}\x{c4}\x{c4}" !~ m/(\x{100}+?)/, "[perl #23769] don't match first byte of utf8 representation")
+        ok: "\x{c4}\x{c4}\x{c4}" !~ m/(\x{100}+)/, "[perl #23769] don't match first byte of utf8 representation"
+        ok: "\x{c4}\x{c4}\x{c4}" !~ m/(\x{100}+?)/, "[perl #23769] don't match first byte of utf8 representation"
     
 
     for (120 .. 130)
         my $head = 'x' x $_
         for my $tail ((@: '\x{0061}', '\x{1234}'))
-            ok(
-                eval qq{use utf8; "$head$tail" =~ m/$head$tail/ },
+            (ok: 
+                eval qq{use utf8; "$head$tail" =~ m/$head$tail/ }
                 '\x{...} misparsed in regexp near 127 char EXACT limit'
-              ); die if $^EVAL_ERROR
+              ); die: if $^EVAL_ERROR
         
     
 
     # perl #25269: panic: pp_match start/end pointers
-    ok("a-bc" eq try
-           my (@: $x, $y) = @: "bca" =~ m/^(?=.*(a)).*(bc)/
-           "$x-$y"
-       , 'captures can move backwards in string'); die if $^EVAL_ERROR
+    (ok: "a-bc" eq try
+             my (@: $x, $y) = @: "bca" =~ m/^(?=.*(a)).*(bc)/
+             "$x-$y"
+         , 'captures can move backwards in string'); die: if $^EVAL_ERROR
 
     # perl #27940: \cA not recognized in character classes
-    ok("a\cAb" =~ m/\cA/, '\cA in pattern')
-    ok("a\cAb" =~ m/[\cA]/, '\cA in character class')
-    ok("a\cAb" =~ m/[\cA-\cB]/, '\cA in character class range')
-    ok("abc" =~ m/[^\cA-\cB]/, '\cA in negated character class range')
-    ok("a\cBb" =~ m/[\cA-\cC]/, '\cB in character class range')
-    ok("a\cCbc" =~ m/[^\cA-\cB]/, '\cC in negated character class range')
-    ok("a\cAb" =~ m/(??{"\cA"})/, '\cA in ??{} pattern')
-    ok("ab" !~ m/a\cIb/x, '\cI in pattern')
+    ok: "a\cAb" =~ m/\cA/, '\cA in pattern'
+    ok: "a\cAb" =~ m/[\cA]/, '\cA in character class'
+    ok: "a\cAb" =~ m/[\cA-\cB]/, '\cA in character class range'
+    ok: "abc" =~ m/[^\cA-\cB]/, '\cA in negated character class range'
+    ok: "a\cBb" =~ m/[\cA-\cC]/, '\cB in character class range'
+    ok: "a\cCbc" =~ m/[^\cA-\cB]/, '\cC in negated character class range'
+    ok: "a\cAb" =~ m/(??{"\cA"})/, '\cA in ??{} pattern'
+    ok: "ab" !~ m/a\cIb/x, '\cI in pattern'
 
     # perl #28532: optional zero-width match at end of string is ignored
-    ok(("abc" =~ m/^abc(\z)?/) && defined($1),
-       'optional zero-width match at end of string')
-    ok(("abc" =~ m/^abc(\z)??/) && !defined($1),
-       'optional zero-width match at end of string')
+    ok: ("abc" =~ m/^abc(\z)?/) && (defined: $1)
+        'optional zero-width match at end of string'
+    ok: ("abc" =~ m/^abc(\z)??/) && !(defined: $1)
+        'optional zero-width match at end of string'
 
 
 
     do # TRIE related
         my @got= $@
         "words"=~m/(word|word|word)(?{push @got,$1})s$/
-        ok((nelems @got)==1,"TRIE optimation is working") or warn "# $(join ' ',@got)"
+        ok: (nelems @got)==1,"TRIE optimation is working" or warn: "# $((join: ' ',@got))"
         @got= $@
         "words"=~m/(word|word|word)(?{push @got,$1})s$/i
-        ok((nelems @got)==1,"TRIEF optimisation is working") or warn "# $(join ' ',@got)"
+        ok: (nelems @got)==1,"TRIEF optimisation is working" or warn: "# $((join: ' ',@got))"
 
-        my @nums= map {int rand 1000}, 1..100
-        my $re="(".(join "|", @nums).")"
+        my @nums= map: {int rand 1000}, 1..100
+        my $re="(".((join: "|", @nums)).")"
         $re=qr/\b$re\b/
 
         foreach ( @nums)
-            ok($_=~m/$re/,"Trie nums") or diag("Failed trie re of $_ with $re")
+            ok: $_=~m/$re/,"Trie nums" or diag: "Failed trie re of $_ with $re"
         
-        $_=join " ", @nums
+        $_=join: " ", @nums
         @got= $@
-        push @got,$1 while m/$re/g
+        (push: @got,$1) while m/$re/g
 
         my %count
         for (@got)
@@ -2266,66 +2266,66 @@ END
         for ( @nums)
             $ok=0 if --%count{+$_}+<0
         
-        ok($ok,"Trie min count matches")
+        ok: $ok,"Trie min count matches"
     
 
 
     # TRIE related
     # LATIN SMALL/CAPITAL LETTER A WITH MACRON
-    ok(("foba  \x{101}foo" =~ qr/(foo|\x{100}foo|bar)/i) && $1 eq "\x{101}foo",
-       "TRIEF + LATIN SMALL/CAPITAL LETTER A WITH MACRON")
+    ok: ("foba  \x{101}foo" =~ qr/(foo|\x{100}foo|bar)/i) && $1 eq "\x{101}foo"
+        "TRIEF + LATIN SMALL/CAPITAL LETTER A WITH MACRON"
 
     # LATIN SMALL/CAPITAL LETTER A WITH RING BELOW
-    ok(("foba  \x{1E01}foo" =~ qr/(foo|\x{1E00}foo|bar)/i) && $1 eq "\x{1E01}foo",
-       "TRIEF + LATIN SMALL/CAPITAL LETTER A WITH RING BELOW")
+    ok: ("foba  \x{1E01}foo" =~ qr/(foo|\x{1E00}foo|bar)/i) && $1 eq "\x{1E01}foo"
+        "TRIEF + LATIN SMALL/CAPITAL LETTER A WITH RING BELOW"
 
     # DESERET SMALL/CAPITAL LETTER LONG I
-    ok(("foba  \x{10428}foo" =~ qr/(foo|\x{10400}foo|bar)/i) &&  $1 eq "\x{10428}foo",
-       "TRIEF + DESERET SMALL/CAPITAL LETTER LONG I")
+    ok: ("foba  \x{10428}foo" =~ qr/(foo|\x{10400}foo|bar)/i) &&  $1 eq "\x{10428}foo"
+        "TRIEF + DESERET SMALL/CAPITAL LETTER LONG I"
 
     # LATIN SMALL/CAPITAL LETTER A WITH RING BELOW + 'X'
-    ok(("foba  \x{1E01}xfoo" =~ qr/(foo|\x{1E00}Xfoo|bar)/i) &&  $1 eq "\x{1E01}xfoo",
-       "TRIEF + LATIN SMALL/CAPITAL LETTER A WITH RING BELOW + 'X'")
+    ok: ("foba  \x{1E01}xfoo" =~ qr/(foo|\x{1E00}Xfoo|bar)/i) &&  $1 eq "\x{1E01}xfoo"
+        "TRIEF + LATIN SMALL/CAPITAL LETTER A WITH RING BELOW + 'X'"
 
     do# TRIE related
 
         use charnames ':full'
 
         my $s="\N{LATIN SMALL LETTER SHARP S}"
-        ok(("foba  ba$s" =~ qr/(foo|Ba$s|bar)/i)
-           &&  $1 eq "ba$s",
-           " # TODO TRIEF + LATIN SMALL LETTER SHARP S =~ ss")
-        ok(("foba  ba$s" =~ qr/(Ba$s|foo|bar)/i)
-           &&  $1 eq "ba$s",
-           " # TODO TRIEF + LATIN SMALL LETTER SHARP S =~ ss")
-        ok(("foba  ba$s" =~ qr/(foo|bar|Ba$s)/i)
-           &&  $1 eq "ba$s",
-           " # TODO TRIEF + LATIN SMALL LETTER SHARP S =~ ss")
+        ok: ("foba  ba$s" =~ qr/(foo|Ba$s|bar)/i)
+               &&  $1 eq "ba$s"
+            " # TODO TRIEF + LATIN SMALL LETTER SHARP S =~ ss"
+        ok: ("foba  ba$s" =~ qr/(Ba$s|foo|bar)/i)
+               &&  $1 eq "ba$s"
+            " # TODO TRIEF + LATIN SMALL LETTER SHARP S =~ ss"
+        ok: ("foba  ba$s" =~ qr/(foo|bar|Ba$s)/i)
+               &&  $1 eq "ba$s"
+            " # TODO TRIEF + LATIN SMALL LETTER SHARP S =~ ss"
 
-        ok(("foba  ba$s" =~ qr/(foo|Bass|bar)/i)
-           &&  $1 eq "ba$s",
-           "TRIEF + LATIN SMALL LETTER SHARP S =~ ss # TODO")
+        ok: ("foba  ba$s" =~ qr/(foo|Bass|bar)/i)
+               &&  $1 eq "ba$s"
+            "TRIEF + LATIN SMALL LETTER SHARP S =~ ss # TODO"
 
-        ok(("foba  ba$s" =~ qr/(foo|BaSS|bar)/i)
-           &&  $1 eq "ba$s",
-           "TRIEF + LATIN SMALL LETTER SHARP S =~ SS # TODO")
+        ok: ("foba  ba$s" =~ qr/(foo|BaSS|bar)/i)
+               &&  $1 eq "ba$s"
+            "TRIEF + LATIN SMALL LETTER SHARP S =~ SS # TODO"
 
-        ok(("foba  ba$($s)pxySS$s$s" =~ qr/(b(?:a$($s)t|a$($s)f|a$($s)p)[xy]+$s*)/i)
-           &&  $1 eq "ba$($s)pxySS$s$s",
-           "COMMON PREFIX TRIEF + LATIN SMALL LETTER SHARP S # TODO")
+        ok: ("foba  ba$($s)pxySS$s$s" =~ qr/(b(?:a$($s)t|a$($s)f|a$($s)p)[xy]+$s*)/i)
+               &&  $1 eq "ba$($s)pxySS$s$s"
+            "COMMON PREFIX TRIEF + LATIN SMALL LETTER SHARP S # TODO"
 
 
     
 
 
-    print $^STDOUT, "# set PERL_SKIP_PSYCHO_TEST to skip this test\n"
-    if (!env::var('PERL_SKIP_PSYCHO_TEST'))
+    print: $^STDOUT, "# set PERL_SKIP_PSYCHO_TEST to skip this test\n"
+    if (!(env::var: 'PERL_SKIP_PSYCHO_TEST'))
         my @normal=qw(these are some normal words)
         use utf8;
-        my $psycho=join "|", @: < @normal,< map { chr $_ },255..20000
-        ok(('these'=~m/($psycho)/) && $1 eq 'these','Pyscho')
+        my $psycho=join: "|", @: < @normal,< map: { chr $_ },255..20000
+        ok: ('these'=~m/($psycho)/) && $1 eq 'these','Pyscho'
     else
-        ok(1,'Skipped Psycho')
+        ok: 1,'Skipped Psycho'
     
 
     # [perl #37038] Global regular matches generate invalid pointers
@@ -2335,8 +2335,8 @@ END
         $s =~ m/(..)(..)/g
         $s = $1
         $s = $2
-        ok($s eq 'cd',
-           "# assigning to original string should not corrupt match vars")
+        ok: $s eq 'cd'
+            "# assigning to original string should not corrupt match vars"
     
 
     do
@@ -2346,27 +2346,27 @@ END
         
         package main
 
-        my $aeek = bless \$%, 'wooosh'
-        try {$aeek->gloople() =~ m/(.)/g;}; die if $^EVAL_ERROR
-        ok($^EVAL_ERROR eq "", "//g match against return value of sub") or print $^STDOUT, "# $^EVAL_ERROR\n"
+        my $aeek = bless: \$%, 'wooosh'
+        try {$aeek->gloople =~ m/(.)/g;}; die: if $^EVAL_ERROR
+        ok: $^EVAL_ERROR eq "", "//g match against return value of sub" or print: $^STDOUT, "# $^EVAL_ERROR\n"
     
 
     do
         sub gloople
             "!"
         
-        try {gloople() =~ m/(.)/g;}; die if $^EVAL_ERROR
-        ok($^EVAL_ERROR eq "", "# 26410 didn't affect sub calls for some reason")
-            or print $^STDOUT, "# $^EVAL_ERROR\n"
+        try {(gloople: ) =~ m/(.)/g;}; die: if $^EVAL_ERROR
+        ok: $^EVAL_ERROR eq "", "# 26410 didn't affect sub calls for some reason"
+            or print: $^STDOUT, "# $^EVAL_ERROR\n"
     
 
     # [perl #37836] Simple Regex causes SEGV when run on specific data
     do
         no warnings 'utf8'
-        $_ = pack('U0C2', 0xa2, 0xf8) # ill-formed UTF-8
+        $_ = pack: 'U0C2', 0xa2, 0xf8 # ill-formed UTF-8
         my $ret = 0
-        try { $ret = s/[\0]+//g }; die if $^EVAL_ERROR
-        ok($ret == 0, "ill-formed UTF-8 doesn't match NUL in class")
+        try { $ret = s/[\0]+//g }; die: if $^EVAL_ERROR
+        ok: $ret == 0, "ill-formed UTF-8 doesn't match NUL in class"
     
 
     do # [perl #38293] chr(65535) should be allowed in regexes
@@ -2375,47 +2375,47 @@ END
 
         $c = chr 0xffff
         $c =~ s/$c//g
-        ok($c eq "", "U+FFFF, parsed as atom")
+        ok: $c eq "", "U+FFFF, parsed as atom"
 
         $c = chr 0xffff
         $r = "\\$c"
         $c =~ s/$r//g
-        ok($c eq "", "U+FFFF backslashed, parsed as atom")
+        ok: $c eq "", "U+FFFF backslashed, parsed as atom"
 
         $c = chr 0xffff
         $c =~ s/[$c]//g
-        ok($c eq "", "U+FFFF, parsed in class")
+        ok: $c eq "", "U+FFFF, parsed in class"
 
         $c = chr 0xffff
         $r = "[\\$c]"
         $c =~ s/$r//g
-        ok($c eq "", "U+FFFF backslashed, parsed in class")
+        ok: $c eq "", "U+FFFF backslashed, parsed in class"
 
         $s = "A\x{ffff}B"
         $s =~ s/\x{ffff}//i
-        ok($s eq "AB", "U+FFFF, EXACTF")
+        ok: $s eq "AB", "U+FFFF, EXACTF"
 
         $s = "\x{ffff}A"
         $s =~ s/\bA//
-        ok($s eq "\x{ffff}", "U+FFFF, BOUND")
+        ok: $s eq "\x{ffff}", "U+FFFF, BOUND"
 
         $s = "\x{ffff}!"
         $s =~ s/\B!//
-        ok($s eq "\x{ffff}", "U+FFFF, NBOUND")
+        ok: $s eq "\x{ffff}", "U+FFFF, NBOUND"
      # non-characters end
 
     do
         # https://rt.perl.org/rt3/Ticket/Display.html?id=39583
 
         # The printing characters
-        my @chars = map { chr($_) }, ord("A")..ord("Z")
+        my @chars = map: { (chr: $_) }, (ord: "A")..ord: "Z"
         my $delim = ","
         my $size = 32771 - 4
         my $str = ''
 
         # create some random junk. Inefficient, but it works.
         for my $i (0 .. $size -1)
-            $str .= @chars[int(rand(nelems @chars))]
+            $str .= @chars[(int: (rand: nelems @chars))]
         
 
         $str .= ($delim x 4)
@@ -2425,28 +2425,28 @@ END
             $res = $1
             $matched=1
         
-        ok($matched,'pattern matches')
-        ok(length($str)==0,"Empty string")
-        ok(defined($res) && length($res)==$size,"\$1 is correct size")
+        ok: $matched,'pattern matches'
+        ok: (length: $str)==0,"Empty string"
+        ok: (defined: $res) && (length: $res)==$size,"\$1 is correct size"
     
 
     do # related to [perl #27940]
-        ok("\0-A"  =~ m/\c@-A/, '@- should not be interpolated in a pattern')
-        ok("\0\0A" =~ m/\c@+A/, '@+ should not be interpolated in a pattern')
-        ok("X\@-A"  =~ m/X@-A/, '@- should not be interpolated in a pattern')
-        ok("X\@\@A" =~ m/X@+A/, '@+ should not be interpolated in a pattern')
+        ok: "\0-A"  =~ m/\c@-A/, '@- should not be interpolated in a pattern'
+        ok: "\0\0A" =~ m/\c@+A/, '@+ should not be interpolated in a pattern'
+        ok: "X\@-A"  =~ m/X@-A/, '@- should not be interpolated in a pattern'
+        ok: "X\@\@A" =~ m/X@+A/, '@+ should not be interpolated in a pattern'
 
-        ok("X\0A" =~ m/X\c@?A/,  '\c@?')
-        ok("X\0A" =~ m/X\c@*A/,  '\c@*')
-        ok("X\0A" =~ m/X\c@(A)/, '\c@(')
-        ok("X\0A" =~ m/X(\c@)A/, '\c@)')
-        ok("X\0A" =~ m/X\c@|ZA/, '\c@|')
+        ok: "X\0A" =~ m/X\c@?A/,  '\c@?'
+        ok: "X\0A" =~ m/X\c@*A/,  '\c@*'
+        ok: "X\0A" =~ m/X\c@(A)/, '\c@('
+        ok: "X\0A" =~ m/X(\c@)A/, '\c@)'
+        ok: "X\0A" =~ m/X\c@|ZA/, '\c@|'
 
-        ok("X\@A" =~ m/X@?A/,  '@?')
-        ok("X\@A" =~ m/X@*A/,  '@*')
-        ok("X\@A" =~ m/X@(A)/, '@(')
-        ok("X\@A" =~ m/X(@)A/, '@)')
-        ok("X\@A" =~ m/X@|ZA/, '@|')
+        ok: "X\@A" =~ m/X@?A/,  '@?'
+        ok: "X\@A" =~ m/X@*A/,  '@*'
+        ok: "X\@A" =~ m/X@(A)/, '@('
+        ok: "X\@A" =~ m/X(@)A/, '@)'
+        ok: "X\@A" =~ m/X@|ZA/, '@|'
     
 
     do
@@ -2461,19 +2461,19 @@ END
                 local $^WARN_HOOK = undef
                 undef $^EVAL_ERROR
                 eval 'BEGIN { use warnings; $^WARN_HOOK = sub ($e) { $warning = $e->message }; }' . "\n"
-                    . $code; die if $^EVAL_ERROR
-                ok( $warning =~ m/$warn_pat/, "expected warning: $(dump::view($warn_pat)), got: $(dump::view($warning))" )
+                    . $code; die: if $^EVAL_ERROR
+                ok:  $warning =~ m/$warn_pat/, "expected warning: $((dump::view: $warn_pat)), got: $((dump::view: $warning))" 
             
         
 
-        ok('fooB'=~m/\N{foo}[\N{B}\N{b}]/,"Passthrough charname")
-        my $handle=make_must_warn('Escape sequence did not correspond to one character')
-        $handle->('q(xxWxx) =~ m/[\N{WARN}]/')
+        ok: 'fooB'=~m/\N{foo}[\N{B}\N{b}]/,"Passthrough charname"
+        my $handle=make_must_warn: 'Escape sequence did not correspond to one character'
+        $handle->& <: 'q(xxWxx) =~ m/[\N{WARN}]/'
         do
             my $code
             my $w=""
             local $^WARN_HOOK = sub ($e) { $w.=$e->description }
-            eval($code=<<'EOFTEST') or die "$^EVAL_ERROR\n$code\n"
+            eval: $code=<<'EOFTEST' or die: "$^EVAL_ERROR\n$code\n"
         do {
             use warnings;
             
@@ -2483,51 +2483,51 @@ END
             1;
         };
 EOFTEST
-            ok($w=~m/Zero length.*replacement character/,
-               "Got expected zero length warning")
-            warn $code
+            ok: $w=~m/Zero length.*replacement character/
+                "Got expected zero length warning"
+            warn: $code
 
         
-        $handle= make_must_warn('Zero length escape sequence in character class replaced with')
-        $handle->('qq(\0) =~ m/[\N{EMPTY-STR}XY]/')
-        ok('AB'=~m/(\N{EVIL})/ && $1 eq 'A',"Charname caching $1")
-        ok('ABC'=~m/(\N{EVIL})/,"Charname caching $1")
-        ok('xy'=~m/x\N{EMPTY-STR}y/, 'Empty string charname produces NOTHING node')
-        ok(''=~m/\N{EMPTY-STR}/, 'Empty string charname produces NOTHING node 2')
+        $handle= make_must_warn: 'Zero length escape sequence in character class replaced with'
+        $handle->& <: 'qq(\0) =~ m/[\N{EMPTY-STR}XY]/'
+        ok: 'AB'=~m/(\N{EVIL})/ && $1 eq 'A',"Charname caching $1"
+        ok: 'ABC'=~m/(\N{EVIL})/,"Charname caching $1"
+        ok: 'xy'=~m/x\N{EMPTY-STR}y/, 'Empty string charname produces NOTHING node'
+        ok: ''=~m/\N{EMPTY-STR}/, 'Empty string charname produces NOTHING node 2'
 
     
     do
-        print $^STDOUT, "# MORE LATIN SMALL LETTER SHARP S\n"
+        print: $^STDOUT, "# MORE LATIN SMALL LETTER SHARP S\n"
 
         use charnames ':full';
 
         #see also test #835
-        ok("ss" =~ m/[\N{LATIN SMALL LETTER SHARP S}x]/i,
-           "unoptimized named sequence in class 1, # TODO sharp S in class")
-        ok("SS" =~ m/[\N{LATIN SMALL LETTER SHARP S}x]/i,
-           "unoptimized named sequence in class 2, # TODO sharp S in class")
-        ok("\N{LATIN SMALL LETTER SHARP S}" =~ m/[\N{LATIN SMALL LETTER SHARP S}x]/,
-           "unoptimized named sequence in class 3 # TODO sharp S in class")
-        ok("\N{LATIN SMALL LETTER SHARP S}" =~ m/[\N{LATIN SMALL LETTER SHARP S}x]/i,
-           "unoptimized named sequence in class 4 # TODO sharp S in clas")
+        ok: "ss" =~ m/[\N{LATIN SMALL LETTER SHARP S}x]/i
+            "unoptimized named sequence in class 1, # TODO sharp S in class"
+        ok: "SS" =~ m/[\N{LATIN SMALL LETTER SHARP S}x]/i
+            "unoptimized named sequence in class 2, # TODO sharp S in class"
+        ok: "\N{LATIN SMALL LETTER SHARP S}" =~ m/[\N{LATIN SMALL LETTER SHARP S}x]/
+            "unoptimized named sequence in class 3 # TODO sharp S in class"
+        ok: "\N{LATIN SMALL LETTER SHARP S}" =~ m/[\N{LATIN SMALL LETTER SHARP S}x]/i
+            "unoptimized named sequence in class 4 # TODO sharp S in clas"
 
-        ok('aabc' !~ m/a\N{PLUS SIGN}b/,'/a\N{PLUS SIGN}b/ against aabc')
-        ok('a+bc' =~ m/a\N{PLUS SIGN}b/,'/a\N{PLUS SIGN}b/ against a+bc')
-        ok('a+bc' =~ m/a\N{PLUS SIGN}b/,'/a\N{PLUS SIGN}b/ against a+bc')
+        ok: 'aabc' !~ m/a\N{PLUS SIGN}b/,'/a\N{PLUS SIGN}b/ against aabc'
+        ok: 'a+bc' =~ m/a\N{PLUS SIGN}b/,'/a\N{PLUS SIGN}b/ against a+bc'
+        ok: 'a+bc' =~ m/a\N{PLUS SIGN}b/,'/a\N{PLUS SIGN}b/ against a+bc'
 
-        ok(' A B'=~m/\N{SPACE}\N{U+0041}\N{SPACE}\N{U+0042}/,
-           'Intermixed named and unicode escapes 1')
-        ok("\N{SPACE}\N{U+0041}\N{SPACE}\N{U+0042}"=~
-           m/\N{SPACE}\N{U+0041}\N{SPACE}\N{U+0042}/,
-           'Intermixed named and unicode escapes 2')
-        ok("\N{SPACE}\N{U+0041}\N{SPACE}\N{U+0042} 3"=~
-           m/[\N{SPACE}\N{U+0041}][\N{SPACE}\N{U+0042}]/,
-           'Intermixed named and unicode escapes')
+        ok: ' A B'=~m/\N{SPACE}\N{U+0041}\N{SPACE}\N{U+0042}/
+            'Intermixed named and unicode escapes 1'
+        ok: "\N{SPACE}\N{U+0041}\N{SPACE}\N{U+0042}"=~
+               m/\N{SPACE}\N{U+0041}\N{SPACE}\N{U+0042}/
+            'Intermixed named and unicode escapes 2'
+        ok: "\N{SPACE}\N{U+0041}\N{SPACE}\N{U+0042} 3"=~
+               m/[\N{SPACE}\N{U+0041}][\N{SPACE}\N{U+0042}]/
+            'Intermixed named and unicode escapes'
     
     $brackets = qr{
 	         {  (?> [^{}]+ | (??{ $brackets }) )* }
 	      }x
-    ok("\{b\{c\}d" !~ m/^((??{ $brackets }))/, "bracket mismatch")
+    ok: "\{b\{c\}d" !~ m/^((??{ $brackets }))/, "bracket mismatch"
 
     :SKIP do
         our @stack= $@
@@ -2543,14 +2543,14 @@ EOFTEST
     )
 
         local $_ = '<<<stuff1>and<stuff2>><<<<right>>>>>'
-        ok(m/^(<((?:(?>[^<>]+)|(?1))*)>(?{push @stack, $2 }))$/,
-           "Recursion should match")
-        ok((nelems @stack)==nelems @expect)
-            or skip("Won't test individual results as count isn't equal",
-                    0+nelems @expect)
+        ok: m/^(<((?:(?>[^<>]+)|(?1))*)>(?{push @stack, $2 }))$/
+            "Recursion should match"
+        ok: (nelems @stack)==nelems @expect
+            or skip: "Won't test individual results as count isn't equal"
+                     0+nelems @expect
         foreach my $idx ( @expect)
-            ok(@expect[$idx] eq @stack[$idx],
-               "Expecting '$expect' at stack pos #$idx")
+            ok: @expect[$idx] eq @stack[$idx]
+                "Expecting '$expect' at stack pos #$idx"
         
 
     
@@ -2562,10 +2562,10 @@ EOFTEST
     # CURLYX and WHILEM blocks, except those related to LONGJMP, the
     # super-linear cache and warnings. It executes about 0.5M regexes
 
-    if (env::var('PERL_SKIP_PSYCHO_TEST'))
-        ok( 1, "Skip: No psycho tests")
+    if ((env::var: 'PERL_SKIP_PSYCHO_TEST'))
+        ok:  1, "Skip: No psycho tests"
     else
-        print $^STDOUT, "# set PERL_SKIP_PSYCHO_TEST to skip this test\n"
+        print: $^STDOUT, "# set PERL_SKIP_PSYCHO_TEST to skip this test\n"
         my $r = qr/^
   	    (?:
   		( (?:a|z+)+ )
@@ -2657,99 +2657,99 @@ EOFTEST
                 
             
         
-        ok($ok, $msg)
+        ok: $ok, $msg
     
 
     # \, breaks {3,4}
-    ok("xaaay"    !~ m/xa{3\,4}y/, "\, in a pattern")
-    ok("xa\{3,4\}y" =~ m/xa{3\,4}y/, "\, in a pattern")
+    ok: "xaaay"    !~ m/xa{3\,4}y/, "\, in a pattern"
+    ok: "xa\{3,4\}y" =~ m/xa{3\,4}y/, "\, in a pattern"
 
     # \c\ followed by _
-    ok("x\c_y"    !~ m/x\c\_y/,    "\_ in a pattern")
-    ok("x\c\_y"   =~ m/x\c\_y/,    "\_ in a pattern")
+    ok: "x\c_y"    !~ m/x\c\_y/,    "\_ in a pattern"
+    ok: "x\c\_y"   =~ m/x\c\_y/,    "\_ in a pattern"
 
     # \c\ followed by other characters
-    for my $c ((@: "z", "\0", "!", chr(254), chr(256)))
+    for my $c ((@: "z", "\0", "!", (chr: 254), (chr: 256)))
         my $targ = "a\034$c"
         my $reg  = "a\\c\\$c"
         local $TODO = $c eq "\0" && '\c\0'
-        ok(eval("qq/$targ/ =~ m/$reg/"), "\\c\\ in pattern")
+        ok: (eval: "qq/$targ/ =~ m/$reg/"), "\\c\\ in pattern"
     
 
     do   # Test the (*PRUNE) pattern
         our $count = 0
         'aaab'=~m/a+b?(?{$count++})(*FAIL)/
-        is($count,9,"expect 9 for no (*PRUNE)")
+        is: $count,9,"expect 9 for no (*PRUNE)"
         $count = 0
         'aaab'=~m/a+b?(*PRUNE)(?{$count++})(*FAIL)/
-        is($count,3,"expect 3 with (*PRUNE)")
+        is: $count,3,"expect 3 with (*PRUNE)"
         local $_ = 'aaab'
         $count=0
         1 while m/.(*PRUNE)(?{$count++})(*FAIL)/g
-        is($count,4,"/.(*PRUNE)/")
+        is: $count,4,"/.(*PRUNE)/"
         $count = 0
         'aaab'=~m/a+b?(??{'(*PRUNE)'})(?{$count++})(*FAIL)/
-        is($count,3,"expect 3 with (*PRUNE)")
+        is: $count,3,"expect 3 with (*PRUNE)"
         local $_ = 'aaab'
         $count=0
         1 while m/.(??{'(*PRUNE)'})(?{$count++})(*FAIL)/g
-        is($count,4,"/.(*PRUNE)/")
+        is: $count,4,"/.(*PRUNE)/"
     
     do   # Test the (*SKIP) pattern
         our $count = 0
         'aaab'=~m/a+b?(*SKIP)(?{$count++})(*FAIL)/
-        is($count,1,"expect 1 with (*SKIP)")
+        is: $count,1,"expect 1 with (*SKIP)"
         local $_ = 'aaab'
         $count=0
         1 while m/.(*SKIP)(?{$count++})(*FAIL)/g
-        is($count,4,"/.(*SKIP)/")
+        is: $count,4,"/.(*SKIP)/"
         $_='aaabaaab'
         $count=0
         our @res= $@
         1 while m/(a+b?)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g
-        is($count,2,"Expect 2 with (*SKIP)" )
-        is("$(join ' ',@res)","aaab aaab","adjacent (*SKIP) works as expected" )
+        is: $count,2,"Expect 2 with (*SKIP)" 
+        is: "$((join: ' ',@res))","aaab aaab","adjacent (*SKIP) works as expected" 
     
     do   # Test the (*SKIP) pattern
         our $count = 0
         'aaab'=~m/a+b?(*MARK:foo)(*SKIP)(?{$count++})(*FAIL)/
-        is($count,1,"expect 1 with (*SKIP)")
+        is: $count,1,"expect 1 with (*SKIP)"
         local $_ = 'aaab'
         $count=0
         1 while m/.(*MARK:foo)(*SKIP)(?{$count++})(*FAIL)/g
-        is($count,4,"/.(*SKIP)/")
+        is: $count,4,"/.(*SKIP)/"
         $_='aaabaaab'
         $count=0
         our @res= $@
         1 while m/(a+b?)(*MARK:foo)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g
-        is($count,2,"Expect 2 with (*SKIP)" )
-        is("$(join ' ',@res)","aaab aaab","adjacent (*SKIP) works as expected" )
+        is: $count,2,"Expect 2 with (*SKIP)" 
+        is: "$((join: ' ',@res))","aaab aaab","adjacent (*SKIP) works as expected" 
     
     do   # Test the (*SKIP) pattern
         our $count = 0
         'aaab'=~m/a*(*MARK:a)b?(*MARK:b)(*SKIP:a)(?{$count++})(*FAIL)/
-        is($count,3,"expect 3 with *MARK:a)b?(*MARK:b)(*SKIP:a)")
+        is: $count,3,"expect 3 with *MARK:a)b?(*MARK:b)(*SKIP:a)"
         local $_ = 'aaabaaab'
         $count=0
         our @res= $@
         1 while m/(a*(*MARK:a)b?)(*MARK:x)(*SKIP:a)(?{$count++; push @res,$1})(*FAIL)/g
-        is($count,5,"Expect 5 with (*MARK:a)b?)(*MARK:x)(*SKIP:a)" )
-        is("$(join ' ',@res)","aaab b aaab b ","adjacent (*MARK:a)b?)(*MARK:x)(*SKIP:a) works as expected" )
+        is: $count,5,"Expect 5 with (*MARK:a)b?)(*MARK:x)(*SKIP:a)" 
+        is: "$((join: ' ',@res))","aaab b aaab b ","adjacent (*MARK:a)b?)(*MARK:x)(*SKIP:a) works as expected" 
     
     do   # Test the (*COMMIT) pattern
         our $count = 0
         'aaabaaab'=~m/a+b?(*COMMIT)(?{$count++})(*FAIL)/
-        is($count,1,"expect 1 with (*COMMIT)")
+        is: $count,1,"expect 1 with (*COMMIT)"
         local $_ = 'aaab'
         $count=0
         1 while m/.(*COMMIT)(?{$count++})(*FAIL)/g
-        is($count,1,"/.(*COMMIT)/")
+        is: $count,1,"/.(*COMMIT)/"
         $_='aaabaaab'
         $count=0
         our @res= $@
         1 while m/(a+b?)(*COMMIT)(?{$count++; push @res,$1})(*FAIL)/g
-        is($count,1,"Expect 1 with (*COMMIT)" )
-        is("$(join ' ',@res)","aaab","adjacent (*COMMIT) works as expected" )
+        is: $count,1,"Expect 1 with (*COMMIT)" 
+        is: "$((join: ' ',@res))","aaab","adjacent (*COMMIT) works as expected" 
     
     do
         # Test named commits and the $REGERROR var
@@ -2761,11 +2761,11 @@ EOFTEST
                              "(*COMMIT$name)"))
                 for my $suffix ((@: '(*FAIL)',''))
                     'aaaab'=~m/a+b$pat$suffix/
-                    is(
-                        $REGERROR,
-                        ($suffix ?? ($name ?? 'foo' !! "1") !! ""),
+                    is: 
+                        $REGERROR
+                        ($suffix ?? ($name ?? 'foo' !! "1") !! "")
                         "Test $pat and \$REGERROR $suffix"
-                        )
+                        
                 
             
         
@@ -2781,11 +2781,11 @@ EOFTEST
                              "(*COMMIT$name)"))
                 for my $suffix ((@: '(*FAIL)',''))
                     'aaaab'=~m/a+b$pat$suffix/
-                    main::is(
-                        $REGERROR,
-                        ($suffix ?? ($name ?? 'foo' !! "1") !! ""),
+                    main::is: 
+                        $REGERROR
+                        ($suffix ?? ($name ?? 'foo' !! "1") !! "")
                         "Test $pat and \$REGERROR $suffix"
-                        )
+                        
                 
             
         
@@ -2797,20 +2797,20 @@ EOFTEST
         for my $word (qw(bar baz bop))
             $REGERROR=""
             "aaaaa$word"=~m/a+(?:bar(*COMMIT:bar)|baz(*COMMIT:baz)|bop(*COMMIT:bop))(*FAIL)/
-            is($REGERROR,$word)
+            is: $REGERROR,$word
         
     
     do   #Regression test for perlbug 40684
         local $Message = "RT#40684 tests:"
         my $s = "abc\ndef"
         my $rex = qr'^abc$'m
-        ok($s =~ m/$rex/)
-        ok($s =~ m/^abc$/m)
+        ok: $s =~ m/$rex/
+        ok: $s =~ m/^abc$/m
     
     do
         #Mindnumbingly simple test of (*THEN)
         for ((@: "ABC","BAX"))
-            ok(m/A (*THEN) X | B (*THEN) C/x,"Simple (*THEN) test")
+            ok: m/A (*THEN) X | B (*THEN) C/x,"Simple (*THEN) test"
         
     
 
@@ -2824,18 +2824,18 @@ EOFTEST
             $one=$1
             $two=$2
         
-        is($one, '((2*3)+4-3)')
-        is($two, '(2*(3+4)-1*(2-3))')
-        is($all, 'foo((2*3)+4-3) + bar(2*(3+4)-1*(2-3))')
-        is($all, $_)
+        is: $one, '((2*3)+4-3)'
+        is: $two, '(2*(3+4)-1*(2-3))'
+        is: $all, 'foo((2*3)+4-3) + bar(2*(3+4)-1*(2-3))'
+        is: $all, $_
     
     do
         my $spaces="      "
-        local $_ =join 'bar', @: $spaces,$spaces
+        local $_ =join: 'bar', @: $spaces,$spaces
         our $count=0
         s/(?>\s+bar)(?{$count++})//g
-        is($_,$spaces,"SUSPEND final string")
-        is($count,1,"Optimiser should have prevented more than one match")
+        is: $_,$spaces,"SUSPEND final string"
+        is: $count,1,"Optimiser should have prevented more than one match"
     
     do
         local $Message ="RT 22395"
@@ -2844,7 +2844,7 @@ EOFTEST
         for my $l ((@: 10,100,1000))
             $count=0
             ('a' x $l) =~ m/(.*)(?{$count++})[bc]/
-            is( $count, $l + 1)
+            is:  $count, $l + 1
         
     
     do
@@ -2861,18 +2861,18 @@ EOFTEST
             
         # End bad block
         
-        is($count,3)
-        is($text,' word2 word4 word6 ')
+        is: $count,3
+        is: $text,' word2 word4 word6 '
     
     do
         # RT#6893
         local $_ = qq(A\nB\nC\n)
         my @res
         while (m#(\G|\n)([^\n]*)\n#gsx)
-            push @res,"$2"
+            push: @res,"$2"
             last if (nelems @res)+>3
         
-        is("$(join ' ',@res)","A B C","RT#6893: /g pattern shouldn't infinite loop")
+        is: "$((join: ' ',@res))","A B C","RT#6893: /g pattern shouldn't infinite loop"
     
 
     do
@@ -2880,26 +2880,26 @@ EOFTEST
         my $dow_name= "nada"
         my $parser = "use utf8; \@: \$dow_name = \@: \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/"
         my $time_string = "D\x{e9} C\x{e9}adaoin"
-        eval $parser; die if $^EVAL_ERROR
-        ok(!$^EVAL_ERROR,"Test Eval worked")
-        is($dow_name,$time_string,"UTF8 trie common prefix extraction")
+        eval $parser; die: if $^EVAL_ERROR
+        ok: !$^EVAL_ERROR,"Test Eval worked"
+        is: $dow_name,$time_string,"UTF8 trie common prefix extraction"
     
 
     do
         my $v
         ($v='bar')=~m/(\w+)/g
         $v='foo'
-        is("$1",'bar','$1 is safe after /g - may fail due to specialized config in pp_hot.c')
+        is: "$1",'bar','$1 is safe after /g - may fail due to specialized config in pp_hot.c'
     
     do
         local $Message = "http://nntp.perl.org/group/perl.perl5.porters/118663"
         my $qr_barR1 = qr/(bar)\g-1/
-        ok("foobarbarxyz" =~ $qr_barR1)
-        ok("foobarbarxyz" =~ qr/foo$($qr_barR1)xyz/)
-        ok("foobarbarxyz" =~ qr/(foo)$($qr_barR1)xyz/)
-        ok("foobarbarxyz" =~ qr/(foo)(bar)\g{-1}xyz/)
-        ok("foobarbarxyz" =~ qr/(foo$qr_barR1)xyz/)
-        ok("foobarbarxyz" =~ qr/(foo(bar)\g{-1})xyz/)
+        ok: "foobarbarxyz" =~ $qr_barR1
+        ok: "foobarbarxyz" =~ qr/foo$($qr_barR1)xyz/
+        ok: "foobarbarxyz" =~ qr/(foo)$($qr_barR1)xyz/
+        ok: "foobarbarxyz" =~ qr/(foo)(bar)\g{-1}xyz/
+        ok: "foobarbarxyz" =~ qr/(foo$qr_barR1)xyz/
+        ok: "foobarbarxyz" =~ qr/(foo(bar)\g{-1})xyz/
     
     do
         local $Message = "RT#41010"
@@ -2911,15 +2911,15 @@ EOFTEST
                     for my $quant ( @quants)
                         for my $tail ( @tails)
                             my $re = "($pat$quant\$)$tail"
-                            ok(m/$re/ && $1 eq $_,"'$_'=~m/$re/")
-                            ok(m/$re/m && $1 eq $_,"'$_'=~m/$re/m")
+                            ok: m/$re/ && $1 eq $_,"'$_'=~m/$re/"
+                            ok: m/$re/m && $1 eq $_,"'$_'=~m/$re/m"
                         
                     
                 
             
         
 
-        my @dpats=@: 
+        my @dpats=@:
                 '\d'
                 '[1234567890]'
                 '(1|[23]|4|[56]|[78]|[90])'
@@ -2930,34 +2930,34 @@ EOFTEST
         my @spats=@: '[ ]',' ','( |\t)','(?: |\t)','[ \t]','\s'
         my @sstrs=@: '  '
         my @dstrs=@: '12345'
-        $doit->(\@spats,< @sstrs)
-        $doit->(\@dpats,< @dstrs)
+        $doit->& <: \@spats,< @sstrs
+        $doit->& <: \@dpats,< @dstrs
     
 
     do
         local $Message = "\$REGMARK"
         our ($REGMARK, $REGERROR)
         our @r= $@
-        ok('foofoo' =~ m/foo (*MARK:foo) (?{push @r,$REGMARK}) /x)
-        is("$(join ' ',@r)","foo")
-        is($REGMARK,"foo")
-        ok('foofoo' !~ m/foo (*MARK:foo) (*FAIL) /x)
-        ok(!$REGMARK)
-        is($REGERROR,'foo')
+        ok: 'foofoo' =~ m/foo (*MARK:foo) (?{push @r,$REGMARK}) /x
+        is: "$((join: ' ',@r))","foo"
+        is: $REGMARK,"foo"
+        ok: 'foofoo' !~ m/foo (*MARK:foo) (*FAIL) /x
+        ok: !$REGMARK
+        is: $REGERROR,'foo'
     
     do
         my $x
         $x = "abc.def.ghi.jkl"
         $x =~ s/.*\K\..*//
-        ok($x eq "abc.def.ghi")
+        ok: $x eq "abc.def.ghi"
 
         $x = "one two three four"
         $x =~ s/o+ \Kthree//g
-        ok($x eq "one two  four")
+        ok: $x eq "one two  four"
 
         $x = "abcde"
         $x =~ s/(.)\K/$1/g
-        ok($x eq "aabbccddee")
+        ok: $x eq "aabbccddee"
     
     sub kt
         return '4' if @_[0] eq '09028623'
@@ -2975,45 +2975,45 @@ EOFTEST
                        qw|[[:^word:]] #@! abc|
             )
             my $m = shift $p
-            my (@: $s, $f) =  map { \split m/ */ }, $p
+            my (@: $s, $f) =  map: { \(split: m/ */) }, $p
             for ($s->@)
-                ok(m/$m/, " $m basic match")
+                ok: m/$m/, " $m basic match"
             for ($f->@)
-                ok(not m/$m/)
+                ok: not m/$m/
             for ($s->@)
-                ok(m/^$m$/)
+                ok: m/^$m$/
             for ($f->@)
-                ok(not m/^$m$/)
+                ok: not m/^$m$/
             for ($s->@)
-                ok("xxxx$_" =~ m/^.*$m$/)
+                ok: "xxxx$_" =~ m/^.*$m$/
             for ($f->@)
-                ok("xxxx$_" !~ m/^.*$m$/)
+                ok: "xxxx$_" !~ m/^.*$m$/
 
     do   # Nested EVAL using PL_curpm (via $1 or friends)
         my $re
         our $grabit = qr/ ([0-6][0-9]{7}) (??{ kt $1 }) [890] /x
         $re = qr/^ ( (??{ $grabit }) ) $ /x
         my @res = @:  '0902862349' =~ $re 
-        is(join("-", @res),"0902862349",
-           'PL_curpm is set properly on nested eval')
+        is: (join: "-", @res),"0902862349"
+            'PL_curpm is set properly on nested eval'
 
         our $qr = qr/ (o) (??{ $1 }) /x
-        ok( 'boob'=~m/( b (??{ $qr }) b )/x && 1,
-            "PL_curpm, nested eval")
+        ok:  'boob'=~m/( b (??{ $qr }) b )/x && 1
+             "PL_curpm, nested eval"
     
 
     do
         use charnames ":full"
-        ok("\N{ROMAN NUMERAL ONE}" =~ m/\p{Alphabetic}/, "I =~ Alphabetic")
-        ok("\N{ROMAN NUMERAL ONE}" =~ m/\p{Uppercase}/,  "I =~ Uppercase")
-        ok("\N{ROMAN NUMERAL ONE}" !~ m/\p{Lowercase}/,  "I !~ Lowercase")
-        ok("\N{ROMAN NUMERAL ONE}" =~ m/\p{IDStart}/,    "I =~ ID_Start")
-        ok("\N{ROMAN NUMERAL ONE}" =~ m/\p{IDContinue}/, "I =~ ID_Continue")
-        ok("\N{SMALL ROMAN NUMERAL ONE}" =~ m/\p{Alphabetic}/, "i =~ Alphabetic")
-        ok("\N{SMALL ROMAN NUMERAL ONE}" !~ m/\p{Uppercase}/,  "i !~ Uppercase")
-        ok("\N{SMALL ROMAN NUMERAL ONE}" =~ m/\p{Lowercase}/,  "i =~ Lowercase")
-        ok("\N{SMALL ROMAN NUMERAL ONE}" =~ m/\p{IDStart}/,    "i =~ ID_Start")
-        ok("\N{SMALL ROMAN NUMERAL ONE}" =~ m/\p{IDContinue}/, "i =~ ID_Continue")
+        ok: "\N{ROMAN NUMERAL ONE}" =~ m/\p{Alphabetic}/, "I =~ Alphabetic"
+        ok: "\N{ROMAN NUMERAL ONE}" =~ m/\p{Uppercase}/,  "I =~ Uppercase"
+        ok: "\N{ROMAN NUMERAL ONE}" !~ m/\p{Lowercase}/,  "I !~ Lowercase"
+        ok: "\N{ROMAN NUMERAL ONE}" =~ m/\p{IDStart}/,    "I =~ ID_Start"
+        ok: "\N{ROMAN NUMERAL ONE}" =~ m/\p{IDContinue}/, "I =~ ID_Continue"
+        ok: "\N{SMALL ROMAN NUMERAL ONE}" =~ m/\p{Alphabetic}/, "i =~ Alphabetic"
+        ok: "\N{SMALL ROMAN NUMERAL ONE}" !~ m/\p{Uppercase}/,  "i !~ Uppercase"
+        ok: "\N{SMALL ROMAN NUMERAL ONE}" =~ m/\p{Lowercase}/,  "i =~ Lowercase"
+        ok: "\N{SMALL ROMAN NUMERAL ONE}" =~ m/\p{IDStart}/,    "i =~ ID_Start"
+        ok: "\N{SMALL ROMAN NUMERAL ONE}" =~ m/\p{IDContinue}/, "i =~ ID_Continue"
     
 
     do
@@ -3022,8 +3022,8 @@ EOFTEST
         for my $u ((@: 0x7FF, 0x800, 0xFFFF, 0x10000))
             no warnings 'utf8' # oops
             my $c = chr $u
-            my $x = sprintf '%04X', $u
-            ok( "A$($c)B" =~ m/A[\0-\x{10000}]B/, "unicode range - $x")
+            my $x = sprintf: '%04X', $u
+            ok:  "A$($c)B" =~ m/A[\0-\x{10000}]B/, "unicode range - $x"
         
     
 
@@ -3031,40 +3031,40 @@ EOFTEST
         use warnings
         local $Message = "ASCII pattern that really is utf8"
         my @w
-        local $^WARN_HOOK =sub (@< @_){push @w,"$(join ' ',@_)"}
+        local $^WARN_HOOK =sub (@< @_){(push: @w,"$((join: ' ',@_))")}
         my $c=qq(\x{DF})
-        ok($c=~m/$c|\x{100}/)
-        ok((nelems @w)==0)
+        ok: $c=~m/$c|\x{100}/
+        ok: (nelems @w)==0
     
     do
         local $Message = "corruption of match results of qr// across scopes"
         my $qr=qr/(fo+)(ba+r)/
         'foobar'=~m/$qr/
-        is("$1$2","foobar")
+        is: "$1$2","foobar"
         do
             'foooooobaaaaar'=~m/$qr/
-            is("$1$2",'foooooobaaaaar')
+            is: "$1$2",'foooooobaaaaar'
         
-        is("$1$2","foobar")
+        is: "$1$2","foobar"
     
     do
         local $Message = "HORIZWS"
-        local $_ ="\t \r\n \n \t".chr(11)."\n"
+        local $_ ="\t \r\n \n \t".(chr: 11)."\n"
         s/\H/H/g
         s/\h/h/g
-        is($_,"\t \r\n \n \t".chr(11)."\n")
-        $_="\t \r\n \n \t".chr(11)."\n"
+        is: $_,"\t \r\n \n \t".(chr: 11)."\n"
+        $_="\t \r\n \n \t".(chr: 11)."\n"
     
     do
         local $Message = "Various whitespace special patterns"
         my @lb=@:  "\x{0D}\x{0A}"
-                   < map { chr( $_ ) }, (@:  ( < 0x0A..0x0D,0x85,0x2028,0x2029 ))
+                   < map: { (chr:  $_ ) }, (@:  ( < 0x0A..0x0D,0x85,0x2028,0x2029 ))
         foreach my $t ((@: \(@: \@lb,qr/\R/,qr/\R+/),))
             my $ary=shift $t->@
             foreach my $pat ( $t->@)
                 foreach my $str ( $ary->@)
-                    ok($str=~m/($pat)/,"$pat")
-                    is($1,$str,"$pat")
+                    ok: $str=~m/($pat)/,"$pat"
+                    is: $1,$str,"$pat"
                 
             
         
@@ -3074,8 +3074,8 @@ EOFTEST
         # test that \xDF matches properly. this is pretty hacky stuff,
         # but its actually needed. the malarky with '-' is to prevent
         # compilation caching from playing any role in the test.
-        my @df= @: chr(0xDF),'-',chr(0xDF)
-        my @strs= @: 'ss','sS','Ss','SS',chr(0xDF)
+        my @df= @: (chr: 0xDF),'-',chr: 0xDF
+        my @strs= @: 'ss','sS','Ss','SS',chr: 0xDF
         my @ss= @strs
 
         for my $ssi (0..(nelems @ss)-1)
@@ -3086,8 +3086,8 @@ EOFTEST
 
                 my $ret= $str=~m/$pat/i
                 next if $pat eq '-'
-                ok($ret,
-                   "\"$sstr\"=~m/\\x\{DF\}/i # TODO multi-char folding")
+                ok: $ret
+                    "\"$sstr\"=~m/\\x\{DF\}/i # TODO multi-char folding"
             
         
     
@@ -3101,97 +3101,97 @@ EOFTEST
         my $str = "$esc$hyp$hyp$esc$esc"
         my @a = @: $str =~ m/\G(?:\Q$esc$esc\E|\Q$esc$hyp\E|$re)/g
 
-        is(0+nelems @a,3)
-        is(join('=', @a),"$esc$hyp=$hyp=$esc$esc")
+        is: 0+nelems @a,3
+        is: (join: '=', @a),"$esc$hyp=$hyp=$esc$esc"
 
     # length() on captures, the numbered ones end up in Perl_magic_len
     do
         my $_ = "aoeu \x{e6}var ook"
         m/^ \w+ \s (?<eek>\S+)/xp
 
-        is( length($^PREMATCH), 0, 'length $`' )
-        is( length($^POSTMATCH), 4, q[length $'] )
-        is( length($^MATCH), 9, 'length $&' )
-        is( length($1), 4, 'length $1' )
+        is:  (length: $^PREMATCH), 0, 'length $`' 
+        is:  (length: $^POSTMATCH), 4, q[length $'] 
+        is:  (length: $^MATCH), 9, 'length $&' 
+        is:  (length: $1), 4, 'length $1' 
     
 
     do
         local $_ = undef
         ($_ = 'abc')=~m/(abc)/g
         $_ = '123'
-        is("$1",'abc',"/g leads to unsafe match vars: $1")
+        is: "$1",'abc',"/g leads to unsafe match vars: $1"
     
     do
         local $Message ='Message-ID: <20070818091501.7eff4831@r2d2>'
         my $str= ""
         for(0..5)
             my @x
-            $str .= "$(join ' ',@x)" # this should ALWAYS be the empty string
+            $str .= "$((join: ' ',@x))" # this should ALWAYS be the empty string
             'a'=~m/(a|)/
-            push @x,1
+            push: @x,1
         
-        is(length($str),"0","Trie scope error, string should be empty")
+        is: (length: $str),"0","Trie scope error, string should be empty"
         $str=""
         my @foo = @:  ('a')x5 
         for ( @foo)
             my @bar
-            $str .= "$(join ' ',@bar)"
-            s/a|/$(push @bar, 1)/
+            $str .= "$((join: ' ',@bar))"
+            s/a|/$((push: @bar, 1))/
         
-        is(length($str),"0","Trie scope error, string should be empty")
+        is: (length: $str),"0","Trie scope error, string should be empty"
     
 
     do
         my $a = 3; "" =~ m/(??{ $a })/
         my $b = $a
-        is($b, $a, "copy of scalar used for postponed subexpression")
+        is: $b, $a, "copy of scalar used for postponed subexpression"
     
     do
         local $Message = "\$REGMARK in replacement -- Bug #49190"
         our $REGMARK
         my $_ = "A"
         s/(*:B)A/$REGMARK/
-        is $_, "B"
+        is: $_, "B"
         $_ = "CCCCBAA"
         s/(*:X)A+|(*:Y)B+|(*:Z)C+/$REGMARK/g
-        is $_, "ZYX"
+        is: $_, "ZYX"
 
     # [perl #60034]
     do
         my $a = "xyzt" x 8192
         local $TODO = "#60034"
-        ok($a =~ m/\A(?>[a-z])*\z/, '(?>) does not cause wrongness on long string')
+        ok: $a =~ m/\A(?>[a-z])*\z/, '(?>) does not cause wrongness on long string'
         use utf8
         $TODO = "#60034"
-        ok($b =~ m/\A(?>[a-z])*\z/,
-           '(?>) does not cause wrongness on long string with UTF-8')
+        ok: $b =~ m/\A(?>[a-z])*\z/
+            '(?>) does not cause wrongness on long string with UTF-8'
 
 
     # Test counter is at bottom of file. Put new tests above here.
     #-------------------------------------------------------------------
 
-    ok(($: ("a" x (2**15 - 10)) =~ m/^()(a|bb)*$/), "Recursive stack cracker: #24274")
-        or print $^STDOUT, "# Unexpected outcome: should pass or crash perl\n"
+    ok: ($: ("a" x (2**15 - 10)) =~ m/^()(a|bb)*$/), "Recursive stack cracker: #24274"
+        or print: $^STDOUT, "# Unexpected outcome: should pass or crash perl\n"
 
-    ok((q(a)x 100) =~ m/^(??{'(.)'x 100})/,
-       "Regexp /^(??\{'(.)'x 100\})/ crashes older perls")
-        or print $^STDOUT, "# Unexpected outcome: should pass or crash perl\n"
+    ok: (q(a)x 100) =~ m/^(??{'(.)'x 100})/
+        "Regexp /^(??\{'(.)'x 100\})/ crashes older perls"
+        or print: $^STDOUT, "# Unexpected outcome: should pass or crash perl\n"
 
-    eval_dies_like( 'm/\k/',
-                    qr/\QSequence \k... not terminated in regex;\E/)
+    eval_dies_like:  'm/\k/'
+                     qr/\QSequence \k... not terminated in regex;\E/
 
     do
         use bytes
         local $Message = "substitution with lookahead (possible segv)"
         $_="ns1ns1ns1"
         s/ns(?=\d)/ns_/g
-        is($_,"ns_1ns_1ns_1")
+        is: $_,"ns_1ns_1ns_1"
         $_="ns1"
         s/ns(?=\d)/ns_/
-        is($_,"ns_1")
+        is: $_,"ns_1"
         $_="123"
         s/(?=\d+)|(?<=\d)/!Bang!/g
-        is($_,"!Bang!1!Bang!2!Bang!3!Bang!")
+        is: $_,"!Bang!1!Bang!2!Bang!3!Bang!"
 
     # [perl #45337] utf8 + "[a]a{2}" + /$.../ = panic: sv_len_utf8 cache
 
@@ -3199,6 +3199,6 @@ EOFTEST
         local $^UTF8CACHE = -1
         use utf8;
         my $s="[a]a\{2\}"
-        ok("aaa" =~ m/$s/, "#45337")
+        ok: "aaa" =~ m/$s/, "#45337"
 
 # end of sub pat_tests

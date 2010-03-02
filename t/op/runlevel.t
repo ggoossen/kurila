@@ -9,18 +9,18 @@
 require './test.pl'
 
 undef $^INPUT_RECORD_SEPARATOR
-our @prgs = split "\n########\n", ~< $^DATA
+our @prgs = split: "\n########\n", ~< $^DATA
 
-plan(tests => nelems @prgs)
+plan: tests => nelems @prgs
 
 for ( @prgs)
     my $switch = ""
     if (s/^\s*(-\w+)//)
         $switch = $1
     
-    my(@: $prog,$expected) =  split(m/\nEXPECT\n/, $_)
+    my(@: $prog,$expected) =  split: m/\nEXPECT\n/, $_
 
-    fresh_perl_is( $prog, $expected, \(%:  switch => $switch, stderr => 1, ) )
+    fresh_perl_is:  $prog, $expected, \(%:  switch => $switch, stderr => 1, ) 
 
 
 __END__

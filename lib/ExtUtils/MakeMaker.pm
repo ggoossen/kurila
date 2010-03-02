@@ -29,7 +29,7 @@ our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
 my $Is_VMS     = $^OS_NAME eq 'VMS'
 my $Is_Win32   = $^OS_NAME eq 'MSWin32'
 
-full_setup()
+(full_setup: )
 
 require ExtUtils::MM  # Things like CPAN assume loading ExtUtils::MakeMaker
 # will give them MM.
@@ -40,14 +40,14 @@ require ExtUtils::MY  # XXX pre-5.8 versions of ExtUtils::Embed expect
 
 
 sub WriteMakefile
-    die "WriteMakefile: Need even number of args" if (nelems @_) % 2
+    die: "WriteMakefile: Need even number of args" if (nelems @_) % 2
 
     require ExtUtils::MY
     my %att = %:  < @_ 
 
-    _verify_att(\%att)
+    _verify_att: \%att
 
-    my $mm = MM->new(\%att)
+    my $mm = MM->new: \%att
     $mm->flush
 
     return $mm
@@ -58,7 +58,7 @@ sub WriteMakefile
 # reference type.  Empty value indicate it takes a non-reference
 # scalar.
 my %Att_Sigs
-my %Special_Sigs = %: 
+my %Special_Sigs = %:
     C                  => 'ARRAY'
     CONFIG             => 'ARRAY'
     CONFIGURE          => 'CODE'
@@ -96,7 +96,7 @@ my %Special_Sigs = %:
     test       => 'HASH'
     
 
-%Att_Sigs{[keys %Recognized_Att_Keys]} = (@: 'PLAINVALUE') x (nelems(%Recognized_Att_Keys)/2)
+%Att_Sigs{[keys %Recognized_Att_Keys]} = (@: 'PLAINVALUE') x ((nelems: %Recognized_Att_Keys)/2)
 %Att_Sigs{[keys %Special_Sigs]} = values %Special_Sigs
 
 
@@ -105,16 +105,16 @@ sub _verify_att($att)
     while( my (@: ?$key, ?$val) = (@:  each $att->%) )
         my $sig = %Att_Sigs{?$key}
         unless( defined $sig )
-            warn "WARNING: $key is not a known parameter.\n"
+            warn: "WARNING: $key is not a known parameter.\n"
             next
 
-        my @sigs   = ref::svtype($sig) eq 'ARRAY' ?? $sig !! @:  $sig 
-        my $given  = ref::svtype($val)
-        unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) || ($_ eq 'CODE' && ref::svtype($val) eq 'CODE') }, @sigs )
-            my $takes = join " or ", map { _format_att($_) }, @sigs
+        my @sigs   = (ref::svtype: $sig) eq 'ARRAY' ?? $sig !! @:  $sig 
+        my $given  = ref::svtype: $val
+        unless( (grep: { $given eq $_ || ($_ && try{($val->isa: $_)}) || ($_ eq 'CODE' && (ref::svtype: $val) eq 'CODE') }, @sigs) )
+            my $takes = join: " or ", map: { (_format_att: $_) }, @sigs
 
-            my $has = _format_att($given)
-            die "$key takes a $takes not a $has."
+            my $has = _format_att: $given
+            die: "$key takes a $takes not a $has."
 
 
 sub _format_att
@@ -127,7 +127,7 @@ sub _format_att
 
 
 sub prompt($mess, ?$def)
-    die("prompt function called without an argument")
+    die: "prompt function called without an argument"
         unless defined $mess
 
     my $isa_tty = -t $^STDIN && (-t $^STDOUT || !(-f $^STDOUT || -c $^STDOUT)) 
@@ -136,17 +136,17 @@ sub prompt($mess, ?$def)
     $def = defined $def ?? $def !! ""
 
     local $^OUTPUT_AUTOFLUSH = 1
-    print $^STDOUT, "$mess $dispdef"
+    print: $^STDOUT, "$mess $dispdef"
 
     my $ans
-    if (env::var('PERL_MM_USE_DEFAULT') || (!$isa_tty && eof $^STDIN))
-        print $^STDOUT, "$def\n"
+    if ((env::var: 'PERL_MM_USE_DEFAULT') || (!$isa_tty && eof $^STDIN))
+        print: $^STDOUT, "$def\n"
     else
         $ans = ~< $^STDIN
         if( defined $ans )
             chomp $ans
         else # user hit ctrl-D
-            print $^STDOUT, "\n"
+            print: $^STDOUT, "\n"
         
     
 
@@ -155,22 +155,22 @@ sub prompt($mess, ?$def)
 
 sub eval_in_subdirs($self) {;
     use Cwd < qw(cwd abs_path);
-    my $pwd = cwd() || die "Can't figure out your cwd!";
+    my $pwd = (cwd: ) || die: "Can't figure out your cwd!";
 
-    local $^INCLUDE_PATH = map { try {abs_path($_) if -e} || $_ }, $^INCLUDE_PATH;
-    push $^INCLUDE_PATH, '.';     # '.' has to always be at the end of $^INCLUDE_PATH
+    local $^INCLUDE_PATH = (map: { try {abs_path: $_ if -e} || $_ }, $^INCLUDE_PATH);
+    push: $^INCLUDE_PATH, '.';     # '.' has to always be at the end of $^INCLUDE_PATH
 
     foreach my $dir ($self->{DIR})
-        my $abs = $self->catdir($pwd,$dir)
-        try { $self->eval_in_x($abs); }
+        my $abs = $self->catdir: $pwd,$dir
+        try { ($self->eval_in_x: $abs); }
         last if $^EVAL_ERROR
     
     chdir $pwd;
-    die $^EVAL_ERROR if $^EVAL_ERROR;
+    die: $^EVAL_ERROR if $^EVAL_ERROR;
 }
 
 sub eval_in_x($self,$dir)
-    chdir $dir or warn("Couldn't change to directory $dir: $^OS_ERROR")
+    chdir $dir or warn: "Couldn't change to directory $dir: $^OS_ERROR"
 
     do
         package main
@@ -182,7 +182,7 @@ sub eval_in_x($self,$dir)
         #         } else {
         #             warn "WARNING from evaluation of $dir/Makefile.PL: $@";
         #         }
-        die "ERROR from evaluation of $dir/Makefile.PL: $($^EVAL_ERROR->message)"
+        die: "ERROR from evaluation of $dir/Makefile.PL: $($^EVAL_ERROR->message)"
     
 
 
@@ -266,7 +266,7 @@ sub full_setup
           ) # loses section ordering
 
     @Overridable = @MM_Sections
-    push @Overridable, < qw[
+    push: @Overridable, < qw[
 
  libscan makeaperl needs_linking perm_rw perm_rwx
  subdir_x test_via_harness test_via_script 
@@ -275,15 +275,15 @@ sub full_setup
  init_PM init_MANPODS init_xs init_PERL init_DIRFILESEP init_linker
                          ]
 
-    push @MM_Sections, < qw[
+    push: @MM_Sections, < qw[
 
  pm_to_blib selfdocument
 
                          ]
 
     # Postamble needs to be the last that was always the case
-    push @MM_Sections, "postamble"
-    push @Overridable, "postamble"
+    push: @MM_Sections, "postamble"
+    push: @Overridable, "postamble"
 
     # All sections are valid keys.
     %Recognized_Att_Keys{[ @MM_Sections]} = (@: 1) x nelems @MM_Sections
@@ -297,14 +297,14 @@ sub full_setup
           )
 
     # 5.5.3 doesn't have any concept of vendor libs
-    push @Get_from_Config, < qw( vendorarchexp vendorlibexp )
+    push: @Get_from_Config, < qw( vendorarchexp vendorlibexp )
 
     foreach my $item ( @attrib_help)
         %Recognized_Att_Keys{+$item} = 1
     
     foreach my $item ( @Get_from_Config)
         %Recognized_Att_Keys{+uc $item} = %Config{?$item}
-        print $^STDOUT, "Attribute '".uc($item)."' => '%Config{?$item}'\n"
+        print: $^STDOUT, "Attribute '".(uc: $item)."' => '%Config{?$item}'\n"
             if ($Verbose +>= 2)
     
 
@@ -321,7 +321,7 @@ sub full_setup
 
 
 sub writeMakefile
-    die <<END
+    die: <<END
 
 The extension you are trying to build apparently is rather old and
 most probably outdated. We detect that from the fact, that a
@@ -349,33 +349,33 @@ sub new
         $self->{+ARGS}{+$k} = $self->{?$k}
     
 
-    if ("$(join ' ',@ARGV)" =~ m/\bPREREQ_PRINT\b/)
+    if ("$((join: ' ',@ARGV))" =~ m/\bPREREQ_PRINT\b/)
         require Data::Dumper
-        print $^STDOUT, Data::Dumper->Dump(\(@: $self->{?PREREQ_PM}), \qw(PREREQ_PM))
+        print: $^STDOUT, Data::Dumper->Dump: \(@: $self->{?PREREQ_PM}), \qw(PREREQ_PM)
         exit 0
     
 
     # PRINT_PREREQ is RedHatism.
-    if ("$(join ' ',@ARGV)" =~ m/\bPRINT_PREREQ\b/)
-        print $^STDOUT, join(" ", map { "perl($_)>=$self->{PREREQ_PM}{?$_} " },
-            sort keys $self->{?PREREQ_PM}), "\n"
+    if ("$((join: ' ',@ARGV))" =~ m/\bPRINT_PREREQ\b/)
+        print: $^STDOUT, (join: " ", (map: { "perl($_)>=$self->{PREREQ_PM}{?$_} " },
+                                               (sort: keys $self->{?PREREQ_PM}))), "\n"
         exit 0
     
 
-    print $^STDOUT, "MakeMaker (v$VERSION)\n" if $Verbose
+    print: $^STDOUT, "MakeMaker (v$VERSION)\n" if $Verbose
     if (-f "MANIFEST" && ! -f "Makefile")
-        check_manifest()
+        (check_manifest: )
     
 
     $self = \$% unless (defined $self)
 
-    check_hints($self)
+    check_hints: $self
 
     my %configure_att         # record &{$self->{CONFIGURE}} attributes
     my %initial_att  = $self->% # record initial attributes
 
     my %unsatisfied = $%
-    foreach my $prereq (sort keys($self->{?PREREQ_PM} || $%))
+    foreach my $prereq ((sort: (keys: $self->{?PREREQ_PM} || $%)))
         # 5.8.0 has a bug with require Foo::Bar alone in an eval, so an
         # extra statement is a workaround.
         my $file = "$prereq.pm"
@@ -388,14 +388,14 @@ sub new
         $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/
 
         if ($^EVAL_ERROR)
-            warn sprintf 'Warning: prerequisite %s %s not found.',
-                $prereq, $self->{PREREQ_PM}{?$prereq}
+            warn: sprintf: 'Warning: prerequisite %s %s not found.'
+                           $prereq, $self->{PREREQ_PM}{?$prereq}
                 unless $self->{?PREREQ_FATAL}
             %unsatisfied{+$prereq} = 'not installed'
         elsif ($pr_version +< $self->{PREREQ_PM}{?$prereq} )
-            warn sprintf "Warning: prerequisite \%s \%s not found. We have \%s.\n",
-                $prereq, $self->{PREREQ_PM}{?$prereq},
-                ($pr_version || 'unknown version')
+            warn: sprintf: "Warning: prerequisite \%s \%s not found. We have \%s.\n"
+                           $prereq, $self->{PREREQ_PM}{?$prereq}
+                           ($pr_version || 'unknown version')
                 unless $self->{?PREREQ_FATAL}
             %unsatisfied{+$prereq} = $self->{PREREQ_PM}{?$prereq} ??
                 $self->{PREREQ_PM}{?$prereq} !! 'unknown version' 
@@ -403,9 +403,9 @@ sub new
     
 
     if (%unsatisfied && $self->{?PREREQ_FATAL})
-        my $failedprereqs = join "\n", map {"    $_ %unsatisfied{?$_}"},
-            sort { $a cmp $b }, keys %unsatisfied
-        die <<"END"
+        my $failedprereqs = join: "\n", map: {"    $_ %unsatisfied{?$_}"},
+                                                 sort: { $a cmp $b }, keys %unsatisfied
+        die: <<"END"
 MakeMaker FATAL: prerequisites not found.
 $failedprereqs
 
@@ -414,20 +414,20 @@ END
     
 
     if (defined $self->{?CONFIGURE})
-        if (!type::is_code($self->{?CONFIGURE}))
-            die "Attribute 'CONFIGURE' to WriteMakefile() not a code\n"
-        %configure_att = %:  <  $self->{?CONFIGURE}->( < @_ )->% 
+        if (!(type::is_code: $self->{?CONFIGURE}))
+            die: "Attribute 'CONFIGURE' to WriteMakefile() not a code\n"
+        %configure_att = %:  <(  $self->{?CONFIGURE}->& <:  < @_ )->% 
         $self = \%:  < $self->%, < %configure_att
 
     my $newclass = ++$PACKNAME
     local @Parent = @Parent    # Protect against non-local exits
     do
-        print $^STDOUT, "Blessing Object into class [$newclass]\n" if $Verbose+>=2
-        mv_all_methods("MY",$newclass)
-        bless $self, $newclass
-        push @Parent, $self
+        print: $^STDOUT, "Blessing Object into class [$newclass]\n" if $Verbose+>=2
+        mv_all_methods: "MY",$newclass
+        bless: $self, $newclass
+        push: @Parent, $self
         require ExtUtils::MY
-        Symbol::fetch_glob("$newclass\:\:ISA")->*->@ = @:  'MM' 
+        (Symbol::fetch_glob: "$newclass\:\:ISA")->*->@ = @:  'MM' 
     
 
     if (defined @Parent[?-2])
@@ -442,18 +442,18 @@ END
             $self->{+$key} = $self->{PARENT}->{?$key}
 
             unless ($Is_VMS && $key =~ m/PERL$/)
-                $self->{+$key} = $self->catdir("..",$self->{$key})
-                    unless $self->file_name_is_absolute($self->{$key})
+                $self->{+$key} = $self->catdir: "..",$self->{$key}
+                    unless $self->file_name_is_absolute: $self->{$key}
             else
                 # PERL or FULLPERL will be a command verb or even a
                 # command with an argument instead of a full file
                 # specification under VMS.  So, don't turn the command
                 # into a filespec, but do add a level to the path of
                 # the argument if not already absolute.
-                my @cmd = split m/\s+/, $self->{?$key}
-                @cmd[1] = $self->catfile('[-]',@cmd[1])
-                    unless ((nelems @cmd) +< 2) || $self->file_name_is_absolute(@cmd[1])
-                $self->{+$key} = join(' ', @cmd)
+                my @cmd = split: m/\s+/, $self->{?$key}
+                @cmd[1] = $self->catfile: '[-]',@cmd[1]
+                    unless ((nelems @cmd) +< 2) || $self->file_name_is_absolute: @cmd[1]
+                $self->{+$key} = join: ' ', @cmd
             
         
         if ($self->{?PARENT})
@@ -466,10 +466,10 @@ END
                 
             
         
-        my @fm = grep { m/^FIRST_MAKEFILE=/ }, @ARGV
-        parse_args($self,< @fm) if (nelems @fm)
+        my @fm = grep: { m/^FIRST_MAKEFILE=/ }, @ARGV
+        parse_args: $self,< @fm if (nelems @fm)
     else
-        parse_args($self, <split(' ', env::var('PERL_MM_OPT') || ''),< @ARGV)
+        parse_args: $self, <(split: ' ', (env::var: 'PERL_MM_OPT') || ''),< @ARGV
     
 
 
@@ -495,18 +495,18 @@ END
 
     if (! $self->{?PERL_SRC} )
         require VMS::Filespec if $Is_VMS
-        my $pthinks = $self->canonpath($^INCLUDED{'Config.pm'})
-        my $cthinks = $self->catfile(%Config{?'archlibexp'},'Config.pm')
-        $pthinks = VMS::Filespec::vmsify($pthinks) if $Is_VMS
+        my $pthinks = $self->canonpath: $^INCLUDED{'Config.pm'}
+        my $cthinks = $self->catfile: %Config{?'archlibexp'},'Config.pm'
+        $pthinks = (VMS::Filespec::vmsify: $pthinks) if $Is_VMS
         if ($pthinks ne $cthinks &&
-            !($Is_Win32 and lc($pthinks) eq lc($cthinks)))
-            print $^STDOUT, "Have $pthinks expected $cthinks\n"
+            !($Is_Win32 and (lc: $pthinks) eq (lc: $cthinks)))
+            print: $^STDOUT, "Have $pthinks expected $cthinks\n"
             if ($Is_Win32)
                 $pthinks =~ s![/\\]Config\.pm$!!i; $pthinks =~ s!.*[/\\]!!
             else
                 $pthinks =~ s!/Config\.pm$!!; $pthinks =~ s!.*/!!
             
-            print $^STDOUT, <<END unless $self->{?UNINSTALLED_PERL}
+            print: $^STDOUT, <<END unless $self->{?UNINSTALLED_PERL}
 Your perl and your Config.pm seem to have different ideas about the 
 architecture they are running on.
 Perl thinks: [$pthinks]
@@ -517,53 +517,53 @@ END
         
     
 
-    $self->init_others()
-    $self->init_platform()
-    $self->init_PERM()
-    my $argv = neatvalue(\@ARGV)
+    $self->init_others
+    $self->init_platform
+    $self->init_PERM
+    my $argv = neatvalue: \@ARGV
     $argv =~ s/^\[/(/
     $argv =~ s/\]$/)/
 
     $self->{+RESULT} ||= $@
-    push $self->{RESULT}, <<END
+    push: $self->{RESULT}, <<END
 # This Makefile is for the $self->{?NAME} extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# $(dump::view($VERSION)) (Revision: $Revision) from the contents of
+# $((dump::view: $VERSION)) (Revision: $Revision) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
 #
-#   MakeMaker ARGV: $(dump::view($argv))
+#   MakeMaker ARGV: $((dump::view: $argv))
 #
 #   MakeMaker Parameters:
 END
 
-    foreach my $key (sort keys %initial_att)
+    foreach my $key ((sort: keys %initial_att))
         next if $key eq 'ARGS'
 
-        my $v = neatvalue(%initial_att{?$key})
+        my $v = neatvalue: %initial_att{?$key}
         $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/
         $v =~ s/\n+/ /g
-        push $self->{RESULT}, "#     $key => $v"
+        push: $self->{RESULT}, "#     $key => $v"
     
     undef %initial_att        # free memory
 
     if (defined $self->{?CONFIGURE})
-        push $self->{RESULT}, <<END
+        push: $self->{RESULT}, <<END
 
 #   MakeMaker 'CONFIGURE' Parameters:
 END
         if (%configure_att)
-            foreach my $key (sort keys %configure_att)
+            foreach my $key ((sort: keys %configure_att))
                 next if $key eq 'ARGS'
-                my $v = neatvalue(%configure_att{?$key})
+                my $v = neatvalue: %configure_att{?$key}
                 $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/
                 $v =~ s/\n+/ /g
-                push $self->{RESULT}, "#     $key => $v"
+                push: $self->{RESULT}, "#     $key => $v"
             
         else
-            push $self->{RESULT}, "# no values returned"
+            push: $self->{RESULT}, "# no values returned"
         
         undef %configure_att  # free memory
     
@@ -589,43 +589,43 @@ END
     foreach my $section (  @MM_Sections )
         # Support for new foo_target() methods.
         my $method = $section
-        $method .= '_target' unless $self->can($method)
+        $method .= '_target' unless $self->can: $method
 
-        print $^STDOUT, "Processing Makefile '$section' section\n" if ($Verbose +>= 2)
-        my $skipit = $self->skipcheck($section)
+        print: $^STDOUT, "Processing Makefile '$section' section\n" if ($Verbose +>= 2)
+        my $skipit = $self->skipcheck: $section
         if ($skipit)
-            push $self->{RESULT}, "\n# --- MakeMaker $section section $skipit."
+            push: $self->{RESULT}, "\n# --- MakeMaker $section section $skipit."
         else
             my %a = $self->{?$section} || $%
-            push $self->{RESULT}, "\n# --- MakeMaker $section section:"
-            push $self->{RESULT}, "# " . join ", ", %a if $Verbose && %a
-            push $self->{RESULT}, $self->maketext_filter(
-                $self->?$method( < %a )
-                )
+            push: $self->{RESULT}, "\n# --- MakeMaker $section section:"
+            push: $self->{RESULT}, "# " . (join: ", ", %a) if $Verbose && %a
+            push: $self->{RESULT}, $self->maketext_filter: 
+                          $self->?$method:  < %a 
+                      
         
     
 
-    push $self->{RESULT}, "\n# End."
+    push: $self->{RESULT}, "\n# End."
 
     $self
 
 
 sub WriteEmptyMakefile
-    die "WriteEmptyMakefile: Need an even number of args" if (nelems @_) % 2
+    die: "WriteEmptyMakefile: Need an even number of args" if (nelems @_) % 2
 
     my %att = %:  < @_ 
-    my $self = MM->new(\%att)
+    my $self = MM->new: \%att
 
     my $new = $self->{?MAKEFILE}
     my $old = $self->{?MAKEFILE_OLD}
     if (-f $old)
-        _unlink($old) or warn "unlink $old: $^OS_ERROR"
+        _unlink: $old or warn: "unlink $old: $^OS_ERROR"
     
     if ( -f $new )
-        _rename($new, $old) or warn "rename $new => $old: $^OS_ERROR"
+        _rename: $new, $old or warn: "rename $new => $old: $^OS_ERROR"
     
-    open my $mfh, '>', $new or die "open $new for write: $^OS_ERROR"
-    print $mfh, <<'EOP'
+    open: my $mfh, '>', $new or die: "open $new for write: $^OS_ERROR"
+    print: $mfh, <<'EOP'
 all :
 
 clean :
@@ -637,22 +637,22 @@ makemakerdflt :
 test :
 
 EOP
-    close $mfh or die "close $new for write: $^OS_ERROR"
+    close $mfh or die: "close $new for write: $^OS_ERROR"
 
 
 sub check_manifest
-    print $^STDOUT, "Checking if your kit is complete...\n"
+    print: $^STDOUT, "Checking if your kit is complete...\n"
     require ExtUtils::Manifest
     # avoid warning
     $ExtUtils::Manifest::Quiet = $ExtUtils::Manifest::Quiet = 1
-    my @missed = ExtUtils::Manifest::manicheck()
+    my @missed = (ExtUtils::Manifest::manicheck: )
     if ((nelems @missed))
-        print $^STDOUT, "Warning: the following files are missing in your kit:\n"
-        print $^STDOUT, "\t", join "\n\t", @missed
-        print $^STDOUT, "\n"
-        print $^STDOUT, "Please inform the author.\n"
+        print: $^STDOUT, "Warning: the following files are missing in your kit:\n"
+        print: $^STDOUT, "\t", join: "\n\t", @missed
+        print: $^STDOUT, "\n"
+        print: $^STDOUT, "Please inform the author.\n"
     else
-        print $^STDOUT, "Looks good\n"
+        print: $^STDOUT, "Looks good\n"
     
 
 
@@ -666,8 +666,8 @@ sub parse_args($self, @< @args)
         if ($value =~ m/^~(\w+)?/) # tilde with optional username
             $value =~ s [^~(\w*)]
                 [$($1 ??
-            ((getpwnam($1))[[7]] || "~$1") !!
-            (getpwuid($^EUID))[[7]]
+            (((getpwnam: $1))[[7]] || "~$1") !!
+            ((getpwuid: $^EUID))[[7]]
             )]x
         
 
@@ -679,9 +679,9 @@ sub parse_args($self, @< @args)
     if (defined $self->{?potential_libs})
         my(@: $msg)="'potential_libs' => '$self->{?potential_libs}' should be"
         if ($self->{?potential_libs})
-            print $^STDOUT, "$msg changed to:\n\t'LIBS' => ['$self->{?potential_libs}']\n"
+            print: $^STDOUT, "$msg changed to:\n\t'LIBS' => ['$self->{?potential_libs}']\n"
         else
-            print $^STDOUT, "$msg deleted.\n"
+            print: $^STDOUT, "$msg deleted.\n"
         
         $self->{+LIBS} = @: $self->{?potential_libs}
         delete $self->{potential_libs}
@@ -689,14 +689,14 @@ sub parse_args($self, @< @args)
     # catch old-style 'ARMAYBE' and inform user how to 'upgrade'
     if (defined $self->{?ARMAYBE})
         my(@: $armaybe) = $self->{?ARMAYBE}
-        print $^STDOUT, "ARMAYBE => '$armaybe' should be changed to:\n",
-            "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n"
+        print: $^STDOUT, "ARMAYBE => '$armaybe' should be changed to:\n"
+               "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n"
         my %dl = ($self->{?dynamic_lib} || \$%)->%
         $self->{+dynamic_lib} = \%:  < %dl, ARMAYBE => $armaybe
         delete $self->{ARMAYBE}
     
     if (defined $self->{?LDTARGET})
-        print $^STDOUT, "LDTARGET should be changed to LDFROM\n"
+        print: $^STDOUT, "LDTARGET should be changed to LDFROM\n"
         $self->{+LDFROM} = $self->{?LDTARGET}
         delete $self->{LDTARGET}
     
@@ -705,21 +705,21 @@ sub parse_args($self, @< @args)
         # So they can choose from the command line, which extensions they want
         # the grep enables them to have some colons too much in case they
         # have to build a list with the shell
-        $self->{+DIR} = \ grep { $_ }, split ":", $self->{?DIR}
+        $self->{+DIR} = \ grep: { $_ }, split: ":", $self->{?DIR}
     
     # Turn a INCLUDE_EXT argument on the command line into an array
     if (defined $self->{?INCLUDE_EXT} && ref \$self->{+INCLUDE_EXT} eq 'SCALAR')
-        $self->{+INCLUDE_EXT} = \ grep { $_ }, split '\s+', $self->{?INCLUDE_EXT}
+        $self->{+INCLUDE_EXT} = \ grep: { $_ }, split: '\s+', $self->{?INCLUDE_EXT}
     
     # Turn a EXCLUDE_EXT argument on the command line into an array
     if (defined $self->{?EXCLUDE_EXT} && ref \$self->{+EXCLUDE_EXT} eq 'SCALAR')
-        $self->{+EXCLUDE_EXT} = \ grep { $_ }, split '\s+', $self->{?EXCLUDE_EXT}
+        $self->{+EXCLUDE_EXT} = \ grep: { $_ }, split: '\s+', $self->{?EXCLUDE_EXT}
     
 
-    foreach my $mmkey (sort keys $self->%)
+    foreach my $mmkey ((sort: keys $self->%))
         next if $mmkey eq 'ARGS'
-        print $^STDOUT, "  $mmkey => ", < neatvalue($self->{?$mmkey}), "\n" if $Verbose
-        print $^STDOUT, "'$mmkey' is not a known MakeMaker parameter name.\n"
+        print: $^STDOUT, "  $mmkey => ", < (neatvalue: $self->{?$mmkey}), "\n" if $Verbose
+        print: $^STDOUT, "'$mmkey' is not a known MakeMaker parameter name.\n"
             unless exists %Recognized_Att_Keys{$mmkey}
     
     $^OUTPUT_AUTOFLUSH = 1 if $Verbose
@@ -731,7 +731,7 @@ sub check_hints($self)
     require File::Spec
     my $curdir = File::Spec->curdir
 
-    my $hint_dir = File::Spec->catdir($curdir, "hints")
+    my $hint_dir = File::Spec->catdir: $curdir, "hints"
     return unless -d $hint_dir
 
     # First we look for the best hintsfile we have
@@ -742,15 +742,15 @@ sub check_hints($self)
 
     # Also try without trailing minor version numbers.
     while (1)
-        last if -f File::Spec->catfile($hint_dir, "$hint.pl")  # found
+        last if -f File::Spec->catfile: $hint_dir, "$hint.pl"  # found
     continue
         last unless $hint =~ s/_[^_]*$// # nothing to cut off
     
-    my $hint_file = File::Spec->catfile($hint_dir, "$hint.pl")
+    my $hint_file = File::Spec->catfile: $hint_dir, "$hint.pl"
 
     return unless -f $hint_file    # really there
 
-    _run_hintfile($self, $hint_file)
+    _run_hintfile: $self, $hint_file
 
 
 sub _run_hintfile
@@ -759,7 +759,7 @@ sub _run_hintfile
     my(@: $hint_file) =@:  shift
 
     local($^EVAL_ERROR, $^OS_ERROR)
-    print $^STDERR, "Processing hints file $hint_file\n"
+    print: $^STDERR, "Processing hints file $hint_file\n"
 
     # Just in case the ./ isn't on the hint file, which File::Spec can
     # often strip off, we bung the curdir into $^INCLUDE_PATH
@@ -767,7 +767,7 @@ sub _run_hintfile
     my $ret = evalfile $hint_file
     if( !defined $ret )
         my $error = $^EVAL_ERROR && $^EVAL_ERROR->message || $^OS_ERROR
-        print $^STDERR, $error
+        print: $^STDERR, $error
     
 
 
@@ -781,7 +781,7 @@ sub mv_all_methods
 
     local $^WARN_HOOK = sub (@< @_)
         # can't use 'no warnings redefined', 5.6 only
-        warn < @_[0]->message unless @_[0]->message =~ m/^Subroutine .* redefined/
+        warn: < @_[0]->message unless @_[0]->message =~ m/^Subroutine .* redefined/
     
     foreach my $method ( @Overridable)
 
@@ -793,10 +793,10 @@ sub mv_all_methods
         # standard, we try to enable the next line again. It was
         # commented out until MM 5.23
 
-        next unless exists Symbol::fetch_glob("$($from)::$method")->&
+        next unless exists (Symbol::fetch_glob: "$($from)::$method")->&
 
         do
-            Symbol::fetch_glob("$($to)::$method")->* = \Symbol::fetch_glob("$($from)::$method")->&
+            (Symbol::fetch_glob: "$($to)::$method")->* = \(Symbol::fetch_glob: "$($from)::$method")->&
 
             # If we delete a method, then it will be undefined and cannot
             # be called.  But as long as we have Makefile.PLs that rely on
@@ -806,8 +806,8 @@ sub mv_all_methods
             do
                 package MY
                 my $super = "SUPER::".$method
-                Symbol::fetch_glob($method)->* = sub (@< @_)
-                    shift->?$super(< @_)
+                (Symbol::fetch_glob: $method)->* = sub (@< @_)
+                    shift->?$super: < @_
                 
             
         
@@ -835,21 +835,21 @@ sub mv_all_methods
 sub skipcheck($self, $section)
 
     if ($section eq 'dynamic')
-        print $^STDOUT, "Warning (non-fatal): Target 'dynamic' depends on targets ",
-            "in skipped section 'dynamic_bs'\n"
+        print: $^STDOUT, "Warning (non-fatal): Target 'dynamic' depends on targets "
+               "in skipped section 'dynamic_bs'\n"
             if $self->{SKIPHASH}{?dynamic_bs} && $Verbose
-        print $^STDOUT, "Warning (non-fatal): Target 'dynamic' depends on targets ",
-            "in skipped section 'dynamic_lib'\n"
+        print: $^STDOUT, "Warning (non-fatal): Target 'dynamic' depends on targets "
+               "in skipped section 'dynamic_lib'\n"
             if $self->{SKIPHASH}{?dynamic_lib} && $Verbose
     
     if ($section eq 'dynamic_lib')
-        print $^STDOUT, "Warning (non-fatal): Target '\$(INST_DYNAMIC)' depends on ",
-            "targets in skipped section 'dynamic_bs'\n"
+        print: $^STDOUT, "Warning (non-fatal): Target '\$(INST_DYNAMIC)' depends on "
+               "targets in skipped section 'dynamic_bs'\n"
             if $self->{SKIPHASH}{?dynamic_bs} && $Verbose
     
     if ($section eq 'static')
-        print $^STDOUT, "Warning (non-fatal): Target 'static' depends on targets ",
-            "in skipped section 'static_lib'\n"
+        print: $^STDOUT, "Warning (non-fatal): Target 'static' depends on targets "
+               "in skipped section 'static_lib'\n"
             if $self->{SKIPHASH}{?static_lib} && $Verbose
     
     return 'skipped' if $self->{?SKIPHASH}{?$section}
@@ -860,22 +860,22 @@ sub flush
     my $self = shift
 
     my $finalname = $self->{?MAKEFILE}
-    print $^STDOUT, "Writing $finalname for $self->{?NAME}\n"
+    print: $^STDOUT, "Writing $finalname for $self->{?NAME}\n"
 
-    unlink($finalname, "MakeMaker.tmp", $Is_VMS ?? 'Descrip.MMS' !! ())
-    open(my $fh,">", "MakeMaker.tmp")
-        or die "Unable to open MakeMaker.tmp: $^OS_ERROR"
+    unlink: $finalname, "MakeMaker.tmp", $Is_VMS ?? 'Descrip.MMS' !! ()
+    open: my $fh,">", "MakeMaker.tmp"
+        or die: "Unable to open MakeMaker.tmp: $^OS_ERROR"
 
     for my $chunk ( $self->{RESULT} )
-        print $fh, "$chunk\n"
+        print: $fh, "$chunk\n"
     
 
     close $fh
-    _rename("MakeMaker.tmp", $finalname) or
-        warn "rename MakeMaker.tmp => $finalname: $^OS_ERROR"
-    chmod 0644, $finalname unless $Is_VMS
+    _rename: "MakeMaker.tmp", $finalname or
+        warn: "rename MakeMaker.tmp => $finalname: $^OS_ERROR"
+    chmod: 0644, $finalname unless $Is_VMS
 
-    my %keep = %:  < @+: map { (@: $_ => 1) }, qw(NEEDS_LINKING HAS_LINK_CODE) 
+    my %keep = %:  < @+: map: { (@: $_ => 1) }, qw(NEEDS_LINKING HAS_LINK_CODE) 
 
     if ($self->{?PARENT} && !$self->{?_KEEP_AFTER_FLUSH})
         foreach (keys $self->%) # safe memory
@@ -883,24 +883,24 @@ sub flush
         
     
 
-    if ( not config_value("eunicefix") eq ":" )
-        system(config_value('eunicefix') . " $finalname")
+    if ( not (config_value: "eunicefix") eq ":" )
+        system: (config_value: 'eunicefix') . " $finalname"
     
 
 
 
 # This is a rename for OS's where the target must be unlinked first.
 sub _rename($src, $dest)
-    chmod 0666, $dest
-    unlink $dest
-    return rename $src, $dest
+    chmod: 0666, $dest
+    unlink: $dest
+    return rename: $src, $dest
 
 
 # This is an unlink for OS's where the target must be writable first.
 sub _unlink
     my @files = @_
-    chmod 0666, < @files
-    return unlink < @files
+    chmod: 0666, < @files
+    return unlink: < @files
 
 
 
@@ -908,7 +908,7 @@ sub _unlink
 # the pre-4.1 mkbootstrap() from their old Makefiles. This MakeMaker
 # writes Makefiles, that use ExtUtils::Mkbootstrap directly.
 sub mkbootstrap
-    die <<END
+    die: <<END
 !!! Your Makefile has been built such a long time ago, !!!
 !!! that is unlikely to work with current MakeMaker.   !!!
 !!! Please rebuild your Makefile                       !!!
@@ -917,7 +917,7 @@ END
 
 # Ditto for mksymlists() as of MakeMaker 5.17
 sub mksymlists
-    die <<END
+    die: <<END
 !!! Your Makefile has been built such a long time ago, !!!
 !!! that is unlikely to work with current MakeMaker.   !!!
 !!! Please rebuild your Makefile                       !!!
@@ -925,22 +925,22 @@ END
 
 
 sub neatvalue($v)
-    return dump::view($v)
+    return dump::view: $v
 
 
 sub selfdocument($self)
     my(@m)
     if ($Verbose)
-        push @m, "\n# Full list of MakeMaker attribute values:"
-        foreach my $key (sort keys $self->%)
+        push: @m, "\n# Full list of MakeMaker attribute values:"
+        foreach my $key ((sort: keys $self->%))
             next if $key eq 'RESULT' || $key =~ m/^[A-Z][a-z]/
-            my(@: $v) =  neatvalue($self->{?$key})
+            my(@: $v) =  neatvalue: $self->{?$key}
             $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/
             $v =~ s/\n+/ /g
-            push @m, "# $key => $v"
+            push: @m, "# $key => $v"
         
     
-    join "\n", @m
+    join: "\n", @m
 
 
 1

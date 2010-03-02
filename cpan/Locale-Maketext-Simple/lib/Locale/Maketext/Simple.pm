@@ -109,11 +109,11 @@ sub import($class, %< %args)
     %args{+Export}   ||= 'loc'
     %args{+Subclass} ||= 'I18N'
 
-    my (@: ?$loc, ?$loc_lang) =  $class->load_loc(< %args) || $@
-    $loc ||= $class->default_loc(< %args)
+    my (@: ?$loc, ?$loc_lang) =  ($class->load_loc: < %args) || $@
+    $loc ||= $class->default_loc: < %args
 
-    Symbol::fetch_glob(caller(0) . "::%args{?Export}")->* = $loc if %args{?Export}
-    Symbol::fetch_glob(caller(0) . "::%args{?Export}_lang")->* = $loc_lang || sub (@< @_) { 1 }
+    (Symbol::fetch_glob: (caller: 0) . "::%args{?Export}")->* = $loc if %args{?Export}
+    (Symbol::fetch_glob: (caller: 0) . "::%args{?Export}_lang")->* = $loc_lang || sub (@< @_) { 1 }
 
 
 my %Loc
@@ -123,15 +123,15 @@ sub reload_loc { %Loc = $% }
 sub load_loc
     my (@: $class, %< %args) =  @_
 
-    my $pkg = join('::', grep { defined and length }, (@:  %args{?Class}, %args{?Subclass}))
+    my $pkg = join: '::', (grep: { defined and length }, (@:  %args{?Class}, %args{?Subclass}))
     return %Loc{?$pkg} if exists %Loc{$pkg}
 
     try { require Locale::Maketext::Lexicon; 1 }   or return
     $Locale::Maketext::Lexicon::VERSION +> 0.20	    or return
     try { require File::Spec; 1 }		    or return
 
-    my $path = %args{?Path} || $class->auto_path(%args{Class}) or return
-    my $pattern = File::Spec->catfile($path, '*.[pm]o')
+    my $path = %args{?Path} || ($class->auto_path: %args{Class}) or return
+    my $pattern = File::Spec->catfile: $path, '*.[pm]o'
     my $decode = %args{?Decode} || 0
     my $encoding = %args{?Encoding} || undef
 
@@ -153,13 +153,13 @@ sub load_loc
 	    unless defined &tense;
 
 	1;
-    " or die $^EVAL_ERROR
+    " or die: $^EVAL_ERROR
 
     my $lh = try { $pkg->get_handle } or return
-    my $style = lc(%args{?Style})
+    my $style = lc: %args{?Style}
     if ($style eq 'maketext')
         %Loc{+$pkg} = sub (@< @_)
-            $lh->maketext(< @_)
+            $lh->maketext: < @_
         
     elsif ($style eq 'gettext')
         %Loc{+$pkg} = sub (@< @_)
@@ -176,36 +176,36 @@ sub load_loc
                     )
             }{$(
                 $1 ?? $1
-                !! $2 ?? "\[$2,"._unescape($3)."]"
+                !! $2 ?? "\[$2,".(_unescape: $3)."]"
                 !! "[_$4]"
                 )}gx
-            return $lh->maketext($str, < @_)
+            return $lh->maketext: $str, < @_
         
     else
-        die "Unknown Style: $style"
+        die: "Unknown Style: $style"
     
 
     return @: %Loc{?$pkg}, sub (@< @_)
-                 $lh = $pkg->get_handle(< @_)
-                 $lh = $pkg->get_handle(< @_)
+                  $lh = $pkg->get_handle: < @_
+                  $lh = $pkg->get_handle: < @_
 
 
 sub default_loc
     my (@: $self, %< %args) =  @_
-    my $style = lc(%args{?Style})
+    my $style = lc: %args{?Style}
     if ($style eq 'maketext')
         return sub (@< @_)
             my $str = shift
             $str =~ s{((?<!~)(?:~~)*)\[_([1-9]\d*|\*)\]}
                      {$1\%$2}g
             $str =~ s{((?<!~)(?:~~)*)\[([A-Za-z#*]\w*),([^\]]+)\]} 
-                     {$("$1\%$2(" . _escape($3) . ')')}g
-            _default_gettext($str, < @_)
+                     {$("$1\%$2(" . (_escape: $3) . ')')}g
+            _default_gettext: $str, < @_
         
     elsif ($style eq 'gettext')
         return \&_default_gettext
     else
-        die "Unknown Style: $style"
+        die: "Unknown Style: $style"
     
 
 
@@ -253,9 +253,9 @@ sub _escape
 
 
 sub _unescape
-    join(',', map {
-            m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ?? "$1_$2$3" !! $_
-        }, split(m/,/, @_[0]))
+    join: ',', (map: {
+                         m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ?? "$1_$2$3" !! $_
+                         }, (split: m/,/, @_[0]))
 
 
 sub auto_path($self, $calldir)

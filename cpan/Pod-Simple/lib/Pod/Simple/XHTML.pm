@@ -44,8 +44,8 @@ my %entities = %:
   q{&} => 'amp'
 
 sub encode_entities($str)
-  return HTML::Entities::encode_entities( $str ) if $HAS_HTML_ENTITIES
-  my $ents = join '', keys %entities
+  return (HTML::Entities::encode_entities:  $str ) if $HAS_HTML_ENTITIES
+  my $ents = join: '', keys %entities
   $str =~ s/([$ents])/$( '&' . %entities{$1} . ';' )/g
   return $str
 
@@ -141,25 +141,25 @@ index for the sake of tradition).
 
 =cut
 
-__PACKAGE__->_accessorize(
- 'perldoc_url_prefix',
- 'perldoc_url_postfix',
- 'title_prefix',  'title_postfix',
- 'html_css', 
- 'html_javascript',
- 'html_doctype',
- 'html_header_tags',
- 'title', # Used internally for the title extracted from the content
- 'default_title',
- 'force_title',
- 'html_header',
- 'html_footer',
- 'index',
- 'batch_mode', # whether we're in batch mode
- 'batch_mode_current_level',
+__PACKAGE__->_accessorize: 
+ 'perldoc_url_prefix'
+ 'perldoc_url_postfix'
+ 'title_prefix',  'title_postfix'
+ 'html_css'
+ 'html_javascript'
+ 'html_doctype'
+ 'html_header_tags'
+ 'title' # Used internally for the title extracted from the content
+ 'default_title'
+ 'force_title'
+ 'html_header'
+ 'html_footer'
+ 'index'
+ 'batch_mode' # whether we're in batch mode
+ 'batch_mode_current_level'
     # When in batch mode, how deep the current module is: 1 for "LWP",
     #  2 for "LWP::Procotol", 3 for "LWP::Protocol::GHTTP", etc
- )
+ 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -173,13 +173,13 @@ you'll want to override when subclassing.
 
 sub new
   my $self = shift
-  my $new = $self->SUPER::new(@_)
+  my $new = $self->SUPER::new: @_
   $new->{+'output_fh'} ||= $^STDOUT
-  $new->accept_targets( 'html', 'HTML' )
-  $new->perldoc_url_prefix('http://search.cpan.org/perldoc?')
-  $new->html_header_tags('<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">')
-  $new->nix_X_codes(1)
-  $new->codes_in_verbatim(1)
+  $new->accept_targets:  'html', 'HTML' 
+  $new->perldoc_url_prefix: 'http://search.cpan.org/perldoc?'
+  $new->html_header_tags: '<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">'
+  $new->nix_X_codes: 1
+  $new->codes_in_verbatim: 1
   $new->{+'scratch'} = ''
   return $new
 
@@ -219,7 +219,7 @@ something like:
 
 sub handle_text($self, $text)
     # escape special characters in HTML (<, >, &, etc)
-    $self->{'scratch'} .= $self->{?'in_verbatim'} ?? encode_entities( $text ) !! $text
+    $self->{'scratch'} .= $self->{?'in_verbatim'} ?? (encode_entities:  $text ) !! $text
 
 sub start_Para($self, _)     { $self->{'scratch'} = '<p>' }
 sub start_Verbatim($self, _) { $self->{'scratch'} = '<pre><code>'; $self->{+'in_verbatim'} = 1}
@@ -342,7 +342,7 @@ sub end_S($self)   { $self->{'scratch'} .= '</nobr>' }
 
 sub emit($self)
   my $out = $self->{'scratch'} . "\n"
-  print $self->{'output_fh'}, $out, "\n"
+  print: $self->{'output_fh'}, $out, "\n"
   $self->{'scratch'} = ''
   return
 

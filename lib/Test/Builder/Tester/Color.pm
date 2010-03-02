@@ -25,7 +25,7 @@ from the command line.
 =cut
 
 sub import
-    Test::Builder::Tester::color(1)
+    Test::Builder::Tester::color: 1
 
 
 =head1 AUTHOR
