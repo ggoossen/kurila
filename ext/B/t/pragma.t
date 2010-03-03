@@ -81,7 +81,7 @@ sub _find_op_cop( $op, $name)
     return 0 if not $op or $op->isa: "B::NULL"
 
     # Succeed when we find our match.
-    return 1 if $op->name =~ $name
+    return 1 if ($op->name: ) =~ $name
 
     # Stash the latest seen COP opnode. This has our hints hash.
     if ( ($op->isa: 'B::COP') )

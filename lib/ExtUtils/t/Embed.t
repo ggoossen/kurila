@@ -140,7 +140,7 @@ unlink: $exe,"embed_test.c",$obj
 unlink: "$exe.manifest" if $cl and (config_value: 'ccversion') =~ m/^(\d+)/ and $1 +>= 14
 unlink: "$exe" . (config_value: "exe_ext") if $skip_exe
 unlink: "embed_test.map","embed_test.lis" if $^OS_NAME eq 'VMS'
-unlink: (glob:  <"./*.dll" if $^OS_NAME eq 'cygwin'
+unlink: < glob: "./*.dll" if $^OS_NAME eq 'cygwin'
 unlink: $testlib	       if $libperl_copied
 
 # gcc -g -I.. -L../ -o perl_test perl_test.c -lperl `../perl -I../lib -MExtUtils::Embed -I../ -e ccflags -e ldopts`
@@ -153,7 +153,7 @@ __END__
 
 #define my_puts(a) if(puts(a) < 0) exit(666)
 
-static const char * cmds [] = { "perl", "-e", "$^OUTPUT_AUTOFLUSH=1; print $^STDOUT, qq[ok 5\\n]", NULL };
+static const char * cmds [] = { "perl", "-e", "$^OUTPUT_AUTOFLUSH=1; print: $^STDOUT, qq[ok 5\\n]", NULL };
 
 #ifdef PERL_GLOBAL_STRUCT_PRIVATE
 static struct perl_vars *my_plvarsp;

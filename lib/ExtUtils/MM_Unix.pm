@@ -42,7 +42,7 @@ BEGIN
     if( %Is{?VMS} )
         # For things like vmsify()
         require VMS::Filespec
-        VMS::Filespec->import
+        VMS::Filespec->import: 
 
 
 
@@ -95,9 +95,9 @@ something that used to be in here, look in MM_Any.
 
 # So we don't have to keep calling the methods over and over again,
 # we have these globals to cache the values.  Faster and shrtr.
-my $Curdir  = __PACKAGE__->curdir
-my $Rootdir = __PACKAGE__->rootdir
-my $Updir   = __PACKAGE__->updir
+my $Curdir  = __PACKAGE__->curdir: 
+my $Rootdir = __PACKAGE__->rootdir: 
+my $Updir   = __PACKAGE__->updir: 
 
 
 =head2 Methods
@@ -129,7 +129,7 @@ sub c_o($self, ...)
     my $flags   = '$(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE)'
 
     if (my $cpp = %Config{?cpprun})
-        my $cpp_cmd = $self->const_cccmd
+        my $cpp_cmd = $self->const_cccmd: 
         $cpp_cmd =~ s/^CCCMD\s*=\s*\$\(CC\)/$cpp/
         push: @m, qq{
 .c.i:
@@ -321,7 +321,7 @@ L<ExtUtils::Liblist> for details.
 =cut
 
 sub const_loadlibs($self)
-    return "" unless $self->needs_linking
+    return "" unless $self->needs_linking: 
     my @m
     push: @m, qq{
 # $self->{?NAME} might depend on some other libraries:
@@ -371,7 +371,7 @@ sub constants($self)
                    )
                       (<@+: (map: { @: "INSTALL".$_
                                        "DESTINSTALL".$_
-                                      }, $self->installvars))
+                                    }, $self->installvars))
                       < qw(
               PERL_LIB
               PERL_ARCHLIB
@@ -495,7 +495,7 @@ sub init_DEST
     $self->{+DESTDIR} ||= ''
 
     # Make DEST variables.
-    foreach my $var ( $self->installvars)
+    foreach my $var ( ($self->installvars: ))
         my $destvar = 'DESTINSTALL'.$var
         $self->{+$destvar} ||= '$(DESTDIR)$(INSTALL'.$var.')'
 
@@ -635,9 +635,9 @@ sub dist_ci($self)
     return q{
 ci :
 	$(PERLRUN) "-MExtUtils::Manifest=maniread" \\
-	  -e "@all = keys %{ maniread() };" \\
-	  -e "print(\$$^STDOUT, qq{Executing $(CI) @all\n}); system(qq{$(CI) @all});" \\
-	  -e "print(\$$^STDOUT, qq{Executing $(RCS_LABEL) ...\n}); system(qq{$(RCS_LABEL) @all});"
+	  -e "@all = keys %{ maniread: };" \\
+	  -e "print: \$$^STDOUT, qq{Executing $(CI) @all\n}; system: qq{$(CI) @all};" \\
+	  -e "print: \$$^STDOUT, qq{Executing $(RCS_LABEL) ...\n}; system: qq{$(RCS_LABEL) @all};"
 }
 
 
@@ -675,7 +675,7 @@ depends on $(DIST_DEFAULT).
 
 sub dist_target($self)
     my $date_check = $self->oneliner: <<'CODE'
-print $$^STDOUT, 'Warning: Makefile possibly out of date with $(VERSION_FROM)', qq[\n]
+print: $$^STDOUT, 'Warning: Makefile possibly out of date with $(VERSION_FROM)', qq[\n]
     if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' +< -M '$(FIRST_MAKEFILE)';
 CODE
 
@@ -832,7 +832,7 @@ $(BOOTSTRAP) : $(FIRST_MAKEFILE) $(BOOTDEP) $(INST_ARCHAUTODIR)$(DFSEP).exists
 	$(NOECHO) $(ECHO) "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
-		-e "Mkbootstrap('$(BASEEXT)','$(BSLOADLIBS)');"
+		-e "Mkbootstrap: '$(BASEEXT)','$(BSLOADLIBS)';"
 	$(NOECHO) $(TOUCH) %s
 	$(CHMOD) $(PERM_RW) %s
 
@@ -852,7 +852,7 @@ Defines how to produce the *.so (or equivalent) files.
 sub dynamic_lib($self, %< %attribs)
     return '' unless $self->needs_linking #might be because of a subdir
 
-    return '' unless $self->has_link_code
+    return '' unless $self->has_link_code: 
 
     my $otherldflags = %attribs{?OTHERLDFLAGS} || ""
     my $inst_dynamic_dep = %attribs{?INST_DYNAMIC_DEP} || ""
@@ -960,7 +960,6 @@ in these dirs:
 $((join: ' ',$dirs->@))
 "
 
-
     my $stderr_duped = 0
     my $stderr_copy
     unless (%Is{?BSD})
@@ -971,8 +970,6 @@ $((join: ' ',$dirs->@))
 find_perl() can't dup STDERR: $^OS_ERROR
 You might see some garbage while we search for Perl
 WARNING
-
-
 
     foreach my $name ( $names->@)
         foreach my $dir ( $dirs->@)
@@ -990,7 +987,7 @@ WARNING
             next unless $self->maybe_command: $abs
             print: $^STDOUT, "Executing $abs\n" if ($trace +>= 2)
 
-            my $version_check = qq{$abs -e "\$^PERL_VERSION =~ m/^\Q$ver\E/; print \$^STDOUT, qq\{VER_OK\n\}"}
+            my $version_check = qq{$abs -e "\$^PERL_VERSION =~ m/^\Q$ver\E/; print: \$^STDOUT, qq\{VER_OK\n\}"}
             $version_check = "%Config{?run} $version_check"
                 if defined %Config{?run} and length %Config{?run}
 
@@ -1007,18 +1004,14 @@ WARNING
                 $val = `$version_check`
                 open: $^STDERR, '>&', $stderr_copy if $stderr_duped
 
-
             if ($val =~ m/^VER_OK/m)
                 print: $^STDOUT, "Using PERL=$abs\n" if $trace
                 return $abs
             elsif ($trace +>= 2)
                 print: $^STDOUT, "Result: '$val' ".($^CHILD_ERROR >> 8)."\n"
 
-
-
     print: $^STDOUT, "Unable to find a perl $ver (by these names: $((join: ' ',$names->@)), in these dirs: $((join: ' ',$dirs->@)))\n"
-    0 # false and not empty
-
+    return 0 # false and not empty
 
 
 =item fixin
@@ -1269,7 +1262,7 @@ sub init_MANPODS
             $self->{+"$($man)PODS"} //= %: 
         else
             my $init_method = "init_$($man)PODS"
-             $self->?$init_method: 
+            $self->?$init_method: 
 
 
 sub _has_pod($self, $file)
@@ -1738,7 +1731,7 @@ sub init_others($self) # --- Initialize Other Attributes
     $self->{+VERBINST}   ||= 0
     $self->{+MOD_INSTALL} ||=
         $self->oneliner: <<'CODE', @: '-MExtUtils::Install'
-install(\(%:<@ARGV), '$(VERBINST)', 0, '$(UNINST)');
+install: \(%:<@ARGV), '$(VERBINST)', 0, '$(UNINST)';
 CODE
     $self->{+DOC_INSTALL}        ||=
         '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e perllocal_install'
@@ -1747,7 +1740,7 @@ CODE
     $self->{+WARN_IF_OLD_PACKLIST} ||=
         '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist'
     $self->{+FIXIN}              ||=
-        q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)"}
+        q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin: shift @ARGV"}
 
     $self->{+UMASK_NULL}         ||= "umask 0"
     $self->{+DEV_NULL}           ||= "> /dev/null 2>&1"
@@ -1870,12 +1863,12 @@ sub init_PERL($self)
     # XXX This logic is flawed.  If "miniperl" is anywhere in the path
     # it will get confused.  It should be fixed to work only on the filename.
     # Define 'FULLPERL' to be a non-miniperl (used in test: target)
-    ($self->{+FULLPERL} = $self->{?PERL}) =~ s/miniperl/$perl_name/i
+    ($self->{+FULLPERL} = $self->{PERL}) =~ s/miniperl/$perl_name/i
         unless $self->{?FULLPERL}
 
     # Little hack to get around VMS's find_perl putting "MCR" in front
     # sometimes.
-    $self->{+ABSPERL} = $self->{?PERL}
+    $self->{+ABSPERL} = $self->{PERL}
     my $has_mcr = $self->{+ABSPERL} =~ s/^MCR\s*//
     if( ($self->file_name_is_absolute: $self->{ABSPERL}) )
         $self->{+ABSPERL} = '$(PERL)'
@@ -2420,7 +2413,7 @@ $tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
 $tmp/perlmain.c: $makefilename}, q{
 	$(NOECHO) $(ECHO) Writing $@
 	$(NOECHO) $(PERL) $(MAP_PERLINC) "-MExtUtils::Miniperl" \\
-		-e "writemain(grep s#.*/auto/##s, split(q| |, q|$(MAP_STATIC)|))" > $@t && $(MV) $@t $@
+		-e "writemain: grep: s#.*/auto/##s, split: q| |, q|$(MAP_STATIC)|" > $@t && $(MV) $@t $@
 
 }
     push: @m, "\t", q{$(NOECHO) $(PERL) $(INSTALLSCRIPT)/fixpmain
@@ -2518,7 +2511,7 @@ sub needs_linking($self)
     confess: "needs_linking called too early" if
       $caller =~ m/^ExtUtils::MakeMaker::/
     return $self->{?NEEDS_LINKING} if defined $self->{?NEEDS_LINKING}
-    if ($self->has_link_code or $self->{?MAKEAPERL})
+    if ($self->has_link_code:  or $self->{?MAKEAPERL})
         $self->{+NEEDS_LINKING} = 1
         return 1
 
@@ -2608,7 +2601,7 @@ sub parse_version($self,$parsefile)
         local $^WARNING = 0
         $result = eval: $eval  ## no critic
         if (ref $result)
-            $result = $result->stringify
+            $result = $result->stringify: 
 
         warn: "Could not eval '$eval' in $parsefile: $($^EVAL_ERROR->message)" if $^EVAL_ERROR
         last
@@ -2861,8 +2854,8 @@ PPD_HTML
     foreach my $prereq ((sort: (keys: $self->{?PREREQ_PM} || (%: ))))
         my $pre_req = $prereq
         $pre_req =~ s/::/-/g
-        my $dep_ver = join: ",", (@: <split: m/\./, $self->{PREREQ_PM}{?$prereq}
-                                     <((@: 0) x 4))[[0 .. 3]]
+        my $dep_ver = join: ",", ( split: m/\./, $self->{PREREQ_PM}{?$prereq}
+                                   +@+ ((@: 0) x 4))[[0 .. 3]]
         $ppd_xml .= sprintf: <<'PPD_OUT', $pre_req, $dep_ver
         <DEPENDENCY NAME="%s" VERSION="%s" />
 PPD_OUT
@@ -3149,7 +3142,7 @@ Defines how to produce the *.a (or equivalent) files.
 =cut
 
 sub static_lib($self)
-    return '' unless $self->has_link_code
+    return '' unless $self->has_link_code: 
 
     my(@m)
     push: @m, <<'END'
@@ -3281,7 +3274,7 @@ Defines the test targets.
 sub test($self, %< %attribs)
     my $tests = %attribs{?TESTS} || ''
     if (!$tests && -d 't')
-        $tests = $self->find_tests
+        $tests = $self->find_tests: 
 
     # note: 'test.pl' name is also hardcoded in init_dirscan()
     my(@m)
@@ -3406,7 +3399,7 @@ Determines typemaps, xsubpp version, prototype behaviour.
 =cut
 
 sub tool_xsubpp($self)
-    return "" unless $self->needs_linking
+    return "" unless $self->needs_linking: 
 
     my $xsdir
     my @xsubpp_dirs = $^INCLUDE_PATH

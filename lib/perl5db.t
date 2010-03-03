@@ -8,17 +8,17 @@ use warnings;
 
 BEGIN
     if (!-c "/dev/null")
-        print $^STDOUT, "1..0 # Skip: no /dev/null\n"
+        print: $^STDOUT, "1..0 # Skip: no /dev/null\n"
         exit 0
     if (!-c "/dev/tty")
-        print $^STDOUT, "1..0 # Skip: no /dev/tty\n"
+        print: $^STDOUT, "1..0 # Skip: no /dev/tty\n"
         exit 0
-    if (env::var('PERL5DB'))
-        print "1..0 # Skip: env::var('PERL5DB') is already set to '$(env::var('PERL5DB'))'\n"
+    if (env::var: 'PERL5DB')
+        print: "1..0 # Skip: env::var('PERL5DB') is already set to '$(env::var('PERL5DB'))'\n"
         exit 0
 
 BEGIN
-  print $^STDOUT, "1..0 # TODO: fix perl5db.pl\n"
+  print: $^STDOUT, "1..0 # TODO: fix perl5db.pl\n"
   exit 0
 
 plan(1)

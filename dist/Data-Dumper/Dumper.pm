@@ -157,8 +157,8 @@ sub Dumpperl
     my $s = shift
     my(@out, $name)
     my $i = 0
-    local(@post)(
-    init_refaddr_format: )
+    local(@post)
+    init_refaddr_format:
 
     $s = ($s->new: < @_) unless ref $s
 

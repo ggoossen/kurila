@@ -349,7 +349,7 @@ sub spawn_with_handles
     
     foreach my $fd ( $fds->@)
         bless: $fd->{?handle}, 'IO::Handle'
-            unless try { $fd->{?handle}->isa: 'IO::Handle') } 
+            unless try { $fd->{?handle}->isa: 'IO::Handle' } 
         # If some of handles to redirect-to coincide with handles to
         # redirect, we need to use saved variants:
         $fd->{?handle}->fdopen: %saved{?fileno $fd->{?open_as}} || $fd->{?open_as}

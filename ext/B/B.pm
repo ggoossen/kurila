@@ -25,7 +25,7 @@ BEGIN
                            init_av end_av regex_padav dowarn defstash
                            curstash warnhook diehook inc_gv @optype @specialsv_name
                       )
-    XSLoader::load:  'B'
+    XSLoader::load: 'B'
 
 
 @B::SV::ISA = @:  'B::OBJECT' 
@@ -113,7 +113,7 @@ sub walkoptree_slow($op, $method, $level)
     $op_count++ # just for statistics
     $level ||= 0
     warn: (sprintf: "walkoptree: \%d. \%s\n", $level, < (peekop: $op)) if $debug
-     $op->?$method: $level if $op->can: $method
+    $op->?$method: $level if $op->can: $method
     if ($op->$ && ($op->flags ^&^ OPf_KIDS))
         my $kid
         unshift: @parents, $op
@@ -172,15 +172,15 @@ sub walkoptree_exec($op, $method, $level)
             return
         
         savesym: $op, (sprintf: "\%s (0x\%lx)", < (class: $op), $op->$)
-         $op->?$method: $level
+        $op->?$method: $level
         $ppname = $op->name
         if ($ppname =~
             m/^(d?or(assign)?|and(assign)?|mapwhile|grepwhile|entertry|range|cond_expr)$/)
             print: $^STDOUT, $prefix, (uc: $1), " => \{\n"
-            walkoptree_exec:  <$op->other, $method, $level + 1
+            walkoptree_exec:  < $op->other, $method, $level + 1
             print: $^STDOUT, $prefix, "\}\n"
         elsif ($ppname eq "match" || $ppname eq "subst")
-            my $pmreplstart = $op->pmreplstart
+            my $pmreplstart = $op->pmreplstart: 
             if ($pmreplstart->$)
                 print: $^STDOUT, $prefix, "PMREPLSTART => \{\n"
                 walkoptree_exec: $pmreplstart, $method, $level + 1
@@ -200,13 +200,13 @@ sub walkoptree_exec($op, $method, $level)
             walkoptree_exec:  <$op->lastop,  $method, $level + 1
             print: $^STDOUT, $prefix, "\}\n"
         elsif ($ppname eq "subst")
-            my $replstart = $op->pmreplstart
+            my $replstart = $op->pmreplstart: 
             if ($replstart->$)
                 print: $^STDOUT, $prefix, "SUBST => \{\n"
                 walkoptree_exec: $replstart, $method, $level + 1
                 print: $^STDOUT, $prefix, "\}\n"
 
-        $op = $op->next
+        $op = $op->next: 
 
 
 sub walksymtable($symref, $method, $recurse, ?$prefix)
@@ -271,9 +271,9 @@ do
     
 
     sub output($section, $fh, $format)
-        my $name = $section->name
-        my $sym = $section->symtable || \$%
-        my $default = $section->default
+        my $name = $section->name: 
+        my $sym = ($section->symtable: ) || \$%
+        my $default = $section->default: 
 
         seek: $output_fh, 0, 0
         while ( ~< $output_fh)

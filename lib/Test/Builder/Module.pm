@@ -76,7 +76,7 @@ sub import
     # Don't run all this when loading ourself.
     return 1 if $class eq 'Test::Builder::Module'
 
-    my $test = $class->builder
+    my $test = $class->builder: 
 
     my $caller = caller
 
@@ -168,7 +168,7 @@ call builder() inside each function rather than store it in a global.
 =cut
 
 sub builder
-    return Test::Builder->new
+    return Test::Builder->new: 
 
 
 

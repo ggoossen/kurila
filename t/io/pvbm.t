@@ -11,7 +11,7 @@ plan: 21
 sub PVBM () { 'foo' }
 
 do
-    my $dummy = (index: 'foo' (PVBM: ))
+    my $dummy = (index: 'foo', (PVBM: ))
 
 do
     my $pvbm = (PVBM: );

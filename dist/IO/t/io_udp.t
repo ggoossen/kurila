@@ -36,7 +36,7 @@ sub compare_addr
 $^OUTPUT_AUTOFLUSH = 1
 print: $^STDOUT, "1..7\n"
 
-require '../../t/test.pl'
+require 'test.pl'
 (watchdog: 15)
 
 use Socket

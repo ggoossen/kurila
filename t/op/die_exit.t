@@ -9,7 +9,6 @@ if ($^OS_NAME eq 'mpeix')
     print: $^STDOUT, "1..0 # Skip: broken on MPE/iX\n"
     exit 0
 
-
 require "./test.pl"
 
 $^OUTPUT_AUTOFLUSH = 1
@@ -33,8 +32,8 @@ my %tests = %:
     15 => \(@:  255,   1)
     16 => \(@:  255, 256)
     # see if implicit close preserves $?
-    17 => \(@:   0,  512, 'do { my $f; open $f, q[TEST]; close $f; $^OS_ERROR=0 }; die;')
-    
+    17 => \(@:   0,  512, 'do { my $f; open: $f, q[TEST]; close $f; $^OS_ERROR=0 }; die:;')
+
 
 my $max = nkeys %tests
 
@@ -45,7 +44,7 @@ open: $^STDERR, ">", "die_exit.err" or die: "Can't open temp error file:  $^OS_E
 
 foreach my $test (1 .. $max)
     my (@: $bang, $query, ?$code) =  %tests{?$test}->@
-    $code ||= 'die;'
+    $code ||= 'die: ;'
     if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS')
         system: qq{$^EXECUTABLE_NAME -e "\$^OS_ERROR = $bang; \$^CHILD_ERROR = $query; $code"}
     else

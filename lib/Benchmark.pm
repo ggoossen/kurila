@@ -586,7 +586,7 @@ sub timestr($tr, ?$style, ?$f)
     my @t = $tr->@
     warn: "bad time value ($((join: ' ',@t)))" unless (nelems @t)==6
     my(@: $r, $pu, $ps, $cu, $cs, $n) =  @t
-    my(@: $pt, $ct, $tt) = @:  $tr->cpu_p, $tr->cpu_c, $tr->cpu_a
+    my(@: $pt, $ct, $tt) = @:  ($tr->cpu_p: ), ($tr->cpu_c: ), $tr->cpu_a: 
     $f = $Default_Format unless defined $f
     # format a time in the required style, other formats may be added here
     $style ||= $Default_Style
@@ -652,8 +652,8 @@ sub runloop($n, $c)
     # in &countit.  This, in turn, can reduce the number of calls to
     # &runloop a lot, and thus reduce additive errors.
     my $tbase = (Benchmark->new: 0)->[1]
-    while ( ( $t0 = (Benchmark->new: 0) )->[1] == $tbase ) {} ;(
-    $subref->& <: )
+    while ( ( $t0 = (Benchmark->new: 0) )->[1] == $tbase ) {} ;
+    $subref->& <:
     $t1 = Benchmark->new: $n
     $td = timediff: $t1, $t0
     timedebug: "runloop:",$td
@@ -831,8 +831,8 @@ sub timethis($n, $code, ?$title, ?$style)
     # you don't get this warning!
     print: $^STDOUT, "            (warning: too few iterations for a reliable count)\n"
         if     $n +< $Min_Count
-      || ($t->real +< 1 && $n +< 1000)
-      || $t->cpu_a +< $Min_CPU
+      || (($t->real: ) +< 1 && $n +< 1000)
+      || ($t->cpu_a: ) +< $Min_CPU
     $t
 
 

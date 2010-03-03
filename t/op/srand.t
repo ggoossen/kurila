@@ -45,8 +45,8 @@ do
 
 
 # This test checks whether Perl called srand for you.
-@first_run  = @:  `$^EXECUTABLE_NAME -e "for (1..100) \{ print \\\$^STDOUT, int rand 100, qq[\n] \}"` 
+@first_run  = @:  `$^EXECUTABLE_NAME -e "for (1..100) \{ print: \\\$^STDOUT, int rand 100, qq[\n] \}"` 
 sleep: 1 # in case our srand() is too time-dependent
-@second_run = @:  `$^EXECUTABLE_NAME -e "for (1..100) \{ print \\\$^STDOUT, int rand 100, qq[\n] \}"` 
+@second_run = @:  `$^EXECUTABLE_NAME -e "for (1..100) \{ print: \\\$^STDOUT, int rand 100, qq[\n] \}"` 
 
 ok:  !(eq_array: \@first_run, \@second_run), 'srand() called automatically'

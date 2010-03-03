@@ -1,28 +1,28 @@
 #!./perl
 
 BEGIN 
-    require "../../t/test.pl"
+    require "test.pl"
 our $NUM_SECTS
-my @strs = map { chomp ; $_ }, grep { !m/^\s*\#/ }, @:  ~< $^DATA
-my $out = runperl(progfile => "t/regop.pl", stderr => 1 )
+my @strs = map: { chomp ; $_ }, grep: { !m/^\s*\#/ }, @:  ~< $^DATA
+my $out = runperl: progfile => "t/regop.pl", stderr => 1 
 # VMS currently embeds linefeeds in the output.
 $out =~ s/\cJ//g if $^OS_NAME = 'VMS'
-my @tests = grep { m/\S/ }, split m/(?=Compiling REx)/, $out
+my @tests = grep: { m/\S/ }, split: m/(?=Compiling REx)/, $out
 # on debug builds we get an EXECUTING... message in there at the top
 shift @tests
     if @tests[0] =~ m/EXECUTING.../
 
-plan( (nelems @tests) + 2 + ( (nelems @strs) - nelems(grep { !$_ or m/^---/ }, @strs )))
+plan:  (nelems @tests) + 2 + ( (nelems @strs) - (nelems: (grep: { !$_ or m/^---/ }, @strs) ))
 
-is( nelems @tests, $NUM_SECTS,
-    "Expecting output for $NUM_SECTS patterns" )
-ok( defined $out, 'regop.pl returned something defined' )
+is:  nelems @tests, $NUM_SECTS
+     "Expecting output for $NUM_SECTS patterns" 
+ok:  defined $out, 'regop.pl returned something defined' 
 
 $out ||= ""
 my $test= 1
 foreach my $testout (  @tests )
     my (@:  $pattern )= @: $testout=~m/Compiling REx "([^"]+)"/
-    ok( $pattern, "Pattern for test " . ($test++) )
+    ok:  $pattern, "Pattern for test " . ($test++) 
     my $diaged
 
     while ((nelems @strs))
@@ -32,11 +32,9 @@ foreach my $testout (  @tests )
         next if m/^\s*#/
         s/^\s+//
         s/\s+$//
-        ok( $testout=~m/\Q$_\E/, "$_: /$pattern/" )
+        ok:  $testout=~m/\Q$_\E/, "$_: /$pattern/" 
             or do
-            !$diaged++ and diag("$_: /$pattern/\n'$testout'")
-        
-    
+            !$diaged++ and diag: "$_: /$pattern/\n'$testout'"
 
 
 # The format below is simple. Each line is an exact

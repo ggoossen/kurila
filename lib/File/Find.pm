@@ -929,8 +929,8 @@ sub _find_dir($wanted, $p_dir, $nlink)
 
             if ( $nlink == -2 )
                 $name = $dir = $p_dir # $File::Find::name / dir
-                $_ = $File::Find::current_dir(
-                $post_process->& <: )               # End-of-directory processing
+                $_ = $File::Find::current_dir
+                ($post_process->& <: )               # End-of-directory processing
             elsif ( $nlink +< 0 )  # must be finddepth, report dirname now
                 $name = $dir_name
                 if ($Is_MacOS)
@@ -1213,7 +1213,7 @@ elsif ($^OS_NAME eq 'MacOS')
 
 # this _should_ work properly on all platforms
 # where File::Find can be expected to work
-$File::Find::current_dir = File::Spec->curdir || '.'
+$File::Find::current_dir = (File::Spec->curdir: ) || '.'
 
 $File::Find::dont_use_nlink = 1
     if $^OS_NAME eq 'os2' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'MSWin32' ||

@@ -45,7 +45,7 @@ do
   (is: (DPeek:  *VAR),	'GV()',			' *VAR');
 
   (is: (DPeek: *VAR{GLOB}),	'\GV()',	' *VAR{GLOB}');
-(like: (DPeek: *VAR{SCALAR}), qr'\\IV\(0\)',' *VAR{SCALAR}')
+  (like: (DPeek: *VAR{SCALAR}), qr'\\IV\(0\)',' *VAR{SCALAR}')
   (is: (DPeek: *VAR{ARRAY}),	'\AV()',	' *VAR{ARRAY}')
   (is: (DPeek: *VAR{HASH}),	'\HV()',	' *VAR{HASH}')
   (is: (DPeek: *VAR{CODE}),	'\CV()',	' *VAR{CODE}')

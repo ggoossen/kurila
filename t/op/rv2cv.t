@@ -8,7 +8,7 @@ plan: tests => 6
 my $foo = sub() return "foo"
 my $x = \ $foo
 
-is:  (($x->&->& <)), "foo"
+is:  ($x->&->& <: ), "foo"
 is: \($x->&), \ $foo 
 is: \($x->&), $x
 
@@ -17,4 +17,4 @@ do
     $x->& = $bar
     is:  \($x->&), $x 
     isnt:  \($x->&), \ $bar 
-    is:  (($x->&->& <)), "bar" 
+    is:  ($x->&->& <: ), "bar" 

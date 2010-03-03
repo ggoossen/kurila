@@ -33,7 +33,7 @@ sub populate
     return $pob
 
 
-sub getprotoent      ( )  { (populate: CORE::getprotoent()) }
+sub getprotoent      ( )  { (populate: CORE::getprotoent:) }
 sub getprotobyname   ($name)  { (populate: (CORE::getprotobyname: $name)) }
 sub getprotobynumber ($number)  { (populate: (CORE::getprotobynumber: $number)) }
 

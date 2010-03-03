@@ -120,7 +120,7 @@ my $err_sub = %options{?nofatal} ?? \&warnings::warnif !! sub (@< @_) { (die: sh
 sub openlog(?$ident, ?$logopt, ?$facility)
 
     # default values
-    $ident    ||= (basename: $^PROGRAM_NAME) || getlogin() || (getpwuid: $^UID) || 'syslog'
+    $ident    ||= (basename: $^PROGRAM_NAME) || (getlogin: ) || (getpwuid: $^UID) || 'syslog'
     $logopt   ||= ''
     $facility ||= (LOG_USER: )
 

@@ -37,7 +37,7 @@ no utf8 # Ironic, no?
 #
 #
 
-plan: tests => 36
+plan: tests => 35
 
 do
     # bug id 20000730.004
@@ -103,15 +103,13 @@ do
 # before the patch, the eval died with an error like:
 #   "my" variable $strict::VERSION can't be in a package
 #
-:SKIP do
-    skip: "Embedded UTF-8 does not work in EBCDIC", 1 if (ord: "A") == 193
+do
     ok: '' eq (runperl: prog => <<'CODE'), "change #17928"
         my $code = qq{ my \$\xe3\x83\x95\xe3\x83\xbc = 5; };
-    {
+    do
         use utf8;
         eval $code;
-        print $@ if $@;
-    }
+        print: $^EVAL_ERROR if $^EVAL_ERROR;
 CODE
 
 
@@ -157,11 +155,10 @@ END
     is: "$((join: ' ',@i))", "60 62 58 50 52 48 70 72 68", "utf8 heredoc index and rindex"
 
 
-:SKIP do
-    skip: "Embedded UTF-8 does not work in EBCDIC", 1 if (ord: "A") == 193
+do
     use utf8;
-    eval qq{is(q \xc3\xbc test \xc3\xbc, qq\xc2\xb7 test \xc2\xb7,
-               "utf8 quote delimiters [perl #16823]");}
+    eval qq{is: q \xc3\xbc test \xc3\xbc, qq\xc2\xb7 test \xc2\xb7
+                "utf8 quote delimiters [perl #16823]";}
 
 
 # Test the "internals".
@@ -206,7 +203,7 @@ do
 
 
 do
-    fresh_perl_like: 'use utf8; utf8::moo()'
+    fresh_perl_like: 'use utf8; utf8::moo:'
                      qr/Undefined subroutine &utf8::moo/, \(%: stderr=>1)
                      "Check Carp is loaded for AUTOLOADing errors"
 

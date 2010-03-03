@@ -18,10 +18,10 @@ print: $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n"
 sub e ($x, $y) { (Pod::Simple::DumpAsXML->_duo: $x, $y) }
 
 my $x = 'Pod::Simple::XMLOutStream'
-sub accept_Q    { @_[0]->accept_codes: 'Q') }
-sub accept_prok { @_[0]->accept_codes: 'prok') }
-sub accept_zing_prok { @_[0]->accept_codes: 'zing:prok') }
-sub accept_zing_superprok { @_[0]->accept_codes: 'z.i_ng:Prok-12') }
+sub accept_Q    { @_[0]->accept_codes: 'Q' }
+sub accept_prok { @_[0]->accept_codes: 'prok' }
+sub accept_zing_prok { @_[0]->accept_codes: 'zing:prok' }
+sub accept_zing_superprok { @_[0]->accept_codes: 'z.i_ng:Prok-12' }
 sub accept_zing_superduperprok
     @_[0]->accept_codes: 'A'
     @_[0]->accept_codes: 'z.i_ng:Prok-12'

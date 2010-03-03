@@ -174,7 +174,7 @@ sub blocking
 
 sub close($sock)
     $sock->*->{+'io_socket_peername'} = undef
-     $sock->SUPER::close: 
+    $sock->SUPER::close: 
 
 
 sub bind($sock, $addr)
@@ -226,22 +226,20 @@ sub connected($sock)
     getpeername: $sock
 
 
-sub send
-    (nelems: @_) +>= 2 && (nelems @_) +<= 4 or croak: 'usage: $sock->send(BUF, [FLAGS, [TO]])'
-    my $sock  = @_[0]
-    my $flags = @_[?2] || 0
-    my $peer  = @_[?3] || $sock->peername
+sub send($sock, $buf, ?$flags, ?$to)
+    $flags ||= 0
+    my $peer  = $to || $sock->peername
 
     croak: 'send: Cannot determine peer address'
         unless(defined $peer)
 
     my $r = defined: (getpeername: $sock)
-        ?? send: $sock, @_[1], $flags
-        !! send: $sock, @_[1], $flags, $peer
+        ?? send: $sock, $buf, $flags
+        !! send: $sock, $buf, $flags, $peer
 
     # remember who we send to, if it was successful
     $sock->*->{+'io_socket_peername'} = $peer
-        if((nelems @_) == 4 && defined $r)
+        if (defined $to) && defined $r
 
     $r
 
@@ -259,14 +257,14 @@ sub shutdown($sock, $how)
 
 
 sub setsockopt
-    (nelems: @_) == 4 or croak: '$sock->setsockopt(LEVEL, OPTNAME, OPTVAL)'
+    4 == (nelems: @_) or croak: '$sock->setsockopt(LEVEL, OPTNAME, OPTVAL)'
     setsockopt: @_[0],@_[1],@_[2],@_[3]
 
 
 my $intsize = length: (pack: "i",0)
 
 sub getsockopt
-    (nelems: @_) == 3 or croak: '$sock->getsockopt(LEVEL, OPTNAME)'
+    3 == (nelems: @_) or croak: '$sock->getsockopt(LEVEL, OPTNAME)'
     my $r = getsockopt: @_[0],@_[1],@_[2]
     # Just a guess
     $r = unpack: "i", $r

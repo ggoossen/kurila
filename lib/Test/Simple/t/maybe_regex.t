@@ -12,7 +12,7 @@ BEGIN
 use Test::More tests => 16
 
 use Test::Builder
-my $Test = Test::Builder->new
+my $Test = Test::Builder->new: 
 
 my $r = $Test->maybe_regex: qr/^FOO$/i
 ok: defined $r, 'qr// detected'

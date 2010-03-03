@@ -6,7 +6,7 @@ plan: tests => 19
 
 use File::Spec
 
-my $devnull = 'File::Spec'->devnull
+my $devnull = 'File::Spec'->devnull: 
 
 (open: my $try, ">", 'Io_argv1.tmp') || (die: "Can't open temp file: $^OS_ERROR")
 print: $try, "a line\n"
@@ -14,14 +14,14 @@ close $try or die: "Could not close: $^OS_ERROR"
 
 do
     my $x = runperl: 
-        prog    => 'while (~< *ARGV) { print $^STDOUT, $_; }'
+        prog    => 'while (~< *ARGV) { print: $^STDOUT, $_; }'
         stdin   => "foo\n"
         args    => \(@:  'Io_argv1.tmp', '-' )
         
     is: $x, "a line\nfoo\n", '   from a file and STDIN'
 
     $x = runperl: 
-        prog    => 'while (~< *ARGV) { print $^STDOUT, $_; }'
+        prog    => 'while (~< *ARGV) { print: $^STDOUT, $_; }'
         stdin   => "foo\n"
         
     is: $x, "foo\n", '   from just STDIN'

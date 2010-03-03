@@ -147,7 +147,7 @@ do
     my ($dir, $noext, $exe, $cmd)
     my $found = 0
 
-    my (@: $curdir, $updir) = @:  <File::Spec->curdir, < File::Spec->updir
+    my (@: $curdir, $updir) = @:  <(File::Spec->curdir: ), < File::Spec->updir: 
 
     # we need:
     #	1) a directory
@@ -245,7 +245,7 @@ ok:  ! (ExtUtils::MM_OS2->file_name_is_absolute:  'arduk' )
      '... but not for paths with no leading slash or volume' 
 
 
-$mm->init_linker
+$mm->init_linker: 
 
 # PERL_ARCHIVE
 is:  $mm->{?PERL_ARCHIVE}, '$(PERL_INC)/libperl$(LIB_EXT)', 'PERL_ARCHIVE' 

@@ -31,7 +31,7 @@ is_deeply:  \(sort: (show_fields: 'Foo', (fields::PUBLIC: )))
 is_deeply:  \(sort: (show_fields: 'Foo', (fields::PRIVATE: )))
             \sort: qw(_no _up_yours)
 
-foreach ((@: Foo->new))
+foreach ((@: (Foo->new: )))
     my $obj = $_
     my %test = %:  Pants => 'Whatever', _no => 'Yeah'
                    what  => 'Ahh',      who => 'Moo'

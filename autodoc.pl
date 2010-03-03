@@ -32,7 +32,7 @@ my $curheader = "Unknown section"
 
 sub autodoc($fh, $file) # parse a file and extract documentation info
     my($in, $doc, $line)
-    :FUNC while ((defined: ($in = ~<$fh)))
+    :FUNC while (defined: ($in = ~<$fh))
         if ($in=~ m/^=head1 (.*)/)
             $curheader = $1
             next FUNC

@@ -101,12 +101,11 @@ sub new
     (DEBUG: )+> 2 and print: $^STDOUT, "To accept: ", (join: ' ', @_to_accept), "\n"
     $new->doc_lang: 
         (  (env::var: 'RTFDEFLANG') || '') =~ m/^(\d{1,10})$/s ?? $1
-        !! ((env::var: 'RTFDEFLANG') || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ?? hex: $1
-        # yes, tolerate hex!
-        !! ((env::var: 'RTFDEFLANG') || '') =~ m/^([a-fA-F0-9]{4})$/s ?? hex: $1
-        # yes, tolerate even more hex!
+            !! ((env::var: 'RTFDEFLANG') || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ?? hex: $1
+            # yes, tolerate hex!
+            !! ((env::var: 'RTFDEFLANG') || '') =~ m/^([a-fA-F0-9]{4})$/s ?? hex: $1
+            # yes, tolerate even more hex!
             !! '1033'
-        
 
     $new->head1_halfpoint_size: 32
     $new->head2_halfpoint_size: 28
@@ -137,9 +136,9 @@ __PACKAGE__->_accessorize:
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 sub run
     my $self = @_[0]
-    return $self->do_middle if $self->bare_output
+    return ($self->do_middle: ) if $self->bare_output: 
     return
-          $self->do_beginning && $self->do_middle && $self->do_end
+          ($self->do_beginning: ) && ($self->do_middle: ) && $self->do_end: 
 
 
 
@@ -154,9 +153,9 @@ sub do_middle      # the main work
     my @indent_stack
     $self->{+'rtfindent'} = 0 unless defined $self->{?'rtfindent'}
 
-    while($token = $self->get_token)
+    while($token = ($self->get_token: ))
 
-        if( ($type = $token->type) eq 'text' )
+        if( ($type = ($token->type: )) eq 'text' )
             if( $self->{?'rtfverbatim'} )
                 (DEBUG: )+> 1 and print: $^STDOUT, "  $type " , < $token->text, " in verbatim!\n"
                 $scratch = rtf_esc_codely: $token->text
@@ -166,7 +165,7 @@ sub do_middle      # the main work
 
             (DEBUG: )+> 1 and print: $^STDOUT, "  $type " , < $token->text, "\n"
 
-            $scratch = $token->text
+            $scratch = $token->text: 
             $scratch =~ s/\t/ /g
             $scratch =~ s/[\cb\cc]//g
 
@@ -206,15 +205,15 @@ sub do_middle      # the main work
             (DEBUG: )+> 1 and print: $^STDOUT, "  +$type ", <$token->tagname
                                      " (", < (map:  {"<$_> " }, $token->attr_hash->%), ")\n"
 
-            if( ($tagname = $token->tagname) eq 'Verbatim'
+            if( ($tagname = ($token->tagname: )) eq 'Verbatim'
                 or $tagname eq 'VerbatimFormatted'
                 )
                 ++$self->{+'rtfverbatim'}
-                my $next = $self->get_token
+                my $next = $self->get_token: 
                 next unless defined $next
                 my $line_count = 1
-                if($next->type eq 'text')
-                    my $t = $next->text_r
+                if(($next->type: ) eq 'text')
+                    my $t = $next->text_r: 
                     while( $t->$ =~ m/$/mg )
                         last if  ++$line_count  +> 15 # no point in counting further
                     
@@ -244,17 +243,17 @@ sub do_middle      # the main work
                             last
                         
                     elsif ((nelems @to_unget) +> 1 and
-                        @to_unget[-2]->type eq 'end' and
-                        @to_unget[-2]->tagname =~ m/^item-/s
+                        (@to_unget[-2]->type: ) eq 'end' and
+                        (@to_unget[-2]->tagname: ) =~ m/^item-/s
                         )
                         # Bail out here, after setting rtfitemkeepn yea or nay.
                         $self->{+'rtfitemkeepn'} = '\keepn' if
-                              @to_unget[-1]->type eq 'start' and
-                              @to_unget[-1]->tagname eq 'Para'
+                              (@to_unget[-1]->type: ) eq 'start' and
+                              (@to_unget[-1]->tagname: ) eq 'Para'
 
                         (DEBUG: )+> 1 and printf: $^STDOUT, "    item-* before \%s(\%s) \%s keepn'd.\n", <
                                                       @to_unget[-1]->type
-                                                  @to_unget[-1]->can: 'tagname') ?? < @to_unget[-1]->tagname !! ''
+                                                  (@to_unget[-1]->can: 'tagname') ?? < @to_unget[-1]->tagname !! ''
                                                   $self->{?'rtfitemkeepn'} ?? "gets" !! "doesn't get"
                         last
                     elsif ((nelems @to_unget) +> 40)
@@ -280,7 +279,7 @@ sub do_middle      # the main work
                 $tagname .= '=' . (($token->attr: 'type') || 'pod')
 
             elsif ($tagname eq 'Data')
-                my $next = $self->get_token
+                my $next = $self->get_token: 
                 next unless defined $next
                 unless( $next->type eq 'text' )
                     $self->unget_token: $next
@@ -343,7 +342,7 @@ sub do_end
 ###########################################################################
 
 sub stylesheet
-    return sprintf: <<'END', <
+    return sprintf: <<'END',
 {\stylesheet
 {\snext0 Normal;}
 {\*\cs10 \additive Default Paragraph Font;}
@@ -369,13 +368,11 @@ sub stylesheet
 }
 
 END
-
-                        @_[0]->codeblock_halfpoint_size, <
-                        @_[0]->head1_halfpoint_size, <
-                        @_[0]->head2_halfpoint_size, <
-                        @_[0]->head3_halfpoint_size, <
-                        @_[0]->head4_halfpoint_size
-    
+                    < @_[0]->codeblock_halfpoint_size
+                    < @_[0]->head1_halfpoint_size
+                    < @_[0]->head2_halfpoint_size
+                    < @_[0]->head3_halfpoint_size
+                    < @_[0]->head4_halfpoint_size
 
 
 ###########################################################################
@@ -415,7 +412,7 @@ sub doc_info
 
     unless($class eq __PACKAGE__)
         $tag = " ($tag)"
-        $tag = " v" . $self->VERSION . $tag   if   defined $self->VERSION
+        $tag = " v" . ($self->VERSION: ) . $tag   if   defined $self->VERSION: 
         $tag = $class . $tag
     
 
@@ -497,7 +494,7 @@ sub rtf_esc_codely
     ($x = (((nelems @_) == 1) ?? @_[0] !! (join: '', @_))
      ) =~ s/([F\x[00]-\x[1F]\\\{\}\x[7F]-\x[FF]])/%Escape{?$1}/g  # ESCAPER
     # Escape \, {, }, -, control chars, and 7f-ff.
-    $x =~ s/([^\x00-\xFF])/$('\\uc1\\u'.(((ord: $1)+<32768)??(ord: $1)!!((ord: $1)-65536)).'?')/g
+    $x =~ s/([^\x[00]-\x[FF]])/$('\\uc1\\u'.(((ord: $1)+<32768)??(ord: $1)!!((ord: $1)-65536)).'?')/g
     return $x
 
 

@@ -21,7 +21,7 @@ my $is_todo
     fail: "Expected failure"
     fail: "Another expected failure"
 
-    $is_todo = Test::More->builder->todo
+    $is_todo = (Test::More->builder: )->todo: 
 
 
 pass: "This is not todo"
@@ -64,7 +64,7 @@ pass: "This is still not todo"
 
 do
     my $warning
-    local $^WARN_HOOK = sub (@< @_) { $warning = @_[0]->message }
+    local $^WARN_HOOK = sub (@< @_) { $warning = @_[0]->message: }
     :TODO do
         # perl gets the line number a little wrong on the first
         # statement inside a block.

@@ -179,9 +179,9 @@ sub concise_cv_obj
         walk_exec: $cv->START
     elsif ($order eq "basic")
         # walk_topdown($cv->ROOT, sub { $_[0]->concise($_[1]) }, 0);
-        my $root = $cv->ROOT
+        my $root = $cv->ROOT: 
         unless (ref $root eq 'B::NULL')
-            walk_topdown: $root, sub (@< @_) { @_[0]->concise: @_[1]) }, 0
+            walk_topdown: $root, sub (@< @_) { @_[0]->concise: @_[1] }, 0
         else
             print: $walkHandle, "B::NULL encountered doing ROOT on $cv. avoiding disaster\n"
 
@@ -203,8 +203,7 @@ sub concise_main
     elsif ($order eq "basic")
         return if (class: (main_root: )) eq "NULL"
         walk_topdown: (main_root: )
-                     sub (@< @_) { @_[0]->concise: @_[1]) }, 0
-
+                      sub (@< @_) { @_[0]->concise: @_[1] }, 0
 
 
 sub concise_specials($name, $order, @< @cv_s)
@@ -301,20 +300,20 @@ sub compile
                                   (B::begin_av->isa: "B::AV") ?? <
                                                    B::begin_av->ARRAY !! ()
             elsif ((type::is_plainvalue: $objname) && $objname eq "INIT")
-                concise_specials: "INIT", $order(
-                                  (B::init_av: )->isa: "B::AV") ?? <
+                concise_specials: "INIT", $order
+                                  ((B::init_av: )->isa: "B::AV") ?? <
                                                    (B::init_av: )->ARRAY !! ()
             elsif ((type::is_plainvalue: $objname) && $objname eq "CHECK")
-                concise_specials: "CHECK", $order(
-                                  (B::check_av: )->isa: "B::AV") ?? <
+                concise_specials: "CHECK", $order
+                                  ((B::check_av: )->isa: "B::AV") ?? <
                                                    (B::check_av: )->ARRAY !! ()
             elsif ((type::is_plainvalue: $objname) && $objname eq "UNITCHECK")
-                concise_specials: "UNITCHECK", $order(
-                                  (B::unitcheck_av: )->isa: "B::AV") ?? <
+                concise_specials: "UNITCHECK", $order
+                                  ((B::unitcheck_av: )->isa: "B::AV") ?? <
                                                    (B::unitcheck_av: )->ARRAY !! ()
             elsif ((type::is_plainvalue: $objname) && $objname eq "END")
-                concise_specials: "END", $order(
-                                  (B::end_av: )->isa: "B::AV") ?? <
+                concise_specials: "END", $order
+                                  ((B::end_av: )->isa: "B::AV") ?? <
                                                    (B::end_av: )->ARRAY !! ()
             else
                 # convert function names to subrefs
@@ -464,12 +463,12 @@ sub walk_exec($top, ?$level)
                 push: $targ->@, $ar
                 push: @todo, \@: $op->pmreplstart, $ar
             elsif ($name =~ m/^enter(loop|iter)$/)
-                %labels{+$op->nextop->$} = "NEXT"
-                %labels{+$op->lastop->$} = "LAST"
-                %labels{+$op->redoop->$} = "REDO"
+                %labels{+($op->nextop: )->$} = "NEXT"
+                %labels{+($op->lastop: )->$} = "LAST"
+                %labels{+($op->redoop: )->$} = "REDO"
 
 
-            $op = $op->next
+            $op = $op->next: 
 
 
     walklines: \@lines, 0
@@ -481,9 +480,9 @@ sub sequence($op)
     return if (class: $op) eq "NULL" or exists %sequence_num{$op->$}
     while ($op->$)
         last if exists %sequence_num{$op->$}
-        my $name = $op->name
+        my $name = $op->name: 
         if ($name =~ m/^(null|scalar|lineseq|scope)$/)
-            next if $oldop and $op->next->$
+            next if $oldop and ($op->next: )->$
         else
             %sequence_num{+$op->$} = $seq_max++
             if ((class: $op) eq "LOGOP")
@@ -508,7 +507,7 @@ sub sequence($op)
 
         $oldop = $op
     continue
-        $op = $op->next
+        $op = $op->next: 
 
 
 
@@ -667,18 +666,18 @@ sub concise_sv($sv, $hr, ?$preferpv)
     $hr->{+svaddr} = sprintf: "\%#x", $sv->$
     if ($hr->{?svclass} eq "GV")
         my $gv = $sv
-        my $stash = $gv->STASH->NAME
+        my $stash = ($gv->STASH: )->NAME: 
         if ($stash eq "main")
             $stash = ""
         else
             $stash = $stash . "::"
 
-        $hr->{+svval} = "*$stash" . $gv->SAFENAME
-        return "*$stash" . $gv->SAFENAME
+        $hr->{+svval} = "*$stash" . $gv->SAFENAME: 
+        return "*$stash" . $gv->SAFENAME: 
     else
         while ((class: $sv) eq "IV" && ($sv->FLAGS ^&^ SVf_ROK))
             $hr->{+svval} .= "\\"
-            $sv = $sv->RV
+            $sv = $sv->RV: 
 
         if ((class: $sv) eq "SPECIAL")
             $hr->{+svval} .= (@: "Null", "sv_undef", "sv_yes", "sv_no")[$sv->$]
@@ -719,7 +718,7 @@ sub fill_srclines
 
 sub concise_op($op, $level, $format)
     my %h
-    %h{+exname} = %h{+name} = $op->name
+    %h{+exname} = %h{+name} = $op->name: 
     %h{+NAME} = uc %h{?name}
     %h{+class} = class: $op
     %h{+extarg} = %h{+targ} = $op->targ
@@ -728,12 +727,12 @@ sub concise_op($op, $level, $format)
         # targ holds the old type
         %h{+exname} = "ex-" . substr: (ppname: %h{?targ}), 3
         %h{+extarg} = ""
-    elsif ($op->name =~ m/^root$/)
+    elsif (($op->name: ) =~ m/^root$/)
         my $refs = "ref" . (%h{?targ} != 1 ?? "s" !! "")
         %h{+targarglife} = %h{+targarg} = "%h{?targ} $refs"
-    elsif ($op->name =~ m/^leave(sub(lv)?|write)?$/)
+    elsif (($op->name: ) =~ m/^leave(sub(lv)?|write)?$/)
         # targ potentially holds a reference count
-        if ($op->private ^&^ 64)
+        if (($op->private: ) ^&^ 64)
             my $refs = "ref" . (%h{?targ} != 1 ?? "s" !! "")
             %h{+targarglife} = %h{+targarg} = "%h{?targ} $refs"
 
@@ -746,11 +745,11 @@ sub concise_op($op, $level, $format)
                 # See changes 19939 and 20005
                 my $fake = ''
                 $fake .= 'a'
-                    if $padname->PARENT_FAKELEX_FLAGS ^&^ PAD_FAKELEX_ANON
+                    if ($padname->PARENT_FAKELEX_FLAGS: ) ^&^ PAD_FAKELEX_ANON
                 $fake .= 'm'
-                    if $padname->PARENT_FAKELEX_FLAGS ^&^ PAD_FAKELEX_MULTI
-                $fake .= ':' . $padname->PARENT_PAD_INDEX
-                    if $curcv->CvFLAGS ^&^ CVf_ANON
+                    if ($padname->PARENT_FAKELEX_FLAGS: ) ^&^ PAD_FAKELEX_MULTI
+                $fake .= ':' . $padname->PARENT_PAD_INDEX: 
+                    if ($curcv->CvFLAGS: ) ^&^ CVf_ANON
                 %h{+targarglife} = "%h{?targarg}:FAKE:$fake"
             else
                 my $intro = $padname->COP_SEQ_RANGE_LOW - $cop_seq_base
@@ -765,14 +764,14 @@ sub concise_op($op, $level, $format)
     %h{+arg} = ""
     %h{+svclass} = %h{+svaddr} = %h{+svval} = ""
     if (%h{?class} eq "PMOP")
-        my $precomp = $op->precomp
+        my $precomp = $op->precomp: 
         if (defined $precomp)
             $precomp = cstring: $precomp # Escape literal control sequences
             $precomp = "/$precomp/"
         else
             $precomp = ""
 
-        my $pmreplroot = $op->pmreplroot
+        my $pmreplroot = $op->pmreplroot: 
         my $pmreplstart
         if ((ref: $pmreplroot) eq "B::GV")
             # with C<@stash_array = split(/pat/, str);>,
@@ -782,9 +781,9 @@ sub concise_op($op, $level, $format)
             # same as the last case, except the value is actually a
             # pad offset for where the GV is kept (this happens under
             # ithreads)
-            my $gv = ( <( <$curcv->PADLIST->ARRAY)[[1]]->ARRAY)[[$pmreplroot]]
-            %h{+arg} = "($precomp => \@" . $gv->NAME . ")"
-        elsif ($op->pmreplstart->$)
+            my $gv = ( <(($curcv->PADLIST: )->ARRAY: )[[1]]->ARRAY: )[$pmreplroot]
+            %h{+arg} = "($precomp => \@" . ($gv->NAME: ) . ")"
+        elsif (($op->pmreplstart: )->$)
             undef $lastnext
             $pmreplstart = "replstart->" . seq: $op->pmreplstart
             %h{+arg} = "(" . (join: " ", (@:  $precomp, $pmreplstart)) . ")"
@@ -792,18 +791,18 @@ sub concise_op($op, $level, $format)
             %h{+arg} = "($precomp)"
 
     elsif (%h{?class} eq "PVOP" and %h{?name} ne "trans")
-        %h{+arg} = '("' . $op->pv . '")'
-        %h{+svval} = '"' . $op->pv . '"'
+        %h{+arg} = '("' . ($op->pv: ) . '")'
+        %h{+svval} = '"' . ($op->pv: ) . '"'
     elsif (%h{?class} eq "COP")
-        my $label = $op->label
+        my $label = $op->label: 
         %h{+coplabel} = $label
         $label = $label ?? "$label: " !! ""
-        my $loc = $op->location ?? $op->location[0] !! '<unknown>'
+        my $loc = ($op->location: ) ?? ($op->location: )[0] !! '<unknown>'
         my $pathnm = $loc
         $loc =~ s[.*/][]
-        my $ln = $op->location ?? $op->location[1] !! '-1'
+        my $ln = ($op->location: ) ?? ($op->location: )[1] !! '-1'
         $loc .= ":$ln"
-        my(@: $stash, $cseq) = @: $op->stash->NAME, $op->cop_seq - $cop_seq_base
+        my(@: $stash, $cseq) = @:( ($op->stash: )->NAME: ), ($op->cop_seq: ) - $cop_seq_base
         %h{+arg} = "($label$stash $cseq $loc)"
         if ($show_src)
             fill_srclines: $pathnm unless exists %srclines{$pathnm}
@@ -817,8 +816,8 @@ sub concise_op($op, $level, $format)
         undef $lastnext
         %h{+arg} = "(other->" . (seq: $op->other) . ")"
     elsif (%h{?class} eq "SVOP" or %h{?class} eq "PADOP")
-        unless (%h{?name} eq 'aelemfast' and $op->flags ^&^ OPf_SPECIAL)
-            my $idx = (%h{?class} eq "SVOP") ?? $op->targ !! $op->padix
+        unless (%h{?name} eq 'aelemfast' and ($op->flags: ) ^&^ OPf_SPECIAL)
+            my $idx = (%h{?class} eq "SVOP") ?? ($op->targ: ) !! $op->padix: 
             my $preferpv = %h{?name} eq "method_named"
             if (%h{?class} eq "PADOP" or !$op->sv->$)
                 my $sv = $curcv->PADLIST->ARRAY[1]->ARRAY[$idx]
@@ -831,7 +830,7 @@ sub concise_op($op, $level, $format)
 
     %h{+seq} = %h{+hyphseq} = seq: $op
     %h{+seq} = "" if %h{?seq} eq "-"
-    %h{+opt} = $op->opt
+    %h{+opt} = $op->opt: 
     %h{+label} = %labels{?$op->$}
     %h{+next} = $op->next
     %h{+next} = ((class: %h{?next}) eq "NULL") ?? "(end)" !! seq: %h{?next}
@@ -907,7 +906,7 @@ sub tree
         return $name . "\n"
 
     my @lines
-    my $kid = $op->first
+    my $kid = $op->first: 
     while ($kid->$)
         push: @lines, < tree: $kid, $level+1
         $kid = $kid->sibling

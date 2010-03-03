@@ -27,7 +27,7 @@ sub walk_output # updates $walkHandle
 
 
 sub shownamearray($name, $av)
-    my @els = $av->ARRAY
+    my @els = $av->ARRAY: 
     my $count = (nelems @els)
     print: $walkHandle, "$name has $count entries\n"
     for my $i (B::PAD_NAME_START_INDEX .. $count -1)
@@ -42,7 +42,7 @@ sub shownamearray($name, $av)
 
 
 sub showvaluearray($name, $av)
-    my @els = $av->ARRAY
+    my @els = $av->ARRAY: 
     my $count = (nelems @els)
     print: $walkHandle, "$name has $count entries\n"
     for my $i (0 .. $count -1 )
@@ -59,8 +59,8 @@ sub showlex($objname, $namesav, $valsav)
 my ($newlex, $nosp1) # rendering state vars
 
 sub newlex($objname, $names, $vals)
-    my @names = $names->ARRAY
-    my @vals  = $vals->ARRAY
+    my @names = $names->ARRAY: 
+    my @vals  = $vals->ARRAY: 
     my $count = (nelems @names)
     print: $walkHandle, "$objname Pad has $count entries\n"
     printf: $walkHandle, "0: \%s\n", @names[0]->terse unless $nosp1
@@ -77,8 +77,8 @@ sub showlex_obj($objname, $obj)
 
 
 sub showlex_main
-    showlex: "comppadlist", < (comppadlist: )->ARRAY	if !$newlex
-    newlex: "main", < (comppadlist: )->ARRAY		if  $newlex
+    showlex: "comppadlist", < (comppadlist: )->ARRAY    if !$newlex
+    newlex: "main", < (comppadlist: )->ARRAY            if  $newlex
 
 
 sub compile

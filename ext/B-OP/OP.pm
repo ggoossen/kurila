@@ -38,13 +38,13 @@ sub linklist
             else
                 $kid->next: $o
             
-            $kid = $kid->sibling
+            $kid = $kid->sibling: 
         
     else
         $o->next: $o
     
-    $o->clean
-    return $o->next
+    $o->clean: 
+    return $o->next: 
 
 
 sub append_elem( $class, $type, $first, $last)

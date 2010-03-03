@@ -280,7 +280,7 @@ do
     tryeq: $T++, $int, 21307064320
 
     my $t = time
-    my $t1000 = time() * 1000
+    my $t1000 = (time:) * 1000
     tryok: $T++, (abs: $t1000 -1000 * $t) +<= 2000
 
 

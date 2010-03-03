@@ -108,7 +108,7 @@ sub new
 sub muse
     my $self = shift
     if($self->verbose)
-        print: $^STDOUT, 'T+', (int: time() - $self->{?'_batch_start_time'}), "s: ", < @_, "\n"
+        print: $^STDOUT, 'T+', (int: (time:) - $self->{?'_batch_start_time'}), "s: ", < @_, "\n"
     
     return 1
 
@@ -117,7 +117,7 @@ sub muse
 
 sub batch_convert($self, $dirs, $outdir)
     $self ||= __PACKAGE__ # tolerate being called as an optionless function
-    $self = $self->new unless ref $self # tolerate being used as a class method
+    $self = ($self->new: ) unless ref $self # tolerate being used as a class method
 
     if(ref $dirs) {
     # OK, it's an explicit set of dirs to scan, specified as an arrayref.
@@ -132,7 +132,7 @@ sub batch_convert($self, $dirs, $outdir)
         $dirs = \ grep: { (length: $_) }, split: qr/$ps/, $dirs
     
 
-    $outdir = $self->filespecsys->curdir
+    $outdir = ($self->filespecsys: )->curdir: 
         unless defined $outdir and length $outdir
 
     $self->_batch_convert_main: $dirs, $outdir
@@ -144,7 +144,7 @@ sub _batch_convert_main($self, $dirs, $outdir)
     # $dirs is either false, or an arrayref.
     # $outdir is a pathspec.
 
-    $self->{+'_batch_start_time'} ||= time()
+    $self->{+'_batch_start_time'} ||= (time: )
 
     $self->muse:  "= ", (scalar: localtime) 
     $self->muse:  "Starting batch conversion to \"$outdir\"" 
@@ -229,7 +229,7 @@ sub _do_one_batch_conversion($self, $module, $mod2path, $outdir, ?$outfile)
         $self->filespecsys->catfile:  $outdir, < @n 
     
 
-    my $progress = $self->progress
+    my $progress = $self->progress: 
 
     my $page = $self->html_render_class->new
     if((DEBUG: )+> 5)
@@ -302,7 +302,7 @@ sub write_contents_file($self, $outdir)
 
     my(@: $toplevel           # maps  toplevelbit => [all submodules]
           $toplevel_form_freq # ends up being  'foo' => 'Foo'
-        ) =  $self->_prep_contents_breakdown
+        ) =  $self->_prep_contents_breakdown: 
 
     my $Contents = try { ($self->_wopen: $outfile) }
     if( $Contents )
@@ -321,7 +321,7 @@ sub write_contents_file($self, $outdir)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 sub _write_contents_start($self, $Contents, $outfile)
-    my $starter = $self->contents_page_start || ''
+    my $starter = ($self->contents_page_start: ) || ''
 
     do
         my $css_wad = $self->_css_wad_to_markup: 1
@@ -383,7 +383,7 @@ sub _write_contents_end($self, $Contents, $outfile)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 sub _prep_contents_breakdown($self)
-    my $contents = $self->_contents
+    my $contents = $self->_contents: 
     my %toplevel # maps  lctoplevelbit => [all submodules]
     my %toplevel_form_freq # ends up being  'foo' => 'Foo'
     # (mapping anycase forms to most freq form)
@@ -415,7 +415,7 @@ sub _prep_contents_breakdown($self)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 sub _contents_filespec($self, $outdir)
-    my $outfile = $self->contents_file
+    my $outfile = $self->contents_file: 
     return unless $outfile
     return $self->filespecsys->catfile:  $outdir, $outfile 
 
@@ -459,7 +459,7 @@ sub batch_mode_page_object_init($self, $page, $module, $infile, $outfile, $depth
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 sub add_header_backlink($self, $page, $module, $infile, $outfile, $depth)
-    return if $self->no_contents_links
+    return if $self->no_contents_links: 
 
     $page->html_header_after_title:  join: '', @:
                                                $page->html_header_after_title || ''
@@ -474,7 +474,7 @@ sub add_header_backlink($self, $page, $module, $infile, $outfile, $depth)
 
 
 sub add_footer_backlink($self, $page, $module, $infile, $outfile, $depth)
-    return if $self->no_contents_links
+    return if $self->no_contents_links: 
 
     $page->html_footer:  join: '', @:
                                    qq[<p class="backlinkbottom"><b><a name="___bottom" href="]
@@ -574,7 +574,7 @@ sub _spray_css($self, $outdir)
     return unless $self->css_flurry
     $self->_gen_css_wad
 
-    my $lol = $self->_css_wad
+    my $lol = $self->_css_wad: 
     foreach my $chunk ( $lol->@)
         my $url = $chunk->[0]
         my $outfile
@@ -601,7 +601,7 @@ sub _spray_css($self, $outdir)
 
 sub _css_wad_to_markup($self, $depth)
 
-    my @css  = ( $self->_css_wad || return '' )->@
+    my @css  = ( ($self->_css_wad: ) || return '' )->@
     return '' unless (nelems @css)
 
     my $rel = 'stylesheet'
@@ -636,7 +636,7 @@ sub _maybe_uplink($self, $url, $uplink)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 sub _gen_css_wad
     my $self = @_[0]
-    my $css_template = $self->_css_template
+    my $css_template = $self->_css_template: 
     foreach my $variation (
 
         # Commented out for sake of concision:
@@ -731,7 +731,7 @@ sub _spray_javascript($self, $outdir)
     return unless $self->javascript_flurry
     $self->_gen_javascript_wad
 
-    my $lol = $self->_javascript_wad
+    my $lol = $self->_javascript_wad: 
     foreach my $script ( $lol->@)
         my $url = $script->[0]
         my $outfile
@@ -764,7 +764,7 @@ sub _gen_javascript_wad
 
 sub _javascript_wad_to_markup($self, $depth)
 
-    my @scripts  = ( $self->_javascript_wad || return '' )->@
+    my @scripts  = ( ($self->_javascript_wad: ) || return '' )->@
     return '' unless (nelems @scripts)
 
     my $out = ''

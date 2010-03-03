@@ -440,13 +440,13 @@ sub _create_runperl # Create the string to qx in runperl().
         %args{+stdin} =~ s/\r/\\r/g
 
         if ($is_mswin || $is_netware || $is_vms)
-            $runperl = qq{$^EXECUTABLE_NAME -e "print \\\$^STDOUT, qq(} .
+            $runperl = qq{$^EXECUTABLE_NAME -e "print: \\\$^STDOUT, qq(} .
                 %args{?stdin} . q{)" | } . $runperl
         elsif ($is_macos)
             # MacOS can only do two processes under MPW at once;
             # the test itself is one; we can't do two more, so
             # write to temp file
-            my $stdin = qq{$^EXECUTABLE_NAME -e 'print \$^STDOUT, qq(} . %args{?stdin} . qq{)' > teststdin; }
+            my $stdin = qq{$^EXECUTABLE_NAME -e 'print: \$^STDOUT, qq(} . %args{?stdin} . qq{)' > teststdin; }
             if (%args{?verbose})
                 my $stdindisplay = $stdin
                 $stdindisplay =~ s/\n/\n\#/g
@@ -455,7 +455,7 @@ sub _create_runperl # Create the string to qx in runperl().
             `$stdin`
             $runperl .= q{ < teststdin }
         else
-            $runperl = qq{$^EXECUTABLE_NAME -e 'print \$^STDOUT, qq(} .
+            $runperl = qq{$^EXECUTABLE_NAME -e 'print: \$^STDOUT, qq(} .
                 %args{?stdin} . q{)' | } . $runperl
     if (defined %args{?args})
         _quote_args: \$runperl, %args{?args}
@@ -558,7 +558,7 @@ sub tempfile()
         loop
             $try .= @letters[$temp % 26]
             $temp = int: $temp / 26
-            while $temp
+        while $temp
         # Need to note all the file names we allocated, as a second request may
         # come before the first is created.
         if (!-e $try && !%tmpfiles{?$try})
@@ -567,7 +567,7 @@ sub tempfile()
             return $try
 
         $count = $count + 1
-        while ($count +< 26 * 26)
+    while ($count +< 26 * 26)
     die: "Can't find temporary file name starting 'tmp$^PID'"
 
 # This is the temporary file for _fresh_perl
@@ -623,7 +623,7 @@ sub _fresh_perl
 
 
     my $pass = $resolve <: $results
-    unless ($pass)
+    unless ($pass or $TODO)
         _diag: "# PROG: \n$prog\n"
         _diag: "# EXPECTED:\n",( $resolve->& <: ), "\n"
         _diag: "# GOT:\n$results\n"
@@ -654,7 +654,8 @@ sub fresh_perl_is($prog, $expected, ?$runperl_args, ?$name)
 
     local $Level = 2
     _fresh_perl: $prog
-                sub (@< @_) { (nelems @_) ?? @_[0] eq $expected !! $expected }
+                 sub (@< @_) 
+                     (nelems @_) ?? @_[0] eq $expected !! $expected
                  $runperl_args, $name
 
 #
@@ -667,9 +668,10 @@ sub fresh_perl_like
     my(@: $prog, $expected, $runperl_args, $name) =  @_
     local $Level = 2
     _fresh_perl: $prog
-                sub (@< @_) { (nelems @_) ??
-                         @_[0] =~ (ref $expected ?? $expected !! m/$expected/) !!
-                         $expected }
+                 sub (@< @_) 
+                     (nelems @_)
+                         ?? @_[0] =~ (ref $expected ?? $expected !! m/$expected/)
+                         !! $expected
                  $runperl_args, $name
 
 
@@ -786,7 +788,7 @@ sub watchdog($timeout)
 
             # Launch watchdog process
             my $watchdog
-                try
+            try
                 local $^WARN_HOOK = sub($err)
                     _diag: "Watchdog warning: $($err->message)"
 
@@ -810,7 +812,7 @@ sub watchdog($timeout)
 
         # Try using fork() to generate a watchdog process
         my $watchdog
-        try { $watchdog = fork() }
+        try { $watchdog = (fork: ) }
         if ((defined: $watchdog))
             if ($watchdog)    # Parent process
                 # Add END block to parent to terminate and

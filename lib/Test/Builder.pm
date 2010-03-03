@@ -62,10 +62,10 @@ singleton, use C<create>.
 
 =cut
 
-my $Test = Test::Builder->new
+my $Test = Test::Builder->new: 
 sub new
     my(@: $class) =@:  shift
-    $Test ||= $class->create
+    $Test ||= $class->create: 
     return $Test
 
 
@@ -131,7 +131,7 @@ sub reset($self)
 
     $self->{+TODO}       = undef
 
-    $self->_dup_stdhandles unless $^COMPILING
+    $self->_dup_stdhandles:  unless $^COMPILING
 
     return
 
@@ -167,7 +167,7 @@ sub plan($self, $cmd, ?$arg)
     
 
     if( $cmd eq 'no_plan' )
-        $self->no_plan
+        $self->no_plan: 
     elsif( $cmd eq 'skip_all' )
         return $self->skip_all: $arg
     elsif( $cmd eq 'tests' )
@@ -315,7 +315,7 @@ sub ok($self, $test, ?$name)
     # store, so we turn it into a boolean.
     $test = $test ?? 1 !! 0
 
-    $self->_plan_check
+    $self->_plan_check: 
 
     lock: $self->{?Curr_Test}
     $self->{+Curr_Test}++
@@ -342,7 +342,7 @@ ERR
     
 
     $out .= "ok"
-    $out .= " $self->{?Curr_Test}" if $self->use_numbers
+    $out .= " $self->{?Curr_Test}" if $self->use_numbers: 
 
     if( defined $name )
         $name =~ s|#|\\#|g     # # in a name can confuse Test::Harness.
@@ -370,7 +370,7 @@ ERR
         my $msg = $todo ?? "Failed (TODO)" !! "Failed"
         $self->_print_diag: "\n" if env::var: 'HARNESS_ACTIVE'
 
-        my(@: _, $file, $line, ...) =  $self->caller
+        my(@: _, $file, $line, ...) =  $self->caller: 
         if( defined $name )
             $self->diag: qq[  $msg test '$name'\n]
             $self->diag: qq[  at $file line $line.\n]
@@ -566,8 +566,8 @@ Works just like Test::More's cmp_ok().
 =cut
 
 
-my %numeric_cmps = %:  < @+: map: { (@: $_, 1) }
-                                      (@:                        ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) 
+my %numeric_cmps = %+: map: { %: $_, 1 }
+                            @: "<",  "<=", ">",  ">=", "==", "!=", "<=>"
 
 sub cmp_ok($self, $got, $type, $expect, ?$name)
 
@@ -575,7 +575,7 @@ sub cmp_ok($self, $got, $type, $expect, ?$name)
     do
         local($^EVAL_ERROR,$^OS_ERROR)  # isolate eval
 
-        my $code = $self->_caller_context
+        my $code = $self->_caller_context: 
 
         # Yes, it has to look like this or 5.4.5 won't see the #line
         # directive.
@@ -670,21 +670,21 @@ Skips the current test, reporting $why.
 sub skip($self, $why)
     $why ||= ''
 
-    $self->_plan_check
+    $self->_plan_check: 
 
     lock: $self->{?Curr_Test}
     $self->{+Curr_Test}++
 
-    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = share: \(%:
-                                                                 'ok'      => 1
-                                                                 actual_ok => 1
-                                                                 name      => ''
-                                                                 type      => 'skip'
-                                                                 reason    => $why
-                                                             )
+    $self->{Test_Results}->[+$self->{?Curr_Test}-1] 
+        = share: \ %:
+                       'ok'      => 1
+                       actual_ok => 1
+                       name      => ''
+                       type      => 'skip'
+                       reason    => $why
 
     my $out = "ok"
-    $out   .= " $self->{?Curr_Test}" if $self->use_numbers
+    $out   .= " $self->{?Curr_Test}" if $self->use_numbers: 
     $out   .= " # skip"
     $out   .= " $why"       if length $why
     $out   .= "\n"
@@ -710,21 +710,20 @@ to
 sub todo_skip($self, $why)
     $why ||= ''
 
-    $self->_plan_check
+    $self->_plan_check: 
 
     lock: $self->{?Curr_Test}
     $self->{+Curr_Test}++
 
-    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = share: \(%:
+    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = share: \ %:
                                                                  'ok'      => 1
                                                                  actual_ok => 0
                                                                  name      => ''
                                                                  type      => 'todo_skip'
                                                                  reason    => $why
-                                                             )
 
     my $out = "not ok"
-    $out   .= " $self->{?Curr_Test}" if $self->use_numbers
+    $out   .= " $self->{?Curr_Test}" if $self->use_numbers: 
     $out   .= " # TODO & SKIP $why\n"
 
     $self->_print: $out
@@ -822,7 +821,6 @@ sub _regex_ok($self, $this, $regex, $cmp, $name)
         $ok = $self->ok:  0, $name 
         $self->diag: "    '$regex' doesn't look much like a regex to me."
         return $ok
-    
 
     do
         my $test = $this =~ m/$usable_regex/ ?? 1 !! 0
@@ -894,7 +892,7 @@ sub is_fh
 
     return try { ($maybe_fh->isa: "IO::Handle") } ||
         # 5.5.4's tied() and can() doesn't like getting undef
-        try { ((tied: $maybe_fh) || '')->can: 'TIEHANDLE') }
+        try { ((tied: $maybe_fh) || '')->can: 'TIEHANDLE' }
 
 
 
@@ -1049,7 +1047,7 @@ Mark Fowler <mark@twoshortplanks.com>
 
 sub diag($self, @< @msgs)
 
-    return if $self->no_diag
+    return if $self->no_diag: 
     return unless (nelems @msgs)
 
     # Prevent printing headers when compiling (i.e. -c)
@@ -1124,7 +1122,7 @@ sub _print($self, @< @msgs)
     my $msg = join: '', @msgs
 
     local $^OUTPUT_FIELD_SEPARATOR = ''
-    my $fh = $self->output
+    my $fh = $self->output: 
 
     # Escape each line after the first with a # so we don't
     # confuse Test::Harness.
@@ -1237,7 +1235,7 @@ my($Testout, $Testerr)
 sub _dup_stdhandles
     my $self = shift
 
-    $self->_open_testhandles
+    $self->_open_testhandles: 
 
     # Set everything to unbuffered else plain prints to STDOUT will
     # come out in the wrong order from our own prints.
@@ -1282,8 +1280,6 @@ sub _plan_check
     unless( $self->{?Have_Plan} )
         local $Level = $Level + 2
         die: "You tried to run a test without a plan"
-    
-
 
 =back
 
@@ -1321,13 +1317,12 @@ sub current_test($self ?= $num)
         if( $num +> nelems $test_results->@ )
             my $start = (nelems $test_results->@) ?? (nelems $test_results->@) !! 0
             for ($start..$num-1)
-                $test_results->[+$_] = share: \(%:
+                $test_results->[+$_] = share: \ %:
                                                   'ok'      => 1
                                                   actual_ok => undef
                                                   reason    => 'incrementing test number'
                                                   type      => 'unknown'
                                                   name      => undef
-                                              )
             
         elsif( $num +< nelems $test_results->@ )
             splice: $test_results->@, $num
@@ -1633,7 +1628,7 @@ FAIL
 
 
 END 
-    $Test->_ending if defined $Test and !$Test->no_ending
+    $Test->_ending:  if defined $Test and !$Test->no_ending: 
 
 
 =head1 EXIT CODES

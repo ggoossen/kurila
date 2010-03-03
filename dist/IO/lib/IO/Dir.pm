@@ -23,12 +23,10 @@ $VERSION = eval $VERSION
 
 sub DIR_UNLINK () { 1 }
 
-sub new
-    (nelems: @_) +>= 1 && (nelems @_) +<= 2 or croak: 'usage: new IO::Dir [DIRNAME]'
-    my $class = shift
+sub new($class, ?$dirname)
     my $dh = (gensym: )
-    if ((nelems @_))
-        IO::Dir::open: $dh, @_[0]
+    if (defined $dirname)
+        IO::Dir::open: $dh, $dirname
             or return undef
     
     bless: $dh, $class

@@ -17,7 +17,7 @@ use IO::File
 
 sub lineno($f)
     my $l
-    $l .= $f->input_line_number
+    $l .= $f->input_line_number: 
     $l
 
 

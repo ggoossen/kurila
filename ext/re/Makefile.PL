@@ -49,7 +49,7 @@ sub MY::c_o
     if ((config_value: "osname") eq 'aix'
           && (config_value: "ccversion") eq '5.0.1.0')
         # Known buggy optimizer.
-        my $cccmd = $self->const_cccmd
+        my $cccmd = $self->const_cccmd: 
         $cccmd =~ s/^CCCMD\s*=\s*//
         $cccmd =~ s/\s\$\(OPTIMIZE\)\s/ /
         $inh .= qq{

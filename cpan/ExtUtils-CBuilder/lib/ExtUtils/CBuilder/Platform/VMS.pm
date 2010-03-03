@@ -127,7 +127,7 @@ sub _liblist_ext($self, $potential_libs,$verbose,$give_libs)
     # a library spec could be resolved via a logical name, we go to some trouble
     # to insure that the copy in the local tree is used, rather than one to
     # which a system-wide logical may point.
-    if ($self->perl_src)
+    if (($self->perl_src: ))
         my($locspec,$type)
         foreach my $lib ( @crtls)
             if ((@: $locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i)

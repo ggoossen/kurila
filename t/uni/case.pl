@@ -17,12 +17,13 @@ sub casetest
     my $ballast = (chr: 0x2672) x 3
     @funcs = @+: map: {my $f = $_;
                           (@: $f
-            sub (@< @_) {my $r =( $f->& <: @_[0] . $ballast); # Add it before
+                              sub (@< @_)
+                                  my $r =( $f->& <: @_[0] . $ballast); # Add it before
                                   $r =~ s/$ballast\z//so # Remove it afterwards
                                       or die: "'@_[0]' to '$r' mangled";
                                   $r; # Result with $ballast removed.
-                              }
-                              )}, @funcs
+                           )}
+                      @funcs
 
     my $file = 'File::Spec'->catfile: ('File::Spec'->catdir: 'File::Spec'->updir
                                                              "lib", "unicore", "To")

@@ -301,17 +301,17 @@ our $BYTES    = 12
 
 our $All = "" ; vec: $All, %Offsets{'all'}, 2 => 3
 
-sub bits
+sub bits(@< @args)
     # called from B::Deparse.pm
 
-    push: @_, 'all' unless @_
+    push: @args, 'all' unless @args
 
     my $mask
     my $catmask 
     my $fatal = 0 
     my $no_fatal = 0 
 
-    foreach my $word ( @_ )
+    foreach my $word ( @args )
         if ($word eq 'FATAL')
             $fatal = 1
             $no_fatal = 0
@@ -325,7 +325,6 @@ sub bits
         
         else
             die: "Unknown warnings category '$word'"
-    
 
     return $mask 
 

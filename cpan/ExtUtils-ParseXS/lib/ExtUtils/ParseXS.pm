@@ -335,8 +335,7 @@ EOF
     $lastline    = $line
     $lastline_no = iohandle::input_line_number: $FH
 
-    :PARAGRAPH
-        while ((fetch_para: ))
+    :PARAGRAPH while (fetch_para: )
         process_para: < %args
     
 
@@ -1095,7 +1094,6 @@ sub merge_section
 
     while (!m/\S/ && nelems @line)
         $_ = shift: @line
-    
 
     while ((defined: $_) && !m/^$BLOCK_re/)
         $in .= "$_\n"
@@ -1106,9 +1104,9 @@ sub merge_section
 
 
 sub process_keyword($pattern)
-    my $kwd( 
+    my $kwd
 
-    (Symbol::fetch_glob: "$($kwd)_handler")->*->& <: )
+    ((Symbol::fetch_glob: "$($kwd)_handler")->*->& <: )
         while $kwd = check_keyword: $pattern 
 
 
@@ -1457,7 +1455,7 @@ sub INCLUDE_handler ()
     ++ %IncludedFiles{+$_} unless m/\|\s*$/ 
 
     # Save the current file context.
-    push: @XSStack, \(%:
+    push: @XSStack, \ %: 
               type            => 'file'
               LastLine        => $lastline
               LastLineNo      => $lastline_no
@@ -1466,7 +1464,6 @@ sub INCLUDE_handler ()
               Filename        => $filename
               Filepathname    => $filepathname
               Handle          => $FH
-        ) 
 
     $FH = (Symbol::gensym: )
 
@@ -1802,21 +1799,21 @@ sub generate_output
             $subexpr =~ s/\$var/$($var)\[ix_$var]/g
             $subexpr =~ s/\n\t/\n\t\t/g
             $expr =~ s/DO_ARRAY_ELEM\n/$subexpr/
-            eval "print \$output_fh, qq\a$expr\a"
+            eval "print: \$output_fh, qq\a$expr\a"
             warn: $^EVAL_ERROR   if  $^EVAL_ERROR
             print: $output_fh, "\t\tSvSETMAGIC(ST(ix_$var));\n" if $do_setmagic
         elsif ($var eq 'RETVAL')
             if ($expr =~ m/^\t\$arg = new/)
                 # We expect that $arg has refcnt 1, so we need to
                 # mortalize it.
-                eval "print \$output_fh, qq\a$expr\a"
+                eval "print: \$output_fh, qq\a$expr\a"
                 warn: $^EVAL_ERROR   if  $^EVAL_ERROR
                 print: $output_fh, "\tsv_2mortal(ST($num));\n"
                 print: $output_fh, "\tSvSETMAGIC(ST($num));\n" if $do_setmagic
             elsif ($expr =~ m/^\s*\$arg\s*=/)
                 # We expect that $arg has refcnt >=1, so we need
                 # to mortalize it!
-                eval "print \$output_fh, qq\a$expr\a"
+                eval "print: \$output_fh, qq\a$expr\a"
                 warn: $^EVAL_ERROR   if  $^EVAL_ERROR
                 print: $output_fh, "\tsv_2mortal(ST(0));\n"
                 print: $output_fh, "\tSvSETMAGIC(ST(0));\n" if $do_setmagic
@@ -1826,22 +1823,20 @@ sub generate_output
                 # coincidence, something like $arg = &sv_undef
                 # works too.
                 print: $output_fh, "\tST(0) = sv_newmortal();\n"
-                eval "print \$output_fh, qq\a$expr\a"
+                eval "print: \$output_fh, qq\a$expr\a"
                 warn: $^EVAL_ERROR   if  $^EVAL_ERROR
             # new mortals don't have set magic
             
         elsif ($do_push)
             print: $output_fh, "\tPUSHs(sv_newmortal());\n"
             $arg = "ST($num)"
-            eval "print \$output_fh, qq\a$expr\a"
+            eval "print: \$output_fh, qq\a$expr\a"
             warn: $^EVAL_ERROR   if  $^EVAL_ERROR
             print: $output_fh, "\tSvSETMAGIC($arg);\n" if $do_setmagic
         elsif ($arg =~ m/^ST\(\d+\)$/)
-            eval "print \$output_fh, qq\a$expr\a"
+            eval "print: \$output_fh, qq\a$expr\a"
             warn: $^EVAL_ERROR   if  $^EVAL_ERROR
             print: $output_fh, "\tSvSETMAGIC($arg);\n" if $do_setmagic
-        
-    
 
 
 sub map_type($type, ?$varname)
@@ -1873,10 +1868,10 @@ sub PUSHED($class, $mode, $fh)
     $mcfile =~ s/\\/\\\\/g
     $SECTION_END_MARKER = qq{#line --- "$mcfile"}
 
-    return bless: \(%: buffer => ''
+    return bless: \ %: buffer => ''
                        fh => $fh
                        line_no => 1
-                   ), $class
+                  $class
 
 
 sub WRITE($self,$buf,$fh)

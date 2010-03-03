@@ -8,7 +8,7 @@ BEGIN
     # so we can compile the thing on non-VMS platforms.
     if( $^OS_NAME eq 'VMS' )
         require VMS::Filespec
-        VMS::Filespec->import
+        VMS::Filespec->import: 
     
 
 
@@ -107,7 +107,7 @@ sub guess_name($self)
         for (@pm)
             s/.pm$//
         if ((nelems @pm) == 1) { ($defpm = @pm[0]) =~ s/.pm$//; }elsif ((nelems @pm))
-            %xs = %:  < @+: map: { s/.xs$//; (@: $_,1) }, (@:  (glob:  <'*.xs')   ## no critic
+            %xs = %:  < @+: map: { s/.xs$//; (@: $_,1) }, (@: glob:  <'*.xs')   ## no critic
             if (keys %xs)
                 foreach my $pm ( @pm)
                     ($defpm = $pm), last if exists %xs{$pm}
@@ -197,7 +197,7 @@ sub find_perl($self, $ver, $names, $dirs, $trace)
         
         foreach my $name ( @snames)
             push: @cand, ($name !~ m![/:>\]]!) ?? < $self->catfile: $dir,$name
-                  !! < $self->fixpath: $name,0
+                      !! < $self->fixpath: $name,0
         
     
     foreach my $name ( @cand)
@@ -350,17 +350,14 @@ must pre-expand the DEST* variables.
 
 =cut
 
-sub init_DEST
-    my $self = shift
+sub init_DEST($self)
 
-        $self->SUPER::init_DEST: 
+    $self->SUPER::init_DEST: 
 
     # Expand DEST variables.
-    foreach my $var ( $self->installvars)
+    foreach my $var ( ($self->installvars: ))
         my $destvar = 'DESTINSTALL'.$var
         $self->{+$destvar} = File::Spec->eliminate_macros: $self->{$destvar}
-    
-
 
 
 =item init_DIRFILESEP
@@ -382,10 +379,9 @@ sub init_DIRFILESEP
 
 =cut
 
-sub init_main
-    my(@: $self) =@:  shift
+sub init_main($self)
 
-        $self->SUPER::init_main: 
+    $self->SUPER::init_main: 
 
     $self->{+DEFINE} ||= ''
     if ($self->{?DEFINE} ne '')
@@ -470,7 +466,7 @@ CODE
 
     $self->{+SHELL}    ||= 'Posix'
 
-        $self->SUPER::init_others: 
+    $self->SUPER::init_others: 
 
     # So we can copy files into directories with less fuss
     $self->{+CP}         = '$(ABSPERLRUN) "-MExtUtils::Command" -e cp'
@@ -539,10 +535,9 @@ MAKEMAKER filepath to VMS style.
 
 =cut
 
-sub init_VERSION
-    my $self = shift
+sub init_VERSION($self)
 
-        $self->SUPER::init_VERSION: 
+    $self->SUPER::init_VERSION
 
     $self->{+DEFINE_VERSION}    = '"$(VERSION_MACRO)=""$(VERSION)"""'
     $self->{+XS_DEFINE_VERSION} = '"$(XS_VERSION_MACRO)=""$(XS_VERSION)"""'
@@ -823,7 +818,7 @@ sub init_dist($self)
     $self->{+SHAR}         ||= 'vms_share'
     $self->{+DIST_DEFAULT} ||= 'zipdist'
 
-        $self->SUPER::init_dist: 
+    $self->SUPER::init_dist
 
     $self->{+DISTVNAME}    = "$self->{?DISTNAME}-$self->{?VERSION_SYM}"
 
@@ -923,7 +918,7 @@ $(BASEEXT).opt : Makefile.PL
     if ($self->{?OBJECT} =~ m/\bBASEEXT\b/ or
         $self->{?OBJECT} =~ m/\b$self->{?BASEEXT}\b/i)
         push: @m, (%Config{?d_vms_case_sensitive_symbols}
-              ?? (uc: $self->{?BASEEXT}) !!'$(BASEEXT)')
+                      ?? (uc: $self->{?BASEEXT}) !!'$(BASEEXT)')
     else  # We don't have a "main" object file, so pull 'em all in
         # Upcase module names if linker is being case-sensitive
         my(@: $upcase) = %Config{?d_vms_case_sensitive_symbols}

@@ -24,13 +24,13 @@ do
     sub new_error2 { return (new_error: ); } $line2 = __LINE__
     my $err = (new_error2: ); $line3 = __LINE__
     is:  (nelems $err->{stack}), 2
-    is: ((join: '**', $err->{stack}[0])), "../lib/error.t**$line2**29**main::new_error**"
-    is: ((join: '**', $err->{stack}[1])), "../lib/error.t**$line3**15**main::new_error2**"
+    is: ((join: '**', $err->{stack}[0])), "../lib/error.t**$line2**30**main::new_error**"
+    is: ((join: '**', $err->{stack}[1])), "../lib/error.t**$line3**16**main::new_error2**"
     is: $err->description, "my message"
     is: $err->stacktrace, <<MSG
 
-    main::new_error called at ../lib/error.t line $line2 character 29.
-    main::new_error2 called at ../lib/error.t line $line3 character 15.
+    main::new_error called at ../lib/error.t line $line2 character 30.
+    main::new_error2 called at ../lib/error.t line $line3 character 16.
 MSG
 
 
@@ -62,7 +62,7 @@ do
     is: ref $err, "error", '$@ is error object'
     is: $err->description, "my die"
     is: $err->stacktrace, <<MSG
- at ../lib/error.t line $line1 character 15.
+ at ../lib/error.t line $line1 character 16.
     (try) called at ../lib/error.t line $line1 character 9.
     (try) called at ../lib/error.t line $line2 character 5.
 MSG
@@ -78,10 +78,10 @@ do
     is: ref $^EVAL_ERROR, "error", '$@ is an error object'
     is: $^EVAL_ERROR->description, "reuse die"
     is: $^EVAL_ERROR->stacktrace, <<MSG
- at ../lib/error.t line $line1 character 15.
+ at ../lib/error.t line $line1 character 16.
     (try) called at ../lib/error.t line $line1 character 9.
     (try) called at ../lib/error.t line $line2 character 5.
-reraised at ../lib/error.t line $($line1+1) character 9.
+reraised at ../lib/error.t line $($line1+1) character 10.
 MSG
 
 
@@ -100,13 +100,13 @@ MSG
 
 # Writing the standard message
 do
-    fresh_perl_is: "die 'foobar'"
+    fresh_perl_is: "die: 'foobar'"
                    'foobar at - line 1 character 1.'
 
 
 # Compilation error
 do
-    fresh_perl_is: 'BEGIN { die "foobar" }', <<MSG 
+    fresh_perl_is: 'BEGIN { die: "foobar" }', <<MSG 
 foobar at - line 1 character 9.
     BEGIN called at - line 1 character 1.
 MSG

@@ -202,7 +202,7 @@ is: ($t->replace_manpage_separator: 'Foo/Bar'),'Foo::Bar','manpage_separator'
 
 ###############################################################################
 
-$t->init_linker
+$t->init_linker: 
 foreach (qw/ EXPORT_LIST PERL_ARCHIVE PERL_ARCHIVE_AFTER /)
     ok:  exists $t->{$_}, "$_ was defined" 
     is:  $t->{$_}, '', "$_ is empty on Unix"

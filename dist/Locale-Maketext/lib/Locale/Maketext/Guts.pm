@@ -142,7 +142,7 @@ sub _compile
                         #  the right package, and that seems just not worth the bother,
                         #  unless someone convinces me otherwise.
 
-                        push: @code, ' @_[0]->' . $m . '('
+                        push: @code, ' ( @_[0]->' . $m . ':'
                     else
                         # TODO: implement something?  or just too icky to consider?
                         $target->_die_pointing: 
@@ -231,17 +231,17 @@ sub _compile
     die: "Last chunk isn't null??" if (nelems @c) and length @c[-1] # sanity
     print: $^STDOUT, (scalar: nelems @c), " chunks under closure\n" if DEBUG: 
     if((nelems @code) == 0) # not possible?
-        print: $^STDOUT, "Empty code\n" if DEBUG: 
+        print: $^STDOUT, "Empty code\n" if DEBUG:
         return \''
     elsif((nelems @code) +> 1) # most cases, presumably!
-        unshift: @code, "join '',@(:\n"
+        unshift: @code, "join: '',@(:\n"
 
     unshift: @code, "sub \{\n"
     push: @code, ")\}\n"
 
-    print: $^STDOUT, < @code if DEBUG: 
+    print: $^STDOUT, < @code if DEBUG:
     my $sub = eval: (join: '', @code)
-    die: "$($^EVAL_ERROR->message) while evalling" . (join: '', @code) if $^EVAL_ERROR # Should be impossible.
+    die: "$(($^EVAL_ERROR->message: )) while evalling" . (join: '', @code) if $^EVAL_ERROR # Should be impossible.
     return $sub
 
 

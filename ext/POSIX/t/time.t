@@ -54,6 +54,6 @@ ok: (clock: ) +>= 0, "...and it returns something >= 0"
 
 :SKIP do
     skip: "No mktime()", 1 if (config_value: 'd_mktime') ne 'define'
-    my $time = time()
+    my $time = time:
     is: (mktime: (localtime: $time)), $time, "mktime()"
 

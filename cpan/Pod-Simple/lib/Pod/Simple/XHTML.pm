@@ -233,59 +233,59 @@ sub start_item_bullet($self, _) { $self->{'scratch'} = '<li>' }
 sub start_item_number($self, $item) { $self->{'scratch'} = "<li>$item->{'number'}. "  }
 sub start_item_text($self, _)   { $self->{'scratch'} = '<li>'   }
 
-sub start_over_bullet($self, _) { $self->{'scratch'} = '<ul>'; $self->emit }
-sub start_over_text($self, _)   { $self->{'scratch'} = '<ul>'; $self->emit }
-sub start_over_block($self, _)  { $self->{'scratch'} = '<ul>'; $self->emit }
-sub start_over_number($self, _) { $self->{'scratch'} = '<ol>'; $self->emit }
+sub start_over_bullet($self, _) { $self->{'scratch'} = '<ul>'; ($self->emit: ) }
+sub start_over_text($self, _)   { $self->{'scratch'} = '<ul>'; ($self->emit: ) }
+sub start_over_block($self, _)  { $self->{'scratch'} = '<ul>'; ($self->emit: ) }
+sub start_over_number($self, _) { $self->{'scratch'} = '<ol>'; ($self->emit: ) }
 
-sub end_over_bullet($self) { $self->{'scratch'} .= '</ul>'; $self->emit }
-sub end_over_text($self)   { $self->{'scratch'} .= '</ul>'; $self->emit }
-sub end_over_block($self)  { $self->{'scratch'} .= '</ul>'; $self->emit }
-sub end_over_number($self) { $self->{'scratch'} .= '</ol>'; $self->emit }
+sub end_over_bullet($self) { $self->{'scratch'} .= '</ul>'; ($self->emit: ) }
+sub end_over_text($self)   { $self->{'scratch'} .= '</ul>'; ($self->emit: ) }
+sub end_over_block($self)  { $self->{'scratch'} .= '</ul>'; ($self->emit: ) }
+sub end_over_number($self) { $self->{'scratch'} .= '</ol>'; ($self->emit: ) }
 
 # . . . . . Now the actual formatters:
 
-sub end_Para($self)     { $self->{'scratch'} .= '</p>'; $self->emit }
+sub end_Para($self)     { $self->{'scratch'} .= '</p>'; ($self->emit: ) }
 sub end_Verbatim($self)
     $self->{'scratch'}     .= '</code></pre>'
     $self->{+'in_verbatim'}  = 0
-    $self->emit
+    $self->emit: 
 
-sub end_head1($self)       { $self->{'scratch'} .= '</h1>'; $self->emit }
-sub end_head2($self)       { $self->{'scratch'} .= '</h2>'; $self->emit }
-sub end_head3($self)       { $self->{'scratch'} .= '</h3>'; $self->emit }
-sub end_head4($self)       { $self->{'scratch'} .= '</h4>'; $self->emit }
+sub end_head1($self)       { $self->{'scratch'} .= '</h1>'; ($self->emit: ) }
+sub end_head2($self)       { $self->{'scratch'} .= '</h2>'; ($self->emit: ) }
+sub end_head3($self)       { $self->{'scratch'} .= '</h3>'; ($self->emit: ) }
+sub end_head4($self)       { $self->{'scratch'} .= '</h4>'; ($self->emit: ) }
 
-sub end_item_bullet($self) { $self->{'scratch'} .= '</li>'; $self->emit }
-sub end_item_number($self) { $self->{'scratch'} .= '</li>'; $self->emit }
-sub end_item_text($self)   { $self->emit }
+sub end_item_bullet($self) { $self->{'scratch'} .= '</li>'; ($self->emit: ) }
+sub end_item_number($self) { $self->{'scratch'} .= '</li>'; ($self->emit: ) }
+sub end_item_text($self)   { ($self->emit: ) }
 
 # This handles =begin and =for blocks of all kinds.
 sub start_for($self, $flags)
   $self->{'scratch'} .= '<div'
   $self->{'scratch'} .= ' class="'.$flags->{'target'}.'"' if ($flags->{'target'})
   $self->{'scratch'} .= '>'
-  $self->emit
+  $self->emit: 
 
 sub end_for($self)
   $self->{'scratch'} .= '</div>'
-  $self->emit
+  $self->emit: 
 
 sub start_Document($self, _)
-  if (defined $self->html_header)
-    $self->{'scratch'} .= $self->html_header
-    $self->emit unless $self->html_header eq ""
+  if (defined ($self->html_header: ))
+    $self->{'scratch'} .= $self->html_header: 
+    $self->emit:  unless ($self->html_header: ) eq ""
   else
     my ($doctype, $title, $metatags)
-    $doctype = $self->html_doctype || ''
-    $title = $self->force_title || $self->title || $self->default_title || ''
-    $metatags = $self->html_header_tags || ''
-    if ($self->html_css)
+    $doctype = ($self->html_doctype: ) || ''
+    $title = ($self->force_title: ) || ($self->title: ) || ($self->default_title: ) || ''
+    $metatags = ($self->html_header_tags: ) || ''
+    if (($self->html_css: ))
       $metatags .= "\n<link rel='stylesheet' href='" .
-             $self->html_css . "' type='text/css'>"
-    if ($self->html_javascript)
+             ($self->html_css: ) . "' type='text/css'>"
+    if (($self->html_javascript: ))
       $metatags .= "\n<script type='text/javascript' src='" .
-                    $self->html_javascript . "'></script>"
+                    ($self->html_javascript: ) . "'></script>"
     $self->{'scratch'} .= <<"HTML"
 $doctype
 <html>
@@ -295,15 +295,15 @@ $metatags
 </head>
 <body>
 HTML
-    $self->emit
+    $self->emit: 
 
 sub end_Document($self)
-  if (defined $self->html_footer)
-    $self->{'scratch'} .= $self->html_footer
-    $self->emit unless $self->html_footer eq ""
+  if (defined ($self->html_footer: ))
+    $self->{'scratch'} .= $self->html_footer: 
+    $self->emit:  unless ($self->html_footer: ) eq ""
   else
     $self->{'scratch'} .= "</body>\n</html>"
-    $self->emit
+    $self->emit: 
 
 # Handling code tags
 sub start_B($self, _) { $self->{'scratch'} .= '<b>' }
@@ -324,12 +324,12 @@ sub end_I($self)   { $self->{'scratch'} .= '</i>' }
 sub start_L($self, $flags)
     my $url
     if ($flags->{'type'} eq 'url')
-      $url = $flags->{'to'}->as_string
+      $url = $flags->{'to'}->as_string: 
     elsif ($flags->{'type'} eq 'pod')
-      $url .= $self->perldoc_url_prefix || ''
-      $url .= $flags->{'to'}->as_string || ''
-      $url .= '/' . $flags->{'section'}->as_string if ($flags->{?'section'})
-      $url .= $self->perldoc_url_postfix || ''
+      $url .= ($self->perldoc_url_prefix: ) || ''
+      $url .= ($flags->{'to'}->as_string: ) || ''
+      $url .= '/' . ($flags->{'section'}->as_string: ) if ($flags->{?'section'})
+      $url .= ($self->perldoc_url_postfix: ) || ''
 #    require Data::Dumper
 #    print STDERR Data::Dumper->Dump([$flags])
 

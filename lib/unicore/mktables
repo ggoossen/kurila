@@ -142,7 +142,7 @@ else
 
 foreach my $lib ((@: 'To', 'lib'
                      < (map: { (File::Spec->catdir: "lib",$_)}
-                                 qw(gc_sc dt bc hst ea jt lb nt ccc))))
+                             qw(gc_sc dt bc hst ea jt lb nt ccc))))
     next if -d $lib
     mkdir: $lib, 0755 or die: "mkdir '$lib': $^OS_ERROR"
 
@@ -413,7 +413,7 @@ sub Table::Extend
     my $Table = shift #self
     my $codepoint = shift
 
-    my $PrevMax = $Table->Max
+    my $PrevMax = $Table->Max: 
 
     die: "oops ($codepoint <= $PrevMax)" if $codepoint +<= $PrevMax
 
@@ -526,9 +526,8 @@ sub Table::Invert
 ##
 ## Can be called as either a constructor or a method.
 ##
-sub Table::Merge
-    shift: @_ if not ref @_[0] ## if called as a constructor, lose the class
-    my @Tables = @_
+sub Table::Merge(@< @Tables)
+    (shift: @Tables) if not ref @Tables[0] ## if called as a constructor, lose the class
 
     ## Accumulate all records from all tables
     my @Records
@@ -824,28 +823,28 @@ sub UnicodeData_Txt()
 
         my $MajorCat = substr: $cat, 0, 1 ## L, M, Z, S, etc
 
-         $Assigned->?$op: $code
-         $Name->?$op: $code, $name
-         $General->?$op: $code, $cat
+        $Assigned->?$op: $code
+        $Name->?$op: $code, $name
+        $General->?$op: $code, $cat
 
         ## add to the sub category (e.g. "Lu", "Nd", "Cf", ..)
         %Cat{+$cat}      ||= Table->New: Is   => $cat
                                          Desc => "General Category '$cat'"
                                          Fuzzy => 0
-         %Cat{?$cat}->?$op: $code
+        %Cat{?$cat}->?$op: $code
 
         ## add to the major category (e.g. "L", "N", "C", ...)
         %Cat{+$MajorCat} ||= Table->New: Is => $MajorCat
                                          Desc => "Major Category '$MajorCat'"
                                          Fuzzy => 0
-         %Cat{?$MajorCat}->?$op: $code
+        %Cat{?$MajorCat}->?$op: $code
 
-         (%General{+$name} ||= Table->New)->?$op: $code, $name
+        (%General{+$name} ||= (Table->New: ))->?$op: $code, $name
 
         # 005F: SPACING UNDERSCORE
-         %Cat{?Word}->?$op: $code  if $cat =~ m/^[LMN]|Pc/
-         %Cat{?Alnum}->?$op: $code if $cat =~ m/^[LM]|Nd/
-         %Cat{?Alpha}->?$op: $code if $cat =~ m/^[LM]/
+        %Cat{?Word}->?$op: $code  if $cat =~ m/^[LMN]|Pc/
+        %Cat{?Alnum}->?$op: $code if $cat =~ m/^[LM]|Nd/
+        %Cat{?Alpha}->?$op: $code if $cat =~ m/^[LM]/
 
         my $isspace =
             ($cat =~ m/Zs|Zl|Zp/ &&
@@ -862,20 +861,20 @@ sub UnicodeData_Txt()
             || $code == 0x0085  # 0085: NEL
 
 
-         %Cat{?Space}->?$op: $code if $isspace
+        %Cat{?Space}->?$op: $code if $isspace
 
-         %Cat{?SpacePerl}->?$op: $code if $isspace
-          && $code != 0x000B # Backward compat.
+        %Cat{?SpacePerl}->?$op: $code if $isspace
+           && $code != 0x000B # Backward compat.
 
-         %Cat{VertSpace}->?$op: $code if grep: {$code == $_} ,
-                                                  @: < 0x0A..0x0D,0x85,0x2028,0x2029
+        %Cat{VertSpace}->?$op: $code if grep: {$code == $_} ,
+                                                    @: < 0x0A..0x0D,0x85,0x2028,0x2029
 
-         %Cat{HorizSpace}->?$op: $code if grep: {$code == $_}, @:
-                                                     0x09,   0x20,   0xa0,   0x1680, 0x180e, 0x2000, 0x2001, 0x2002
-                                                     0x2003, 0x2004, 0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200a
-                                                     0x202f, 0x205f, 0x3000
+        %Cat{HorizSpace}->?$op: $code if grep: {$code == $_}, @:
+                                                       0x09,   0x20,   0xa0,   0x1680, 0x180e, 0x2000, 0x2001, 0x2002
+                                                       0x2003, 0x2004, 0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200a
+                                                       0x202f, 0x205f, 0x3000
 
-         %Cat{?Blank}->?$op: $code if $isspace
+        %Cat{?Blank}->?$op: $code if $isspace
           && !($code == 0x000A ||
              $code == 0x000B ||
              $code == 0x000C ||
@@ -883,18 +882,18 @@ sub UnicodeData_Txt()
              $code == 0x0085 ||
              $cat =~ m/^Z[lp]/)
 
-         %Cat{?Digit}->?$op: $code if $cat eq "Nd"
-         %Cat{?Upper}->?$op: $code if $cat eq "Lu"
-         %Cat{?Lower}->?$op: $code if $cat eq "Ll"
-         %Cat{?Title}->?$op: $code if $cat eq "Lt"
-         %Cat{?ASCII}->?$op: $code if $code +<= 0x007F
-         %Cat{?Cntrl}->?$op: $code if $cat =~ m/^C/
+        %Cat{?Digit}->?$op: $code if $cat eq "Nd"
+        %Cat{?Upper}->?$op: $code if $cat eq "Lu"
+        %Cat{?Lower}->?$op: $code if $cat eq "Ll"
+        %Cat{?Title}->?$op: $code if $cat eq "Lt"
+        %Cat{?ASCII}->?$op: $code if $code +<= 0x007F
+        %Cat{?Cntrl}->?$op: $code if $cat =~ m/^C/
         my $isgraph = !$isspace && $cat !~ m/Cc|Cs|Cn/
-         %Cat{?Graph}->?$op: $code if $isgraph
-         %Cat{?Print}->?$op: $code if $isgraph || $isspace
-         %Cat{?Punct}->?$op: $code if $cat =~ m/^P/
+        %Cat{?Graph}->?$op: $code if $isgraph
+        %Cat{?Print}->?$op: $code if $isgraph || $isspace
+        %Cat{?Punct}->?$op: $code if $cat =~ m/^P/
 
-         %Cat{?XDigit}->?$op: $code if ($code +>= 0x30 && $code +<= 0x39)  ## 0..9
+        %Cat{?XDigit}->?$op: $code if ($code +>= 0x30 && $code +<= 0x39)  ## 0..9
           || ($code +>= 0x41 && $code +<= 0x46)  ## A..F
           || ($code +>= 0x61 && $code +<= 0x66) ## a..f
 
@@ -1054,7 +1053,7 @@ sub UnicodeData_Txt()
     ## Unassigned is the same as 'Cn'
     New_Alias: Is => 'Unassigned', SameAs => 'Cn', Fuzzy => 0
 
-    %Cat{?C}->Replace:  %Cat{?C}->Merge: %Cat{Cn})  ## Now merge in Cn into C
+    %Cat{?C}->Replace:  %Cat{?C}->Merge: %Cat{Cn}  ## Now merge in Cn into C
 
 
     # LC is Ll, Lu, and Lt.
@@ -1317,7 +1316,8 @@ sub HangulSyllableType_txt()
         %HST{+$pv} ||= Table->New: Is => "HangulSyllableType$pv"
         %HST{?$pv}->Append: $first
 
-        if ($last) { %HST{?$pv}->Extend: $last) }
+        if ($last) 
+            %HST{?$pv}->Extend: $last
 
     close $in
 
@@ -2118,13 +2118,13 @@ EOFHEADER
 
     require File::Find
     my @output_files
-    File::Find::find: \(%:
+    File::Find::find: \ %:
                           no_chdir=>1
                           wanted=>sub (@< @_)
                               if (m/\.pl$/)
                                   s!^\./!!
                                   push: @output_files, "$_\n"
-                     ),"."
+                      "."
 
     print: $ofh, sort: @output_files
     print: $ofh, "\n# ", (nelems @input)," input files\n"

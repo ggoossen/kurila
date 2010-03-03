@@ -44,17 +44,14 @@ else
     is: @t[3]->tagname, 'head1'
     is: @t[4]->tagname, 'Document'
 
-    is: @t[0]->attr: 'start_line'), '5'
-    is: @t[1]->attr: 'start_line'), '5'
-
-
+    is: (@t[0]->attr: 'start_line'), '5'
+    is: (@t[1]->attr: 'start_line'), '5'
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @t = pump_it_up: 
     qq{Woowoo\n\n=over\n\n=item *\n\nStuff L<HTML::TokeParser>\n\n}
         . qq{=item *\n\nThings I<like that>\n\n=back\n\n=cut\n\n}
-    
 
 if(
     not:  (is: (nelems:  (grep: { ref $_ and $_->can: 'type' }, @t)) => 16) 
@@ -100,7 +97,7 @@ else
     is: @t[14]->tagname, 'over-bullet'
     is: @t[15]->tagname, 'Document'
 
-    is: @t[4]->attr: "type"), "pod"
+    is: (@t[4]->attr: "type"), "pod"
 
 
 
@@ -175,7 +172,6 @@ do
     ok: @t[4]->tagname, 'Document'
 
 
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 do
@@ -202,7 +198,6 @@ do
     ok: @t[2]->text,    'Lala zaza'
     ok: @t[3]->tagname, 'Para'
     ok: @t[4]->tagname, 'Document'
-
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -243,7 +238,6 @@ do
     ok: @t[4]->tagname, 'Document'
 
 
-
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 do
@@ -272,7 +266,6 @@ do
     ok: @t[3]->tagname, 'Para'
     ok: @t[4]->tagname, 'Document'
     close: $in
-
 
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -305,7 +298,6 @@ do
     close: $in
 
 
-
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 do
@@ -334,9 +326,6 @@ do
     ok: @t[3]->tagname, 'Para'
     ok: @t[4]->tagname, 'Document'
     close: $in
-
-
-
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -127,7 +127,7 @@ sub memEQ_clause($self, $args)
         $checked_at = 1
     
 
-    my $name_param = $self->name_param
+    my $name_param = $self->name_param: 
 
     if ($len +< 3 and defined $checked_at)
         my $check
@@ -345,8 +345,9 @@ sub return_clause($self, $args, $item)
     #      *iv_return = thingy;
     #      return PERL_constant_ISIV;
     $clause
-        .= $self->assign : \(%: indent=>$indent, type=>$type, pre=>$pre, post=>$post
-                                item=>$item), ref $value ?? < $value->@ !! $value
+        .= $self->assign: \ %: indent=>$indent, type=>$type, pre=>$pre, post=>$post
+                               item=>$item
+                          ref $value ?? < $value->@ !! $value
 
     if (defined $macro && $macro ne "" && $macro ne "1")
         ##else
@@ -359,9 +360,9 @@ sub return_clause($self, $args, $item)
         else
             my @default = ref $default ?? $default->@ !! @: $default
             $type = shift @default
-            $clause .= $self->assign : \(%: indent=>$indent, type=>$type, pre=>$pre
-                                            post=>$post, item=>$item), < @default
-        
+            $clause .= $self->assign: \ %: indent=>$indent, type=>$type, pre=>$pre
+                                           post=>$post, item=>$item
+                                      < @default
     
     ##endif
     $clause .= $self->macro_to_endif: $macro
@@ -381,8 +382,8 @@ sub match_clause($self, $args, $item)
         $inner_indent = $indent
     
 
-    $body .= $self->memEQ_clause : \(%: name => $name, checked_at => $offset
-                                        indent => length $indent)
+    $body .= $self->memEQ_clause: \ %: name => $name, checked_at => $offset
+                                       indent => length $indent
     # If we've been presented with an arrayref for $item, then the user string
     # contains in the range 128-255, and we need to check whether it was utf8
     # (or not).
@@ -510,12 +511,11 @@ sub switch_clause($self, $args, $namelen, $items, @< @items)
                                     $items->{[ $best->{?$char}->@]}))
             # warn "You are here";
             if ($do_front_chop)
-                $body .= $self->match_clause : \(%: indent => 2 + length $indent
-                                                    checked_at => \$char), $thisone
+                $body .= $self->match_clause: \(%: indent => 2 + length $indent
+                                                   checked_at => \$char), $thisone
             else
-                $body .= $self->match_clause : \(%: indent => 2 + length $indent
-                                                    checked_at => $offset), $thisone
-            
+                $body .= $self->match_clause: \(%: indent => 2 + length $indent
+                                                   checked_at => $offset), $thisone
         
         $body .= $indent . "  break;\n"
     
@@ -536,7 +536,7 @@ sub C_constant_prefix_param_defintion
 
 
 sub name_param_definition
-    "const char *" . @_[0]->name_param
+    "const char *" . @_[0]->name_param: 
 
 
 sub namelen_param
@@ -544,7 +544,7 @@ sub namelen_param
 
 
 sub namelen_param_definition
-    'size_t ' . @_[0]->namelen_param
+    'size_t ' . @_[0]->namelen_param: 
 
 
 sub C_constant_other_params
@@ -798,11 +798,11 @@ sub C_constant($self, $args, @< @items)
     else
         # We are the top level.
         $body .= "  /* Initially switch on the length of the name.  */\n"
-        $body .= $self->dogfood : \(%: package => $package, subname => $subname
-                                       default_type => $default_type, what => $what
-                                       indent => $indent, breakout => $breakout)
-                                  < @items
-        $body .= '  switch ('.$self->namelen_param.") \{\n"
+        $body .= $self->dogfood: \ %: package => $package, subname => $subname
+                                      default_type => $default_type, what => $what
+                                      indent => $indent, breakout => $breakout
+                                 < @items
+        $body .= '  switch ('.($self->namelen_param: ).") \{\n"
         # Need to group names of the same length
         my @by_length
         foreach ( @items)
@@ -836,12 +836,12 @@ sub C_constant($self, $args, @< @items)
                     $what->{+''} = 1 if $_->{?utf8}
                 
                 $params = $self->params : $what
-                push: @subs, < $self->C_constant : \(%: package=>$package
-                                                        subname=>"$($subname)_$i"
-                                                        default_type => $default_type
-                                                        types => $what, indent => $indent
-                                                        breakout => \@: $i, $items)
-                                                   < @by_length[$i]
+                push: @subs, < $self->C_constant: \ %: package=>$package
+                                                       subname=>"$($subname)_$i"
+                                                       default_type => $default_type
+                                                       types => $what, indent => $indent
+                                                       breakout => \@: $i, $items
+                                                  < @by_length[$i]
                 $body .= "    return $($subname)_$i ("
                     # Eg "aTHX_ "
                     . $self->C_constant_prefix_param: $params

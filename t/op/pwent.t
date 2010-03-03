@@ -3,12 +3,12 @@
 our (%Config, $where)
 
 BEGIN 
-    try {my @n = (@:  getpwuid 0 ); setpwent()}
+    try {my @n = (@:  getpwuid: 0 ); setpwent: }
     if ($^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/(The \w+ function is unimplemented)/)
         print: $^STDOUT, "1..0 # Skip: $1\n"
         exit 0
     
-    try { require Config; Config->import; }
+    try { require Config; (Config->import: ); }
     my $reason
     if (%Config{?'i_pwd'} ne 'define')
         $reason = '%Config{i_pwd} undefined'
@@ -83,7 +83,7 @@ my %seen
 
 print: $^STDOUT, "# where $where\n"
 
-setpwent()
+setpwent: ;
 
 while ( ~< *PW)
     chomp
@@ -133,7 +133,7 @@ while ( ~< *PW)
     $n++
 
 
-endpwent()
+endpwent: ;
 
 print: $^STDOUT, "# max = $max, n = $n, perfect = ", (nelems: keys %perfect), "\n"
 
@@ -167,23 +167,23 @@ print: $^STDOUT, "\n"
 
 my @pw1
 
-setpwent()
+setpwent: ;
 for (1..$max)
-    my $pw = scalar getpwent()
+    my $pw = scalar getpwent: ;
     last unless defined $pw
     push: @pw1, $pw
 
-endpwent()
+endpwent: ;
 
 my @pw2
 
-setpwent()
+setpwent: ;
 for (1..$max)
-    my (@: $pw, ...) = @: getpwent()
+    my (@: $pw, ...) = @: getpwent: ;
     last unless defined $pw
     push: @pw2, $pw
 
-endpwent()
+endpwent: ;
 
 print: $^STDOUT, "not " unless "$((join: ' ',@pw1))" eq "$((join: ' ',@pw2))"
 print: $^STDOUT, "ok ", $tst++, "\n"

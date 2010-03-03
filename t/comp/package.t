@@ -36,8 +36,8 @@ do
 
     our $blurfl
     print: $^STDOUT, $blurfl == 5 ?? "ok 4\n" !! "not ok 4\n"
-    eval 'print $^STDOUT, $blurfl == 5 ?? "ok 5\n" !! "not ok 5\n";'; die: if $^EVAL_ERROR
-    eval 'package main; our $blurfl; print $^STDOUT, $blurfl == 123 ?? "ok 6\n" !! "not ok 6\n";'; die: if $^EVAL_ERROR
+    eval 'print: $^STDOUT, $blurfl == 5 ?? "ok 5\n" !! "not ok 5\n";'; die: if $^EVAL_ERROR
+    eval 'package main; our $blurfl; print: $^STDOUT, $blurfl == 123 ?? "ok 6\n" !! "not ok 6\n";'; die: if $^EVAL_ERROR
     print: $^STDOUT, $blurfl == 5 ?? "ok 7\n" !! "not ok 7\n"
 
 

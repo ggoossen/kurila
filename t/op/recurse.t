@@ -71,8 +71,8 @@ my (@: $x, $y, $z) = @: 18, 12, 6
 is: (takeuchi: $x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1"
 
 do
-    sub get_first1
-        (get_list1: < @_)->[0]
+    sub get_first1(@< @args)
+        (get_list1: < @args)->[0]
     
 
     sub get_list1
@@ -115,7 +115,7 @@ do
         $r = (runperl: 
             nolib => 1
             stderr => 1
-            prog => q{our $d=0; our $e=1; sub c { ++$d; if ($d +> 66000) { $e=0 } else { c(); c() unless $d % 32768 } --$d } c(); exit $e});
+            prog => q{our $d=0; our $e=1; sub c { ++$d; if ($d +> 66000) { $e=0 } else { c:; c: unless $d % 32768 } --$d } c:; exit: $e});
     }
     :SKIP do
         skip: "Out of memory -- increase your data/heap?", 2

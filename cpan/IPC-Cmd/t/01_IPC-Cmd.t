@@ -16,8 +16,8 @@ for (@Funcs +@+ @Meths)
 for (@Funcs)
     can_ok:  __PACKAGE__,    $_ 
 
-my $Have_IPC_Run    = $Class->can_use_ipc_run
-my $Have_IPC_Open3  = $Class->can_use_ipc_open3
+my $Have_IPC_Run    = $Class->can_use_ipc_run: 
+my $Have_IPC_Open3  = $Class->can_use_ipc_open3: 
 
 $IPC::Cmd::VERBOSE  = $IPC::Cmd::VERBOSE = $Verbose
 
@@ -113,8 +113,8 @@ do   ### list of commands and regexes matching output ###
 do   ### list of commands and regexes matching output ###
     my $map = \@:
         # command                                    # output regex
-        \(@:  "$^EXECUTABLE_NAME -e'warn 42'",                          qr/^42 /, )
-        \(@:  \(@: $^EXECUTABLE_NAME, "-e'warn 42'"),                       qr/^42 /, )
+        \(@:  "$^EXECUTABLE_NAME -e'warn: 42'",                          qr/^42 /, )
+        \(@:  \(@: $^EXECUTABLE_NAME, "-e'warn: 42'"),                       qr/^42 /, )
         
 
     diag:  "Running tests that print only to stderr"  if $Verbose

@@ -144,8 +144,8 @@ for (qw(g j k l m n o p q r s t u v w x y z))
 
 %h->del: 'goner1'
 
-my @keys = %h->keys
-my @values = %h->values
+my @keys = %h->keys: 
+my @values = %h->values: 
 
 is:  (nelems: @keys), 30 
 is:  (nelems: @values), 30 

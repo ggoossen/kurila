@@ -58,12 +58,10 @@ my @installed_files =
        '../dummy-install/bin/program'
        "../dummy-install/lib/perl5/$((config_value: 'archname'))/perllocal.pod"
        "../dummy-install/lib/perl5/$((config_value: 'archname'))/auto/Big/Dummy/.packlist"
-    
 
 foreach my $file ( @installed_files)
     ok:  -e $file, "  $file installed" 
     ok:  -r $file, "  $file readable" 
-
 
 
 # nmake outputs its damned logo

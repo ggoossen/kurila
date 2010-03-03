@@ -16,7 +16,7 @@ my $out = Test::Builder::Tester::Tie->new: "STDOUT"
 my $err = Test::Builder::Tester::Tie->new: "STDERR"
 
 # ooooh, use the test suite
-my $t = Test::Builder->new
+my $t = Test::Builder->new: 
 
 # remember the testing outputs
 my $original_output_handle
@@ -44,8 +44,8 @@ sub start_testing
     $err->reset
 
     # remeber that we're testing
-    $testing_num = $t->current_test
-    $t->current_test = 0
+    $testing_num = $t->current_test: 
+    ($t->current_test: ) = 0
 
 
 # each test test is actually two tests.  This is bad and wrong
@@ -63,7 +63,7 @@ sub my_test_test
     (env::var: 'HARNESS_ACTIVE' ) = $original_harness_env
 
     # reset the number of tests
-    $t->current_test = $testing_num
+    ($t->current_test: ) = $testing_num
 
     # check we got the same values
     my $got

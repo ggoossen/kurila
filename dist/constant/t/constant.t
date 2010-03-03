@@ -8,7 +8,7 @@ BEGIN                           # ...and save 'em for later
 END { (print: $^STDERR, < @warnings) }
 
 use Test::More tests => 88
-my $TB = Test::More->builder
+my $TB = Test::More->builder: 
 
 BEGIN { (use_ok: 'constant'); }
 
@@ -109,7 +109,7 @@ is: (nelems: @warnings), 0, "unexpected warning"
 
 ok: 1
 
-my $curr_test = $TB->current_test
+my $curr_test = $TB->current_test: 
 use constant CSCALAR    => \"ok 37\n"
 use constant CHASH      => \%:  foo => "ok 38\n" 
 use constant CARRAY     => \(@:  undef, "ok 39\n" )
@@ -121,7 +121,7 @@ print: $output, (CHASH: )->{?foo}
 print: $output, (CARRAY: )->[1]
 print: $output, (CCODE: )->& <: $curr_test+4
 
-$TB->current_test += 4
+($TB->current_test: ) += 4
 
 eval q{ CCODE->{foo} }
 like: $^EVAL_ERROR->{?description}, qr/^Expected a HASH REF but got a CODE/
@@ -233,7 +233,7 @@ use constant \%:
     RFAM   => \(@:  \ qw( John Jane Sally ) )
     SPIT   => sub (@< @_) { shift }
 
-(is: (nelems: $:(FAMILY: )->@) (THREE: ))
+is: (nelems: $:(FAMILY: )->@), (THREE: )
 is: (nelems: $:(FAMILY: )->@), nelems (RFAM: )->[0]->@
 is: (FAMILY: )->[2], (RFAM: )->[0]->[2]
 is: (AGES: )->{?(FAMILY: )->[1]}, 28

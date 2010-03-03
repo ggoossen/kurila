@@ -205,8 +205,6 @@ sub make_macro
             $macros .= qq{/macro="$key=$val"}
         else
             $macros .= qq{ $key=$val}
-        
-    
 
     return $is_mms ?? "$make$macros $target" !! "$make $target $macros"
 
@@ -221,7 +219,7 @@ touched.
 
 =cut
 
-sub calibrate_mtime
+sub calibrate_mtime()
     (open: my $file, ">", "calibrate_mtime.tmp") || die: $^OS_ERROR
     print: $file, "foo"
     close $file
@@ -306,9 +304,9 @@ sub have_compiler
 
     try {
         require ExtUtils::CBuilder;
-        my $cb = 'ExtUtils::CBuilder'->new;
+        my $cb = ('ExtUtils::CBuilder'->new: );
 
-        $have_compiler = $cb->have_compiler;
+        $have_compiler = ($cb->have_compiler: );
     }
 
     return $have_compiler

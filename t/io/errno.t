@@ -8,7 +8,7 @@ require './test.pl'
 
 plan:  tests => 16 
 
-my $test_prog = 'while(~< *ARGV){print $^STDOUT, $_}; print $^STDOUT, $^OS_ERROR'
+my $test_prog = 'while(~< *ARGV){print: $^STDOUT, $_}; print: $^STDOUT, $^OS_ERROR'
 
 for my $perlio (@: 'perlio', 'stdio')
     (env::var: 'PERLIO') = $perlio

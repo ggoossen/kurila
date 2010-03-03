@@ -58,14 +58,12 @@ unless (defined $listen)
                 $PATH = mktemp: "$TMPDIR/sXXXXXXXX"
                 last if $listen = IO::Socket::UNIX->new: Local => $PATH
                                                          Listen => 0
-            
-        
     
     defined $listen or die: "$PATH: $^OS_ERROR"
 
 print: $^STDOUT, "ok 1\n"
 
-if(my $pid = fork())
+if(my $pid = fork: )
 
     my $sock = $listen->accept
 
@@ -76,7 +74,7 @@ if(my $pid = fork())
 
         print: $sock, "ok 4\n"
 
-        $sock->close
+        $sock->close: 
 
         waitpid: $pid,0
         (unlink: $PATH) || $^OS_NAME eq 'os2' || warn: "Can't unlink $PATH: $^OS_ERROR"
@@ -96,7 +94,7 @@ elsif(defined $pid)
 
     print: $^STDOUT, $sock->getline
 
-    $sock->close
+    $sock->close: 
 
     exit
 else

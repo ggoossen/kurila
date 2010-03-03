@@ -55,6 +55,6 @@ sub parse_version_string
 do
     is: (parse_version_string: q[ $VERSION = '1.00'; sub version { $VERSION } ])
         '1.00'
-    is: (parse_version_string: q[ use version; $VERSION = version->new("1.2.3") ])
+    is: (parse_version_string: q[ use version; $VERSION = version->new: "1.2.3" ])
         (qv: "1.2.3")->stringify
 

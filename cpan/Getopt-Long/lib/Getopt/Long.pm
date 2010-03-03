@@ -107,7 +107,7 @@ sub import
     # Hide one level and call super.
     local $Exporter::ExportLevel = 1
     push: @syms, < qw(&GetOptions) if (nelems @syms) # always export GetOptions
-     $pkg->SUPER::import: < @syms
+    $pkg->SUPER::import: < @syms
     # And configure.
     Configure: < @config if (nelems @config)
 
@@ -543,25 +543,23 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
                             if $debug
                         my $eval_error = do
                             local $^EVAL_ERROR = undef
-                            try {(
-                                %linkage{?$opt}
-                                                    ->& <: (Getopt::Long::CallBack->new
-                                                                                : name    => $opt
-                                                                                   ctl     => $ctl
-                                                                                   opctl   => \%opctl
-                                                                                   linkage => \%linkage
-                                                                                   prefix  => $prefix
-                                                                                )
-                                                         $ctl->[(CTL_DEST: )] == (CTL_DEST_HASH: )?? ($key) !! ()
-                                                         $arg);
+                            try {
+                                %linkage{?$opt}->& <: Getopt::Long::CallBack->new:
+                                                             name    => $opt
+                                                             ctl     => $ctl
+                                                             opctl   => \%opctl
+                                                             linkage => \%linkage
+                                                             prefix  => $prefix
+                                                      $ctl->[(CTL_DEST: )] == (CTL_DEST_HASH: )?? ($key) !! ()
+                                                      $arg
                             }
                             $^EVAL_ERROR
                         
                         print: $^STDERR, ("=> die($eval_error)\n")
                             if $debug && $eval_error ne ''
                         if ($eval_error)
-                            if ( $eval_error->message =~ m/^!/ )
-                                if ( $eval_error->message =~ m/^!FINISH\b/ )
+                            if ( ($eval_error->message: ) =~ m/^!/ )
+                                if ( ($eval_error->message: ) =~ m/^!FINISH\b/ )
                                     $goon = 0
                             else
                                 warn: $eval_error
@@ -752,7 +750,7 @@ sub ParseOptionSpec($opt, $opctl)
             !! $dest eq '%' ?? (CTL_DEST_HASH: )!! (CTL_DEST_SCALAR: )
         # Fields are hard-wired here.
         $entry = \@: $type,$orig,$def eq '+' ?? undef !! $def
-                         $dest,0,1
+                     $dest,0,1
     else
         my (@: $mand, $type, $dest, ...) =
             @: $spec =~ m/^([=:])([ionfs])([@%])?(\{(\d+)?(,)?(\d+)?\})?$/
@@ -888,7 +886,6 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
                     delete %hit{version}
                 elsif ( $auto_help && (exists: %hit{help}) )
                     delete %hit{help}
-                
             
             # Now see if it really is ambiguous.
             unless ( (keys: %hit) == 1 )
@@ -899,7 +896,6 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
                 return  @: 1, undef
             
             @hits = keys: %hit
-        
 
         # Complete the option name, if appropriate.
         if ( (nelems @hits) == 1 && @hits[0] ne $opt )
@@ -910,7 +906,6 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
         
     elsif ( $ignorecase )
         $tryopt = lc: $opt
-    
 
     # Check validity by fetching the info.
     my $ctl = $opctl->{?$tryopt}
@@ -1275,7 +1270,7 @@ sub VersionMessage(@< @args)
 sub HelpMessage(@args)
     try {
         require Pod::Usage;
-        Pod::Usage->import;
+        (Pod::Usage->import: );
         1;
     } || die: "Cannot provide help: cannot load Pod::Usage\n"
 
@@ -1319,7 +1314,7 @@ sub setup_pa_args($tag, @args)
 # Sneak way to know what version the user requested.
 sub VERSION
     $requested_version = @_[?1]
-     shift->SUPER::VERSION: < @_
+    shift->SUPER::VERSION: < @_
 
 
 package Getopt::Long::CallBack

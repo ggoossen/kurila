@@ -126,9 +126,9 @@ sub validate
             # if it's a "cd" directive...
             if ($this =~ m/^cd\b/)
                 # add "|| die ..."
-                $this .= ' || die "cannot cd to $file\n"'
+                $this .= ' || die: "cannot cd to $file\n"'
                 # expand "cd" directive with directory name
-                $this =~ s/\bcd\b/chdir(\$cwd = '$file')/
+                $this =~ s/\bcd\b/(chdir: (\$cwd = '$file'))/
             else
                 # add "|| warn" as a default disposition
                 $this .= ' || warn' unless $this =~ m/\|\|/
@@ -137,7 +137,7 @@ sub validate
                 # to call valmess instead of die/warn directly
                 # valmess will look up the error message from %Val_Message
                 $this =~ s/ ^ ( (\S+) \s+ \S+ ) \s* \|\| \s* (die|warn) \s* $
-                          /$1 || valmess('$3', '$2', \$file)/x
+                          /$1 || (valmess: '$3', '$2', \$file)/x
             
 
             do
@@ -149,9 +149,7 @@ sub validate
                     if ( $orig_sigwarn )
                         $orig_sigwarn->& <: < @_
                     else
-                        print: $^STDERR, @_[0]->message
-                    
-                
+                        print: $^STDERR, @_[0]->message: 
 
                 # do the test
                 eval $this
@@ -220,7 +218,6 @@ sub valmess($disposition, $test, $file)
         
     else
         $ferror = "Can't do $test $file.\n"
-    
 
     die: "$ferror\n" if $disposition eq 'die'
     warn: "$ferror\n"

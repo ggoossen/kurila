@@ -22,7 +22,7 @@ sub load ($mod, @< @args)
             for my $flag ( qw[1 0] )
                 my $file = _to_file:  $mod, $flag
                 try { require $file }
-                $^EVAL_ERROR ?? ($err .= $^EVAL_ERROR->message) !! last LOAD
+                $^EVAL_ERROR ?? ($err .= ($^EVAL_ERROR->message: )) !! last LOAD
             
             die: $err if $err
         

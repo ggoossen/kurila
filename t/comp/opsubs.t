@@ -34,37 +34,37 @@ can_ok:  'main', "m"
     isnt:  m('unqualified'), "m-unqualified", "m('unqualified') is oper" 
 
 is:  (main::m: 'main'), "m-main", "main::m() is func" 
-is:  ((&m->& < 'amper')), "m-amper", "&m() is func" 
+is:  (&m->& <: 'amper'), "m-amper", "&m() is func" 
 
 # q operator
 can_ok:  'main', "q" 
 isnt:  q('unqualified'), "q-unqualified", "q('unqualified') is oper" 
 is:  (main::q: 'main'), "q-main", "main::q() is func" 
-is:  ((&q->& < 'amper')), "q-amper", "&q() is func" 
+is:  (&q->& <: 'amper'), "q-amper", "&q() is func" 
 
 # qq operator
 can_ok:  'main', "qq" 
 isnt:  qq('unqualified'), "qq-unqualified", "qq('unqualified') is oper" 
 is:  (main::qq: 'main'), "qq-main", "main::qq() is func" 
-is:  ((&qq->& < 'amper')), "qq-amper", "&qq() is func" 
+is:  (&qq->& <: 'amper'), "qq-amper", "&qq() is func" 
 
 # qr operator
 can_ok:  'main', "qr" 
 isnt:  qr('unqualified'), "qr-unqualified", "qr('unqualified') is oper" 
 is:  (main::qr: 'main'), "qr-main", "main::qr() is func" 
-is:  ((&qr->& < 'amper')), "qr-amper", "&qr() is func" 
+is:  (&qr->& <: 'amper'), "qr-amper", "&qr() is func" 
 
 # qx operator
 can_ok:  'main', "qx" 
 is:  (main::qx: 'main'), "qx-main", "main::qx() is func" 
-is:  ((&qx->& < 'amper')), "qx-amper", "&qx() is func" 
+is:  (&qx->& <: 'amper'), "qx-amper", "&qx() is func" 
 
 # s operator
 can_ok:  'main', "s" 
 eval "s('unqualified')"
 like:  $^EVAL_ERROR->{?description}, qr/^statement end found where string delimeter expected/, "s('unqualified') doesn't work" 
 is:  (main::s: 'main'), "s-main", "main::s() is func" 
-is:  ((&s->& < 'amper')), "s-amper", "&s() is func" 
+is:  (&s->& <: 'amper'), "s-amper", "&s() is func" 
 
 =pod
 

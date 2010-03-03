@@ -65,7 +65,7 @@ END
     
 
 
-sub setup_xs
+sub setup_xs()
     (setup_mm_test_root: )
     chdir 'MM_TEST_ROOT:[t]' if $Is_VMS
 
@@ -78,7 +78,6 @@ sub setup_xs
         (open: my $file, ">", $file) || die: "Can't create $file: $^OS_ERROR"
         print: $file, $text
         close $file
-    
 
     return 1
 

@@ -116,7 +116,7 @@ sub version_report
     if($class eq __PACKAGE__)
         return "$class $VERSION"
     else
-        my $v = $class->VERSION
+        my $v = $class->VERSION: 
         return "$class $v (" . __PACKAGE__ . " $VERSION)"
     
 
@@ -143,8 +143,8 @@ sub output_string
     return ($this->{+'output_string'} = @_[0])
 
 
-sub abandon_output_string { @_[0]->abandon_output_fh; delete @_[0]->{'output_string'} }
-sub abandon_output_fh     { @_[0]->output_fh: undef) }
+sub abandon_output_string { @_[0]->abandon_output_fh ; delete @_[0]->{'output_string'} }
+sub abandon_output_fh     { @_[0]->output_fh: undef }
 # These don't delete the string or close the FH -- they just delete our
 #  references to it/them.
 # TODO: document these
@@ -156,11 +156,11 @@ sub new
     my $class = (ref: @_[0]) || @_[0]
     #Carp::croak(__PACKAGE__ . " is a virtual base class -- see perldoc "
     #  . __PACKAGE__ );
-    return bless: \(%:
+    return bless: \ %:
                       'accept_codes'      => \(%:  < @+: (map:  { (@: $_=>$_) }, @Known_formatting_codes ) )
                       'accept_directives' => \(%:  < %Known_directives )
                       'accept_targets'    => \$%
-        ), $class
+                  $class
 
 
 
@@ -674,10 +674,8 @@ sub _remap_sequences
                 else
                     print: $^STDOUT, "   Code $was<> maps to "
                            ref: $is
-                           ?? ( "tags ", < (map:  {"$_<" }, $is->@), '...', < (map:  {'>' }, $is->@), "\n" )
+                               ?? ( "tags ", < (map:  {"$_<" }, $is->@), '...', < (map:  {'>' }, $is->@), "\n" )
                                !! "tag $is<...>.\n"
-                
-            
 
             if(!defined $is)
                 $self->whine: $start_line, "Deleting unknown formatting code $was<>"
@@ -991,17 +989,16 @@ sub _treat_Ls($self,@< @stack)
             # anything after it is part of the url.
             # the url text node itself may contain parts of both.
 
-            if (my @: ?$url_index, ?$text_part, ?$url_part =(
+            if (my @: ?$url_index, ?$text_part, ?$url_part =
                 # grep is no good here; we want to bail out immediately so that we can
                 # use $1, $2, etc. without having to do the match twice.
-                sub 
+                (sub ()
                     for (2..(nelems: $ell->@)-1)
                          next if ref $ell->[$_]
                          next unless $ell->[$_] =~ m/^(?:([^|]*)\|)?(\w+:[^:\s]\S*)$/s
                          return @: $_, $1, $2
                     return $@
-                ->& <: )
-
+                )->& <: 
               )
                 $ell->[1]->{+'type'} = 'url'
 
@@ -1017,9 +1014,8 @@ sub _treat_Ls($self,@< @stack)
  
                 $ell->[1]->{+to} = Pod::Simple::LinkSection->new: 
                     (nelems: @url) == 1
-                    ?? @url[0]
-                    !! \@: '', $%, < @url
-                    
+                        ?? @url[0]
+                        !! \@: '', $%, < @url
 
                 (splice: $ell->@, 2, (nelems: $ell->@)-1, < @text);
 
@@ -1418,7 +1414,7 @@ sub _duo
     my(@out)
 
     while( (nelems @_) )
-        my $parser = $class->new
+        my $parser = $class->new: 
 
         push: @out, ''
         $parser->output_string:  \( @out[-1] ) 

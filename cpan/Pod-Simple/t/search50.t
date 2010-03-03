@@ -32,8 +32,8 @@ $x->callback: sub (@< @args)
 
 print: $^STDOUT, "# \$^INCLUDE_PATH == $((join: ' ',$^INCLUDE_PATH))\n"
 
-my $t = time();   my $name2where = $x->survey
-$t = time() - $t
+my $t = time: ;   my $name2where = $x->survey: 
+$t = (time: ) - $t
 ok: $found
 
 print: $^STDOUT, "# Found $found items in $t seconds!\n# See...\n"

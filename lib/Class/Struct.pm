@@ -106,12 +106,12 @@ sub struct
         
         my $init = "defined(\%init\{?'$name'\}) ?? \%init\{'$name'\} !! "
         if( $type eq '@' )
-            $out .= "    die 'Initializer for $name must be array reference'\n"
+            $out .= "    die: 'Initializer for $name must be array reference'\n"
             $out .= "        if defined(\%init\{?'$name'\}) && ref(\%init\{'$name'\}) ne 'ARRAY';\n"
             $out .= "    \$r->$elem = $init \\\$\@;$cmt\n"
             %arrays{+$name}++
         elsif( $type eq '%' )
-            $out .= "    die 'Initializer for $name must be hash reference'\n"
+            $out .= "    die: 'Initializer for $name must be hash reference'\n"
             $out .= "        if defined(\%init\{?'$name'\}) && ref(\%init\{'$name'\}) ne 'HASH';\n"
             $out .= "    \$r->$elem = $init \\\$\%;$cmt\n"
             %hashes{+$name}++
@@ -119,11 +119,11 @@ sub struct
             $out .= "    \$r->$elem = $init undef;$cmt\n"
         elsif( $type =~ m/^\w+(?:::\w+)*$/ )
             $out .= "    if (defined(\%init\{?'$name'\})) \{\n"
-            $out .= "       if (ref \%init\{'$name'\} eq 'HASH')\n"
-            $out .= "            \{ \$r->$elem = $type->new(\%init\{'$name'\}->\%) \} $cmt\n"
-            $out .= "       elsif (UNIVERSAL::isa(\%init\{'$name'\}, '$type'))\n"
+            $out .= "       if ((ref: \%init\{'$name'\}) eq 'HASH')\n"
+            $out .= "            \{ \$r->$elem = $type->new: \%init\{'$name'\}->\% \} $cmt\n"
+            $out .= "       elsif (UNIVERSAL::isa: \%init\{'$name'\}, '$type')\n"
             $out .= "            \{ \$r->$elem = \%init\{'$name'\} \} $cmt\n"
-            $out .= "       else \{ die 'Initializer for $name must be hash or $type reference' \}\n"
+            $out .= "       else \{ die: 'Initializer for $name must be hash or $type reference' \}\n"
             $out .= "    \}\n"
             %classes{+$name} = $type
             $got_class = 1
@@ -132,7 +132,7 @@ sub struct
         
         $idx += 2
     
-    $out .= "    bless \$r, \$class;\n  \}\n"
+    $out .= "    bless: \$r, \$class;\n  \}\n"
 
     # Create accessor methods.
 
@@ -157,18 +157,18 @@ sub struct
             
             if( defined %arrays{?$name} )
                 $out .= "    my \$i;\n"
-                $out .= "    \@_ ?? (\$i = shift) !! return \$r->$elem;\n"
-                $out .= "    if (ref(\$i) eq 'ARRAY' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n"
+                $out .= "    \@_ ?? (\$i = shift: ) !! return \$r->$elem;\n"
+                $out .= "    if ((ref: \$i) eq 'ARRAY' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n"
                 $sel = "->[+\$i]"
             elsif( defined %hashes{?$name} )
                 $out .= "    my \$i;\n"
-                $out .= "    \@_ ?? (\$i = shift) !! return \$r->$elem;\n"
-                $out .= "    if (ref(\$i) eq 'HASH' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n"
+                $out .= "    \@_ ?? (\$i = shift: ) !! return \$r->$elem;\n"
+                $out .= "    if ((ref: \$i) eq 'HASH' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n"
                 $sel = "->\{+\$i\}"
             elsif( defined %classes{?$name} )
-                $out .= "    die '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\@_[0], '%classes{?$name}');\n"
+                $out .= "    die: '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa: \@_[0], '%classes{?$name}';\n"
             
-            $out .= "    die 'Too many args to $name' if nelems(\@_) +> 1;\n"
+            $out .= "    die: 'Too many args to $name' if (nelems: \@_) +> 1;\n"
             $out .= "    \@_ ?? ($pre\$r->$elem$sel = shift$pst) !! $pre\$r->$elem$sel$pst;\n"
             $out .= "  \}\n"
         
@@ -451,7 +451,7 @@ accessor accordingly.
     sub count {
         my $self = shift;
         if ( @_ ) {
-            die 'count must be nonnegative' if @_[0] < 0;
+            die: 'count must be nonnegative' if @_[0] < 0;
             $self->{'MyObj::count'} = shift;
             warn "Too many args to count" if @_;
         }

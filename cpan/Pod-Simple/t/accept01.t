@@ -19,7 +19,7 @@ print: $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n"
 sub e ($x, $y) { (Pod::Simple::DumpAsXML->_duo: $x, $y) }
 
 my $x = 'Pod::Simple::XMLOutStream'
-sub accept_N { @_[0]->accept_codes: 'N') }
+sub accept_N { @_[0]->accept_codes: 'N' }
 
 print: $^STDOUT, "# Some sanity tests...\n"
 is:  ($x->_out:  "=pod\n\nI like pie.\n") # without acceptor

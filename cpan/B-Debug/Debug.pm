@@ -9,7 +9,7 @@ my %done_gv
 
 sub _printop
     my $op = shift
-    my $addr = $op->$ ?? $op->ppaddr !! ''
+    my $addr = $op->$ ?? ($op->ppaddr: ) !! ''
     $addr =~ s/^PL_ppaddr// if $addr
     return sprintf: "0x\%x \%s \%s", $op->$, $op->$ ?? (class: $op) !! '', $addr
 
@@ -125,7 +125,7 @@ sub B::RV::debug($rv)
     printf: $^STDOUT, <<'EOT', $rv->RV->$
 	RV		0x%x
 EOT
-    $rv->RV->debug
+    ($rv->RV: )->debug: 
 
 
 sub B::PV::debug($sv)
@@ -183,10 +183,10 @@ sub B::CV::debug($sv)
 	OUTSIDE		0x%x
 	OUTSIDE_SEQ	%d
 EOT
-    $start->debug if $start
-    $root->debug if $root
-    $gv->debug if $gv
-    $padlist->debug if $padlist
+    $start->debug:  if $start
+    $root->debug:  if $root
+    $gv->debug:  if $gv
+    $padlist->debug:  if $padlist
 
 
 sub B::AV::debug($av)
@@ -207,7 +207,7 @@ sub B::GV::debug($gv)
     
     my (@: $sv) =  $gv->SV
     my (@: $av) =  $gv->AV
-    my (@: $cv) =  $gv->CV
+    my (@: $cv) =  $gv->CV:
         $gv->B::SV::debug: 
     printf: $^STDOUT, <<'EOT', < $gv->SAFENAME, < $gv->STASH->NAME, < $gv->STASH, $sv->$, < $gv->GvREFCNT, < $gv->FORM, $av->$, $gv->HV->$, $gv->EGV->$, $cv->$, < $gv->CVGEN, < $gv->LINE, < $gv->FILE, < $gv->GvFLAGS
 	NAME		%s
@@ -224,9 +224,9 @@ sub B::GV::debug($gv)
 	FILE		%s
 	GvFLAGS		0x%x
 EOT
-    $sv->debug if $sv
-    $av->debug if $av
-    $cv->debug if $cv
+    $sv->debug:  if $sv
+    $av->debug:  if $av
+    $cv->debug:  if $cv
 
 
 sub B::SPECIAL::debug

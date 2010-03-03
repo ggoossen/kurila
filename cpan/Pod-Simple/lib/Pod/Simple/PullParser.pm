@@ -24,13 +24,13 @@ __PACKAGE__->_accessorize:
 #  And here is how we implement a pull-parser on top of a push-parser...
 
 sub filter($self, $source)
-    $self = $self->new unless ref $self
+    $self = ($self->new: ) unless ref $self
 
     $source = $^STDIN{IO} unless defined $source
     $self->set_source: $source
     $self->output_fh: $^STDOUT{IO}
 
-    $self->run # define run() in a subclass if you want to use filter()!
+    $self->run:  # define run() in a subclass if you want to use filter()!
     return $self
 
 
@@ -143,26 +143,24 @@ sub get_token
                         print: $^STDOUT, "  line \{$l\}\n"
                     else
                         print: $^STDOUT, "  line undef\n"
-                    
                 
                 print: $^STDOUT, "* end of ", (scalar: nelems @lines), " lines\n"
 
-
-             $self->SUPER::parse_lines: < @lines
+            $self->SUPER::parse_lines: < @lines
 
         elsif(exists $self->{'source_arrayref'})
             DEBUG: and print: $^STDOUT, "$self 's source is arrayref $self->{?'source_arrayref'}, with "
                               (scalar: nelems $self->{?'source_arrayref'}->@), " items left in it.\n"
 
             (DEBUG: )+> 3 and print: $^STDOUT, "  Fetching ", (Pod::Simple::MANY_LINES: ), " lines.\n"
-             $self->SUPER::parse_lines: 
+            $self->SUPER::parse_lines: 
                  (splice: $self->{'source_arrayref'}->@
                           0
                           (Pod::Simple::MANY_LINES: ))
                 
             unless( nelems  $self->{?'source_arrayref'}->@ )
                 DEBUG: and print: $^STDOUT, "That's it for that source arrayref!  Killing.\n"
-                 $self->SUPER::parse_lines: undef
+                $self->SUPER::parse_lines: undef
                 delete $self->{'source_arrayref'} # so it can be GC'd
             
         # to make sure that an undef is always sent to signal end-of-stream

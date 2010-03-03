@@ -35,18 +35,17 @@ do
     $^STDOUT = $stdout_fh->*{IO}
     my $warnings = ''
     local $^WARN_HOOK = sub (@< @_)
-        $warnings .= @_[0]->description
+        $warnings .= @_[0]->description: 
 
     my $mm
 
     $warnings = ''
     dies_like: {
-                   $mm = (WriteMakefile: 
+                   $mm = WriteMakefile:
                        NAME            => 'Big::Dummy'
                        VERSION_FROM    => 'lib/Big/Dummy.pm'
                        AUTHOR          => sub {}
-            );
-                   }, qr|AUTHOR takes a PLAINVALUE not a CODE.|
+                  }, qr|AUTHOR takes a PLAINVALUE not a CODE.|
 
     # LIBS accepts *both* a string or an array ref.  The first cut of
     # our verification did not take this into account.
@@ -74,11 +73,10 @@ do
 
     $warnings = ''
     dies_like: {
-                   $mm = (WriteMakefile: 
+                   $mm = WriteMakefile: 
                        NAME            => 'Big::Dummy'
                        VERSION_FROM    => 'lib/Big/Dummy.pm'
                        LIBS            => (%:  wibble => "wobble" )
-            );
                    }, qr{^LIBS takes a ARRAY or PLAINVALUE not a HASH}m 
 
 
@@ -99,10 +97,9 @@ do
     # Test VERSION
     $warnings = ''
     dies_like: {
-                   $mm = (WriteMakefile: 
+                   $mm = WriteMakefile: 
                        NAME       => 'Big::Dummy'
                        VERSION    => \(@: 1,2,3)
-            );
                    }, qr{^VERSION takes a version object or PLAINVALUE} 
 
     $warnings = ''
@@ -128,10 +125,9 @@ do
 
     $warnings = ''
     dies_like: {
-                   $mm = (WriteMakefile: 
+                   $mm = WriteMakefile: 
                        NAME       => 'Big::Dummy'
                        VERSION    => bless: \$%, "Some::Class"
-            );
                    }, qr/^VERSION takes a version object or PLAINVALUE not a REF/ 
 
 

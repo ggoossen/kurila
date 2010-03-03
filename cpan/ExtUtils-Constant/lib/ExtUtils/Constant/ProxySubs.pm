@@ -320,11 +320,9 @@ EOBOOT
                        "        /* This is the default value: */\n" if $type
                 print: $xs_fh, "#else\n"
             
-            print: $xs_fh, "        \{ ", (join: ', ', (@:  "\"$name\"", $namelen
-                                                            <( $type_to_value->& <: $value))), " \},\n"
+            print: $xs_fh, "        \{ ", (join: ', ', (@: "\"$name\"", $namelen
+                                                           <( $type_to_value->& <: $value))), " \},\n"
                    $self->macro_to_endif: $macro
-        
-
 
         # Terminate the list with a NULL
         print: $xs_fh, "        \{ NULL, 0", (", 0" x $number_of_args), " \} \};\n"

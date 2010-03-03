@@ -76,7 +76,7 @@ do
     skip: "open -| busted and noisy on VMS", 3 if $Is_VMS
 
     ok:  (open: my $f, '-|', <<EOC),     'open -|' 
-    $Perl -e "print \\\$^STDOUT, qq(a row\\n); print  \\\$^STDOUT,qq(another row\\n)"
+    $Perl -e "print: \\\$^STDOUT, qq(a row\\n); print:  \\\$^STDOUT,qq(another row\\n)"
 EOC
 
     my @rows = @:  ~< $f 
@@ -88,7 +88,7 @@ EOC
     skip: "Output for |- doesn't go to shell on MacOS", 5 if $Is_MacOS
 
     ok:  (open: my $f, '|-', $Perl . <<'EOC'),     'open |-' 
-    -e 'while (my $_ = ~< $^STDIN) { s/^not //; print $^STDOUT, $_; }'
+    -e 'while (my $_ = ~< $^STDIN) { s/^not //; print: $^STDOUT, $_; }'
 EOC
 
     my @rows = @:  ~< $f 
@@ -169,7 +169,7 @@ do
     skip: "open -| busted and noisy on VMS", 3 if $Is_VMS
 
     ok:  (open: local $f, '-|', <<EOC),  'open local $f, "-|", ...' 
-    $Perl -e "print \\\$^STDOUT, qq(a row\\n); print \\\$^STDOUT, qq(another row\\n)"
+    $Perl -e "print: \\\$^STDOUT, qq(a row\\n); print: \\\$^STDOUT, qq(another row\\n)"
 EOC
     my @rows = @:  ~< $f 
 
@@ -181,7 +181,7 @@ EOC
     skip: "Output for |- doesn't go to shell on MacOS", 5 if $Is_MacOS
 
     ok:  (open: local $f, '|-', $Perl . <<'EOC'),  'open local $f, "|-", ...' 
-    -e 'while (my $_ = ~< $^STDIN) { s/^not //; print $^STDOUT, $_; }'
+    -e 'while (my $_ = ~< $^STDIN) { s/^not //; print: $^STDOUT, $_; }'
 EOC
 
     my @rows = @:  ~< $f 
@@ -203,7 +203,7 @@ like:  $^EVAL_ERROR->message, qr/Bad filehandle:\s+afile/,          '       righ
 
 do
     for (1..2)
-        ok:  (open: my $f, "-|", qq{$Perl -e "print \\\$^STDOUT, 'ok\n'"}), 'open -|'
+        ok:  (open: my $f, "-|", qq{$Perl -e "print: \\\$^STDOUT, 'ok\n'"}), 'open -|'
         is:  scalar ~< $f, "ok\n", '       readline'
         ok:  close $f,            '       close' 
     
@@ -279,7 +279,7 @@ fresh_perl_like: 'open m', qr/^Search pattern not terminated at/
                  \(%:  stderr => 1 ), 'open m test'
 
 fresh_perl_is: 
-    'sub f { open(my $fh, "<", "xxx"); $fh = "f"; } f; f;print $^STDOUT, "ok"'
+    'sub f { open(my $fh, "<", "xxx"); $fh = "f"; } f; f;print: $^STDOUT, "ok"'
     'ok', \(%:  stderr => 1 )
     '#29102: Crash on assignment to lexical filehandle'
 

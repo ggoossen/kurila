@@ -3,7 +3,7 @@ BEGIN
     my $THISDIR = dirname: $^PROGRAM_NAME
     unshift: $^INCLUDE_PATH, $THISDIR
     require "testp2pt.pl"
-    TestPodIncPlainText->import
+    TestPodIncPlainText->import: 
 
 
 my %options = %+: map: { %: $_ => 1 }, @ARGV   ## convert cmdline to options-hash

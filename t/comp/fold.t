@@ -23,7 +23,7 @@ is: $a, 3
 is: $^EVAL_ERROR, ""
 
 my $b = 0
-$a = eval 'if ($b) {return sqrt -3} 3'
+$a = eval 'if ($b) {return sqrt: -3} 3'
 is: $a, 3
 is: $^EVAL_ERROR, ""
 

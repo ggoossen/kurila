@@ -455,8 +455,7 @@ sub initialize
         unless exists $self->{Label}
 
     # Run base initialize
-        $self->SUPER::initialize: 
-
+    $self->SUPER::initialize:
 
 
 =back
@@ -882,11 +881,11 @@ __TEX_COMMENT__
 
     my $preamble = ''
 
-    if ($self->AddPreamble)
+    if (($self->AddPreamble: ))
 
-        if (defined $self->UserPreamble)
+        if (defined ($self->UserPreamble: ))
 
-            $preamble = $self->UserPreamble
+            $preamble = $self->UserPreamble: 
 
             # Add the description of where this came from
             $preamble .=  "\n$comment\n\%\%  Preamble supplied by user.\n\n"
@@ -901,7 +900,7 @@ __TEX_COMMENT__
                 '\usepackage{makeidx}'
                 '\makeindex'
 
-            unless ($self->MakeIndex)
+            unless (($self->MakeIndex: ))
                 foreach ( @makeidx)
                     $_ = '%% ' . $_
                 
@@ -912,7 +911,7 @@ __TEX_COMMENT__
             my $tableofcontents = '\tableofcontents'
 
             $tableofcontents = '%% ' . $tableofcontents
-                unless $self->TableOfContents
+                unless $self->TableOfContents: 
 
             # Roll our own
             $preamble = << "__TEX_HEADER__"
@@ -956,17 +955,17 @@ sub end_pod
     my $end = ''
 
     # Use the user version of the postamble if defined
-    if ($self->AddPostamble)
+    if (($self->AddPostamble: ))
 
-        if (defined $self->UserPostamble)
-            $end = $self->UserPostamble
+        if (defined ($self->UserPostamble: ))
+            $end = $self->UserPostamble: 
 
         else
 
             # Check for index
             my $makeindex = '\printindex'
 
-            $makeindex = '%% '. $makeindex  unless $self->MakeIndex
+            $makeindex = '%% '. $makeindex  unless $self->MakeIndex: 
 
             $end = "$makeindex\n\n\\end\{document\}\n"
         
@@ -1261,12 +1260,12 @@ sub interior_sequence($self, $seq_command, $seq_argument, $pod_seq)
         
 
         # Handle internal links differently
-        my $type = $link->type
-        my $page = $link->page
+        my $type = $link->type: 
+        my $page = $link->page: 
 
         if ($type eq 'section' && $page eq '')
             # Use internal latex reference
-            my $node = $link->node
+            my $node = $link->node: 
 
             # Convert to a label
             $node = $self->_create_label: $node
@@ -1366,7 +1365,7 @@ sub end_list
     
 
     # What to write depends on list type
-    my $type = $self->lists->[-1]->type
+    my $type = ($self->lists: )->[-1]->type: 
 
     # Dont write anything if the list type is not set
     # iomplying that a list was created but no entries were
@@ -1430,7 +1429,7 @@ sub add_item
 
     
 
-    my $type = $self->lists->[-1]->type
+    my $type = ($self->lists: )->[-1]->type: 
 
     if ($type eq 'description')
         # Handle long items - long items do not wrap
@@ -1513,7 +1512,7 @@ sub head
     
 
     # Check to see whether section should be unnumbered
-    my $star = ($level +>= $self->LevelNoNum ?? '*' !! '')
+    my $star = ($level +>= ($self->LevelNoNum: ) ?? '*' !! '')
 
     # Section
     $self->_output: "\\" .@LatexSections[$level] .$star ."\{$paragraph\\label\{".$label ."\}\\index\{".$index."\}\}\n"

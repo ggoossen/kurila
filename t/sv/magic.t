@@ -131,7 +131,7 @@ EOH
     ok: (print: $script_fh, $headmaybe . <<EOB . $middlemaybe . <<'EOF' . $tailmaybe), '$!'
 #!$wd/perl
 EOB
-print $^STDOUT, "\$^EXECUTABLE_NAME is $^EXECUTABLE_NAME, \$^PROGRAM_NAME is $^PROGRAM_NAME\n";
+print: $^STDOUT, "\$^EXECUTABLE_NAME is $^EXECUTABLE_NAME, \$^PROGRAM_NAME is $^PROGRAM_NAME\n";
 EOF
     ok: (close: $script_fh), '$!'
     ok: (chmod: 0755, $script), '$!'

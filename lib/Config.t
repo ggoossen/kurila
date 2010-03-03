@@ -131,7 +131,7 @@ foreach my $pain (@: $first, < @virtual)
 my @: $path, $ver, @< @orig_inc
     =  split: m/\n/
               runperl: nolib=>1
-                       prog=>'print $^STDOUT, qq{$^EXECUTABLE_NAME\n$^PERL_VERSION\n}; print $^STDOUT, qq{$_\n} while $_ = shift $^INCLUDE_PATH'
+                       prog=>'print: $^STDOUT, qq{$^EXECUTABLE_NAME\n$^PERL_VERSION\n}; ( print: $^STDOUT, qq{$_\n} ) while $_ = shift: $^INCLUDE_PATH'
 
 die: "This perl is $^PERL_VERSION at $^EXECUTABLE_NAME; other perl is $ver (at $path) "
          . '- failed to find this perl' unless $^PERL_VERSION eq $ver

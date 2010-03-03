@@ -44,7 +44,7 @@ else
 # Didn't work as of perl-5.8.0-RC2.
 use File::Spec   # To portably get /dev/null
 
-my $devnull = File::Spec->devnull
+my $devnull = File::Spec->devnull: 
 if (-c $devnull)
     if ((sysopen: my $wo, $devnull,  O_WRONLY))
         print: $^STDOUT, "ok 7 # open /dev/null O_WRONLY\n"

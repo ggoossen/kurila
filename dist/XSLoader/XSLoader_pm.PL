@@ -12,46 +12,41 @@ open: my $out, ">", "XSLoader.pm" or die: $^OS_ERROR
 print: $out, <<'EOT'
 # Generated from XSLoader.pm.PL (resolved config_value() value)
 
-package XSLoader;
+package XSLoader
 
-our $VERSION = "0.08";
+our $VERSION = "0.08"
 
 # enable debug/trace messages from DynaLoader perl code
-# $dl_debug = %ENV{PERL_DL_DEBUG} || 0 unless defined $dl_debug;
+# $dl_debug = %ENV{PERL_DL_DEBUG} || 0 unless defined $dl_debug
 
 EOT
 
-print: $out, '  my $dl_dlext = ', (to_string: (Config::config_value: 'dlext')), ";\n" 
+print: $out, 'my $dl_dlext = ', (to_string: (Config::config_value: 'dlext')), "\n" 
 
 print: $out, <<'EOT'
 
-package DynaLoader;
+package DynaLoader
 
 # No prizes for guessing why we don't say 'bootstrap DynaLoader;' here.
 # NOTE: All dl_*.xs (including dl_none.xs) define a dl_error() XSUB
-boot_DynaLoader('DynaLoader') if exists(&boot_DynaLoader) &&
-                                !exists(&dl_error);
-package XSLoader;
+boot_DynaLoader: 'DynaLoader' if exists(&boot_DynaLoader) &&
+                                 !exists(&dl_error)
+package XSLoader
 
-sub load {
-    package DynaLoader;
-
-    die q{XSLoader::load('Your::Module', $Your::Module::VERSION)} unless @_;
-
-    my($module) = @_[0];
+sub load($module, @< @args)
+    package DynaLoader
 
     # work with static linking too
     my $boots = Symbol::fetch_glob("$module\::bootstrap");
-    return $boots->*->(< @_) if exists $boots->*->&;
+    return $boots->*->& <: $module, < @args if exists $boots->*->&
 
-    unless ($module and exists &dl_load_file) {
-        my $bootstrap_inherit = DynaLoader->can('bootstrap_inherit') || 
-                                XSLoader->can('bootstrap_inherit');
-        return $bootstrap_inherit->(< @_);
-    }
+    unless ($module and exists &dl_load_file)
+        my $bootstrap_inherit = (DynaLoader->can: 'bootstrap_inherit') || 
+                                (XSLoader->can: 'bootstrap_inherit')
+        return $bootstrap_inherit->& <: $module, < @args
 
-    my @modparts = split(m/::/,$module);
-    my $modfname = @modparts[-1];
+    my @modparts = split: m/::/,$module
+    my $modfname = @modparts[-1]
 
 EOT
 
@@ -59,52 +54,50 @@ print: $out, <<'EOT' if exists &DynaLoader::mod2fname
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
     # It may also edit @modparts if required.
-    $modfname = mod2fname(\@modparts) if exists &mod2fname;
+    $modfname = mod2fname: \@modparts if exists &mod2fname
 
 EOT
 
 print: $out, <<'EOT' if $^OS_NAME eq 'os2'
 
     # os2 static build can dynaload, but cannot dynaload Perl modules...
-    die 'Dynaloaded Perl modules are not available in this build of Perl' if $OS2::is_static;
+    die: 'Dynaloaded Perl modules are not available in this build of Perl' if $OS2::is_static
 
 EOT
 
 print: $out, <<'EOT'
-    my $modpname = join('/', @modparts);
-    my $modlibname = (@: caller())[1];
-    my $c = nelems @modparts;
-    $modlibname =~ s,[\\/][^\\/]+$,, while $c--;	# Q&D basename
-    my $file = "$modlibname/auto/$modpname/$modfname.$dl_dlext";
+    my $modpname = join: '/', @modparts
+    my $modlibname = (@: (caller:))[1]
+    my $c = nelems: @modparts
+    $modlibname =~ s,[\\/][^\\/]+$,, while $c--  	# Q&D basename
+    my $file = "$modlibname/auto/$modpname/$modfname.$dl_dlext"
 
 #   print STDERR "XSLoader::load for $module ($file)\n" if $dl_debug;
 
-    my $bs = $file;
-    $bs =~ s/(\.\w+)?(;\d*)?$/\.bs/; # look for .bs 'beside' the library
+    my $bs = $file
+    $bs =~ s/(\.\w+)?(;\d*)?$/\.bs/  # look for .bs 'beside' the library
 
     if (-s $bs) # only read file if it's not empty
-        try { evalfile $bs; }
-        warn if $^EVAL_ERROR
+        try  evalfile $bs
+        (warn: ) if $^EVAL_ERROR
 
-    if (not -f $file or -s $bs) {
-        my $bootstrap_inherit = DynaLoader->can('bootstrap_inherit') || 
-                                XSLoader->can('bootstrap_inherit');
-        return $bootstrap_inherit->(< @_);
-    }
+    if (not -f $file or -s $bs)
+        my $bootstrap_inherit = (DynaLoader->can: 'bootstrap_inherit') || 
+                                (XSLoader->can: 'bootstrap_inherit')
+        return $bootstrap_inherit->& <: $module, < @args
 
-    my $bootname = "boot_$module";
-    $bootname =~ s/\W/_/g;
-    @DynaLoader::dl_require_symbols = @: $bootname;
+    my $bootname = "boot_$module"
+    $bootname =~ s/\W/_/g
+    @DynaLoader::dl_require_symbols = @: $bootname
 
-    my $boot_symbol_ref;
+    my $boot_symbol_ref
 
 EOT
 
 if ($^OS_NAME eq 'darwin')
     print: $out, <<'EOT'
-        if ($boot_symbol_ref = dl_find_symbol(0, $bootname)) {
-            goto boot; #extension library has already been loaded, e.g. darwin
-        }
+    if ($boot_symbol_ref = dl_find_symbol: 0, $bootname)
+        goto boot; #extension library has already been loaded, e.g. darwin
 EOT
 
 
@@ -116,33 +109,30 @@ print: $out, <<'EOT'
     # in this perl code simply because this was the last perl code
     # it executed.
 
-    my $libref = dl_load_file($file, 0) or
-          die("Can't load '$file' for module $module: " . dl_error());
-    push(@DynaLoader::dl_librefs,$libref);  # record loaded object
+    my $libref = dl_load_file: $file, 0 or
+          die: "Can't load '$file' for module $module: " . (dl_error: )
+    push: @DynaLoader::dl_librefs,$libref  # record loaded object
 
-    my @unresolved = dl_undef_symbols();
-    if (@unresolved) {
-        warn("Undefined symbols present after loading $file: @unresolved\n");
-    }
+    my @unresolved = (dl_undef_symbols: )
+    if (@unresolved)
+        warn: "Undefined symbols present after loading $file: @unresolved\n"
 
-    $boot_symbol_ref = dl_find_symbol($libref, $bootname) or 
-        die("Can't find '$bootname' symbol in $file\n");
+    $boot_symbol_ref = dl_find_symbol: $libref, $bootname or 
+        die: "Can't find '$bootname' symbol in $file\n"
 
-    push(@DynaLoader::dl_modules, $module); # record loaded module
+    push: @DynaLoader::dl_modules, $module   # record loaded module
 
-    my $xs = dl_install_xsub("$module\::bootstrap", $boot_symbol_ref, $file);
+    my $xs = dl_install_xsub: "$module\::bootstrap", $boot_symbol_ref, $file
 
     # See comment block above
-    push(@DynaLoader::dl_shared_objects, $file); # record files loaded
-    return $xs->(<@_);
-}
+    push: @DynaLoader::dl_shared_objects, $file   # record files loaded
+    return $xs->& <: $module, <@args
 
-sub bootstrap_inherit {
-    require DynaLoader;
-    DynaLoader::bootstrap_inherit(<@_);
-}
+sub bootstrap_inherit(@< @args)
+    require DynaLoader
+    DynaLoader::bootstrap_inherit: <@args
 
-1;
+1
 
 
 __END__

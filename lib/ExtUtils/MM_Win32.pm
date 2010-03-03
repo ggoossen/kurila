@@ -121,7 +121,7 @@ Using \ for Windows.
 sub init_DIRFILESEP
     my(@: $self) =@:  shift
 
-    my $make = $self->make
+    my $make = $self->make: 
 
     # The ^ makes sure its not interpreted as an escape in nmake
     $self->{+DIRFILESEP} = $make eq 'nmake' ?? '^\' !!
@@ -166,7 +166,7 @@ sub init_others($self)
     $self->{+LD}     ||= %Config{?ld} || 'link'
     $self->{+AR}     ||= %Config{?ar} || 'lib'
 
-        $self->SUPER::init_others: 
+    $self->SUPER::init_others: 
 
     # Setting SHELL from $Config{sh} can break dmake.  Its ok without it.
     delete $self->{SHELL}
@@ -226,7 +226,7 @@ sub special_targets($self)
 
     my $make_frag = $self->SUPER::special_targets: 
 
-    $make_frag .= <<'MAKE_FRAG' if $self->make eq 'dmake'
+    $make_frag .= <<'MAKE_FRAG' if ($self->make: ) eq 'dmake'
 .USESHELL :
 MAKE_FRAG
 
@@ -244,7 +244,7 @@ to its own method.
 =cut
 
 sub static_lib($self)
-    return '' unless $self->has_link_code
+    return '' unless $self->has_link_code: 
 
     my(@m)
     push: @m, <<'END'
@@ -284,7 +284,7 @@ Complicated stuff for Win32 that I don't understand. :(
 sub dynamic_lib($self, %< %attribs)
     return '' unless $self->needs_linking #might be because of a subdir
 
-    return '' unless $self->has_link_code
+    return '' unless $self->has_link_code: 
 
     my $otherldflags = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '')
     my $inst_dynamic_dep = %attribs{?INST_DYNAMIC_DEP} || ""
@@ -403,7 +403,7 @@ banner.
 
 sub pasthru
     my(@: $self) =@:  shift
-    return "PASTHRU = " . ($self->make eq 'nmake' ?? "-nologo" !! "")
+    return "PASTHRU = " . (($self->make: ) eq 'nmake' ?? "-nologo" !! "")
 
 
 =item oneliner
@@ -439,7 +439,7 @@ sub quote_literal($self, $text)
     # quotes; however it transforms {{ into { either inside and outside double
     # quotes.  It also translates }} into }.  The escaping below is not
     # 100% correct.
-    if( $self->make eq 'dmake' )
+    if( ($self->make: ) eq 'dmake' )
         $text =~ s/{/\{\{/g
         $text =~ s/}}/\}\}\}/g
     

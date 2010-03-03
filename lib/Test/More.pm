@@ -143,7 +143,7 @@ or for deciding between running the tests at all:
 =cut
 
 sub plan
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     $tb->plan: < @_
 
@@ -218,7 +218,7 @@ This is the same as Test::Simple's ok() routine.
 =cut
 
 sub ok($test, ?$name)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     $tb->ok: $test, $name
 
@@ -284,13 +284,13 @@ function which is an alias of isnt().
 =cut
 
 sub is($lhs, $rhs, ?$msg)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     $tb->is_eq: $lhs, $rhs, $msg
 
 
 sub isnt($lhs, $rhs, ?$msg)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     $tb->isnt_eq: $lhs, $rhs, $msg
 
@@ -327,7 +327,7 @@ diagnostics on failure.
 =cut
 
 sub like($got, $expected, ?$name)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     $tb->like: $got, $expected, $name
 
@@ -343,7 +343,7 @@ given pattern.
 =cut
 
 sub unlike($got, $expected, ?$name)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     $tb->unlike: $got, $expected, $name
 
@@ -383,7 +383,7 @@ is()'s use of C<eq> will interfere:
 =cut
 
 sub cmp_ok
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     $tb->cmp_ok: < @_
 
@@ -420,7 +420,7 @@ as one test.  If you desire otherwise, use:
 
 sub can_ok($proto, @< @methods)
     my $class = ref $proto || $proto
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     unless( $class )
         my $ok = $tb->ok:  0, "->can(...)" 
@@ -480,7 +480,7 @@ you'd like them to be more specific, you can supply an $object_name
 =cut
 
 sub isa_ok($object, $class, ?$obj_name)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     my $diag
     $obj_name = 'The object' unless defined $obj_name
@@ -494,7 +494,7 @@ sub isa_ok($object, $class, ?$obj_name)
         local $^EVAL_ERROR = undef
         my $rslt = try { ($object->isa: $class) }
         if( $^EVAL_ERROR )
-            if( $^EVAL_ERROR->message =~ m/^Can't call method "isa" on unblessed reference/ )
+            if( ($^EVAL_ERROR->message: ) =~ m/^Can't call method "isa" on unblessed reference/ )
                 # Its an unblessed reference
                 if( !(UNIVERSAL::isa: $object, $class) )
                     my $ref = ref $object
@@ -504,7 +504,7 @@ sub isa_ok($object, $class, ?$obj_name)
                 die: <<WHOA
 WHOA! I tried to call ->isa on your object and got some weird error.
 Here's the error.
-$($^EVAL_ERROR->message)
+$(($^EVAL_ERROR->message: ))
 WHOA
             
         elsif( !$rslt )
@@ -607,7 +607,7 @@ because the notion of "compile-time" is relative.  Instead, you want:
 
 sub use_ok($module, @< @imports)
     @imports = $@ unless (nelems @imports)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     my(@: $pack,$filename,$line) =@:  caller
 
@@ -616,14 +616,14 @@ sub use_ok($module, @< @imports)
         # probably a version check.  Perl needs to see the bare number
         # for it to work with non-Exporter based modules.
         $code = <<USE
-package $pack;
-use $module $(@imports[0]->stringify);
-1;
+package $pack
+use $module $(@imports[0]->stringify: )
+1
 USE
     else
         $code = <<USE
-package $pack;
-use $module < \@args[0]->\@;
+package $pack
+use $module < \@args[0]->\@
 1;
 USE
     
@@ -634,7 +634,7 @@ USE
     unless( $ok )
         $tb->diag: <<DIAGNOSTIC
     Tried to use '$module'.
-    Error:  $($eval_error->message)
+    Error:  $(($eval_error->message: ))
 DIAGNOSTIC
 
     
@@ -662,7 +662,7 @@ sub _eval
 
 sub dies_like($coderef, $like, ?$name)
 
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     if (try {( $coderef->& <: ); 1; })
         $tb->diag: "didn't die"
@@ -682,7 +682,7 @@ Like use_ok(), except it requires the $module or $file.
 =cut
 
 sub require_ok ($module)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     my $pack = caller
 
@@ -691,9 +691,9 @@ sub require_ok ($module)
     $module = qq['$module'] unless _is_module_name: $module
 
     my $code = <<REQUIRE
-package $pack;
-require $module;
-1;
+package $pack
+require $module
+1
 REQUIRE
 
     my(@: $eval_result, $eval_error) =  _eval: $code
@@ -702,10 +702,8 @@ REQUIRE
     unless( $ok )
         $tb->diag: <<DIAGNOSTIC
     Tried to require '$module'.
-    Error:  $($eval_error->message)
+    Error:  $(($eval_error->message: ))
 DIAGNOSTIC
-
-    
 
     return $ok
 
@@ -765,7 +763,7 @@ sub _dne
 
 
 sub is_deeply
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     unless( (nelems @_) == 2 or (nelems @_) == 3 )
         my $msg = <<WARNING
@@ -900,7 +898,7 @@ interfere with the test.
 =cut
 
 sub diag
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     $tb->diag: < @_
 
@@ -916,7 +914,7 @@ together.
 =cut
 
 sub info
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     $tb->info: < @_
 
@@ -985,7 +983,7 @@ use TODO.  Read on.
 
 #'#
 sub skip($why, ?$how_many)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     unless( defined $how_many )
         # $how_many can only be avoided when no_plan is in use.
@@ -1070,7 +1068,7 @@ interpret them as passing.
 =cut
 
 sub todo_skip($why, ?$how_many)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     unless( defined $how_many )
         # $how_many can only be avoided when no_plan is in use.
@@ -1123,7 +1121,7 @@ The test will exit with 255.
 
 sub BAIL_OUT
     my $reason = shift
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     $tb->BAIL_OUT: $reason
 
@@ -1192,7 +1190,7 @@ sub _eq_array($a1, $a2)
 
 
 sub _deep_check($e1, $e2)
-    my $tb = Test::More->builder
+    my $tb = Test::More->builder: 
 
     my $ok = 0
 

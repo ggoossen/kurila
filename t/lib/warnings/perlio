@@ -53,7 +53,7 @@ open(my $f, ">:xyz", "bb");
 use warnings 'layer';
 open($f, ">:xyz", "bb");
 close $f;
-END { 1 while unlink "bb" } # KEEP THIS WITH THE LAST TEST.
+END { 1 while unlink: "bb" } # KEEP THIS WITH THE LAST TEST.
 EXPECT
 Unknown PerlIO layer "xyz" at - line 5 character 1.
 ########

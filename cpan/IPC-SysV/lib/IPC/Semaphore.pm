@@ -94,10 +94,10 @@ sub set
     else
         croak: 'Bad arg count' if (nelems @_) % 2
         my %arg = %:  < @_ 
-        $ds = $self->stat
+        $ds = $self->stat: 
             or return undef
         my($key,$val)
-         $ds->?$key: $val
+        $ds->?$key: $val
             while((@: $key,$val) =(@:  each %arg))
     
 

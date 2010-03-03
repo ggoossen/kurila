@@ -98,7 +98,7 @@ sub tryrun
 #                    -T, tainting will be enabled, and any
 #                    subsequent options ignored.
 
-tryrun: \(%: PERL5OPT => '-w'), \(@: '-e', 'print $^STDOUT, $main::x')
+tryrun: \(%: PERL5OPT => '-w'), \(@: '-e', 'print: $^STDOUT, $main::x')
         ""
         qq{Name "main::x" used only once: possible typo
 Use of uninitialized value \$main::x in print at -e line 1 character 1.
@@ -114,44 +114,44 @@ tryrun: \(%: PERL5OPT => '-MExporter -MExporter'), \(@: '-e0')
         ""
 
 tryrun: \(%: PERL5OPT => '-Mwarnings')
-        \(@: '-e', 'print $^STDOUT, "ok" if $^INCLUDED{"warnings.pm"}')
+        \(@: '-e', 'print: $^STDOUT, "ok" if $^INCLUDED{"warnings.pm"}')
         "ok"
         ""
 
 tryrun: \(%: PERL5OPT => '-w -w')
-        \(@: '-e', 'print $^STDOUT, env::var(q[PERL5OPT])')
+        \(@: '-e', 'print: $^STDOUT, env::var: q[PERL5OPT]')
         '-w -w'
         ''
 
 tryrun: \(%: PERLLIB => "foobar$((config_value: 'path_sep'))42")
-        \(@: '-e', 'print $^STDOUT, < grep { $_ eq "foobar" }, $^INCLUDE_PATH')
+        \(@: '-e', 'print: $^STDOUT, < grep: { $_ eq "foobar" }, $^INCLUDE_PATH')
         'foobar'
         ''
 
 tryrun: \(%: PERLLIB => "foobar$((config_value: 'path_sep'))42")
-        \(@: '-e', 'print $^STDOUT, < grep { $_ eq "42" }, $^INCLUDE_PATH')
+        \(@: '-e', 'print: $^STDOUT, < grep: { $_ eq "42" }, $^INCLUDE_PATH')
         '42'
         ''
 
 tryrun: \(%: PERL5LIB => "foobar$((config_value: 'path_sep'))42")
-        \(@: '-e', 'print $^STDOUT, < grep { $_ eq "foobar" }, $^INCLUDE_PATH')
+        \(@: '-e', 'print: $^STDOUT, < grep: { $_ eq "foobar" }, $^INCLUDE_PATH')
         'foobar'
         ''
 
 tryrun: \(%: PERL5LIB => "foobar$((config_value: 'path_sep'))42")
-        \(@: '-e', 'print $^STDOUT, < grep { $_ eq "42" }, $^INCLUDE_PATH')
+        \(@: '-e', 'print: $^STDOUT, < grep: { $_ eq "42" }, $^INCLUDE_PATH')
         '42'
         ''
 
 tryrun: \(%: PERL5LIB => "foo"
              PERLLIB => "bar")
-        \(@: '-e', 'print $^STDOUT, < grep { $_ eq "foo" }, $^INCLUDE_PATH')
+        \(@: '-e', 'print: $^STDOUT, < grep: { $_ eq "foo" }, $^INCLUDE_PATH')
         'foo'
         ''
 
 tryrun: \(%: PERL5LIB => "foo"
              PERLLIB => "bar")
-        \(@: '-e', 'print $^STDOUT, < grep { $_ eq "bar" }, $^INCLUDE_PATH')
+        \(@: '-e', 'print: $^STDOUT, < grep: { $_ eq "bar" }, $^INCLUDE_PATH')
         ''
         ''
 

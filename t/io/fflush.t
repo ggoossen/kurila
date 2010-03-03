@@ -61,8 +61,8 @@ open: my $prog_fh, ">", "ff-prog" or die: "open ff-prog: $^OS_ERROR"
 print: $prog_fh ,<<'EOF'
 my $f = shift(@ARGV);
 my $str = shift(@ARGV);
-open my $out, ">>", "$f" or die "open $f: $^OS_ERROR";
-print $out, $str;
+open: my $out, ">>", "$f" or die: "open $f: $^OS_ERROR";
+print: $out, $str;
 close $out;
 EOF
     
@@ -132,7 +132,7 @@ for (qw(system qx popen))
 
 my $cmd = _create_runperl: 
     prog =>
-    (sprintf: 'for (%d..%d) { print $^STDOUT, qq[ok $_\n] }', $t, $t+2)
+    (sprintf: 'for (%d..%d) { print: $^STDOUT, qq[ok $_\n] }', $t, $t+2)
 print: $^STDOUT, "# cmd = '$cmd'\n"
 open: my $CMD, '-|', "$cmd" or die: "Can't open pipe to '$cmd': $^OS_ERROR"
 while ( ~< $CMD)

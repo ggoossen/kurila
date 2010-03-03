@@ -19,6 +19,6 @@ sub foo()
 is:  (foo: ), "original foo" 
 
 *foo->& = sub () return "new foo with ->&"
-is:  ((*foo->&->& <)), "new foo with ->&" 
+is: (*foo->&->& <: ), "new foo with ->&" 
 
-(eval_dies_like: 'non_existing_sub()', qr/Undefined subroutine &non_existing_sub called/)
+eval_dies_like: 'non_existing_sub:', qr/Undefined subroutine &non_existing_sub called/

@@ -1,24 +1,18 @@
 #!/usr/bin/perl -w
 
 BEGIN 
-    if( (env::var: 'PERL_CORE') )
+    if (env::var: 'PERL_CORE')
         chdir 't' if -d 't'
         $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift: $^INCLUDE_PATH, 't/lib'
-    
 
 
 use Config
 
 use Test::More
 
-unless( try { require Data::Dumper } )
-    plan: skip_all => 'Data::Dumper not available'
-
-
 plan: tests => 11
-
 
 use MakeMaker::Test::Utils
 use MakeMaker::Test::Setup::BFD
@@ -42,7 +36,6 @@ END
     ok:  chdir File::Spec->updir 
     ok:  (teardown_recurs: ), 'teardown' 
 
-
 (ok:  (chdir: 'Big-Dummy'), "chdir'd to Big-Dummy" ) ||
     diag: "chdir failed: $^OS_ERROR"
 
@@ -57,7 +50,6 @@ do
     die: if $^EVAL_ERROR
     main::is_deeply:  $PREREQ_PM, (%:  strict => 0 ), 'prereqs dumped' 
     main::is:  $^EVAL_ERROR, '',                             '  without error' 
-
 
 
 $prereq_out = run: qq{$Perl Makefile.PL "PRINT_PREREQ=1"}

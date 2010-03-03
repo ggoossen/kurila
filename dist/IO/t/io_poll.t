@@ -52,7 +52,7 @@ print: $^STDOUT, "ok 5\n"
 
 $poll->remove: $stdout
 
-@h = $poll->handles
+@h = $poll->handles: 
 
 print: $^STDOUT, "not "
     unless (nelems @h) == 1

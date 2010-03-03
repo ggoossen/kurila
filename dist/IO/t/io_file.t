@@ -2,7 +2,7 @@
 
 
 use bytes
-require "../../t/test.pl"
+require "test.pl"
 plan: tests => ($^OS_NAME =~ m/MSWin32/ ?? 9 !! 6)
 
 my $Class       = 'IO::File'
@@ -26,7 +26,7 @@ do {   my $tmp;
 ### now read in the file, once without binmode, once with.
 ### without binmode should fail at least on win32...
 if( $^OS_NAME =~ m/MSWin32/ )
-    my $fh = $Class->new
+    my $fh = $Class->new: 
 
     isa_ok:  $fh,                $Class 
     ok:  < ($fh->open: $File),       "   Opened '$File'" 
@@ -36,7 +36,7 @@ if( $^OS_NAME =~ m/MSWin32/ )
 
 
 ### now with binmode, it must pass
-do {   my $fh = $Class->new;
+do {   my $fh = ($Class->new: );
 
     isa_ok:  $fh,                $Class ;
     ok:  ($fh->open: $File),       "   Opened '$File' $^OS_ERROR" ;

@@ -2,7 +2,7 @@
 
 use File::Path
 use File::Spec
-require "../../t/test.pl"
+require "test.pl"
 (plan: tests => 17)
 
 do 
@@ -10,9 +10,8 @@ do
 
     my @load
     local $^WARNING = 0
-    local *XSLoader::load = sub 
-        (push: @load, \@_)
-    
+    local *XSLoader::load = sub (@< @args)
+        push: @load, \@args
 
         # use_ok() calls import, which we do not want to do
     (require_ok:  'IO' )
@@ -81,7 +80,7 @@ if ( -d $fakedir or mkpath:  $fakedir )
         (my $package = <<'                END_HERE') =~ s/\t//g;
                 package IO::fakemod;
 
-                sub import { die "Do not import!\n" }
+                sub import { die: "Do not import!\n" }
 
                 sub exists { 1 }
 

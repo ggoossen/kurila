@@ -140,7 +140,7 @@ MAKE_FRAG
 
 sub static_lib($self)
 
-    return '' unless $self->has_link_code
+    return '' unless $self->has_link_code: 
 
     my $m = <<'END'
 $(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists
@@ -185,7 +185,7 @@ Defines how to produce the *.so (or equivalent) files.
 sub dynamic_lib($self, %< %attribs)
     return '' unless $self->needs_linking #might be because of a subdir
 
-    return '' unless $self->has_link_code
+    return '' unless $self->has_link_code: 
 
     my(@: $otherldflags) = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '')
     my(@: $inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || ""

@@ -4,7 +4,7 @@ print: $^STDOUT, "1..71\n"
 
 our ($foo, $fact, $ans, $i, $x, $eval)
 
-eval 'print $^STDOUT, "ok 1\n";'
+eval 'print: $^STDOUT, "ok 1\n";'
 
 if ($^EVAL_ERROR eq '') {print: $^STDOUT, "ok 2\n";} else {print: $^STDOUT, "not ok 2\n";}
 
@@ -36,7 +36,7 @@ $ans = eval $fact
 if ($ans == 120) {print: $^STDOUT, "ok 9\n";} else {print: $^STDOUT, "not ok 9 $ans\n";}
 
 open: my $try, ">",'Op.eval'
-print: $try, 'print $^STDOUT, "ok 10\n"; unlink "Op.eval";',"\n"
+print: $try, 'print: $^STDOUT, "ok 10\n"; unlink: "Op.eval";',"\n"
 close $try
 
 evalfile './Op.eval'; print: $^STDOUT, $^EVAL_ERROR
@@ -45,7 +45,7 @@ evalfile './Op.eval'; print: $^STDOUT, $^EVAL_ERROR
 
 $i = 11
 for (1..3)
-    eval 'print $^STDOUT, "ok ", $i++, "\n"'
+    eval 'print: $^STDOUT, "ok ", $i++, "\n"'
 
 
 try {
@@ -69,38 +69,38 @@ do
 my $b = 'wrong'
 my $X = sub (@< @_)
     my $b = "right"
-    print: $^STDOUT, (eval: '"$b"') eq $b ?? "ok 24\n" !! "not ok 24\n"(
+    print: $^STDOUT, (eval: '"$b"') eq $b ?? "ok 24\n" !! "not ok 24\n"
 
-$X->& <: )
+($X->& <: )
 
 
 # check navigation of multiple eval boundaries to find lexicals
 
 my $x = 25
 eval <<'EOT'; die: if $^EVAL_ERROR
-  print $^STDOUT, "# $x\n";	# clone into eval's pad
+  print: $^STDOUT, "# $x\n";	# clone into eval's pad
   sub do_eval1 {
-     eval @_[0]; die if $^EVAL_ERROR;
+     eval @_[0]; die: if $^EVAL_ERROR;
   }
 EOT
-do_eval1: 'print $^STDOUT, "ok $x\n"'
+do_eval1: 'print: $^STDOUT, "ok $x\n"'
 $x++
-do_eval1: 'eval q[print $^STDOUT, "ok $x\n"]'
+do_eval1: 'eval q[print: $^STDOUT, "ok $x\n"]'
 $x++
-do_eval1: 'sub { print $^STDOUT, "# $x\n"; eval q[print $^STDOUT, "ok $x\n"] }->()'
+do_eval1: 'sub { print: $^STDOUT, "# $x\n"; eval q[print: $^STDOUT, "ok $x\n"] }->()'
 $x++
 
 # calls from within eval'' should clone outer lexicals
 
 eval <<'EOT'; die: if $^EVAL_ERROR
   sub do_eval2 {
-     eval @_[0]; die if $^EVAL_ERROR;
+     eval @_[0]; die: if $^EVAL_ERROR;
   }
-do_eval2('print $^STDOUT, "ok $x\n"');
+do_eval2('print: $^STDOUT, "ok $x\n"');
 $x++;
-do_eval2('eval q[print $^STDOUT, "ok $x\n"]');
+do_eval2('eval q[print: $^STDOUT, "ok $x\n"]');
 $x++;
-do_eval2('sub { print $^STDOUT, "# $x\n"; eval q[print $^STDOUT, "ok $x\n"] }->()');
+do_eval2('sub { print: $^STDOUT, "# $x\n"; eval q[print: $^STDOUT, "ok $x\n"] }->()');
 $x++;
 EOT
 
@@ -111,15 +111,15 @@ my $ok = 'ok'
 eval <<'EOT'; die: if $^EVAL_ERROR
   # $x unbound here
   sub do_eval3 {
-     eval @_[0]; die if $^EVAL_ERROR;
+     eval @_[0]; die: if $^EVAL_ERROR;
   }
 EOT
 do
     my $ok = 'not ok'
-    do_eval3: 'print $^STDOUT, "$ok ' . $x++ . '\n"'
-    do_eval3: 'eval q[print $^STDOUT, "$ok ' . $x++ . '\n"]'
+    do_eval3: 'print: $^STDOUT, "$ok ' . $x++ . '\n"'
+    do_eval3: 'eval q[print: $^STDOUT, "$ok ' . $x++ . '\n"]'
     print: $^STDOUT, "# sub with eval\n"
-    do_eval3: 'sub { eval q[print $^STDOUT, "$ok ' . $x++ . '\n"] }->()'
+    do_eval3: 'sub { eval q[print: $^STDOUT, "$ok ' . $x++ . '\n"] }->()'
 
 
 # can recursive subroutine-call inside eval'' see its own lexicals?
@@ -127,7 +127,7 @@ sub recurse
     my $l = shift
     if ($l +< $x)
         ++$l
-        eval 'print $^STDOUT, "# level $l\n"; recurse($l);'
+        eval 'print: $^STDOUT, "# level $l\n"; recurse($l);'
         die: if $^EVAL_ERROR
     else
         print: $^STDOUT, "ok $l\n"
@@ -140,20 +140,17 @@ do
 $x++
 
 # do closures created within eval bind correctly?
-eval <<'EOT'(
-  sub create_closure {
-    my $self = shift;
-    return sub {
-       print $^STDOUT, $self;
-    };
-  }
+eval <<'EOT'
+  sub create_closure($self)
+    return sub()
+       print: $^STDOUT, $self
 EOT
-(create_closure: "ok $x\n")->& <: )
+((create_closure: "ok $x\n")->& <: )
 $x++
 
 # does lexical search terminate correctly at subroutine boundary?
 $main::r = "ok $x\n"
-sub terminal { eval 'our $r; print $^STDOUT, $r' }
+sub terminal { eval 'our $r; print: $^STDOUT, $r' }
 do
     my $r = "not ok $x\n"
     eval 'terminal($r)'
@@ -179,8 +176,8 @@ do
 # ditto for eval ""
 do
     my $status = eval q{
-        eval q{ die };
-        print $^STDOUT, "# eval ' return ' test\n";
+        eval q{ die: };
+        print: $^STDOUT, "# eval ' return ' test\n";
         return; # removing this changes behavior
     }
     print: $^STDOUT, "not " if $^EVAL_ERROR
@@ -219,7 +216,7 @@ my $zzz = 1
 
 eval q{
     sub fred1 {
-        eval q{ print $^STDOUT, eval '$zzz' == 1 ?? 'ok' !! 'not ok', " @_[?0]\n"}
+        eval q{ print: $^STDOUT, eval '$zzz' == 1 ?? 'ok' !! 'not ok', " @_[?0]\n"}
     }
     fred1(47);
     do { my $zzz = 2; fred1(48) };
@@ -227,7 +224,7 @@ eval q{
 
 eval q{
     sub fred2 {
-        print $^STDOUT, eval('$zzz') == 1 ?? 'ok' !! 'not ok', " @_[?0]\n";
+        print: $^STDOUT, eval('$zzz') == 1 ?? 'ok' !! 'not ok', " @_[?0]\n";
     }
 }; die: if $^EVAL_ERROR
 fred2: 49
@@ -257,25 +254,25 @@ eval q{
         return 0 if       $yyy  != 9;
         return 0 if eval '$yyy' != 9;
         return 0 if eval '$l' != $l;
-        return $l * fred3($l-1);
+        return $l * fred3: $l-1;
     }
-    my $r = fred3(5);
-    print $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 52\n";
-    $r = eval'fred3(5)';
-    print $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 53\n";
+    my $r = fred3: 5;
+    print: $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 52\n";
+    $r = eval'fred3: 5';
+    print: $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 53\n";
     $r = 0;
-    eval '$r = fred3(5)';
-    print $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 54\n";
+    eval '$r = fred3: 5';
+    print: $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 54\n";
     $r = 0;
-    do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' };
-    print $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 55\n";
+    do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3: 5' };
+    print: $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 55\n";
 }
 my $r = fred3: 5
 print: $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 56\n"
-$r = eval'fred3(5)'
+$r = eval'fred3: 5'
 print: $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 57\n"
 $r = 0
-eval'$r = fred3(5)'
+eval'$r = fred3: 5'
 print: $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 58\n"
 $r = 0
 do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' }

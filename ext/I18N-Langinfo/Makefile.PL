@@ -27,9 +27,9 @@ if (try {require ExtUtils::Constant; 1})
                  MON_2 MON_3 MON_4 MON_5 MON_6 MON_7 MON_8 MON_9 NOEXPR NOSTR
                  PM_STR T_FMT T_FMT_AMPM YESEXPR YESSTR))
         push: @names           # This lot are always enums in old langinfo.h:
-              \%:  name=>$_, type=>"IV"
-                   macro=> \(@: "#if defined($_) || (defined(__GNU_LIBRARY__) && defined(_NL_ITEM))\n"
-                                "#endif\n")
+              \%: name=>$_, type=>"IV"
+                  macro=> \(@: "#if defined($_) || (defined(__GNU_LIBRARY__) && defined(_NL_ITEM))\n"
+                               "#endif\n")
     foreach (qw (CRNCYSTR THOUSEP RADIXCHAR))
         push: @names           # This lot are only enums for __SVR4_I386_ABI_L1__:
               \%: name=>$_, type=>"IV"
@@ -39,7 +39,6 @@ if (try {require ExtUtils::Constant; 1})
         NAME => 'I18N::Langinfo'
         NAMES => \@names
         PROXYSUBS => 1
-        
 else
     use File::Copy
     use File::Spec

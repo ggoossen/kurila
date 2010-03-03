@@ -58,8 +58,7 @@ Filenames with * and ? will be glob expanded.
 # VMS uses % instead of ? to mean "one character"
 my $wild_regex = $Is_VMS ?? '*%' !! '*?'
 sub expand_wildcards
-    @ARGV = @+: map:  { m/[$wild_regex]/o ?? (glob: $_ !! @: $_ }, @ARGV
-
+    @ARGV = @+: map:  { m/[$wild_regex]/ ?? (glob: $_) !! @: $_ }, @ARGV
 
 
 =item cat
@@ -97,7 +96,7 @@ Removes files and directories - recursively (even if readonly)
 
 =cut
 
-sub rm_rf
+sub rm_rf()
     (expand_wildcards: )
     rmtree: < (grep: { -e $_ }, @ARGV) 
 
@@ -110,7 +109,7 @@ Removes files (even if readonly)
 
 =cut
 
-sub rm_f
+sub rm_f()
     (expand_wildcards: )
 
     foreach my $file ( @ARGV)
@@ -167,7 +166,7 @@ Returns true if all moves succeeded, false otherwise.
 
 =cut
 
-sub mv
+sub mv()
     (expand_wildcards: )
     my @src = @ARGV
     my $dst = pop @src
@@ -193,7 +192,7 @@ Returns true if all copies succeeded, false otherwise.
 
 =cut
 
-sub cp
+sub cp()
     (expand_wildcards: )
     my @src = @ARGV
     my $dst = pop @src
@@ -246,7 +245,7 @@ Creates directories, including any parent directories.
 
 =cut
 
-sub mkpath
+sub mkpath()
     (expand_wildcards: )
     File::Path::mkpath: \ @ARGV,0,0777
 
@@ -261,7 +260,7 @@ shell's idea of true and false).
 =cut
 
 sub test_f
-    exit: -f @ARGV[0] ?? 0 !! 1
+    exit: (-f @ARGV[0]) ?? 0 !! 1
 
 
 =item test_d
@@ -274,7 +273,7 @@ not (ie. shell's idea of true and false).
 =cut
 
 sub test_d
-    exit: -d @ARGV[0] ?? 0 !! 1
+    exit: (-d @ARGV[0]) ?? 0 !! 1
 
 
 =item dos2unix

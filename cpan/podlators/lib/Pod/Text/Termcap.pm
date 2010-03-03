@@ -45,12 +45,12 @@ sub new($self, @< @args)
 
     # Fall back on a hard-coded terminal speed if POSIX::Termios isn't
     # available (such as on VMS).
-    try { $termios = POSIX::Termios->new }
+    try { $termios = (POSIX::Termios->new: ) }
     if ($^EVAL_ERROR)
         $ospeed = 9600
     else
-        $termios->getattr
-        $ospeed = $termios->getospeed || 9600
+        $termios->getattr: 
+        $ospeed = ($termios->getospeed: ) || 9600
     
 
     # Fall back on the ANSI escape sequences if Term::Cap doesn't work.
@@ -70,13 +70,13 @@ sub new($self, @< @args)
 # Make level one headings bold.
 sub cmd_head1($self, $attrs, $text)
     $text =~ s/\s+$//
-     $self->SUPER::cmd_head1 : $attrs, "$self->{?BOLD}$text$self->{?NORM}"
+    $self->SUPER::cmd_head1 : $attrs, "$self->{?BOLD}$text$self->{?NORM}"
 
 
 # Make level two headings bold.
 sub cmd_head2($self, $attrs, $text)
     $text =~ s/\s+$//
-     $self->SUPER::cmd_head2 : $attrs, "$self->{?BOLD}$text$self->{?NORM}"
+    $self->SUPER::cmd_head2 : $attrs, "$self->{?BOLD}$text$self->{?NORM}"
 
 
 # Fix up B<> and I<>.  Note that we intentionally don't do F<>.

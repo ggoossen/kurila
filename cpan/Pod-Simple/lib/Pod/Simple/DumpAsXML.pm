@@ -31,7 +31,7 @@ sub _handle_element_start
             next if $key eq 'start_line' and @_[0]->{?'hide_line_numbers'}
             my $value = @_[2]->{?$key}
             if (@_[1] eq 'L' and $key =~ m/^(?:section|to)$/)
-                $value = $value->as_string
+                $value = $value->as_string: 
             
             $value = _xml_escape: $value
             print: $fh, ' ', $key, '="', $value, '"'

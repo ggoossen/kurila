@@ -30,7 +30,7 @@ B::walksymtable: \%Testing::Symtable::, 'find_syms', sub (@< @_) { @_[0] =~ m/Fo
 
 sub B::GV::find_syms($symbol)
 
-    %main::Subs{+$symbol->STASH->NAME . '::' . $symbol->NAME}++
+    %main::Subs{+(($symbol->STASH: )->NAME: ) . '::' . ($symbol->NAME: )}++
 
 
 my @syms = map: { 'Testing::Symtable::'.$_ }, qw(This That wibble moo car)

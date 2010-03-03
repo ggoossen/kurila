@@ -108,8 +108,8 @@ my $Inc_uninstall_warn_handler
 
 my $INSTALL_ROOT = env::var: 'PERL_INSTALL_ROOT'
 
-my $Curdir = File::Spec->curdir
-my $Updir  = File::Spec->updir
+my $Curdir = File::Spec->curdir: 
+my $Updir  = File::Spec->updir: 
 
 sub _estr(@< @mess)
     return join: "\n", @: '!' x 72,< @mess,'!' x 72,''
@@ -763,7 +763,7 @@ sub install #XXX OS-SPECIFIC
 
         my $realtarget= $targetfile
         if ($diff)
-            try {
+            try
                 if (-f $targetfile)
                     print: $^STDOUT, "_unlink_or_rename($targetfile)\n" if $verbose+>1
                     $targetfile= _unlink_or_rename:  $targetfile, 'tryhard', 'install' 
@@ -784,7 +784,7 @@ sub install #XXX OS-SPECIFIC
                 (_chmod:  $mode, $targetfile, $verbose );
                 $result->{+install}{+$targetfile} = $sourcefile;
                 1
-                } or do
+              or do
                 $result->{+install_fail}{+$targetfile} = $sourcefile
                 die: $^EVAL_ERROR
 
@@ -810,7 +810,6 @@ sub install #XXX OS-SPECIFIC
         print: $^STDOUT, "Writing %pack{?'write'}\n"
         $packlist->write: (install_rooted_file: %pack{?'write'}) unless $dry_run
 
-
     _do_cleanup: $verbose
     return $result
 
@@ -834,7 +833,6 @@ sub _do_cleanup($verbose)
     elsif (defined $MUST_REBOOT ^&^ $verbose)
         warn: < _estr: "Installation will be completed at the next reboot.\n"
                        "However it is not necessary to reboot immediately.\n"
-
 
 
 =begin _undocumented
@@ -886,7 +884,7 @@ reboot. A wrapper for _unlink_or_rename().
 
 
 sub forceunlink( $file, ?$tryhard) #XXX OS-SPECIFIC
-    _unlink_or_rename:  $file, $tryhard, (not: "installing") 
+    _unlink_or_rename:  $file, $tryhard, not: "installing"
 
 
 =begin _undocumented
@@ -945,19 +943,18 @@ sub install_default(@< @_)
     my $INST_SCRIPT = File::Spec->catdir: $Curdir,'blib','script'
     my $INST_MAN1DIR = File::Spec->catdir: $Curdir,'blib','man1'
     my $INST_MAN3DIR = File::Spec->catdir: $Curdir,'blib','man3'
-    install: \(%:
+    install: \%:
                  read => (config_value: "sitearchexp") . "/auto/$FULLEXT/.packlist"
                  write => (config_value: "installsitearch") . "/auto/$FULLEXT/.packlist"
-                 $INST_LIB => ((directory_not_empty: $INST_ARCHLIB)) ??
-                  (config_value: "installsitearch") !!
-                  config_value: "installsitelib"
+                 $INST_LIB => (directory_not_empty: $INST_ARCHLIB) ??
+                      (config_value: "installsitearch") !!
+                      config_value: "installsitelib"
                  $INST_ARCHLIB => config_value: "installsitearch"
                  $INST_BIN => config_value: "installbin"
                  $INST_SCRIPT => config_value: "installscript"
                  $INST_MAN1DIR => config_value: "installman1dir"
                  $INST_MAN3DIR => config_value: "installman3dir"
-            ),1,0,0
-
+             1,0,0
 
 
 =item B<uninstall>
@@ -1018,8 +1015,9 @@ sub inc_uninstall($filepath,$libdir,$verbose,$dry_run,$ignore,$results)
     my $file = ((File::Spec->splitpath: $filepath))[2]
     my %seen_dir = $%
 
-    my @PERL_ENV_LIB = split: (config_value: "path_sep"), defined env::var: 'PERL5LIB'
-                              ?? (env::var: 'PERL5LIB') !! (env::var: 'PERLLIB') || ''
+    my @PERL_ENV_LIB = split: (config_value: "path_sep")
+                              defined env::var: 'PERL5LIB'
+                                   ?? (env::var: 'PERL5LIB') !! (env::var: 'PERLLIB') || ''
 
     my @dirs=@:  < @PERL_ENV_LIB
                  < $^INCLUDE_PATH
@@ -1135,7 +1133,6 @@ sub pm_to_blib($fromto,$autodir, ?$pm_filter)
         if( -f $to && -s $from == -s $to && -M $to +< -M $from )
             print: $^STDOUT, "Skip $to (unchanged)\n"
             next
-
 
         # When a pm_filter is defined, we need to pre-process the source first
         # to determine whether it has changed or not.  Therefore, only perform

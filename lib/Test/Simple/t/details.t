@@ -11,7 +11,7 @@ BEGIN
 
 use Test::More
 use Test::Builder
-my $Test = Test::Builder->new
+my $Test = Test::Builder->new: 
 
 $Test->plan:  tests => 9 
 $Test->level: 0
@@ -27,9 +27,9 @@ push: @Expected_Details, \%:  'ok'      => 1
 
 # Inline TODO tests will confuse pre 1.20 Test::Harness, so we
 # should just avoid the problem and not print it out.
-my $out_fh  = $Test->output
-my $todo_fh = $Test->todo_output
-my $start_test = $Test->current_test + 1
+my $out_fh  = $Test->output: 
+my $todo_fh = $Test->todo_output: 
+my $start_test = ($Test->current_test: ) + 1
 my $new_out = ""
 open: my $new_fh, '>>', \$new_out or die: 
 $Test->output: $new_fh

@@ -1456,6 +1456,7 @@ lib/version.t			Tests for version objects
 lib/vmsish.pm			Control VMS-specific behavior of Perl core
 lib/vmsish.t			Tests for vmsish.pm
 lib/warnings.pm			For "use warnings"
+lib/warnings-pm.t		See if warning.pm is correct
 lib/warnings/register.pm	For "use warnings::register"
 lib/warnings.t			See if warning controls work
 locale.c			locale-specific utility functions
@@ -2048,6 +2049,7 @@ t/io/utf8.t			See if file seeking works
 t/japh/abigail.t		Obscure tests
 t/lex/chars.t			See if character escapes work
 t/lex/indentation.t		See if indentation works
+t/lex/label.t			See if label are correctly recognized
 t/lex/location.t		See if locations are correctly saved
 t/lex/pod.t			See if pod works
 t/lex/qq.t			See if qq works

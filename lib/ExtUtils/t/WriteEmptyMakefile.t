@@ -19,9 +19,10 @@ use ExtUtils::MakeMaker < qw(WriteEmptyMakefile)
 
 can_ok: __PACKAGE__, 'WriteEmptyMakefile'
 
-try { (WriteEmptyMakefile: "something"); }
-like: $^EVAL_ERROR->{description}, qr/Need an even number of args/
-
+try
+    local $^WARN_HOOK = sub($e) { die: $e }
+    WriteEmptyMakefile: "something"
+like: $^EVAL_ERROR->{description}, qr/Odd number of elements/
 
 do
     my $stdout = ''

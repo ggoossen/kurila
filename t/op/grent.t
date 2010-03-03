@@ -10,7 +10,7 @@ if ($^EVAL_ERROR and $^EVAL_ERROR->{?description} =~ m/(The \w+ function is unim
 
 
 our (%Config, $where)
-try { require Config; Config->import; }
+try { require Config; (Config->import: ); }
 my $reason
 if (%Config{?'i_grp'} ne 'define')
     $reason = '%Config{i_grp} not defined'
@@ -86,7 +86,7 @@ my %seen
 
 print: $^STDOUT, "# where $where\n"
 
-(ok:  setgrent(), 'setgrent' ) || print: $^STDOUT, "# $^OS_ERROR\n"
+(ok:  (setgrent: ), 'setgrent' ) || print: $^STDOUT, "# $^OS_ERROR\n"
 
 while ( ~< *GR)
     chomp
@@ -133,7 +133,7 @@ while ( ~< *GR)
     $n++
 
 
-endgrent()
+endgrent: ;
 
 print: $^STDOUT, "# max = $max, n = $n, perfect = ", nkeys %perfect, "\n"
 
@@ -164,22 +164,22 @@ else
 
 my @gr1
 
-setgrent()
+setgrent: ;
 for (1..$max)
-    my $gr = scalar getgrent()
+    my $gr = scalar getgrent:;
     last unless defined $gr
     push: @gr1, $gr
 
-endgrent()
+endgrent:;
 
 my @gr2
 
-setgrent()
+setgrent:;
 for (1..$max)
-    my (@: $gr, ...) = @: getgrent()
+    my (@: $gr, ...) = @: getgrent:;
     last unless defined $gr
     push: @gr2, $gr
 
-endgrent()
+endgrent:;
 
 is: "$((join: ' ',@gr1))", "$((join: ' ',@gr2))"

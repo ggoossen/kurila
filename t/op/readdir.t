@@ -28,12 +28,12 @@ if ((nelems @D) +> $min && (nelems @D) +< $max) { print: $^STDOUT, "ok 2\n"; }el
 
 
 our @R = sort: @D
-our @G = sort: (glob: "op/*.t"
-@G = (sort: (glob: ":op:*.t") if $^OS_NAME eq 'MacOS'
+our @G = sort: glob: "op/*.t"
+@G = sort: (glob: ":op:*.t") if $^OS_NAME eq 'MacOS'
 if (@G[0] =~ m#.*\](\w+\.t)#i)
     # grep is to convert filespecs returned from glob under VMS to format
     # identical to that returned by readdir
-    @G = grep:  {s#.*\](\w+\.t).*#op/$1#i }, (@: (glob: "op/*.t")
+    @G = grep:  {s#.*\](\w+\.t).*#op/$1#i }, @: (glob: "op/*.t")
 
 while (@R && @G && @G[0] eq ($^OS_NAME eq 'MacOS' ?? ':op:' !! 'op/').@R[0])
     shift: @R

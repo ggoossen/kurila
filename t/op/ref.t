@@ -98,7 +98,7 @@ is: ref $refref, 'HASH'
 
 sub PVBM () { 'foo' }
 do
-    my $dummy = (index: 'foo' (PVBM: ))
+    my $dummy = (index: 'foo', PVBM: )
 
 my $pviv = 1; "$pviv"
 my $pvnv = 1.0; "$pvnv"
@@ -293,7 +293,7 @@ is: $a, 2
 foreach my $lexical ((@: '', 'my $a; '))
     my $expect = "pass\n"
     my $result = runperl: switches => \(@: '-w'), stderr => 1
-                          prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $a->$; print $^STDOUT, $a, qq[\n]'
+                          prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $a->$; print: $^STDOUT, $a, qq[\n]'
 
     is: $^CHILD_ERROR, 0
     is: $result, $expect
@@ -311,14 +311,14 @@ do { my $a1 = bless: \(@: 3),"x";
 curr_test: $test+4
 
 is: (runperl: 
-        prog=> 'print $^STDOUT, 1, qq[\n]; print $^STDOUT, qq-*$^INPUT_RECORD_SEPARATOR*-, qq[\n];print $^STDOUT, 1, qq[\n];')
+        prog=> 'print: $^STDOUT, 1, qq[\n]; print: $^STDOUT, qq-*$^INPUT_RECORD_SEPARATOR*-, qq[\n];print: $^STDOUT, 1, qq[\n];')
     "1\n*\n*\n1\n"
 
 # bug #27268: freeing self-referential typeglobs could trigger
 # "Attempt to free unreferenced scalar" warnings
 
 is: (runperl: 
-        prog => 'use Symbol;my $x=bless \gensym,"t"; print $^STDOUT, $_;$x->$->*=$x'
+        prog => 'use Symbol;my $x=bless: \gensym,"t"; print: $^STDOUT, $_;$x->$->*=$x'
         stderr => 1
         ), '', 'freeing self-referential typeglob'
 
@@ -427,9 +427,9 @@ my $rpvbm = \$pvbm
 (ok: !try { $rpvbm->foo }, 'PVBM is not an object')
 
 # bug 24254
-(is:  (runperl: stderr => 1, prog => 'try { for (@: 1) { map { die }, @: 2 } };'), "")
-(is:  (runperl: stderr => 1, prog => 'for (@: 125) { map { exit }, @: 213}'), "")
-(like:  (runperl: stderr => 1, prog => 'for my $a (@: 3) {my @b=sort {die}, @: 4,5}'), qr/Died at -e line 1/)
+(is:  (runperl: stderr => 1, prog => 'try { for (@: 1) { map: { die: }, @: 2 } };'), "")
+(is:  (runperl: stderr => 1, prog => 'for (@: 125) { map: { exit: }, @: 213}'), "")
+(like:  (runperl: stderr => 1, prog => 'for my $a (@: 3) {my @b=sort: {die:}, @: 4,5}'), qr/Died at -e line 1/)
 
 # Bit of a hack to make test.pl happy. There are 3 more tests after it leaves.
 $test = (curr_test: )

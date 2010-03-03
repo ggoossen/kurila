@@ -79,12 +79,18 @@ try { local (\$@)->@; }
 (test_err_localref: )
 $x = \%aa
 $y = \%aa
-try { local $x->%; }      (test_err_localref: )
-try { local $x->%; }    (test_err_localref: )
-try { local $y->%; }      (test_err_localref: )
-try { local $y->%; }    (test_err_localref: )
-try { local (\%aa)->%; }  (test_err_localref: )
-try { local (\%: a=>1)->%; }(test_err_localref: )
+try { local $x->%; }
+(test_err_localref: )
+try { local $x->%; }
+(test_err_localref: )
+try { local $y->%; }
+(test_err_localref: )
+try { local $y->%; }
+(test_err_localref: )
+try { local (\%aa)->%; }
+(test_err_localref: )
+try { local (\%: a=>1)->%; }
+(test_err_localref: )
 
 
 do

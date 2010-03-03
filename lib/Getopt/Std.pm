@@ -129,7 +129,7 @@ sub getopt($argumentative, ?$hash)
     
     unless (ref $hash)
         local $Exporter::ExportLevel = 1
-        Getopt::Std->import
+        Getopt::Std->import: 
     
 
 
@@ -275,7 +275,7 @@ sub getopts($argumentative, ?$hash)
     
     unless (ref $hash)
         local $Exporter::ExportLevel = 1
-        Getopt::Std->import
+        Getopt::Std->import: 
     
     $errs == 0
 

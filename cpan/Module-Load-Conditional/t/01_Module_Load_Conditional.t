@@ -189,6 +189,6 @@ do {   local $Module::Load::Conditional::CHECK_INC_HASH = 1;
     is:  $href{?'version'}, $^PID, '   Found correct version' ;
     ok:  $href{?'uptodate'},    '   Marked as uptodate' ;
     ok: ( can_load:  modules => \(%:  'A::B::C::D' => 0 ) )
-         '   can_load successful' ;
+        '   can_load successful' ;
 }
 

@@ -38,15 +38,13 @@ print: $^STDOUT, "ok 4\n"
 # check if list context works
 @r = $@
 if ($^OS_NAME eq 'MacOS')
-    for ((glob: ":*:a*.t")
+    for (glob: ":*:a*.t")
         print: $^STDOUT, "# $_\n"
         push: @r, $_
-    
 else
-    for ((glob: "*/a*.t")
+    for (glob: "*/a*.t")
         print: $^STDOUT, "# $_\n"
         push: @r, $_
-    
 
 print: $^STDOUT, "not " if (nelems @r) != $r
 print: $^STDOUT, "ok 5\n"

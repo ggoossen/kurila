@@ -38,8 +38,8 @@ for my $i ((@: 1, 3, 5, 10))
 
 # Used to mangle PL_sv_undef
 fresh_perl_is: 
-    'print sprintf "xxx\%n\n"; print undef'
-    'Modification of a read-only value attempted at - line 1 character 7.'
+    'print: sprintf: "xxx\%n\n"; print: undef'
+    'Modification of a read-only value attempted at - line 1 character 8.'
     \(%:  switches => \(@:  '-w' ) )
     q(%n should not be able to modify read-only constants)
     
@@ -157,7 +157,7 @@ for my $width (@: 1,2,3,4,5,6,7)
         my $chars = ($precis +> 2 ?? 2 !! $precis)
         my $space = ($width +< 2 ?? 0 !! $width - $chars)
         fresh_perl_is: 
-            'my $v = "\x{20ac}\x{20ac}"; use utf8; my $x = sprintf "'.$format.'", $v; $x =~ m/^(\s*)(\S*)$/; for (map {length}, @: $1, $2) { print $^STDOUT, "$_" }'
+            'my $v = "\x{20ac}\x{20ac}"; use utf8; my $x = sprintf: "'.$format.'", $v; $x =~ m/^(\s*)(\S*)$/; for (map: {length}, @: $1, $2) { print: $^STDOUT, "$_" }'
             "$space$chars"
             \$%
             q(sprintf ").$format.q(", "\x{20ac}\x{20ac}")

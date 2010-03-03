@@ -166,7 +166,7 @@ is: $^EVAL_ERROR, ''
 
 
 # This segfaulted in a blead.
-fresh_perl_is: 'package Foo; Foo->VERSION;  print $^STDOUT, "ok"', 'ok'
+fresh_perl_is: 'package Foo; Foo->VERSION;  print: $^STDOUT, "ok"', 'ok'
 
 package Foo
 

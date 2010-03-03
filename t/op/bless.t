@@ -81,7 +81,7 @@ do
 # no class, or empty string (with a warning), or undef (with two)
 expected: (bless: \$@), 'main', "ARRAY"
 do
-    local $^WARN_HOOK = sub (@< @_) { (push: @w, @_[0]->message) }
+    local $^WARN_HOOK = sub (@< @_) { push: @w, @_[0]->message }
     use warnings;
 
     my $m = bless: \$@

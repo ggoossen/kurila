@@ -19,17 +19,17 @@ if [[ -z $FOO ]]; then echo 'not ok 1'; fi
 #!/some/path/that/leads/to/perl -0
 
 # These lines get executed
-my $test = @ARGV[0];
-if ($^INPUT_RECORD_SEPARATOR != '\0') {
-    print $^STDOUT, "not ";
-}
-if (-f 'switchx.t') {
-    print($^STDOUT, "ok $test\n");
-}
-$test++;
-print $^STDOUT, "ok $test\n";
+my $test = @ARGV[0]
+if ($^INPUT_RECORD_SEPARATOR != '\0')
+    print: $^STDOUT, "not "
+
+if (-f 'switchx.t')
+    print: $^STDOUT, "ok $test\n"
+
+$test++
+print: $^STDOUT, "ok $test\n"
 
 __END__
 
 # This is ignored
-print $^STDOUT, "not ok $test";
+print: $^STDOUT, "not ok $test";

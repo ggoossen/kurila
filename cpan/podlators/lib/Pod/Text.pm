@@ -157,8 +157,7 @@ sub _handle_element_start($self, $element, $attrs)
         push:  $self->%{PENDING}->@, \(@:  $attrs, '' )
     elsif (($self->can : "start_$method"))
         my $method = 'start_' . $method
-         $self->?$method : $attrs, ''
-    
+        $self->?$method : $attrs, ''
 
 
 # Handle the end of an element.  If we had a cmd_ method for this element,
@@ -178,12 +177,10 @@ sub _handle_element_end($self, $element)
                 $self->%{PENDING}->[-1]->[1] .= $text
             else
                 $self->output : $text
-            
         
     elsif (($self->can : "end_$method"))
         my $method = 'end_' . $method
-         $self->?$method : 
-    
+        $self->?$method :
 
 
 ##############################################################################
@@ -241,7 +238,7 @@ sub output($self, $text)
 # Output a block of code (something that isn't part of the POD text).  Called
 # by preprocess_paragraph only if we were given the code option.  Exists here
 # only so that it can be overridden by subclasses.
-sub output_code { @_[0]->output : @_[1]) }
+sub output_code { @_[0]->output : @_[1] }
 
 ##############################################################################
 # Document initialization
@@ -329,7 +326,7 @@ sub cmd_para($self, $attrs, $text)
 # Handle a verbatim paragraph.  Just print it out, but indent it according to
 # our margin.
 sub cmd_verbatim($self, $attrs, $text)
-    $self->item if defined $self->%{?ITEM}
+    $self->item:  if defined $self->%{?ITEM}
     return if $text =~ m/^\s*$/
     $text =~ s/^(\n*)(\s*\S+)/$($1 . (' ' x $self->%{?MARGIN}) . $2)/gm
     $text =~ s/\s*$/\n\n/
@@ -418,10 +415,10 @@ sub over_common_end($self)
 
 
 # Dispatch the start and end calls as appropriate.
-sub start_over_bullet { @_[0]->over_common_start : @_[1]) }
-sub start_over_number { @_[0]->over_common_start : @_[1]) }
-sub start_over_text   { @_[0]->over_common_start : @_[1]) }
-sub start_over_block  { @_[0]->over_common_start : @_[1]) }
+sub start_over_bullet { @_[0]->over_common_start : @_[1] }
+sub start_over_number { @_[0]->over_common_start : @_[1] }
+sub start_over_text   { @_[0]->over_common_start : @_[1] }
+sub start_over_block  { @_[0]->over_common_start : @_[1] }
 sub end_over_bullet { @_[0]->over_common_end }
 sub end_over_number { @_[0]->over_common_end }
 sub end_over_text   { @_[0]->over_common_end }
@@ -430,7 +427,7 @@ sub end_over_block  { @_[0]->over_common_end }
 # The common handler for all item commands.  Takes the type of the item, the
 # attributes, and then the text of the item.
 sub item_common($self, $type, $attrs, $text)
-    $self->item if defined $self->%{?ITEM}
+    $self->item:  if defined $self->%{?ITEM}
 
     # Clean up the text.  We want to end up with two variables, one ($text)
     # which contains any body text after taking out the item portion, and
@@ -560,7 +557,7 @@ sub pod2text
 # that the same object can be reused to convert multiple pages.
 sub parse_from_file
     my $self = shift
-    $self->reinit
+    $self->reinit: 
 
     # Fake the old cutting option to Pod::Parser.  This fiddings with internal
     # Pod::Simple state and is quite ugly; we need a better approach.

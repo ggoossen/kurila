@@ -15,7 +15,7 @@ use MakeMaker::Test::Utils
 use Test::More tests => 6
 use File::Spec
 
-my $TB = Test::More->builder
+my $TB = Test::More->builder: 
 
 BEGIN { (use_ok: 'ExtUtils::MM') }
 
@@ -37,13 +37,13 @@ sub try_oneliner
 
 
 # Lets see how it deals with quotes.
-try_oneliner: q{print $^STDOUT, "foo'o", ' bar"ar'}, $@,  q{foo'o bar"ar},  'quotes'
+try_oneliner: q{print: $^STDOUT, "foo'o", ' bar"ar'}, $@,  q{foo'o bar"ar},  'quotes'
 
 # How about dollar signs?
-try_oneliner: q{our $PATH = 'foo'; print $^STDOUT, $PATH}, $@, q{foo},   'dollar signs' 
+try_oneliner: q{our $PATH = 'foo'; print: $^STDOUT, $PATH}, $@, q{foo},   'dollar signs' 
 
 # switches?
-try_oneliner: q{print $^STDOUT, $^INPUT_RECORD_SEPARATOR}, (@: '-0'),           "\0",       'switches' 
+try_oneliner: q{print: $^STDOUT, $^INPUT_RECORD_SEPARATOR}, (@: '-0'),           "\0",       'switches' 
 
 # XXX gotta rethink the newline test.  The Makefile does newline
 # escaping, then the shell.

@@ -3,7 +3,7 @@ use base 'Exporter'
 
 use warnings
 our ($TODO, $Level, $using_open)
-require "../../t/test.pl"
+require "test.pl"
 
 our $VERSION = '0.02'
 
@@ -527,11 +527,11 @@ sub getRendering
         my $opwalker = B::Concise::compile: < @opts, $code
         die: "bad BC::compile retval" unless type::is_code: $opwalker
 
-        (B::Concise::reset_sequence: )(
-        $opwalker->& <: )
+        (B::Concise::reset_sequence: )
+        $opwalker->& <:
 
         # kludge error into rendering if its empty.
-        $rendering = $^EVAL_ERROR->message if $^EVAL_ERROR and ! $rendering
+        $rendering = ($^EVAL_ERROR->message: ) if $^EVAL_ERROR and ! $rendering
     else
         die: "bad testcase; no prog, code or Dx parameter\n"
     
@@ -902,7 +902,7 @@ sub mydumper
         
         return
 
-    Data::Dumper->import
+    Data::Dumper->import: 
     $Data::Dumper::Sortkeys = 1
     $dumploaded++
     Dumper: < @_

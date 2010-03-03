@@ -17,7 +17,7 @@ $^OUTPUT_AUTOFLUSH = 1
 
 print: $^STDOUT, "1..8\n"
 
-require '../../t/test.pl'
+require 'test.pl'
 
 (watchdog: 15)
 
@@ -55,9 +55,7 @@ sub connect
             print: $^STDOUT, "ok 4\n"
             return 0
 
-
-     $self->SUPER::connect: < @_
-
+    $self->SUPER::connect: < @_
 
 
 
@@ -72,9 +70,9 @@ my $listen = (IO::Socket::INET->new: Listen => 2
 
 print: $^STDOUT, "ok 1\n"
 
-my $port = $listen->sockport
+my $port = $listen->sockport: 
 
-if(my $pid = fork())
+if(my $pid = fork: )
 
     my $sock = $listen->accept or die: "$^OS_ERROR"
     print: $^STDOUT, "ok 5\n"
@@ -84,7 +82,7 @@ if(my $pid = fork())
 
     waitpid: $pid,0
 
-    $sock->close
+    $sock->close: 
 
     print: $^STDOUT, "ok 8\n"
 
@@ -101,7 +99,7 @@ elsif(defined $pid)
     sleep: 1 # race condition
     print: $^STDOUT, $sock->getline
 
-    $sock->close
+    $sock->close: 
 
     exit
 else

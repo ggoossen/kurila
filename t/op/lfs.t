@@ -23,7 +23,7 @@ sub zap
     unlink: "big2"
 
 
-sub bye
+sub bye()
     (zap: )
     exit: 0
 
@@ -127,10 +127,10 @@ print: $^STDOUT, "# we seem to have sparse files...\n"
 (env::var: 'LC_ALL' ) = "C"
 
 my $r = system: '../perl', '-e', <<'EOF'
-open(my $big, ">", "big");
-seek($big, 5_000_000_000, 0);
-print $big, "big";
-exit 0;
+open: my $big, ">", "big"
+seek: $big, 5_000_000_000, 0
+print: $big, "big"
+exit 0
 EOF
 
 open: $big, ">", "big" or do { warn: "open failed: $^OS_ERROR\n"; bye: }

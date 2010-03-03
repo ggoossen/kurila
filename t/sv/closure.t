@@ -252,15 +252,15 @@ END_MARK_ONE
 END_MARK_TWO
 
                 $code .= <<"END_MARK_THREE" # Backwhack a lot!
-    print \$^STDOUT, "not ok: got unexpected warning \$msg\\n";
+    print: \$^STDOUT, "not ok: got unexpected warning \$msg\\n";
 \} \}
 
 do \{
     my \$test = $test;
     sub test (\$sub) \{
       my \$ok = \$sub->();
-      print \$^STDOUT, \$ok ?? "ok \$test\n" !! "not ok \$test\n";
-      printf \$^STDOUT, "# Failed at line \\\%d\n", (\@: caller)[2] unless \$ok;
+      print: \$^STDOUT, \$ok ?? "ok \$test\n" !! "not ok \$test\n";
+      printf: \$^STDOUT, "# Failed at line \\\%d\n", (\@: caller)[2] unless \$ok;
       \$test++;
     \}
 \};
@@ -365,7 +365,6 @@ END
                     $code .= "\}\n\n"
                 elsif ($where_declared eq 'in_anon') # {
                     $code .= "\};\n\n"
-                
 
                 # We may need to do something with the sub we just made...
                 $code .= "undef \$outer;\n" if $undef_outer
@@ -475,7 +474,6 @@ END
                     my $lnum = 0
                     for my $line ((split: '\n', $code))
                         printf: $^STDOUT, "\%3d:  \%s\n", ++$lnum, $line
-                    
                 
                 if ($^CHILD_ERROR)
                     printf: $^STDOUT, "not ok: exited with error code \%04X\n", $^CHILD_ERROR
@@ -486,8 +484,6 @@ END
                                # End of foreach $within
                                # End of foreach $where_declared
                                # End of foreach $inner_type
-
-
 
 do
     # The following dumps core with perl <= 5.8.0 (bugid 9535) ...
@@ -524,13 +520,13 @@ test: {( $a->& <: ) == 123 }
 
 # this coredumped on <= 5.8.0 because evaling the closure caused
 # an SvFAKE to be added to the outer anon's pad, which was then grown.
-my $outer(
-sub (@< @_)
+my $outer
+(sub (@< @_)
     my $x
-    $x = eval 'sub { $outer }'(
-    $x->& <: )
-    $a = \@:  99( 
-    $x->& <: )
+    $x = eval 'sub { $outer }'
+    ($x->& <: )
+    $a = \@:  99
+    ($x->& <: )
  ->& <: )
 test: {1}
 
@@ -606,11 +602,10 @@ do
 
 do
     my $x = 1
-    sub f16302
+    sub f16302()
         (sub (@< @_)
             test: { defined $x and $x == 1 }
          ->& <: )
-    
 
 (f16302: )
 
@@ -632,16 +627,16 @@ do
     my $progfile = "b23265.pl"
     open: my $t, ">", "$progfile" or die: "$^PROGRAM_NAME: $^OS_ERROR\n"
     print: $t  ,<< '__EOF__'
-        print $^STDOUT,
-            sub {@_[0]->(<@_)} -> (
+        print:
+            $^STDOUT
+            sub {@_[0]->(<@_)} ->& <:
                 sub {
                     @_[1]
                         ??  @_[0]->(@_[0], @_[1] - 1) .  sub {"x"}->()
                         !! "y"
-                },   
+                }
                 2
-            )
-            , "\n"
+            "\n"
         ;
 __EOF__
     close $t
@@ -655,8 +650,8 @@ do
     # savestack, due to the early freeing of the anon closure
 
     my $got = runperl: stderr => 1, prog =>
-                       'sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; try{$f->()}; print $^STDOUT, qq(ok\n)'
-                      
+                       'sub d {die:} my $f; $f = sub {my $x=1; $f = 0; d}; try{ $f->& <: }; print: $^STDOUT, qq(ok\n)'
+
     test: { $got eq "ok\n" }
 
 
@@ -675,10 +670,3 @@ do
     # test { $flag == 1 };
     print: $^STDOUT, "not ok $test # TODO cleanup sub freeing\n"
     $test++
-
-
-
-
-
-
-

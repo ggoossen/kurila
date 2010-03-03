@@ -201,7 +201,7 @@ sub catdir
     if (@args[0] eq '') # absolute path, rootdir
         shift @args
         $relative = 0
-        $first_arg = $self->rootdir
+        $first_arg = $self->rootdir: 
 
     elsif (@args[0] =~ m/^[^:]+:/) # absolute path, volume name
         $relative = 0

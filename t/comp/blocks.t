@@ -31,26 +31,26 @@ e1
 my $expect = ":" . join: ":", @expect
 
 fresh_perl_is: <<'SCRIPT', $expect,\(%: switches => \(@: ''), stdin => '', stderr => 1 ),'Order of execution of special blocks'
-BEGIN {print $^STDOUT, ":b1"}
-END {print $^STDOUT, ":e1"}
-BEGIN {print $^STDOUT, ":b2"}
+BEGIN {print: $^STDOUT, ":b1"}
+END {print: $^STDOUT, ":e1"}
+BEGIN {print: $^STDOUT, ":b2"}
 do {
-    BEGIN {BEGIN {print $^STDOUT, ":b3"}; print $^STDOUT, ":b4"}
+    BEGIN {BEGIN {print: $^STDOUT, ":b3"}; print: $^STDOUT, ":b4"}
 };
-CHECK {print $^STDOUT, ":c1"}
-INIT {print $^STDOUT, ":i1"}
-UNITCHECK {print $^STDOUT, ":u1"}
-eval 'BEGIN {print $^STDOUT, ":b5"}';
-eval 'UNITCHECK {print $^STDOUT, ":u2"}';
-eval 'UNITCHECK {print $^STDOUT, ":u3"; UNITCHECK {print $^STDOUT, ":u4"}}';
-"a" =~ m/(?{UNITCHECK {print $^STDOUT, ":u5"};
-           CHECK {print $^STDOUT, ":c2"};
-           BEGIN {print $^STDOUT, ":b6"}})/x;
-try {BEGIN {print $^STDOUT, ":b7"}};
-try {UNITCHECK {print $^STDOUT, ":u6"}};
-try {INIT {print $^STDOUT, ":i2"}};
-try {CHECK {print $^STDOUT, ":c3"}};
-END {print $^STDOUT, ":e2"}
+CHECK {print: $^STDOUT, ":c1"}
+INIT {print: $^STDOUT, ":i1"}
+UNITCHECK {print: $^STDOUT, ":u1"}
+eval 'BEGIN {print: $^STDOUT, ":b5"}';
+eval 'UNITCHECK {print: $^STDOUT, ":u2"}';
+eval 'UNITCHECK {print: $^STDOUT, ":u3"; UNITCHECK {print: $^STDOUT, ":u4"}}';
+"a" =~ m/(?{UNITCHECK {print: $^STDOUT, ":u5"};
+           CHECK {print: $^STDOUT, ":c2"};
+           BEGIN {print: $^STDOUT, ":b6"}})/x;
+try {BEGIN {print: $^STDOUT, ":b7"}};
+try {UNITCHECK {print: $^STDOUT, ":u6"}};
+try {INIT {print: $^STDOUT, ":i2"}};
+try {CHECK {print: $^STDOUT, ":c3"}};
+END {print: $^STDOUT, ":e2"}
 SCRIPT
 
 @expect =@:  <
@@ -68,31 +68,31 @@ SCRIPT
 $expect = ":" . join: ":", @expect
 fresh_perl_is: <<'SCRIPT2', $expect,\(%: switches => \(@: ''), stdin => '', stderr => 1 ),'blocks interact with packages/scopes'
 our $f;
-BEGIN {$f = 'main'; print $^STDOUT, ":$f"}
-UNITCHECK {print $^STDOUT, ":$f"}
-CHECK {print $^STDOUT, ":$f"}
-INIT {print $^STDOUT, ":$f"}
-END {print $^STDOUT, ":$f"}
+BEGIN {$f = 'main'; print: $^STDOUT, ":$f"}
+UNITCHECK {print: $^STDOUT, ":$f"}
+CHECK {print: $^STDOUT, ":$f"}
+INIT {print: $^STDOUT, ":$f"}
+END {print: $^STDOUT, ":$f"}
 package bar;
 our $f;
-BEGIN {$f = 'bar';print $^STDOUT, ":$f"}
-UNITCHECK {print $^STDOUT, ":$f"}
-CHECK {print $^STDOUT, ":$f"}
-INIT {print $^STDOUT, ":$f"}
-END {print $^STDOUT, ":$f"}
+BEGIN {$f = 'bar';print: $^STDOUT, ":$f"}
+UNITCHECK {print: $^STDOUT, ":$f"}
+CHECK {print: $^STDOUT, ":$f"}
+INIT {print: $^STDOUT, ":$f"}
+END {print: $^STDOUT, ":$f"}
 package foo;
 our $f;
 do {
     my $f;
-    BEGIN {$f = 'myfoo'; print $^STDOUT, ":$f"}
-    UNITCHECK {print $^STDOUT, ":$f"}
-    CHECK {print $^STDOUT, ":$f"}
-    INIT {print $^STDOUT, ":$f"}
-    END {print $^STDOUT, ":$f"}
+    BEGIN {$f = 'myfoo'; print: $^STDOUT, ":$f"}
+    UNITCHECK {print: $^STDOUT, ":$f"}
+    CHECK {print: $^STDOUT, ":$f"}
+    INIT {print: $^STDOUT, ":$f"}
+    END {print: $^STDOUT, ":$f"}
 };
-BEGIN {$f = "foo";print $^STDOUT, ":$f"}
-UNITCHECK {print $^STDOUT, ":$f"}
-CHECK {print $^STDOUT, ":$f"}
-INIT {print $^STDOUT, ":$f"}
-END {print $^STDOUT, ":$f"}
+BEGIN {$f = "foo";print: $^STDOUT, ":$f"}
+UNITCHECK {print: $^STDOUT, ":$f"}
+CHECK {print: $^STDOUT, ":$f"}
+INIT {print: $^STDOUT, ":$f"}
+END {print: $^STDOUT, ":$f"}
 SCRIPT2

@@ -86,7 +86,7 @@ DONE
 
 use Test::More;
 
-my $numtests = nelems(@tests) / 2;
+my $numtests = (nelems: @tests) / 2;
 plan tests => $numtests;
 
 use Text::Tabs;

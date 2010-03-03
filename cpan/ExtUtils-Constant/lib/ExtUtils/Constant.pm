@@ -118,10 +118,11 @@ sub constant_types
 
 
 sub C_constant($package, $subname, $default_type, $what, $indent, $breakout, @< @items)
-    ExtUtils::Constant::XS->C_constant: \(%: package => $package, subname => $subname
+    ExtUtils::Constant::XS->C_constant: \ %: package => $package, subname => $subname
                                              default_type => $default_type
                                              types => $what, indent => $indent
-                                             breakout => $breakout), < @items
+                                             breakout => $breakout
+                                        < @items
 
 
 =item XS_constant PACKAGE, TYPES, XS_SUBNAME, C_SUBNAME
@@ -296,8 +297,8 @@ EOT
 EOT
 
     $result =~ s/^/$(' 'x$indent)/gm
-    return ExtUtils::Constant::XS->dump_names: \(%: default_type=>%args{?DEFAULT_TYPE}
-                                                    indent=>$indent,)
+    return ExtUtils::Constant::XS->dump_names: \ %: default_type=>%args{?DEFAULT_TYPE}
+                                                    indent=>$indent
                                                < %args{NAMES}->@
         . $result
 

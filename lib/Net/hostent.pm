@@ -31,7 +31,7 @@ struct: 'Net::hostent' => \@:
             addr_list        => '@'
        
 
-sub addr($self, @< @_) { $self->addr_list->[0] }
+sub addr($self, @< @_) { ($self->addr_list: )->[0] }
 
 sub populate
     return unless (nelems @_)
@@ -56,9 +56,9 @@ sub gethostbyaddr ($addr, ?$addrtype)
 sub gethost($name_addr)
     if ($name_addr =~ m/^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/)
         require Socket
-        &gethostbyaddr->& < < Socket::inet_aton: $name_addr
+        &gethostbyaddr->& <: < Socket::inet_aton: $name_addr
     else
-        &gethostbyname->& < $name_addr
+        &gethostbyname->& <: $name_addr
 
 1
 __END__

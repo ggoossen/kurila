@@ -326,7 +326,7 @@ EOT
     foreach ($export_names->@)
         print: $fh, "\t$_\n"
     print: $fh, ");\n"
-    print: $fh, "$package->bootstrap(\$VERSION);\n1;\n__END__\n"
+    print: $fh, "$package->bootstrap: \$VERSION;\n1;\n__END__\n"
     close $fh or die: "close $pm: $^OS_ERROR\n"
 
     ################ test.pl
@@ -337,9 +337,9 @@ EOT
     print: $fh, <<"EOT" or die: $^OS_ERROR
 use $package < qw($((join: ' ',$export_names->@)));
 
-print \$^STDOUT, "1..1\n";
-print \$^STDOUT, "ok 1\n";
-open \$^STDOUT, ">", "$output" or die "Failed to open '$output': \$^OS_ERROR";
+print: \$^STDOUT, "1..1\n";
+print: \$^STDOUT, "ok 1\n";
+open: \$^STDOUT, ">", "$output" or die: "Failed to open '$output': \$^OS_ERROR";
 EOT
     print: $fh, $testfile or die: $^OS_ERROR
     close $fh or die: "close $testpl: $^OS_ERROR\n"
@@ -452,18 +452,17 @@ EOT
 # What follows goes to the temporary file.
 # IV
 my $five = FIVE;
-if ($five == 5) {
-  print $^STDOUT, "ok $test\n";
-} else {
-  print $^STDOUT, "not ok $test # five: \$five\n";
-}
-$test++;
+if ($five == 5)
+  print: $^STDOUT, "ok $test\n"
+else
+  print: $^STDOUT, "not ok $test # five: \$five\n"
+$test++
 
 # PV
 if (OK6 eq "ok 6\n") {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 } else {
-  print $^STDOUT, "not ok $test # \$five\n";
+  print: $^STDOUT, "not ok $test # \$five\n";
 }
 $test++;
 
@@ -472,23 +471,23 @@ $_ = OK7;
 s/.*\0//s;
 s/7/$test/;
 $test++;
-print $^STDOUT, $_;
+print: $^STDOUT, $_;
 
 # NV
 my $farthing = FARTHING;
 if ($farthing == 0.25) {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 } else {
-  print $^STDOUT, "not ok $test # $farthing\n";
+  print: $^STDOUT, "not ok $test # $farthing\n";
 }
 $test++;
 
 # UV
 my $not_zero = NOT_ZERO;
 if ($not_zero +> 0 && $not_zero == ^~^0) {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 } else {
-  print $^STDOUT, "not ok $test # \$not_zero=$not_zero ^~^0=" . (^~^0) . "\n";
+  print: $^STDOUT, "not ok $test # \$not_zero=$not_zero ^~^0=" . (^~^0) . "\n";
 }
 $test++;
 
@@ -496,91 +495,91 @@ $test++;
 # Also tests custom cpp #if clauses
 my $close = CLOSE;
 if ($close eq '*/') {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 } else {
-  print $^STDOUT, "not ok $test # \$close='$close'\n";
+  print: $^STDOUT, "not ok $test # \$close='$close'\n";
 }
 $test++;
 
 # Default values if macro not defined.
 my $answer = ANSWER;
 if ($answer == 42) {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 } else {
-  print $^STDOUT, "not ok $test # What do you get if you multiply six by nine? '$answer'\n";
+  print: $^STDOUT, "not ok $test # What do you get if you multiply six by nine? '$answer'\n";
 }
 $test++;
 
 # not defined macro
 my $notdef = try { NOTDEF; };
 if (defined $notdef) {
-  print $^STDOUT, "not ok $test # \$notdef='$notdef'\n";
+  print: $^STDOUT, "not ok $test # \$notdef='$notdef'\n";
 } elsif ($^EVAL_ERROR->{description} !~ m/Your vendor has not defined the requested ExtTest macro/) {
-  warn $^EVAL_ERROR->message;
-  print $^STDOUT, "not ok $test\n";
+  warn: $^EVAL_ERROR->message;
+  print: $^STDOUT, "not ok $test\n";
 } else {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 }
 $test++;
 
 # not a macro
-my $notthere = try { ExtTest::NOTTHERE(); };
+my $notthere = try { ExtTest::NOTTHERE: ; };
 if (defined $notthere) {
-  print $^STDOUT, "not ok $test # \$notthere='$notthere'\n";
+  print: $^STDOUT, "not ok $test # \$notthere='$notthere'\n";
 } elsif ($^EVAL_ERROR->{description} !~ m/Undefined subroutine .*NOTTHERE called/) {
-  chomp $^EVAL_ERROR;
-  print $^STDOUT, "not ok $test # \$^EVAL_ERROR='$^EVAL_ERROR'\n";
+  chomp: $^EVAL_ERROR;
+  print: $^STDOUT, "not ok $test # \$^EVAL_ERROR='$^EVAL_ERROR'\n";
 } else {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 }
 $test++;
 
 # Truth
 my $yes = Yes;
 if ($yes) {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 } else {
-  print $^STDOUT, "not ok $test # $yes='\$yes'\n";
+  print: $^STDOUT, "not ok $test # $yes='\$yes'\n";
 }
 $test++;
 
 # Falsehood
 my $no = No;
 if (defined $no and !$no) {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 } else {
-  print $^STDOUT, "not ok $test # \$no=" . defined ($no) ?? "'$no'\n" !! "undef\n";
+  print: $^STDOUT, "not ok $test # \$no=" . defined ($no) ?? "'$no'\n" !! "undef\n";
 }
 $test++;
 
 # Undef
 my $undef = Undef;
 unless (defined $undef) {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 } else {
-  print $^STDOUT, "not ok $test # \$undef='$undef'\n";
+  print: $^STDOUT, "not ok $test # \$undef='$undef'\n";
 }
 $test++;
 
 # invalid macro (chosen to look like a mix up between No and SW)
-$notdef = try { ExtTest::So() };
+$notdef = try { ExtTest::So: };
 if (defined $notdef) {
-  print $^STDOUT, "not ok $test # \$notdef='$notdef'\n";
+  print: $^STDOUT, "not ok $test # \$notdef='$notdef'\n";
 } elsif ($^EVAL_ERROR->{description} !~ m/^Undefined subroutine .*So called/) {
-  print $^STDOUT, "not ok $test # \$^EVAL_ERROR='$^EVAL_ERROR'\n";
+  print: $^STDOUT, "not ok $test # \$^EVAL_ERROR='$^EVAL_ERROR'\n";
 } else {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 }
 $test++;
 
 # invalid defined macro
-$notdef = try { ExtTest::EW() };
+$notdef = try { ExtTest::EW: };
 if (defined $notdef) {
-  print $^STDOUT, "not ok $test # \$notdef='$notdef'\n";
+  print: $^STDOUT, "not ok $test # \$notdef='$notdef'\n";
 } elsif ($^EVAL_ERROR->{description} !~ m/^Undefined subroutine .*EW called/) {
-  print $^STDOUT, "not ok $test # \$^EVAL_ERROR='$^EVAL_ERROR'\n";
+  print: $^STDOUT, "not ok $test # \$^EVAL_ERROR='$^EVAL_ERROR'\n";
 } else {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 }
 $test++;
 
@@ -597,20 +596,20 @@ my $fail;
 while (my @: ?$point, ?$bearing = @: each %compass) {
   my $val = eval $point;
   if ($^EVAL_ERROR) {
-    print $^STDOUT, "# $point: \$^EVAL_ERROR='$^EVAL_ERROR'\n";
+    print: $^STDOUT, "# $point: \$^EVAL_ERROR='$^EVAL_ERROR'\n";
     $fail = 1;
   } elsif (!defined $bearing) {
-    print $^STDOUT, "# $point: \$val=undef\n";
+    print: $^STDOUT, "# $point: \$val=undef\n";
     $fail = 1;
   } elsif ($val != $bearing) {
-    print $^STDOUT, "# $point: \$val=$val, not $bearing\n";
+    print: $^STDOUT, "# $point: \$val=$val, not $bearing\n";
     $fail = 1;
   }
 }
 if ($fail) {
-  print $^STDOUT, "not ok $test\n";
+  print: $^STDOUT, "not ok $test\n";
 } else {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 }
 $test++;
 
@@ -619,16 +618,16 @@ EOT
     $test_body .= <<"EOT"
 my \$rfc1149 = RFC1149;
 if (\$rfc1149 ne "$parent_rfc1149") \{
-  print \$^STDOUT, "not ok \$test # '\$rfc1149' ne '$parent_rfc1149'\n";
+  print: \$^STDOUT, "not ok \$test # '\$rfc1149' ne '$parent_rfc1149'\n";
 \} else \{
-  print \$^STDOUT, "ok \$test\n";
+  print: \$^STDOUT, "ok \$test\n";
 \}
 \$test++;
 
 if (\$rfc1149 != 1149) \{
-  printf \$^STDOUT, "not ok \$test # \\\%d != 1149\n", \$rfc1149;
+  printf: \$^STDOUT, "not ok \$test # \\\%d != 1149\n", \$rfc1149;
 \} else \{
-  print \$^STDOUT, "ok \$test\n";
+  print: \$^STDOUT, "ok \$test\n";
 \}
 \$test++;
 
@@ -638,9 +637,9 @@ EOT
 # test macro=>1
 my $open = OPEN;
 if ($open eq '/*') {
-  print $^STDOUT, "ok $test\n";
+  print: $^STDOUT, "ok $test\n";
 } else {
-  print $^STDOUT, "not ok $test # \$open='$open'\n";
+  print: $^STDOUT, "not ok $test # \$open='$open'\n";
 }
 $test++;
 EOT
@@ -662,9 +661,9 @@ EOT
         # No error expected
         $test_body .= <<"EOT"
   if (\$error or \$got ne "$expect") \{
-    print $^STDOUT, "not ok $dummytest # error '\$error', expect '$expect', got '\$got'\n";
+    print: $^STDOUT, "not ok $dummytest # error '\$error', expect '$expect', got '\$got'\n";
   \} else \{
-    print $^STDOUT, "ok $dummytest\n";
+    print: $^STDOUT, "ok $dummytest\n";
   \}
 \};
 EOT
@@ -672,9 +671,9 @@ EOT
         # Error expected.
         $test_body .= <<"EOT"
   if (\$error) \{
-    print \$^STDOUT, "ok $dummytest # error='\$error' (as expected)\n";
+    print: \$^STDOUT, "ok $dummytest # error='\$error' (as expected)\n";
   \} else \{
-    print \$^STDOUT, "not ok $dummytest # expected error, got no error and '\$got'\n";
+    print: \$^STDOUT, "not ok $dummytest # expected error, got no error and '\$got'\n";
   \}
 EOT
 
@@ -686,7 +685,7 @@ EOT
 
 # Simple tests to verify bits of the switch generation system work.
 sub simple
-    (start_tests: )
+    start_tests:
     # Deliberately leave $name in @_, so that it is indexed from 1.
     my (@: $name, @< @items) =  @_
     my $test_header
@@ -697,9 +696,9 @@ sub simple
         $test_body .= <<"EOT"
 \$value = $thisname;
 if (\$value == $counter) \{
-  print \$^STDOUT, "ok $dummytest\n";
+  print: \$^STDOUT, "ok $dummytest\n";
 \} else \{
-  print \$^STDOUT, "not ok $dummytest # $thisname gave \$value\n";
+  print: \$^STDOUT, "not ok $dummytest # $thisname gave \$value\n";
 \}
 EOT
         ++$dummytest

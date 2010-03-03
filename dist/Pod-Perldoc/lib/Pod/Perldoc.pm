@@ -207,9 +207,9 @@ sub aside  # If we're in -v or DEBUG mode, say this.
                                  my $callsub = ((caller: 1))[[3]]
                                  my $package = quotemeta: __PACKAGE__ . '::'
                                  $callsub =~ s/^$package/'/os
-                               # the o is justified, as $package really won't change.
+                                 # the o is justified, as $package really won't change.
                                  $callsub . ": "
-                                 !! ''
+                               !! ''
                              < @_
             
         if((DEBUG: )) { (print: $^STDOUT, $out) } else { print: $^STDERR, $out }
@@ -327,7 +327,7 @@ sub init
 
     $self->{+'target'} = undef
 
-    $self->init_formatter_class_list
+    $self->init_formatter_class_list: 
 
     $self->{+'pagers' } = @Pagers unless exists $self->{'pagers'}
     $self->{+'bindir' } = $Bindir   unless exists $self->{'bindir'}
@@ -407,13 +407,13 @@ sub process
 
     my @pages
     $self->{+'pages'} = \@pages
-    if(    $self->opt_f) @pages = (@: "perlfunc")              
-    elsif( $self->opt_q) @pages ="perlfaq1" .. "perlfaq9"
+    if(    ($self->opt_f: )) @pages = (@: "perlfunc")              
+    elsif( ($self->opt_q: )) @pages ="perlfaq1" .. "perlfaq9"
     else                 @pages = $self->{?'args'}->@
                          # @pages = __FILE__
                          #  if @pages == 1 and $pages[0] eq 'perldoc';
 
-    return $self->usage_brief  unless  (nelems @pages)
+    return ($self->usage_brief: )  unless  (nelems @pages)
 
     $self->find_good_formatter_class
     $self->formatter_sanity_check
@@ -610,7 +610,7 @@ sub options_reading
     (DEBUG: )+> 1
         and print: $^STDOUT, "  Args after switch processing: $((join: ' ',$self->{?'args'}->@))\n"
 
-    return $self->usage if $self->opt_h
+    return ($self->usage: ) if $self->opt_h: 
 
     return
 
@@ -626,9 +626,9 @@ sub options_processing
         $self->{+'podidx'} = $podidx
     
 
-    $self->{+'output_to_stdout'} = 1  if  $self->opt_T or ! -t $^STDOUT
+    $self->{+'output_to_stdout'} = 1  if  $self->opt_T:  or ! -t $^STDOUT
 
-    $self->options_sanity
+    $self->options_sanity: 
 
     $self->opt_n: "nroff" unless $self->opt_n
     $self->add_formatter_option:  '__nroffer' => $self->opt_n 
@@ -690,7 +690,7 @@ sub grand_search_init($self, $pages, @< @found)
 
         $self->aside:  "Searching for $page\n" 
 
-        if ($self->opt_F)
+        if (($self->opt_F: ))
             next unless -r $page
             push: @found, $page if $self->opt_m or $self->containspod: $page
             next
@@ -767,7 +767,7 @@ sub maybe_generate_dynamic_pod($self, $found_things)
         push: $self->{'temp_file_list'}->@, $buffer
         # I.e., it MIGHT be deleted at the end.
 
-        my $in_list = $self->opt_f
+        my $in_list = $self->opt_f: 
 
         print: $buffd, "=over 8\n\n" if $in_list
         print: $buffd, < @dynamic_pod  or die: "Can't print $buffer: $^OS_ERROR"
@@ -851,7 +851,7 @@ sub search_perlfunc($self, $found_things, $pod)
         print: $^STDOUT, "Going to perlfunc-scan for $search_re in $perlfunc\n"
 
     my $re = 'Alphabetical Listing of Perl Functions'
-    if ( $self->opt_L )
+    if ( ($self->opt_L: ) )
         my $tr = $self->{'translators'}->[0]
         $re =  $tr->search_perlfunc_re if $tr->can: 'search_perlfunc_re'
     
@@ -898,7 +898,7 @@ sub search_perlfaqs( $self, $found_things, $pod)
 
     my $found = 0
     my %found_in
-    my $search_key = $self->opt_q
+    my $search_key = $self->opt_q: 
 
     my $rx = try { qr/$search_key/ }
         or die: <<EOD
@@ -941,7 +941,6 @@ sub render_findings($self, $found_things)
     my $formatter = $formatter_class->can: 'new'
         ?? $formatter_class->new
         !! $formatter_class
-    
 
     if(! nelems $found_things->@)
         die: "Nothing found?!"
@@ -984,7 +983,6 @@ sub render_findings($self, $found_things)
         ( ($formatter->can: 'output_extension') && $formatter->output_extension )
             || undef
         $self->useful_filename_bit
-        
 
     # Now, finally, do the formatting!
     do
@@ -1059,7 +1057,7 @@ sub MSWin_temp_cleanup
     (opendir: my $tmpdh, $tempdir) || return
     my @to_unlink
 
-    my $limit = time() - $Temp_File_Lifetime
+    my $limit = (time: ) - $Temp_File_Lifetime
 
     (DEBUG: )+> 5 and printf: $^STDOUT, "Looking for things pre-dating \%s (\%x)\n"
                               ($limit) x 2
@@ -1105,11 +1103,11 @@ sub MSWin_perldoc_tempfile($self, $suffix, $infix)
             # Yes, we embed the create-time in the filename!
                          $tempdir
                          $infix || 'x'
-                         time()
+                         time
                          $^PID
                          exists:  &Win32::GetTickCount 
-                         ?? ((Win32::GetTickCount: ) ^&^ 0xff)
-                         !! int: rand 256
+                             ?? ((Win32::GetTickCount: ) ^&^ 0xff)
+                             !! int: rand 256
             # Under MSWin, $$ values get reused quickly!  So if we ran
             # perldoc foo and then perldoc bar before there was time for
             # time() to increment time."_$$" would likely be the same
@@ -1416,7 +1414,7 @@ sub maybe_diddle_INC
 
 sub new_output_file
     my $self = shift
-    my $outspec = $self->opt_d  # Yes, -d overrides all else!
+    my $outspec = $self->opt_d:   # Yes, -d overrides all else!
     # So don't call this twice per format-job!
 
     return ($self->new_tempfile: < @_) unless defined $outspec and length $outspec

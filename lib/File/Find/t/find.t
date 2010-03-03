@@ -635,7 +635,7 @@ if ( $symlink_exists )
 
         File::Find::find:  \(%: wanted => \&wanted_File, follow => 1
                                 dangling_symlinks =>
-                               sub (@< @_) { $warn_msg = "@_[0] is a dangling symbolic link" }
+                                sub (@< @_) { $warn_msg = "@_[0] is a dangling symbolic link" }
                             )
                            (topdir: 'dangling_dir_sl'), (topdir: 'fa') 
 

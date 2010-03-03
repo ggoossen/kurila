@@ -1,14 +1,14 @@
 #!./perl
 
 BEGIN
-    require "../t/test.pl"
+    require "test.pl"
     skip_all: "No perlio" unless ((PerlIO::Layer->find: 'perlio'))
     plan: 15
 
 use warnings 'layer'
 my $warn
 my $file = "fail$^PID"
-$^WARN_HOOK = sub { $warn = shift->message }
+$^WARN_HOOK = sub { $warn =( shift->message: ) }
 
 END 
     1 while unlink: $file

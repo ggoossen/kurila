@@ -214,7 +214,7 @@ sub get_files
     return keys %file
 
 
-sub write_errno_pm
+sub write_errno_pm()
 
     # quick sanity check
 
@@ -237,12 +237,9 @@ sub write_errno_pm
             print: $cppi, "#define $err WSA$err\n"
             print: $cppi, "#endif\n"
             %err{+$err} = 1
-        
-    
 
     foreach my $err (keys %err)
         print: $cppi, '"',$err,'" [[',$err,']]',"\n"
-    
 
     close: $cppi
 
@@ -335,9 +332,9 @@ our (\@EXPORT_OK,\%EXPORT_TAGS,\@ISA,\$VERSION,\%errno)
 use Exporter ()
 use Config
 
-"\$(config_value('archname'))-\$(config_value('osvers'))" eq
+"\$(config_value: 'archname')-\$(config_value: 'osvers')" eq
     "$((config_value: 'archname'))-$((config_value: 'osvers'))" or
-        die "Errno architecture ($((config_value: 'archname'))-$((config_value: 'osvers'))) does not match executable architecture (\$(config_value('archname'))-\$(config_value('osvers')))";
+        die: "Errno architecture ($((config_value: 'archname'))-$((config_value: 'osvers'))) does not match executable architecture (\$(config_value: 'archname')-\$(config_value: 'osvers'))";
 
 \$VERSION = "$VERSION";
 \$VERSION = eval \$VERSION;

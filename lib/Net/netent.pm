@@ -49,9 +49,9 @@ sub getnetbyaddr ($net, ?$addrtype)
 sub getnet($name)
     if ($name =~ m/^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/)
         require Socket
-        &getnetbyaddr->& < < Socket::inet_aton: $name
+        &getnetbyaddr->& <: < Socket::inet_aton: $name
     else
-        &getnetbyname->& < $name
+        &getnetbyname->& <: $name
 
 1
 __END__

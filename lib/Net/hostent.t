@@ -53,8 +53,8 @@ is:  (inet_ntoa: $i->addr), "127.0.0.1",   'addr from gethostbyaddr'
     print: $^STDOUT, "# name = " . $h->name . ", aliases = " . (join: ",", $h->aliases->@) . "\n"
 
     my $in_alias
-    unless ($h->name =~ m/^localhost(?:\..+)?$/i)
-        foreach ( $h->aliases->@)
+    unless (($h->name: ) =~ m/^localhost(?:\..+)?$/i)
+        foreach ( ($h->aliases: )->@)
             if (m/^localhost(?:\..+)?$/i)
                 $in_alias = 1
                 last
@@ -67,7 +67,7 @@ is:  (inet_ntoa: $i->addr), "127.0.0.1",   'addr from gethostbyaddr'
 
     if ($in_alias)
         # If we found it in the aliases before, expect to find it there again.
-        foreach ( $h->aliases->@)
+        foreach ( ($h->aliases: )->@)
             if (m/^localhost(?:\..+)?$/i)
                 # This time, clear the flag if we see "localhost"
                 undef $in_alias

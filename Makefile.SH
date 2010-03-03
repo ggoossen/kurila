@@ -768,7 +768,7 @@ $(MINIPERL_EXE): $& miniperlmain$(OBJ_EXT) $(mini_obj) opmini$(OBJ_EXT) perlmini
 	$(CC) -o $(MINIPERL_EXE) $(CLDFLAGS) \
 	    $(mini_obj) \
 	    miniperlmain$(OBJ_EXT) opmini$(OBJ_EXT) perlmini$(OBJ_EXT) $(libs)
-	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e 'glob("?")' || $(MAKE) minitest
+	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e 'glob: "?"' || $(MAKE) minitest
 !NO!SUBS!
 		;;
 	next4*)
@@ -776,7 +776,7 @@ $(MINIPERL_EXE): $& miniperlmain$(OBJ_EXT) $(mini_obj) opmini$(OBJ_EXT) perlmini
 $(MINIPERL_EXE): $& miniperlmain$(OBJ_EXT) $(mini_obj) perlmini$(OBJ_EXT) opmini$(OBJ_EXT)
 	$(CC) -o $(MINIPERL_EXE) $(mini_obj) \
 	    miniperlmain$(OBJ_EXT) opmini$(OBJ_EXT) perlmini$(OBJ_EXT) $(libs)
-	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e 'glob("?")' || $(MAKE) minitest
+	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e 'glob: "?"' || $(MAKE) minitest
 !NO!SUBS!
 		;;
 	darwin*)
@@ -798,7 +798,7 @@ $(MINIPERL_EXE): $& miniperlmain$(OBJ_EXT) $(mini_obj) opmini$(OBJ_EXT) perlmini
 	$(CC) $(CLDFLAGS) $(NAMESPACEFLAGS) -o $(MINIPERL_EXE) \
 	    $(mini_obj) \
 	    miniperlmain$(OBJ_EXT) opmini$(OBJ_EXT) perlmini$(OBJ_EXT) $(libs)
-	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e 'glob("?")' || $(MAKE) minitest
+	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e 'glob: "?"' || $(MAKE) minitest
 !NO!SUBS!
 		;;
 	*)
@@ -808,7 +808,7 @@ $(MINIPERL_EXE): $& miniperlmain$(OBJ_EXT) $(mini_obj) opmini$(OBJ_EXT) perlmini
 	$(LDLIBPTH) $(CC) $(CLDFLAGS) -o $(MINIPERL_EXE) \
 	    $(mini_obj) \
 	    miniperlmain$(OBJ_EXT) opmini$(OBJ_EXT) perlmini$(OBJ_EXT) $(libs)
-	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e 'glob("?")' || $(MAKE) minitest
+	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e 'glob: "?"' || $(MAKE) minitest
 !NO!SUBS!
 		;;
 	esac
@@ -941,7 +941,7 @@ lib/re.pm: ext/re/re.pm
 
 $(plfixlocal): $(CONFIGPM)
 	$(CPS) $@.pl $@
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -I"`pwd`/lib" "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)" $@
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -I"`pwd`/lib" "-MExtUtils::MY" -e "MY->fixin: shift @ARGV" $@
 
 unidatafiles $(unidatafiles): uni.data
 
@@ -974,13 +974,13 @@ extra.pods: $(MINIPERL_EXE)
 	done
 
 extras.make: perl$(EXE_EXT)
-	-@test ! -s extras.lst || PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) $(RUN) ./perl -Ilib -MCPAN -e '@ARGV&&make(@ARGV)' `cat extras.lst`
+	-@test ! -s extras.lst || PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) $(RUN) ./perl -Ilib -MCPAN -e '@ARGV&&make:@ARGV' `cat extras.lst`
 
 extras.test: perl$(EXE_EXT)
-	-@test ! -s extras.lst || PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) $(RUN) ./perl -Ilib -MCPAN -e '@ARGV&&test(@ARGV)' `cat extras.lst`
+	-@test ! -s extras.lst || PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) $(RUN) ./perl -Ilib -MCPAN -e '@ARGV&&test:@ARGV' `cat extras.lst`
 
 extras.install: perl$(EXE_EXT)
-	-@test ! -s extras.lst || PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) $(RUN) ./perl -Ilib -MCPAN -e '@ARGV&&install(@ARGV)' `cat extras.lst`
+	-@test ! -s extras.lst || PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) $(RUN) ./perl -Ilib -MCPAN -e '@ARGV&&install:@ARGV' `cat extras.lst`
 
 .PHONY: install install-strip install-all install-verbose install-silent \
 	no-install install.perl install.man install.html
@@ -1436,7 +1436,7 @@ Makefile: Makefile.SH ./config.sh
 
 .PHONY: distcheck
 distcheck: FORCE
-	perl '-MExtUtils::Manifest=&fullcheck' -e 'fullcheck()'
+	perl '-MExtUtils::Manifest=&fullcheck' -e '(fullcheck: )'
 
 .PHONY: elc
 elc:	emacs/cperl-mode.elc

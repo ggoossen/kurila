@@ -14,7 +14,7 @@ chdir 't'
 
 
 use Test::Builder
-my $tb = Test::Builder->new
+my $tb = Test::Builder->new: 
 
 my %Original_Output
 for (qw(output failure_output todo_output))
@@ -47,7 +47,7 @@ $tb->no_ending: 1
 
 
 # Now reset it.
-$tb->reset
+$tb->reset: 
 
 my $test_num = 2   # since we already printed 1
 # Utility testing functions.

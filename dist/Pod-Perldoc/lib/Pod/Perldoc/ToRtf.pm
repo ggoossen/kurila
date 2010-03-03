@@ -17,7 +17,7 @@ sub write_with_binmode { 0 }
 sub output_extension   { 'rtf' }
 
 sub page_for_perldoc($self, $tempfile, $perldoc)
-    return unless $perldoc->IS_MSWin32
+    return unless $perldoc->IS_MSWin32: 
 
     my $rtf_pager = (env::var: 'RTFREADER') || 'write.exe'
 

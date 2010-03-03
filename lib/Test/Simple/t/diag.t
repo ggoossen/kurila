@@ -12,7 +12,7 @@ BEGIN
 
 use Test::More tests => 5
 
-my $Test = Test::More->builder
+my $Test = Test::More->builder: 
 
 # now make a filehandle where we can send data
 my $output = ""

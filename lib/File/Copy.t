@@ -2,7 +2,7 @@
 
 use Test::More
 
-my $TB = Test::More->builder
+my $TB = Test::More->builder: 
 
 plan: tests => 60
 
@@ -15,11 +15,12 @@ use File::Copy
 use Config
 
 
-foreach my $code (@: "copy()", "copy('arg')", "copy('arg', 'arg', 'arg', 'arg')"
-                     "move()", "move('arg')", "move('arg', 'arg', 'arg')"
+foreach my $code (@: "copy:", "copy: 'arg'", "copy: 'arg', 'arg', 'arg', 'arg'"
+                     "move:", "move: 'arg'", "move: 'arg', 'arg', 'arg'"
     )
     eval $code
-    like: $^EVAL_ERROR->message, qr/^Usage: /, "'$code' is a usage error"
+    like: $^EVAL_ERROR->message, qr/^Usage: |Not enough arguments|Too many arguments/
+          "'$code' is a usage error"
 
 
 

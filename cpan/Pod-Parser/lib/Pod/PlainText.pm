@@ -126,8 +126,7 @@ sub initialize
     $self->%{+INDENTS}  = \$@              # Stack of indentations.
     $self->%{+MARGIN}   = $self->%{?indent}  # Current left margin in spaces.
 
-        $self->SUPER::initialize: 
-
+    $self->SUPER::initialize
 
 
 ############################################################################
@@ -145,7 +144,7 @@ sub command
     return if ($self->%{?EXCLUDE} && $command ne 'end')
     $self->item : "\n" if defined $self->%{?ITEM}
     $command = 'cmd_' . $command
-     $self->?$command : < @_
+    $self->?$command : < @_
 
 
 # Called for a verbatim paragraph.  Gets the paragraph, the line number, and
@@ -153,7 +152,7 @@ sub command
 # to spaces.
 sub verbatim($self, $_, _, ?_)
     return if $self->%{?EXCLUDE}
-    $self->item if defined $self->%{?ITEM}
+    $self->item:  if defined $self->%{?ITEM}
     return if m/^\s*$/
     s/^(\s*\S+)/$((' ' x $self->%{?MARGIN}) . $1)/gm
     $self->output : $_
@@ -332,7 +331,7 @@ sub cmd_back($self, ...)
 # An individual list item.
 sub cmd_item
     my $self = shift
-    if (defined $self->%{?ITEM}) { $self->item }
+    if (defined $self->%{?ITEM}) { ($self->item: ) }
     local $_ = shift
     s/\s+$//
     $self->%{+ITEM} = $self->interpolate : $_

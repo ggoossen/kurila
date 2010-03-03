@@ -157,8 +157,8 @@ sub erase($obj, $action)
 
 sub reinit
     my $obj= shift
-    $obj->erase
-    $obj->share_redo
+    $obj->erase: 
+    $obj->share_redo: 
 
 
 sub root

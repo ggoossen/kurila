@@ -23,7 +23,7 @@ sub _normalize
 #---------------------------------------------------------------------------
 # The extent of our functional interface:
 
-sub detect () { return __PACKAGE__->ambient_langprefs; }
+sub detect () { return (__PACKAGE__->ambient_langprefs: ); }
 
 #===========================================================================
 

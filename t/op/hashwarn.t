@@ -8,7 +8,7 @@ use warnings
 our (@warnings)
 
 BEGIN 
-    $^WARN_HOOK = sub (@< @_) { (push: @warnings, @_[0]->message) }
+    $^WARN_HOOK = sub (@< @_) { push: @warnings, @_[0]->message }
     $^OUTPUT_AUTOFLUSH = 1
 
 

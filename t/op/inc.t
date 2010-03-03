@@ -139,7 +139,7 @@ foreach (keys %postdec)
     my $ans = %postdec{?$_}
     my $down
     try {$down = $_--}
-    ok: defined $down and $down eq $ans
+    ok: (defined $down and $down eq $ans)
 
 
 check_same: \%orig, \%postdec
@@ -193,7 +193,7 @@ sub check_some_code
     my (@: $start, $warn, $action, $description) =  @_
     my $warn_line = ($warn ?? 'use' !! 'no') . " warnings 'imprecision';"
     my @warnings
-    local $^WARN_HOOK = sub (@< @_) {(push: @warnings, @_[0]->message)}
+    local $^WARN_HOOK = sub (@< @_) {push: @warnings, @_[0]->message}
 
     print: $^STDOUT, "# checking $action under $warn_line\n"
     my $code = <<"EOC"
@@ -261,7 +261,7 @@ die: "Could not find a value which overflows the mantissa" unless $found
 
 sub PVBM () { 'foo' }
 do
-    my $dummy = (index: 'foo' (PVBM: ))
+    my $dummy = (index: 'foo', (PVBM: ))
 
 (ok: scalar try { my $pvbm = (PVBM: ); $pvbm++ })
 (ok: scalar try { my $pvbm = (PVBM: ); $pvbm-- })

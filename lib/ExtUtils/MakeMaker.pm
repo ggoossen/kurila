@@ -39,11 +39,9 @@ require ExtUtils::MY  # XXX pre-5.8 versions of ExtUtils::Embed expect
 # This will go when Embed is it's own CPAN module.
 
 
-sub WriteMakefile
-    die: "WriteMakefile: Need even number of args" if (nelems @_) % 2
+sub WriteMakefile(%< %att)
 
     require ExtUtils::MY
-    my %att = %:  < @_ 
 
     _verify_att: \%att
 
@@ -382,7 +380,7 @@ sub new
         $file =~ s{::}{/}g
         try { require $file }
 
-        my $pr_version = $prereq->VERSION || 0
+        my $pr_version = ($prereq->VERSION: ) || 0
 
         # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
         $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/
@@ -416,7 +414,7 @@ END
     if (defined $self->{?CONFIGURE})
         if (!(type::is_code: $self->{?CONFIGURE}))
             die: "Attribute 'CONFIGURE' to WriteMakefile() not a code\n"
-        %configure_att = %:  <(  $self->{?CONFIGURE}->& <:  < @_ )->% 
+        %configure_att = ( $self->{CONFIGURE}->& <: < @_ )->%
         $self = \%:  < $self->%, < %configure_att
 
     my $newclass = ++$PACKNAME
@@ -473,25 +471,25 @@ END
     
 
 
-    $self->{+NAME} ||= $self->guess_name
+    $self->{+NAME} ||= $self->guess_name: 
 
     ($self->{+NAME_SYM} = $self->{?NAME}) =~ s/\W+/_/g
 
-    $self->init_MAKE
-    $self->init_main
-    $self->init_VERSION
-    $self->init_dist
-    $self->init_INST
-    $self->init_INSTALL
-    $self->init_DEST
-    $self->init_dirscan
-    $self->init_PM
-    $self->init_MANPODS
-    $self->init_xs
-    $self->init_PERL
-    $self->init_DIRFILESEP
-    $self->init_linker
-    $self->init_ABSTRACT
+    $self->init_MAKE: 
+    $self->init_main: 
+    $self->init_VERSION: 
+    $self->init_dist: 
+    $self->init_INST: 
+    $self->init_INSTALL: 
+    $self->init_DEST: 
+    $self->init_dirscan: 
+    $self->init_PM: 
+    $self->init_MANPODS: 
+    $self->init_xs: 
+    $self->init_PERL: 
+    $self->init_DIRFILESEP: 
+    $self->init_linker: 
+    $self->init_ABSTRACT: 
 
     if (! $self->{?PERL_SRC} )
         require VMS::Filespec if $Is_VMS
@@ -583,7 +581,7 @@ END
     # We run all the subdirectories now. They don't have much to query
     # from the parent, but the parent has to query them: if they need linking!
     unless ($self->{?NORECURS})
-        $self->eval_in_subdirs if (nelems $self->{?DIR})
+        $self->eval_in_subdirs:  if (nelems $self->{?DIR})
     
 
     foreach my $section (  @MM_Sections )
@@ -599,21 +597,17 @@ END
             my %a = $self->{?$section} || $%
             push: $self->{RESULT}, "\n# --- MakeMaker $section section:"
             push: $self->{RESULT}, "# " . (join: ", ", %a) if $Verbose && %a
-            push: $self->{RESULT}, $self->maketext_filter: 
+            push: $self->{RESULT}
+                  $self->maketext_filter: 
                           $self->?$method:  < %a 
-                      
-        
-    
 
     push: $self->{RESULT}, "\n# End."
 
     $self
 
 
-sub WriteEmptyMakefile
-    die: "WriteEmptyMakefile: Need an even number of args" if (nelems @_) % 2
+sub WriteEmptyMakefile(%< %att)
 
-    my %att = %:  < @_ 
     my $self = MM->new: \%att
 
     my $new = $self->{?MAKEFILE}
@@ -729,7 +723,7 @@ sub check_hints($self)
     # We allow extension-specific hints files.
 
     require File::Spec
-    my $curdir = File::Spec->curdir
+    my $curdir = File::Spec->curdir: 
 
     my $hint_dir = File::Spec->catdir: $curdir, "hints"
     return unless -d $hint_dir
@@ -763,7 +757,7 @@ sub _run_hintfile
 
     # Just in case the ./ isn't on the hint file, which File::Spec can
     # often strip off, we bung the curdir into $^INCLUDE_PATH
-    local $^INCLUDE_PATH = @:  File::Spec->curdir, < $^INCLUDE_PATH
+    local $^INCLUDE_PATH = @:  (File::Spec->curdir: ), < $^INCLUDE_PATH
     my $ret = evalfile $hint_file
     if( !defined $ret )
         my $error = $^EVAL_ERROR && $^EVAL_ERROR->message || $^OS_ERROR
@@ -875,7 +869,7 @@ sub flush
         warn: "rename MakeMaker.tmp => $finalname: $^OS_ERROR"
     chmod: 0644, $finalname unless $Is_VMS
 
-    my %keep = %:  < @+: map: { (@: $_ => 1) }, qw(NEEDS_LINKING HAS_LINK_CODE) 
+    my %keep = %+: map: { %: $_ => 1 }, qw(NEEDS_LINKING HAS_LINK_CODE) 
 
     if ($self->{?PARENT} && !$self->{?_KEEP_AFTER_FLUSH})
         foreach (keys $self->%) # safe memory

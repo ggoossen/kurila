@@ -78,7 +78,7 @@ sub command
     my (@: $cmd, $text, $line_num, $pod_para)  =  @_
     $cmd     = ''  unless (defined $cmd)
     local $_ = $text || ''
-    my $out_fh  = $self->output_handle
+    my $out_fh  = $self->output_handle: 
 
     ## Defer to the superclass for everything except '=include'
     return  ($self->SUPER::command: < @_) unless ($cmd eq "include")

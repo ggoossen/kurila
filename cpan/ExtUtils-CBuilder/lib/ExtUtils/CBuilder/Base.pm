@@ -93,7 +93,7 @@ sub compile($self, %< %args)
     my @ccflags = $self->split_like_shell: $cf{ccflags}
     my @optimize = $self->split_like_shell: $cf{optimize}
     my @flags = @: < @include_dirs, < @defines, < @cccdlflags, < @extra_compiler_flags
-                   $self->arg_nolink
+                   $self->arg_nolink: 
                    < @ccflags, < @optimize
                    < $self->arg_object_file: %args{object_file}
         
@@ -224,8 +224,8 @@ sub perl_src
 
     return unless env::var: 'PERL_CORE'
 
-    my $Updir = File::Spec->updir
-    my $dir   = File::Spec->curdir
+    my $Updir = File::Spec->updir: 
+    my $dir   = File::Spec->curdir: 
 
     # Try up to 5 levels upwards
     for (0..10)

@@ -8,7 +8,7 @@ BEGIN
 
 
 use Test::Builder
-my $Test = Test::Builder->new
+my $Test = Test::Builder->new: 
 
 $Test->plan:  tests => 7 
 

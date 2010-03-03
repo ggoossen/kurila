@@ -14,7 +14,7 @@ is:  (env::var: "PERL_TEST_ENV_VAR"), "test1", "PERL_TEST_ENV_VAR was set"
 (env::var: "PERL_TEST_ENV_VAR") = "test2"
 is:  (env::var: "PERL_TEST_ENV_VAR"), "test2", "PERL_TEST_ENV_VAR adjusted" 
 
-fresh_perl_is: qq{print \$^STDOUT, env::var("PERL_TEST_ENV_VAR")}
+fresh_perl_is: qq{print: \$^STDOUT, env::var: "PERL_TEST_ENV_VAR"}
                "test2"
                \$%
                "PERL_TEST_ENV_VAR passed through to child"

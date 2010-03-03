@@ -16,7 +16,7 @@ my $io
 
 use_ok: 'IO::File'
 
-$io = IO::File->new
+$io = IO::File->new: 
 
 ok: ($io->open: "io_utf8", ">:utf8"), "open >:utf8"
 ok: ((print: $io, (chr: 256))), "print chr(256)"

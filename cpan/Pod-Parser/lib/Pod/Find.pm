@@ -148,7 +148,6 @@ sub pod_find
             push: @search, < (grep:  {$_ ne File::Spec->curdir }, @new_INC)
         else
             push: @search, < (grep:  {$_ ne File::Spec->curdir }, $^INCLUDE_PATH)
-        
 
         %opts{+perl} = 1
     
@@ -355,7 +354,7 @@ sub pod_where
     my %options = %:
         'inc' => 0
         'verbose' => 0
-        'dirs' => \ @:  File::Spec->curdir
+        'dirs' => \ @:  File::Spec->curdir: 
 
     # Check for an options hash as first argument
     if (defined @_[0] && (ref: @_[0]) eq 'HASH')

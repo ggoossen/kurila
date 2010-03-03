@@ -155,12 +155,13 @@ cmp_ok:  $^INCLUDED{?'Quux2.pm'}, '\==', $sref,       '  val Quux2.pm is correct
 
 pop $^INCLUDE_PATH
 
-push: $^INCLUDE_PATH, sub ($self, $filename)
-    if ((substr: $filename,0,4) eq 'Toto')
-        $^INCLUDED{+$filename} = 'xyz'
-        return get_temp_fh: $filename
-    else
-        return undef
+push: $^INCLUDE_PATH
+      sub ($self, $filename)
+          if ((substr: $filename,0,4) eq 'Toto')
+              $^INCLUDED{+$filename} = 'xyz'
+              return get_temp_fh: $filename
+          else
+              return undef
 
 $evalret = try { require Toto; 1 }
 die: $^EVAL_ERROR if $^EVAL_ERROR
@@ -171,14 +172,13 @@ is:  $^INCLUDED{?'Toto.pm'}, 'xyz',	   '  val Toto.pm is correct in $^INCLUDED'
 
 pop $^INCLUDE_PATH
 
-push: $^INCLUDE_PATH, sub (@< @_)
-    my (@: $self, $filename) =  @_
-    if ($filename eq 'abc.pl')
-        return get_temp_fh: $filename, qq(return "abc";\n)
-    else
-        return undef
-    
-
+push: $^INCLUDE_PATH
+      sub (@< @_)
+          my (@: $self, $filename) =  @_
+          if ($filename eq 'abc.pl')
+              return get_temp_fh: $filename, qq(return "abc";\n)
+          else
+              return undef
 
 my $ret = ""
 $ret ||= evalfile 'abc.pl'
@@ -200,14 +200,15 @@ exit if $minitest
     skip:  "No PerlIO available", 3  unless $has_perlio
     pop $^INCLUDE_PATH
 
-    push: $^INCLUDE_PATH, sub (@< @_)
-        my (@: $cr, $filename) =  @_
-        my $module = $filename; $module =~ s,/,::,g; $module =~ s/\.pm$//
-        open: my $fh, '<'
-              \"package $module; sub complain \{ warn q(barf) \}; \$main::file = __FILE__;"
-            or die: $^OS_ERROR
-        $^INCLUDED{+$filename} = "/custom/path/to/$filename"
-        return $fh
+    push: $^INCLUDE_PATH
+          sub (@< @_)
+              my (@: $cr, $filename) =  @_
+              my $module = $filename; $module =~ s,/,::,g; $module =~ s/\.pm$//
+              open: my $fh, '<'
+                    \"package $module; sub complain \{ warn: q(barf) \}; \$main::file = __FILE__;"
+                  or die: $^OS_ERROR
+              $^INCLUDED{+$filename} = "/custom/path/to/$filename"
+              return $fh
 
     require Publius::Vergilius::Maro
     is:  $^INCLUDED{?'Publius/Vergilius/Maro.pm'}
@@ -228,28 +229,29 @@ if ($can_fork)
     # This little bundle of joy generates n more recursive use statements,
     # with each module chaining the next one down to 0. If it works, then we
     # can safely nest subprocesses
-    push: $^INCLUDE_PATH, sub (@< @_)
-        return unless @_[1] =~ m/^BBBLPLAST(\d+)\.pm/
-        my $pid = open: my $fh, "-|", "-"
-        if ($pid)
-            # Parent
-            return $fh
-        
-        die: "Can't fork self: $^OS_ERROR" unless defined $pid
+    push: $^INCLUDE_PATH
+          sub (@< @_)
+              return unless @_[1] =~ m/^BBBLPLAST(\d+)\.pm/
+              my $pid = open: my $fh, "-|", "-"
+              if ($pid)
+                  # Parent
+                  return $fh
 
-        # Child
-        my $count = $1
-        # Lets force some fun with odd sized reads.
-        $^OUTPUT_AUTOFLUSH = 1
-        print: $^STDOUT, 'push @main::bbblplast, '
-        print: $^STDOUT, "$count;\n"
-        if ($count--)
-            print: $^STDOUT, "use BBBLPLAST$count;\n"
-        
-        print: $^STDOUT, "pass('In @_[1]');"
-        print: $^STDOUT, '"Truth"'
-        POSIX::_exit: 0
-        die: "Can't get here: $^OS_ERROR"
+              die: "Can't fork self: $^OS_ERROR" unless defined $pid
+
+              # Child
+              my $count = $1
+              # Lets force some fun with odd sized reads.
+              $^OUTPUT_AUTOFLUSH = 1
+              print: $^STDOUT, 'push: @main::bbblplast, '
+              print: $^STDOUT, "$count;\n"
+              if ($count--)
+                  print: $^STDOUT, "use BBBLPLAST$count;\n"
+
+              print: $^STDOUT, "pass: 'In @_[1]';"
+              print: $^STDOUT, '"Truth"'
+              POSIX::_exit: 0
+              die: "Can't get here: $^OS_ERROR"
     
 
     @::bbblplast = $@

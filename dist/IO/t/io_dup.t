@@ -25,7 +25,7 @@ print: $stdout, "ok 2\n"
 print: $stderr, "ok 3\n"
 
 # Since some systems don't have echo, we use Perl.
-my $echo = qq{$^EXECUTABLE_NAME -e "print \\\$^STDOUT, qq(ok \%d\n)"}
+my $echo = qq{$^EXECUTABLE_NAME -e "print: \\\$^STDOUT, qq(ok \%d\n)"}
 
 my $cmd = sprintf: $echo, 4
 print: $^STDOUT, `$cmd`
@@ -34,8 +34,8 @@ $cmd = sprintf: "$echo 1>&2", 5
 $cmd = (sprintf: $echo, 5) if $^OS_NAME eq 'MacOS'
 print: $^STDOUT, `$cmd`
 
-$stderr->close
-$stdout->close
+$stderr->close: 
+$stdout->close: 
 
 $stdout->fdopen: $dupout,"w"
 $stderr->fdopen: $duperr,"w"

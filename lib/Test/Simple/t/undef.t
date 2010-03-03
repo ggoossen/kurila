@@ -14,9 +14,9 @@ use Test::More tests => 18
 BEGIN { $^WARNING = 1; }
 
 my $warnings = ''
-local $^WARN_HOOK = sub (@< @_) { $warnings .= @_[0]->message }
+local $^WARN_HOOK = sub (@< @_) { $warnings .= @_[0]->message: }
 
-my $TB = Test::Builder->new
+my $TB = Test::Builder->new: 
 sub no_warnings
     $TB->is_eq: $warnings, '', '  no warnings'
     $warnings = ''
@@ -71,7 +71,7 @@ warnings_like: qr/Use of uninitialized value.*/
 
 
 
-my $tb = Test::More->builder
+my $tb = Test::More->builder: 
 
 my $caught
 open: *CATCH, '+<', \$caught or die: 

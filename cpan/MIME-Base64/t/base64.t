@@ -351,7 +351,7 @@ sub decodeTest
         \(@: 'Y'        => '')
         \(@: 'x=='      => '')
         \(@: ''         => '')
-        \(@: undef()    => '')
+        \(@: (undef)    => '')
         
 
     for my $test ( @decode_tests)

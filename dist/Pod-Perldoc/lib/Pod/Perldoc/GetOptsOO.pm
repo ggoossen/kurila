@@ -57,17 +57,16 @@ sub getopts
                 $rest = shift $args->@
             else            # like -fbar  (== -f bar)
                 shift $args->@
-            
 
             (DEBUG: )+> 3 and print: $^STDOUT, " $method => $rest\n"
-             $target->?$method:  $rest 
+            $target->?$method:  $rest 
 
         # Otherwise, it's not argumental...
         else
 
             if( ($target->can: ( $method = "opt_$first") ) )
                 (DEBUG: )+> 3 and print: $^STDOUT, " $method is true ($truth)\n"
-                 $target->?$method:  $truth 
+                $target->?$method:  $truth 
 
             # Otherwise it's an unknown option...
 

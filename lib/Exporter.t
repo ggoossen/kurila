@@ -89,7 +89,7 @@ do
 
 do
     package Foo
-    Testing->import
+    Testing->import: 
 
     main::ok:  exists &lifejacket,      'simple import' 
 

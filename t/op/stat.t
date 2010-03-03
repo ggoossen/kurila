@@ -33,7 +33,7 @@ my $Is_UFS     = $Is_Darwin && (@: `df -t ufs . 2>/dev/null`) == 2
 my(@: $DEV, $INO, $MODE, $NLINK, $UID, $GID, $RDEV, $SIZE
       $ATIME, $MTIME, $CTIME, $BLKSIZE, $BLOCKS) = @:  <0..12
 
-my $Curdir = File::Spec->curdir
+my $Curdir = File::Spec->curdir: 
 
 
 my $tmpfile = 'Op_stat.tmp'
@@ -271,7 +271,9 @@ ok: ! -e $tmpfile_link,  '   -e on unlinked file'
 
     my $try = sub (@< @_)
         my @c1 = @:  eval qq[\$DEV =~ m/^@_[0].*/mg] 
-        my @c2 = eval qq[grep \{ @_[1] "/dev/\$_" \}, \@DEV]
+        die: if $^EVAL_ERROR
+        my @c2 = eval qq[grep: \{ @_[1] "/dev/\$_" \}, \@DEV]
+        die: if $^EVAL_ERROR
         my $c1 = nelems @c1
         my $c2 = nelems @c2
         is: $c1, $c2, "ls and @_[1] agreeing on /dev ($c1 $c2)"
@@ -342,7 +344,7 @@ ok: ! -e $tmpfile_link,  '   -e on unlinked file'
     ok: ! -t *TTY,    '!-t on closed TTY filehandle'
 
 
-my $Null = File::Spec->devnull
+my $Null = File::Spec->devnull: 
 :SKIP do
     skip: "No null device to test with", 1 unless -e $Null
     skip: "We know Win32 thinks '$Null' is a TTY", 1 if $Is_MSWin32
@@ -486,7 +488,7 @@ do
 
     # And now for the ambigious bareword case
     ok: (open: $dir, "<", "TEST"), 'Can open "TEST" dir'
-        || diag: "Can't open 'TEST':  $^OS_ERROR"
+       || diag: "Can't open 'TEST':  $^OS_ERROR"
     my $size = (@: (stat: $dir))[7]
     ok: defined $size, "stat() on bareword works"
     is: $size, -s "TEST", "size returned by stat of bareword is for the file"
@@ -516,7 +518,7 @@ do
 
         # And now for the ambigious bareword case
         ok: (open: $dir, "<", "TEST"), 'Can open "TEST" dir'
-            || diag: "Can't open 'TEST':  $^OS_ERROR"
+           || diag: "Can't open 'TEST':  $^OS_ERROR"
         my $size = (@: (stat: $dir))[7]
         ok: defined $size, "stat() on *THINGY\{IO\} works"
         is: $size, -s "TEST"

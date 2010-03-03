@@ -503,8 +503,6 @@ sub manicopy($read,$target,$how)
                 File::Path::mkpath: \(@: "$target/$dir"),! $Quiet,$Is_VMS ?? undef !! 0755
             
             cp_if_diff: $file, "$target/$file", $how
-        
-    
 
 
 sub cp_if_diff($from, $to, $how)

@@ -510,10 +510,7 @@ sub _sanity_check_and_defaults
             if ( exists %utmpl{$key}{'store'} )
                 _store_error:  (loc: 
                                    q|Store variable for '%1' is not a reference!|, $key
-                    ), 1, 1  unless ref %utmpl{$key}{?'store'}
-            
-        
-    
+                                 ), 1, 1  unless ref %utmpl{$key}{?'store'}
 
     ### errors found ###
     return if $fail

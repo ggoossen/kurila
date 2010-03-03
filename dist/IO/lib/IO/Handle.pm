@@ -383,19 +383,16 @@ sub sysread($io, $bufref, $len, ?$offset)
     sysread: $io, $bufref->$, $len, $offset || 0
 
 
-sub write
-    (nelems: @_) +>= 2 && (nelems @_) +<= 4 or die: 'usage: $io->write(BUF [, LEN [, OFFSET]])'
-    @_[+2] = (length: @_[1]) unless defined @_[?2]
-    print: @_[0]  ,substr: @_[1], @_[?3] || 0, @_[2]
+sub write($io, $buf, ?$len, ?$offset)
+    $len //= length: $buf
+    print: $io, substr: $buf, $offset || 0, $len
 
 
-sub syswrite
-    (nelems: @_) +>= 2 && (nelems @_) +<= 4 or die: 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])'
-    if ((defined: @_[?2]))
-        syswrite: @_[0], @_[1], @_[2], @_[?3] || 0
+sub syswrite($io, $buf, ?$len, ?$offset)
+    if (defined: $len)
+        syswrite: $io, $buf, $len, $offset || 0
     else
-        syswrite: @_[0], @_[1]
-
+        syswrite: $io, $buf
 
 
 sub stat($io)

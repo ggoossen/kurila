@@ -79,7 +79,7 @@ is: (@: $str =~ m/(\p{sc:InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}"
 is: (@: $str =~ m/(\p{sc=InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}"
 
 use File::Spec
-my $updir = 'File::Spec'->updir
+my $updir = 'File::Spec'->updir: 
 
 # the %utf8::... hashes are already in existence
 # because utf8_pva.pl was run by utf8_heavy.pl

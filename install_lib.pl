@@ -30,7 +30,7 @@ OS
         # You never saw us. We weren't here.
 
         require Config
-        Config->import
+        Config->import: 
 
 if ((config_value: 'd_umask'))
     umask: 022 # umasks like 077 aren't that useful for installations

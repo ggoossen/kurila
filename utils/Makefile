@@ -6,7 +6,7 @@ RUN =   # Used mainly cross-compilation setups.
 CPS = cp
 
 # From MakeMaker.
-FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)"
+FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin: shift @ARGV"
 
 # Files to be built with variable substitution after miniperl is
 # available.  Dependencies handled manually below (for now).

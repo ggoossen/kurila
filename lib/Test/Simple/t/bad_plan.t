@@ -23,7 +23,7 @@ sub ok($test, $name)
 
 
 use Test::Builder
-my $Test = Test::Builder->new
+my $Test = Test::Builder->new: 
 
 print: $^STDOUT, "1..2\n"
 

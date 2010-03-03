@@ -42,7 +42,7 @@ sub init_dist($self)
 $(NOECHO) $(TEST_F) tmp.zip && $(RM_F) tmp.zip; $(ZIP) -ll -mr tmp.zip $(DISTVNAME) && unzip -o tmp.zip && $(RM_F) tmp.zip
 MAKE_TEXT
 
-        $self->SUPER::init_dist: 
+    $self->SUPER::init_dist
 
 
 sub dlsyms($self,%< %attribs)

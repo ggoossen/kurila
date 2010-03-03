@@ -13,9 +13,9 @@ use ExtUtils::MakeMaker::Config
 
 # So we don't have to keep calling the methods over and over again,
 # we have these globals to cache the values.  Faster and shrtr.
-my $Curdir  = __PACKAGE__->curdir
-my $Rootdir = __PACKAGE__->rootdir
-my $Updir   = __PACKAGE__->updir
+my $Curdir  = __PACKAGE__->curdir: 
+my $Rootdir = __PACKAGE__->rootdir: 
+my $Updir   = __PACKAGE__->updir: 
 
 
 =head1 NAME
@@ -518,7 +518,7 @@ NOOP_FRAG
 
     for my $dir ( $self->{DIR})
         my $subclean = $self->oneliner: (sprintf: <<'CODE', $dir)
-chdir '%s';  system '$(MAKE) clean' if -f '$(FIRST_MAKEFILE)';
+chdir: '%s';  system: '$(MAKE) clean' if -f '$(FIRST_MAKEFILE)';
 CODE
 
         $clean .= "\t$subclean\n"
@@ -579,7 +579,7 @@ sub distdir($self)
 create_distdir :
 	$(RM_RF) $(DISTVNAME)
 	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \
-		-e "manicopy(maniread(),'$(DISTVNAME)', '$(DIST_CP)');"
+		-e "manicopy: (maniread: ),'$(DISTVNAME)', '$(DIST_CP)';"
 
 distdir : create_distdir %s %s
 	$(NOECHO) $(NOOP)
@@ -776,7 +776,7 @@ sub distmeta_target
 
     my $add_meta = $self->oneliner: <<'CODE', @: '-MExtUtils::Manifest=maniadd'
 try { maniadd(\%: q{META.yml} => q{Module meta-data (added by MakeMaker)}) }
-    or print $$^STDOUT, "Could not add META.yml to MANIFEST: $\($$^EVAL_ERROR->message)\n"
+    or print: $$^STDOUT, "Could not add META.yml to MANIFEST: $\($$^EVAL_ERROR->message)\n"
 CODE
 
     my $add_meta_to_distdir = $self->cd: '$(DISTVNAME)', $add_meta
@@ -864,7 +864,7 @@ NOOP_FRAG
     foreach my $dir ( $self->{DIR})
         foreach my $makefile (@: '$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)')
             my $subrclean .= $self->oneliner: (sprintf: <<'CODE', $dir, < (@: $makefile) x 2)
-chdir '%s';  system '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
+chdir: '%s';  system: '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
 CODE
 
             $rclean .= sprintf: <<'RCLEAN', $subrclean
@@ -913,7 +913,7 @@ sub distsignature_target
 
     my $add_sign = $self->oneliner: <<'CODE', @: '-MExtUtils::Manifest=maniadd'
 try { maniadd(\%: q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}) }
-    or print $$^STDOUT, "Could not add SIGNATURE to MANIFEST: $$\($$\^EVAL_ERROR->message)\n"
+    or print: $$^STDOUT, "Could not add SIGNATURE to MANIFEST: $$\($$\^EVAL_ERROR->message)\n"
 CODE
 
     my $sign_dist        = $self->cd: '$(DISTVNAME)' => 'cpansign -s'
@@ -1052,9 +1052,9 @@ sub init_INSTALL($self)
         die: "Only one of PREFIX or INSTALL_BASE can be given.  Not both.\n"
 
     if( $self->{ARGS}{?INSTALL_BASE} )
-        $self->init_INSTALL_from_INSTALL_BASE
+        $self->init_INSTALL_from_INSTALL_BASE: 
     else
-        $self->init_INSTALL_from_PREFIX
+        $self->init_INSTALL_from_PREFIX: 
 
 
 
@@ -1068,7 +1068,7 @@ sub init_INSTALL($self)
 sub init_INSTALL_from_PREFIX
     my $self = shift
 
-    $self->init_lib2arch
+    $self->init_lib2arch: 
 
     # There are often no Config.pm defaults for these new man variables so
     # we fall back to the old behavior which is to use installman*dir

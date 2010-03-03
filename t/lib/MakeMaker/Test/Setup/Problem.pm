@@ -17,13 +17,11 @@ WriteMakefile(
 END
 
     'Problem-Module/subdir/Makefile.PL'    => <<'END'
-printf $^STDOUT, "\$^INCLUDE_PATH \%s .\n", (grep { $_ eq '.' }, $^INCLUDE_PATH) ?? "has" !! "doesn't have";
+printf: $^STDOUT, "\$^INCLUDE_PATH \%s .\n", (grep: { $_ eq '.' }, $^INCLUDE_PATH) ?? "has" !! "doesn't have";
 
-warn "I think I'm going to be sick\n";
-die "YYYAaaaakkk\n";
+warn: "I think I'm going to be sick\n";
+die: "YYYAaaaakkk\n";
 END
-
-    
 
 
 sub setup_recurs
@@ -36,7 +34,6 @@ sub setup_recurs
         (open: my $fh, ">", "$file") || die: "Can't create $file: $^OS_ERROR"
         print: $fh, $text
         close $fh
-    
 
     return 1
 
@@ -46,10 +43,8 @@ sub teardown_recurs
         my $dir = dirname: $file
         if( -e $dir )
             (rmtree: $dir) || return
-        
     
     return 1
-
 
 
 1

@@ -46,7 +46,7 @@ output.
 # set up testing
 ####
 
-my $t = Test::Builder->new
+my $t = Test::Builder->new: 
 
 ###
 # make us an exporter
@@ -139,8 +139,8 @@ sub _start_testing
 
     # remeber that we're testing
     $testing = 1
-    $testing_num = $t->current_test
-    $t->current_test = 0
+    $testing_num = $t->current_test: 
+    ($t->current_test: ) = 0
 
     # look, we shouldn't do the ending stuff
     $t->no_ending: 1
@@ -333,7 +333,7 @@ sub test_test
     $t->todo_output: $original_todo_handle
 
     # restore the test no, etc, back to the original point
-    $t->current_test = $testing_num
+    ($t->current_test: ) = $testing_num
     $testing = 0
 
     # re-enable the original setting of the harness

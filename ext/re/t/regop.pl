@@ -14,7 +14,7 @@ while ((nelems @tests))
     $pat="m/$pat/" if (substr: $pat,0,2) ne 'm/'
     # string eval to get the free regex message in the right place.
     eval qq[
-        print \$^STDERR, "$str"=~$pat ?? '\%MATCHED\%' !! '\%FAILED\%',"\n";
+        print: \$^STDERR, "$str"=~$pat ?? '\%MATCHED\%' !! '\%FAILED\%',"\n";
     ]
     die: $^EVAL_ERROR if $^EVAL_ERROR
 

@@ -32,7 +32,6 @@ sub cmd_line
         return qq/"@_[0]"/
     else
         return @_[0]
-    
 
 
 my ($pid, $reaped_pid)
@@ -42,7 +41,7 @@ my ($pid, $reaped_pid)
 print: $^STDOUT, "1..7\n"
 
 ok: 1, ($pid = (open2: \*READ, \*WRITE, $perl, '-e'
-                       (cmd_line: 'print $^STDOUT, scalar ~< $^STDIN')))
+                       (cmd_line: 'print: $^STDOUT, scalar ~< $^STDIN')))
 ok: 2, print: \*WRITE, "hi kid\n"
 ok: 3, (~< *READ) =~ m/^hi kid\r?\n$/
 ok: 4, (close: \*WRITE), $^OS_ERROR

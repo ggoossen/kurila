@@ -337,7 +337,7 @@ sub run
 
 
     ### flag to indicate we have a buffer captured
-    my $have_buffer = __PACKAGE__->can_capture_buffer ?? 1 !! 0
+    my $have_buffer = (__PACKAGE__->can_capture_buffer: ) ?? 1 !! 0
 
     ### flag indicating if the subcall went ok
     my $ok
@@ -427,9 +427,8 @@ sub _open3_run
         ((IS_WIN32: )?? $^STDERR !! $kiderror)
         $^STDIN
         ((IS_WIN32: )?? $^STDOUT !! $kidout)
-        
 
-    ($^STDOUT)->autoflush: 1);   ($^STDERR)->autoflush: 1);   ($^STDIN)->autoflush: 1
+    ($^STDOUT)->autoflush: 1;   ($^STDERR)->autoflush: 1;   ($^STDIN)->autoflush: 1
     $kidout->autoflush: 1   if UNIVERSAL::can: $kidout,   'autoflush'
     $kiderror->autoflush: 1 if UNIVERSAL::can: $kiderror, 'autoflush'
 
@@ -437,7 +436,7 @@ sub _open3_run
     ### code courtesy of theorbtwo from #london.pm
     my $stdout_done = 0
     my $stderr_done = 0
-    :OUTER while ( my @ready = $selector->can_read )
+    :OUTER while ( my @ready = ($selector->can_read: ) )
 
         for my $h (  @ready )
             my $buf

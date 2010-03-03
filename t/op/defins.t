@@ -7,7 +7,7 @@
 our $warns
 
 BEGIN 
-    $^WARN_HOOK = sub (@< @_) { $warns++; (print: $^STDERR, @_[0]->message) }
+    $^WARN_HOOK = sub (@< @_) { $warns++; print: $^STDERR, @_[0]->message }
 
 require './test.pl'
 plan:  tests => 16 

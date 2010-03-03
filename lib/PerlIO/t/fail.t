@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN 
-    require "../t/test.pl"
+    require "test.pl"
     skip_all: "No perlio" unless ((PerlIO::Layer->find:  'perlio'))
     plan: 15
 

@@ -13,7 +13,7 @@ my $unplanned
 
 BEGIN 
     $unplanned = 'oops'
-    $unplanned = Test::Builder->new->has_plan
+    $unplanned = (Test::Builder->new: )->has_plan: 
 ;
 
 use Test::More tests => 2

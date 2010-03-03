@@ -224,7 +224,7 @@ sub maketext
     # If we make it here, there was an exception thrown in the
     #  call to $value, and so scream:
     if($^EVAL_ERROR)
-        my $err = $^EVAL_ERROR->message
+        my $err = $^EVAL_ERROR->message: 
         # pretty up the error message
         $err =~ s<\s+at\s+\(eval\s+\d+\)\s+line\s+(\d+)\.?\n?>
              <\n in bracket code [compiled line $1],>s
@@ -251,7 +251,7 @@ sub get_handle($base_class, @< @languages)
             DEBUG: and print: $^STDOUT, "Lgs\@", __LINE__, ": ", < (map:  {"<$_>" }, @languages), "\n"
 
     else
-        @languages = $base_class->_ambient_langprefs
+        @languages = $base_class->_ambient_langprefs: 
 
 
     @languages = $base_class->_langtag_munging: < @languages

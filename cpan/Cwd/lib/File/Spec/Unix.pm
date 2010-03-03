@@ -366,7 +366,7 @@ sub abs2rel($self,$path,?$base)
     my @pathchunks = $self->splitdir:  $path_directories 
     my @basechunks = $self->splitdir:  $base_directories 
 
-    if ($base_directories eq $self->rootdir)
+    if ($base_directories eq ($self->rootdir: ))
         shift @pathchunks
         return $self->canonpath:  ($self->catpath: '', ($self->catdir:  < @pathchunks ), '') 
 
@@ -376,7 +376,7 @@ sub abs2rel($self,$path,?$base)
         shift @pathchunks
         shift @basechunks
 
-    return $self->curdir unless @pathchunks || @basechunks
+    return ($self->curdir: ) unless @pathchunks || @basechunks
 
     # $base now contains the directories the resulting relative path
     # must ascend out of before it can descend to $path_directory.
@@ -457,12 +457,11 @@ sub _cwd
     (Cwd::getcwd: )
 
 
-
 # Internal method to reduce xx\..\yy -> yy
 sub _collapse($fs, $path)
 
-    my $updir  = $fs->updir
-    my $curdir = $fs->curdir
+    my $updir  = $fs->updir: 
+    my $curdir = $fs->curdir: 
 
     my @: $vol, $dirs, $file =  $fs->splitpath: $path
     my @dirs = $fs->splitdir: $dirs

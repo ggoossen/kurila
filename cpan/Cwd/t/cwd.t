@@ -203,7 +203,7 @@ path_ends_with: (Cwd::_perl_abs_path: $path), 'cwd.t', '_perl_abs_path() can be 
 :SKIP do
     my $file
     do
-        my $root = Cwd::abs_path: File::Spec->rootdir	# Add drive letter?
+        my $root = Cwd::abs_path: File::Spec->rootdir   # Add drive letter?
         opendir: my $fh, $root or skip: "Can't opendir($root): $^OS_ERROR", 2+$EXTRA_ABSPATH_TESTS
         (@: ?$file) = grep: {-f $_ and not -l $_}, map: { (File::Spec->catfile: $root, $_) }, @:  readdir $fh
         closedir $fh

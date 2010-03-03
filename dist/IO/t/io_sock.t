@@ -44,9 +44,9 @@ if ($^OS_NAME eq 'os2' and
         print: $^STDOUT, "ok $_ # skipped: broken fork\n"
     exit 0
 
-my $port = $listen->sockport
+my $port = $listen->sockport: 
 
-if(my $pid = fork())
+if(my $pid = fork: )
 
     my $sock = $listen->accept or die: "accept failed: $^OS_ERROR"
     print: $^STDOUT, "ok 2\n"
@@ -56,7 +56,7 @@ if(my $pid = fork())
 
     print: $sock, "ok 4\n"
 
-    $sock->close
+    $sock->close: 
 
     waitpid: $pid,0
 
@@ -80,7 +80,7 @@ elsif(defined $pid)
 
     print: $^STDOUT, $sock->getline
 
-    $sock->close
+    $sock->close: 
 
     exit
 else
@@ -92,11 +92,11 @@ else
 $listen = (IO::Socket::INET->new: Listen => '', Timeout => 15) or die: "$^OS_ERROR"
 $port = $listen->sockport
 
-if(my $pid = fork())
+if(my $pid = fork: )
     my $sock
     :SERVER_LOOP
         while (1)
-        last SERVER_LOOP unless $sock = $listen->accept
+        last SERVER_LOOP unless $sock = $listen->accept: 
         while ( ~< $sock)
             last SERVER_LOOP if m/^quit/
             last if m/^done/
@@ -104,7 +104,7 @@ if(my $pid = fork())
 
         $sock = undef
 
-    $listen->close
+    $listen->close: 
 elsif (defined $pid)
     # child, try various ways to connect
     my $sock = IO::Socket::INET->new: "localhost:$port"
@@ -168,7 +168,8 @@ my $server = IO::Socket->new: Domain => AF_INET
                         LocalAddr => '127.0.0.1'
 $port = $server->sockport
 
-if (my $pid = fork())
+
+if (my $pid = fork: )
     my $buf
     $server->recv: \$buf, 100
     print: $^STDOUT, $buf
@@ -221,7 +222,7 @@ $listen = (IO::Socket::INET->new:  Listen => 2, Proto => 'tcp', Timeout => 15) |
 print: $^STDOUT, "ok 16\n"
 die: if( !(defined:  $listen))
 my $serverport = $listen->sockport
-my $server_pid = fork()
+my $server_pid = fork:
 if( $server_pid)
 
     ### TEST 17 Client/Server establishment
@@ -334,7 +335,7 @@ elsif ((defined: $server_pid))
     #
     :SERVER_LOOP while (1)
         my $sock
-        last SERVER_LOOP unless $sock = $listen->accept
+        last SERVER_LOOP unless $sock = $listen->accept: 
         # Do not print ok/not ok for this binmode() since there's
         # a race condition with our client, just die if we fail.
         if ($has_perlio) { binmode: $sock, ":utf8" or die: }
@@ -361,7 +362,7 @@ elsif ((defined: $server_pid))
 
         $sock = undef
 
-    $listen->close
+    $listen->close: 
     exit 0
 
 else

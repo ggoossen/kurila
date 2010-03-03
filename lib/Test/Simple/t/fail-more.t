@@ -211,7 +211,7 @@ ERR
 
 do
     my $warnings
-    local $^WARN_HOOK = sub (@< @_) { $warnings .= @_[0]->message }
+    local $^WARN_HOOK = sub (@< @_) { $warnings .= @_[0]->message: }
 
     local our $TODO = "Fix line numbers"
 

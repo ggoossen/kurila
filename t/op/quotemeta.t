@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN 
-    require Config; Config->import
+    require Config; Config->import: 
     require "./test.pl"
 
 

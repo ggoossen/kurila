@@ -299,12 +299,10 @@ sub run_tests
                   'ax13876y25677y21378y21378kbc' => 1
                   'ax13876y25677y21378y21378kcb' => 0 # Not b.
                   'ax13876y25677y21378y21378y21378kbc' => 0 # 5 runs
-        
 
     for ( keys %ans )
         ok:  (not:  %ans{?$_} xor m/a(?=([yx]($long_constant_len)){2,4}[k-o]).*b./o )
         ok:  (not:  %ans{?$_} xor m/a(?=([yx]($long_var_len)){2,4}[k-o]).*b./o )
-    
 
     $_ = " a (bla()) and x(y b((l)u((e))) and b(l(e)e)e"
     my $expect = "(bla()) ((l)u((e))) (l(e)e)"
@@ -539,50 +537,49 @@ sub run_tests
     do
         local $TODO = $::running_as_thread
         ok: $str =~ m/.\G./p and $^MATCH eq 'bc'
-    
 
     ok:  $str =~ m/\G../p and $^MATCH eq 'cd' 
 
     our ($foo, $bar)
     undef $foo; undef $bar
-    ok:  $str =~ m/b(?{$foo = $_; $bar = pos})c/
+    ok:  $str =~ m/b(?{$foo = $_; $bar = pos:;})c/
            and $foo eq 'abcde' and $bar eq 2 
 
     undef $foo; undef $bar
     pos: $str, undef
-    ok:  $str =~ m/b(?{$foo = $_; $bar = pos})c/g
+    ok:  $str =~ m/b(?{$foo = $_; $bar = pos:;})c/g
            and $foo eq 'abcde' and $bar eq 2 and (pos: $str) eq 3 
 
     $_ = $str
 
     undef $foo; undef $bar
-    ok:  m/b(?{$foo = $_; $bar = pos})c/
+    ok:  m/b(?{$foo = $_; $bar = pos:;})c/
            and $foo eq 'abcde' and $bar eq 2 
 
     undef $foo; undef $bar
-    ok:   m/b(?{$foo = $_; $bar = pos})c/g
+    ok:   m/b(?{$foo = $_; $bar = pos:;})c/g
             and $foo eq 'abcde' and $bar eq 2 and (pos: )eq 3 
 
     undef $foo; undef $bar
     pos: $_, undef
-    1 while m/b(?{$foo = $_; $bar = pos})c/g
+    1 while m/b(?{$foo = $_; $bar = pos:;})c/g
     ok:   $foo eq 'abcde' and $bar eq 2 and not defined (pos: )
 
     undef $foo; undef $bar
     $_ = 'abcde|abcde'
-    ok:   s/b(?{$foo = $_; $bar = pos})c/x/g and $foo eq 'abcde|abcde'
+    ok:   s/b(?{$foo = $_; $bar = pos:;})c/x/g and $foo eq 'abcde|abcde'
              and $bar eq 8 and $_ eq 'axde|axde' 
 
     our @res = $@
     # List context:
     $_ = 'abcde|abcde'
-    our @dummy = @:  m/([ace]).(?{push @res, $1,$2})([ce])(?{push @res, $1,$2})/g 
+    our @dummy = @:  m/([ace]).(?{push: @res, $1,$2})([ce])(?{push: @res, $1,$2})/g 
     @res = map: {defined $_ ?? "'$_'" !! 'undef'}, @res
     $res = "$((join: ' ',@res))"
     ok:   "$((join: ' ',@res))" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" 
 
     @res = $@
-    @dummy = @:  m/([ace]).(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})([ce])(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})/gp 
+    @dummy = @:  m/([ace]).(?{push: @res, $^PREMATCH,$^MATCH,$^POSTMATCH})([ce])(?{push: @res, $^PREMATCH,$^MATCH,$^POSTMATCH})/gp 
     @res = map: {defined $_ ?? "'$_'" !! 'undef'}, @res
     $res = "$((join: ' ',@res))"
     ok:   "$((join: ' ',@res))" eq
@@ -648,7 +645,7 @@ sub run_tests
     our @a = qw(foo bar)
     our @b = $@
     for (@a)
-        s/(\w)(?{push @b, $1})/,$1,/g
+        s/(\w)(?{push: @b, $1})/,$1,/g
 
     ok: "$((join: ' ',@b))" eq "f o o b a r"
 
@@ -1039,8 +1036,8 @@ sub run_tests
             $input = "a\{b\}c\{d\}"
             eval <<EOT; die: if $^EVAL_ERROR
         while (eval \$input =~ $rx) \{
-            die if \$^EVAL_ERROR;
-            diag "\\\$1 = '\$1' \\\$2 = '\$2'";
+            die: if \$^EVAL_ERROR;
+            diag: "\\\$1 = '\$1' \\\$2 = '\$2'";
             ++\$i;
         \}
 EOT
@@ -1201,22 +1198,22 @@ EOT
     ## Test basic $^N usage outside of a regex
     ##
     $x = "abcdef"
-    ok: $x =~ m/cde/ and not defined $^LAST_SUBMATCH_RESULT
-    ok: $x =~ m/(cde)/          and $^LAST_SUBMATCH_RESULT eq "cde"
-    ok: $x =~ m/(c)(d)(e)/      and $^LAST_SUBMATCH_RESULT eq   "e"
-    ok: $x =~ m/(c(d)e)/        and $^LAST_SUBMATCH_RESULT eq "cde"
-    ok: $x =~ m/(foo)|(c(d)e)/  and $^LAST_SUBMATCH_RESULT eq "cde"
-    ok: $x =~ m/(c(d)e)|(foo)/  and $^LAST_SUBMATCH_RESULT eq "cde"
-    ok: $x =~ m/(c(d)e)|(abc)/  and $^LAST_SUBMATCH_RESULT eq "abc"
-    ok: $x =~ m/(c(d)e)|(abc)x/ and $^LAST_SUBMATCH_RESULT eq "cde"
-    ok: $x =~ m/(c(d)e)(abc)?/  and $^LAST_SUBMATCH_RESULT eq "cde"
-    ok: $x =~ m/(?:c(d)e)/      and $^LAST_SUBMATCH_RESULT eq  "d" 
-    ok: $x =~ m/(?:c(d)e)(?:f)/ and $^LAST_SUBMATCH_RESULT eq  "d" 
-    ok: $x =~ m/(?:([abc])|([def]))*/ and $^LAST_SUBMATCH_RESULT eq  "f" 
-    ok: $x =~ m/(?:([ace])|([bdf]))*/ and $^LAST_SUBMATCH_RESULT eq  "f" 
-    ok: $x =~ m/(([ace])|([bd]))*/    and $^LAST_SUBMATCH_RESULT eq  "e" 
+    ok: ( $x =~ m/cde/ and not defined $^LAST_SUBMATCH_RESULT )
+    ok: ( $x =~ m/(cde)/          and $^LAST_SUBMATCH_RESULT eq "cde" )
+    ok: ( $x =~ m/(c)(d)(e)/      and $^LAST_SUBMATCH_RESULT eq   "e" )
+    ok: ( $x =~ m/(c(d)e)/        and $^LAST_SUBMATCH_RESULT eq "cde" )
+    ok: ( $x =~ m/(foo)|(c(d)e)/  and $^LAST_SUBMATCH_RESULT eq "cde" )
+    ok: ( $x =~ m/(c(d)e)|(foo)/  and $^LAST_SUBMATCH_RESULT eq "cde" )
+    ok: ( $x =~ m/(c(d)e)|(abc)/  and $^LAST_SUBMATCH_RESULT eq "abc" )
+    ok: ( $x =~ m/(c(d)e)|(abc)x/ and $^LAST_SUBMATCH_RESULT eq "cde" )
+    ok: ( $x =~ m/(c(d)e)(abc)?/  and $^LAST_SUBMATCH_RESULT eq "cde" )
+    ok: ( $x =~ m/(?:c(d)e)/      and $^LAST_SUBMATCH_RESULT eq  "d"  )
+    ok: ( $x =~ m/(?:c(d)e)(?:f)/ and $^LAST_SUBMATCH_RESULT eq  "d"  )
+    ok: ( $x =~ m/(?:([abc])|([def]))*/ and $^LAST_SUBMATCH_RESULT eq  "f"  )
+    ok: ( $x =~ m/(?:([ace])|([bdf]))*/ and $^LAST_SUBMATCH_RESULT eq  "f"  )
+    ok: ( $x =~ m/(([ace])|([bd]))*/    and $^LAST_SUBMATCH_RESULT eq  "e"  )
     do
-        ok: $x =~ m/(([ace])|([bdf]))*/   and $^LAST_SUBMATCH_RESULT eq  "f" 
+        ok: ( $x =~ m/(([ace])|([bdf]))*/   and $^LAST_SUBMATCH_RESULT eq  "f"  )
     
     ## test to see if $^N is automatically localized -- it should now
     ## have the value set in test 653
@@ -1226,11 +1223,11 @@ EOT
     ## Now test inside (?{...})
     ##
     our ($y, $z)
-    ok: $x =~ m/a([abc])(?{$y=$^LAST_SUBMATCH_RESULT})c/      and $y eq "b" 
-    ok: $x =~ m/a([abc]+)(?{$y=$^LAST_SUBMATCH_RESULT})d/     and $y eq "bc"
-    ok: $x =~ m/a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})d/ and $y eq "bc"
-    ok: $x =~ m/(a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})d)(?{$z=$^LAST_SUBMATCH_RESULT})e/ and $y eq "bc" and $z eq "abcd"
-    ok: $x =~ m/(a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})de)(?{$z=$^LAST_SUBMATCH_RESULT})/ and $y eq "bc" and $z eq "abcde"
+    ok: ( $x =~ m/a([abc])(?{$y=$^LAST_SUBMATCH_RESULT})c/      and $y eq "b"  )
+    ok: ( $x =~ m/a([abc]+)(?{$y=$^LAST_SUBMATCH_RESULT})d/     and $y eq "bc" )
+    ok: ( $x =~ m/a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})d/ and $y eq "bc" )
+    ok: ( $x =~ m/(a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})d)(?{$z=$^LAST_SUBMATCH_RESULT})e/ and $y eq "bc" and $z eq "abcd" )
+    ok: ( $x =~ m/(a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})de)(?{$z=$^LAST_SUBMATCH_RESULT})/ and $y eq "bc" and $z eq "abcde" )
 
     # Test the Unicode script classes
 
@@ -1812,8 +1809,6 @@ EOT
             ok:  "xyz" =~ m/$re/ 
             ($subst = "xyz") =~ s/$re//
             ok:  $subst eq '' 
-        
-    
 
     do
         print: $^STDOUT, "# qr/.../x\n"
@@ -2112,7 +2107,7 @@ END
         # XXX DAPM 13-Apr-06. Recursive split is still broken. It's only luck it
         # hasn't been crashing. Disable this test until it is fixed properly.
         # XXX also check what it returns rather than just doing ok(1,...)
-        # split /(?{ split "" })/, "abc";
+        # split /(?{ split: "" })/, "abc";
         ok: 1,'cache_re & "(?{": it dumps core in 5.6.1 & 5.8.0'
     
 
@@ -2142,8 +2137,8 @@ END
     func: "standalone"
     $_ = "x"; s/x/$(func: "in subst")/
     $_ = "x"; s/x/$(func: "in multiline subst")/m
-    #$_ = "x"; /x(?{func "in regexp"})/;
-    #$_ = "x"; /x(?{func "in multiline regexp"})/m;
+    #$_ = "x"; /x(?{func: "in regexp"})/;
+    #$_ = "x"; /x(?{func: "in multiline regexp"})/m;
 
     # bug RT#19049
     $_="abcdef\n"
@@ -2242,10 +2237,10 @@ END
 
     do # TRIE related
         my @got= $@
-        "words"=~m/(word|word|word)(?{push @got,$1})s$/
+        "words"=~m/(word|word|word)(?{push: @got,$1})s$/
         ok: (nelems @got)==1,"TRIE optimation is working" or warn: "# $((join: ' ',@got))"
         @got= $@
-        "words"=~m/(word|word|word)(?{push @got,$1})s$/i
+        "words"=~m/(word|word|word)(?{push: @got,$1})s$/i
         ok: (nelems @got)==1,"TRIEF optimisation is working" or warn: "# $((join: ' ',@got))"
 
         my @nums= map: {int rand 1000}, 1..100
@@ -2473,7 +2468,7 @@ END
             my $code
             my $w=""
             local $^WARN_HOOK = sub ($e) { $w.=$e->description }
-            eval: $code=<<'EOFTEST' or die: "$^EVAL_ERROR\n$code\n"
+            eval: ($code=<<'EOFTEST') or die: "$^EVAL_ERROR\n$code\n"
         do {
             use warnings;
             
@@ -2543,7 +2538,7 @@ EOFTEST
     )
 
         local $_ = '<<<stuff1>and<stuff2>><<<<right>>>>>'
-        ok: m/^(<((?:(?>[^<>]+)|(?1))*)>(?{push @stack, $2 }))$/
+        ok: m/^(<((?:(?>[^<>]+)|(?1))*)>(?{push: @stack, $2 }))$/
             "Recursion should match"
         ok: (nelems @stack)==nelems @expect
             or skip: "Won't test individual results as count isn't equal"
@@ -2706,7 +2701,7 @@ EOFTEST
         $_='aaabaaab'
         $count=0
         our @res= $@
-        1 while m/(a+b?)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g
+        1 while m/(a+b?)(*SKIP)(?{$count++; push: @res,$1})(*FAIL)/g
         is: $count,2,"Expect 2 with (*SKIP)" 
         is: "$((join: ' ',@res))","aaab aaab","adjacent (*SKIP) works as expected" 
     
@@ -2721,7 +2716,7 @@ EOFTEST
         $_='aaabaaab'
         $count=0
         our @res= $@
-        1 while m/(a+b?)(*MARK:foo)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g
+        1 while m/(a+b?)(*MARK:foo)(*SKIP)(?{$count++; push: @res,$1})(*FAIL)/g
         is: $count,2,"Expect 2 with (*SKIP)" 
         is: "$((join: ' ',@res))","aaab aaab","adjacent (*SKIP) works as expected" 
     
@@ -2732,7 +2727,7 @@ EOFTEST
         local $_ = 'aaabaaab'
         $count=0
         our @res= $@
-        1 while m/(a*(*MARK:a)b?)(*MARK:x)(*SKIP:a)(?{$count++; push @res,$1})(*FAIL)/g
+        1 while m/(a*(*MARK:a)b?)(*MARK:x)(*SKIP:a)(?{$count++; push: @res,$1})(*FAIL)/g
         is: $count,5,"Expect 5 with (*MARK:a)b?)(*MARK:x)(*SKIP:a)" 
         is: "$((join: ' ',@res))","aaab b aaab b ","adjacent (*MARK:a)b?)(*MARK:x)(*SKIP:a) works as expected" 
     
@@ -2747,7 +2742,7 @@ EOFTEST
         $_='aaabaaab'
         $count=0
         our @res= $@
-        1 while m/(a+b?)(*COMMIT)(?{$count++; push @res,$1})(*FAIL)/g
+        1 while m/(a+b?)(*COMMIT)(?{$count++; push: @res,$1})(*FAIL)/g
         is: $count,1,"Expect 1 with (*COMMIT)" 
         is: "$((join: ' ',@res))","aaab","adjacent (*COMMIT) works as expected" 
     
@@ -2938,7 +2933,7 @@ EOFTEST
         local $Message = "\$REGMARK"
         our ($REGMARK, $REGERROR)
         our @r= $@
-        ok: 'foofoo' =~ m/foo (*MARK:foo) (?{push @r,$REGMARK}) /x
+        ok: 'foofoo' =~ m/foo (*MARK:foo) (?{push: @r,$REGMARK}) /x
         is: "$((join: ' ',@r))","foo"
         is: $REGMARK,"foo"
         ok: 'foofoo' !~ m/foo (*MARK:foo) (*FAIL) /x

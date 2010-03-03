@@ -194,7 +194,7 @@ sub readline
         if not $Term::ReadLine::registered and $Term::ReadLine::toloop
       and exists &Tk::DoOneEvent
     #$str = scalar <$in>;
-    $str = $self->get_line
+    $str = $self->get_line: 
     $str =~ s/^\s*\Q$prompt\E// if ($^OS_NAME eq 'MacOS')
     utf8::upgrade: $str
         if ($^UNICODE ^&^ (PERL_UNICODE_STDIN: )|| defined $^ENCODING) &&
@@ -244,7 +244,7 @@ sub new
         unless (nelems @_)==2 or (nelems @_)==4
     my ($FIN, $FOUT, $ret)
     if ((nelems @_)==2)
-        my(@: $console, $consoleOUT) =  @_[0]->findConsole
+        my(@: $console, $consoleOUT) =  @_[0]->findConsole: 
 
 
         # the Windows CONIN$ needs GENERIC_WRITE mode to allow
@@ -283,7 +283,7 @@ sub Features { \%features }
 
 sub get_line
     my $self = shift
-    my $in = $self->IN
+    my $in = $self->IN: 
     local ($^INPUT_RECORD_SEPARATOR) = "\n"
     return scalar ~< $in
 
@@ -384,14 +384,14 @@ sub tkRunning
 
 sub get_c
     my $self = shift
-    $self->Tk_loop if $Term::ReadLine::toloop && exists &Tk::DoOneEvent
-    return getc $self->IN
+    $self->Tk_loop:  if $Term::ReadLine::toloop && exists &Tk::DoOneEvent
+    return getc $self->IN: 
 
 
 sub get_line
     my $self = shift
-    $self->Tk_loop if $Term::ReadLine::toloop && exists &Tk::DoOneEvent
-    my $in = $self->IN
+    $self->Tk_loop:  if $Term::ReadLine::toloop && exists &Tk::DoOneEvent
+    my $in = $self->IN: 
     local ($^INPUT_RECORD_SEPARATOR) = "\n"
     return scalar ~< $in
 

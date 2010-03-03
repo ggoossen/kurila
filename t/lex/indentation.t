@@ -3,7 +3,7 @@
 BEGIN
     require './test.pl'
 
-plan: tests => 21
+plan: tests => 22
 
 our ($x, $y)
 
@@ -78,8 +78,8 @@ is: (join: "*", $x), q[aap]
 is: $y, 1
 
 # @(:
-$x = @(:(@:  'aap'
-              'noot' ))
+$x = @(: 'aap',
+         'noot' )
 is:  (join: "*", $x), "aap*noot"
 
 # s/// seperared by statement end
@@ -111,7 +111,22 @@ EOE
 
 # detection of newlines with something that has lookahead
 
-eval_dies_like: <<'EOE', qr/Not enough arguments for bless/
+do
+    local our $TODO = "Proper error message"
+    eval_dies_like: <<'EOE', qr/Not enough arguments for bless/
 bless
 (1, 2)
+EOE
+
+do
+    local our $TODO = "Gracefull recovery after missing ("
+    eval_dies_like: <<'EOE', qr/XXXX/
+do
+    (defined: $a
+
+=pod
+
+=cut
+
+1
 EOE

@@ -10,7 +10,7 @@ BEGIN
     if ($^EVAL_ERROR)
         print: $^STDOUT, "1..0 # Skip: no Config\n"
     else
-        Config->import
+        Config->import: 
     
 
 

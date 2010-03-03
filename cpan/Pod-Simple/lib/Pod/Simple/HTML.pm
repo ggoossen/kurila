@@ -208,9 +208,9 @@ sub batch_mode_page_object_init($self, $batchconvobj, $module, $infile, $outfile
 
 sub run
     my $self = @_[0]
-    return $self->do_middle if $self->bare_output
+    return ($self->do_middle: ) if $self->bare_output: 
     return
-          $self->do_beginning && $self->do_middle && $self->do_end
+          ($self->do_beginning: ) && ($self->do_middle: ) && $self->do_end: 
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -235,33 +235,33 @@ sub do_beginning
         if(defined $title and $title =~ m/\S/)
             $title = $self->title_prefix . (esc: $title) . $self->title_postfix
         else
-            $title = $self->default_title
+            $title = $self->default_title: 
             $title = '' unless defined $title
             DEBUG: and print: $^STDOUT, "Title defaults to $title\n"
         
     
 
 
-    my $after = $self->html_header_after_title  || ''
-    if($self->html_css)
+    my $after = ($self->html_header_after_title: )  || ''
+    if(($self->html_css: ))
         my $link =
             $self->html_css =~ m/</
-            ?? $self->html_css # It's a big blob of markup, let's drop it in
+            ?? $self->html_css  # It's a big blob of markup, let's drop it in
             !! sprintf:         # It's just a URL, so let's wrap it up
-            qq[<link rel="stylesheet" type="text/css" title="pod_stylesheet" href="\%s">\n], <
-                $self->html_css
+                 qq[<link rel="stylesheet" type="text/css" title="pod_stylesheet" href="\%s">\n], <
+                     $self->html_css
             
         $after =~ s{(</head>)}{$link\n$1}i  # otherwise nevermind
     
     $self->_add_top_anchor: \$after
 
-    if($self->html_javascript)
+    if(($self->html_javascript: ))
         my $link =
             $self->html_javascript =~ m/</
-            ?? $self->html_javascript # It's a big blob of markup, let's drop it in
+            ?? $self->html_javascript  # It's a big blob of markup, let's drop it in
             !! sprintf:         # It's just a URL, so let's wrap it up
-            qq[<script type="text/javascript" src="\%s"></script>\n], <
-                $self->html_javascript
+                 qq[<script type="text/javascript" src="\%s"></script>\n], <
+                     $self->html_javascript
             
         $after =~ s{(</head>)}{$link\n$1}i  # otherwise nevermind
     
@@ -321,11 +321,11 @@ sub do_end
 
 sub do_middle
     my $self = @_[0]
-    return $self->_do_middle_main_loop unless $self->index
+    return ($self->_do_middle_main_loop: ) unless $self->index: 
 
-    if( $self->output_string )
+    if( ($self->output_string: ) )
         # An efficiency hack
-        my $out = $self->output_string #it's a reference to it
+        my $out = $self->output_string:  #it's a reference to it
         my $sneakytag = "\f\f\e\e\b\bIndex Here\e\e\b\b\f\f\n"
         $out->$ .= $sneakytag
         $self->_do_middle_main_loop
@@ -341,14 +341,14 @@ sub do_middle
         return 1
     
 
-    unless( $self->output_fh )
+    unless( ($self->output_fh: ) )
         require Carp
         Carp::confess: "Parser object \$p doesn't seem to have any output object!  I don't know how to deal with that."
     
 
     # If we get here, we're outputting to a FH.  So we need to do some magic.
     # Namely, divert all content to a string, which we output after the index.
-    my $fh = $self->output_fh
+    my $fh = $self->output_fh: 
     my $content = ''
     do
         # Our horrible bait and switch:
@@ -422,7 +422,7 @@ sub _do_middle_main_loop
     my @stack
     my $dont_wrap = 0
 
-    while($token = $self->get_token)
+    while($token = ($self->get_token: ))
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         if( ($type = $token->type) eq 'start' )
@@ -476,7 +476,7 @@ sub _do_middle_main_loop
                 $self->unget_token: < @to_unget
 
             elsif ($tagname eq 'Data')
-                my $next = $self->get_token
+                my $next = $self->get_token: 
                 next unless defined $next
                 unless( $next->type eq 'text' )
                     $self->unget_token: $next
@@ -500,7 +500,7 @@ sub _do_middle_main_loop
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         elsif( $type eq 'end' )
-            if( ($tagname = $token->tagname) =~ m/^over-/s )
+            if( ($tagname = ($token->tagname: )) =~ m/^over-/s )
                 if( my $end = pop @stack )
                     print: $fh, $end
                 
@@ -547,7 +547,7 @@ sub do_link($self, $token)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub do_url_link { return @_[1]->attr: 'to') }
+sub do_url_link { return @_[1]->attr: 'to' }
 
 sub do_man_link { return undef }
 # But subclasses are welcome to override this if they have man
@@ -677,10 +677,10 @@ sub resolve_pod_page_link_singleton_mode($self, $it)
     my $url = $self->pagepath_url_escape: $it
 
     $url =~ s{::$}{}s # probably never comes up anyway
-    $url =~ s{::}{/}g unless $self->perldoc_url_prefix =~ m/\?/s # sane DWIM?
+    $url =~ s{::}{/}g unless ($self->perldoc_url_prefix: ) =~ m/\?/s # sane DWIM?
 
     return undef unless length $url
-    return $self->perldoc_url_prefix . $url . $self->perldoc_url_postfix
+    return ($self->perldoc_url_prefix: ) . $url . $self->perldoc_url_postfix: 
 
 
 sub resolve_pod_page_link_batch_mode($self, $to)
@@ -698,7 +698,7 @@ sub resolve_pod_page_link_batch_mode($self, $to)
 
 
 sub batch_mode_rectify_path($self, $pathbits)
-    my $level = $self->batch_mode_current_level
+    my $level = $self->batch_mode_current_level: 
     $level-- # how many levels up to go to get to the root
     if($level +< 1)
         unshift: $pathbits->@, '.' # just to be pretty
@@ -738,17 +738,15 @@ sub linearize_tokens  # self, tokens
     while($t = shift @_)
         if(!ref $t or !(UNIVERSAL::can: $t, 'is_text'))
             $out .= $t # a string, or some insane thing
-        elsif($t->is_text)
-            $out .= $t->text
-        elsif($t->is_start and $t->tag eq 'X')
+        elsif(($t->is_text: ))
+            $out .= $t->text: 
+        elsif($t->is_start:  and ($t->tag: ) eq 'X')
             # Ignore until the end of this X<...> sequence:
             my $x_open = 1
             while($x_open)
-                next if( ($t = shift @_)->is_text )
-                if(   $t->is_start and $t->tag eq 'X') { ++$x_open }
-                    elsif($t->is_end   and $t->tag eq 'X') { --$x_open }
-            
-        
+                next if( ($t = shift @_)->is_text: )
+                if ( $t->is_start:  and ($t->tag: ) eq 'X') { ++$x_open }
+                elsif($t->is_end:    and ($t->tag: ) eq 'X') { --$x_open }
     
     return undef if length $out +> $Linearization_Limit
     return $out

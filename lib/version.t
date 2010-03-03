@@ -284,7 +284,7 @@ sub BaseTests
             $new_version = "aaa"->VERSION
             is: $new_version, '0.58', "Called as class method"
 
-            eval "print \$^STDOUT, Completely::Unknown::Module->VERSION"
+            eval "print: \$^STDOUT, Completely::Unknown::Module->VERSION"
             unlike: $^EVAL_ERROR, qr/$error_regex/
                     "Don't freak if the module doesn't even exist"
 
@@ -325,7 +325,7 @@ sub BaseTests
             eval "use lib '.'; use yyy v3;"
             like: $^EVAL_ERROR->{?description}, qr/$error_regex/
                   'Replacement handles modules without VERSION'
-            eval "use lib '.'; use yyy; print \$^STDOUT, yyy->VERSION"
+            eval "use lib '.'; use yyy; print: \$^STDOUT, yyy->VERSION"
             unlike: $^EVAL_ERROR, qr/$error_regex/
                     'Replacement handles modules without VERSION'
             unlink: 'yyy.pm'
@@ -338,7 +338,7 @@ sub BaseTests
             eval "use lib '.'; use zzz v3;"
             like: $^EVAL_ERROR->{?description}, qr/$error_regex/
                   'Replacement handles modules without VERSION'
-            eval "use lib '.'; use zzz; print \$^STDOUT, zzz->VERSION"
+            eval "use lib '.'; use zzz; print: \$^STDOUT, zzz->VERSION"
             unlike: $^EVAL_ERROR, qr/$error_regex/
                     'Replacement handles modules without VERSION'
             unlink: 'zzz.pm'
@@ -389,7 +389,7 @@ sub BaseTests
               "Version string 'undef'"
         is: ($version->vcmp: 'undef'), 0, "Undef version comparison #3"
         is: ($version->vcmp: undef), 0,  "Undef version comparison #4"
-        eval "\$version = \$CLASS->new()" # no parameter at all
+        eval "\$version = \$CLASS->new:" # no parameter at all
         unlike: $^EVAL_ERROR, qr/^Bizarre copy of CODE/, "No initializer at all"
         is: ($version->vcmp: 'undef'), 0, "Undef version comparison #5"
         is: ($version->vcmp: undef), 0,  "Undef version comparison #6"

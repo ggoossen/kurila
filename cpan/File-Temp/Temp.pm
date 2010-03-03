@@ -408,7 +408,7 @@ sub _gettemp
         # If @dirs only has one entry (i.e. the directory template) that means
         # we are in the current directory
         if (((nelems @dirs)-1) == 0)
-            $parent = File::Spec->curdir
+            $parent = File::Spec->curdir: 
         else
 
             if ($^OS_NAME eq 'VMS')  # need volume to avoid relative dir spec
@@ -434,7 +434,7 @@ sub _gettemp
         $parent = File::Spec->catpath: $volume,$directories,''
 
         # If $parent is empty replace with curdir
-        $parent = File::Spec->curdir
+        $parent = File::Spec->curdir: 
             unless $directories ne ''
 
     
@@ -1093,7 +1093,7 @@ sub filename
 
 sub STRINGIFY
     my $self = shift
-    return $self->filename
+    return $self->filename: 
 
 
 =item B<dirname>
@@ -1151,7 +1151,7 @@ sub DESTROY
         print: $^STDOUT, "# --------->   Unlinking $self\n" if $DEBUG
 
         # only delete if this process created it
-        return unless exists %FILES_CREATED_BY_OBJECT{+$^PID}{$self->filename}
+        return unless exists %FILES_CREATED_BY_OBJECT{+$^PID}{($self->filename: )}
 
         # The unlink1 may fail if the file has been closed
         # by the caller. This leaves us with the decision
@@ -1748,7 +1748,7 @@ Will croak() if there is an error.
 sub tmpnam
 
     # Retrieve the temporary directory name
-    my $tmpdir = File::Spec->tmpdir
+    my $tmpdir = File::Spec->tmpdir: 
 
     croak: "Error temporary directory is not writable"
         if $tmpdir eq ''
@@ -2355,7 +2355,7 @@ sub dirname
 
 sub STRINGIFY
     my $self = shift
-    return $self->dirname
+    return $self->dirname: 
 
 
 sub unlink_on_destroy
@@ -2368,7 +2368,7 @@ sub unlink_on_destroy
 
 sub DESTROY
     my $self = shift
-    if ($self->unlink_on_destroy &&
+    if (($self->unlink_on_destroy: ) &&
         $^PID == $self->{?LAUNCHPID} && !$File::Temp::KEEP_ALL)
         rmtree: $self->{?DIRNAME}, $File::Temp::DEBUG, 0
             if -d $self->{?DIRNAME}

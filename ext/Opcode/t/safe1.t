@@ -48,7 +48,7 @@ foreach(1..3)
     (print: $^STDOUT, ($cpt->reval: '$test::foo')     	?? "not ok $t\n" !! "ok $t\n"); $t++
     (print: $^STDOUT, ($cpt->reval: '${*{Symbol::fetch_glob("test::foo")}}')		?? "not ok $t\n" !! "ok $t\n"); $t++
 
-    $cpt->erase # erase the compartment, e.g., delete all variables
+    $cpt->erase:  # erase the compartment, e.g., delete all variables
 
     (print: $^STDOUT, ($cpt->reval: '$foo') ?? "not ok $t\n" !! "ok $t\n"); $t++
 

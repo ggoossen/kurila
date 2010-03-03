@@ -17,7 +17,7 @@ $runme = $^EXECUTABLE_NAME
 %h = %:  <1..6
 $aref = \@a
 $href = \%h
-open: my $op_fh, '-|', qq{$runme -le "print \\\$^STDOUT, 'aaa Ok ok' for 1..100"}
+open: my $op_fh, '-|', qq{$runme -le "print: \\\$^STDOUT, 'aaa Ok ok' for 1..100"}
 $chopit = 'aaaaaa'
 @chopar =113 .. 119
 $posstr = '123456'
@@ -91,10 +91,6 @@ EOE
                 skip: "$comment: unimplemented", 1
             else
                 fail: "error: $($^EVAL_ERROR->message)"
-            
-        
-    
-
 
 for ( @simple_input)
     :SKIP
@@ -120,10 +116,6 @@ EOE
                 skip: "skipping $comment: syntax not good for selfassign", 1
             else
                 fail: "error: $($^EVAL_ERROR->message)"
-            
-        
-    
-
 
 try {
     sub PVBM () { 'foo' }
@@ -142,7 +134,7 @@ ok: 1
 __END__
 ref $xref                       # ref
 ref $cstr                       # ref nonref
-`$runme -e "print \\\$^STDOUT, qq[1\\n]"`                               # backtick skip(MSWin32)
+`$runme -e "print: \\\$^STDOUT, qq[1\\n]"`                               # backtick skip(MSWin32)
 `$undefed`                      # backtick undef skip(MSWin32)
 ~< $op_fh                               # readline
 'faked'                         # rcatline
@@ -150,8 +142,8 @@ chop $chopit                    # chop
 (chop (@x=@chopar))             # schop
 chomp $chopit                   # chomp
 (chop (@x=@chopar))             # schomp
-pos $posstr                     # pos
-pos $chopit                     # pos returns undef
+pos: $posstr                     # pos
+pos: $chopit                     # pos returns undef
 $nn++==2                        # postinc
 $nn++==3                        # i_postinc
 $nn--==4                        # postdec
@@ -183,47 +175,47 @@ $n ^|^ $n                               # bit_or
 -$n                             # negate
 -$n                             # i_negate
 ^~^$n                           # complement
-atan2 $n,$n                     # atan2
-sin $n                          # sin
-cos $n                          # cos
+atan2: $n,$n                     # atan2
+sin: $n                          # sin
+cos: $n                          # cos
 '???'                           # rand
-exp $n                          # exp
-log $n                          # log
-sqrt $n                         # sqrt
-int $n                          # int
-hex $n                          # hex
-oct $n                          # oct
-abs $n                          # abs
-length $posstr                  # length
-substr $posstr, 2, 2            # substr
-vec("abc",2,8)                  # vec
-index $posstr, 2                # index
-rindex $posstr, 2               # rindex
-sprintf '%i%i', $n, $n          # sprintf
-ord $n                          # ord
-chr $n                          # chr
-crypt $n, $n                    # crypt
-ucfirst ($cstr . "a")           # ucfirst padtmp
-ucfirst $cstr                   # ucfirst
-lcfirst $cstr                   # lcfirst
-uc $cstr                        # uc
-lc $cstr                        # lc
-quotemeta $cstr                 # quotemeta
+exp: $n                          # exp
+log: $n                          # log
+sqrt: $n                         # sqrt
+int: $n                          # int
+hex: $n                          # hex
+oct: $n                          # oct
+abs: $n                          # abs
+length: $posstr                  # length
+substr: $posstr, 2, 2            # substr
+vec: "abc",2,8                  # vec
+index: $posstr, 2                # index
+rindex: $posstr, 2               # rindex
+sprintf: '%i%i', $n, $n          # sprintf
+ord: $n                          # ord
+chr: $n                          # chr
+crypt: $n, $n                    # crypt
+ucfirst: ($cstr . "a")           # ucfirst padtmp
+ucfirst: $cstr                   # ucfirst
+lcfirst: $cstr                   # lcfirst
+uc: $cstr                        # uc
+lc: $cstr                        # lc
+quotemeta: $cstr                 # quotemeta
 (each %h) % 2 == 1              # each
-nkeys %h                                # nkeys
-pack "C2", $n,$n                # pack
-join "a", @a                    # join
-push @a,3==6                    # push
-unshift @aaa                    # unshift
+nkeys: %h                                # nkeys
+pack: "C2", $n,$n                # pack
+join: "a", @a                    # join
+push: @a,3==6                    # push
+unshift: @aaa                    # unshift
 '???'           # grepwhile
 subb()                          # entersub
 caller                          # caller
 '???'                           # warn
 'faked'                         # die
-open my $blah, "<", "non-existent"      # open
-fileno $^STDERR                 # fileno
-umask 0                         # umask
-select undef,undef,undef,0      # select
+open: my $blah, "<", "non-existent"      # open
+fileno: $^STDERR                 # fileno
+umask: 0                         # umask
+select: undef,undef,undef,0      # select
 getc($op_fh)                            # getc
 '???'                           # read
 '???'                           # sysread
@@ -243,30 +235,30 @@ getc($op_fh)                            # getc
 chdir 'non-existent'            # chdir
 '???'                           # chown
 '???'                           # chroot
-unlink 'non-existent'           # unlink
-chmod 'non-existent'            # chmod
-utime 'non-existent'            # utime
-rename 'non-existent', 'non-existent1'  # rename
-link 'non-existent', 'non-existent1' # link
+unlink: 'non-existent'           # unlink
+chmod: 'non-existent'            # chmod
+utime: 'non-existent'            # utime
+rename: 'non-existent', 'non-existent1'  # rename
+link: 'non-existent', 'non-existent1' # link
 '???'                           # symlink
-readlink 'non-existent' # readlink
+readlink: 'non-existent' # readlink
 '???'                           # mkdir
 '???'                           # rmdir
 '???'                           # telldir
 '???'                           # fork
 '???'                           # wait
 '???'                           # waitpid
-system "$runme -e 0"            # system skip(VMS)
+system: "$runme -e 0"            # system skip(VMS)
 '???'                           # exec
 '???'                           # kill
 getppid                         # getppid
 getpgrp                         # getpgrp
 '???'                           # setpgrp
-getpriority $^PID, $^PID                # getpriority
+getpriority: $^PID, $^PID                # getpriority
 '???'                           # setpriority
 time                            # time
-localtime $^BASETIME                    # localtime
-gmtime $^BASETIME                       # gmtime
+localtime: $^BASETIME                    # localtime
+gmtime: $^BASETIME                       # gmtime
 '???'                           # sleep: can randomly fail
 '???'                           # alarm
 '???'                           # shmget

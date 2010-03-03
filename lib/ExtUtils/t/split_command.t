@@ -25,7 +25,7 @@ my $mm = bless: \(%:  NAME => "Foo" ), "MM"
 # I don't expect anything to have a length shorter than 256 chars.
 cmp_ok:  $mm->max_exec_len, '+>=', 256,   'max_exec_len' 
 
-my $echo = $mm->oneliner: q{print $^STDOUT, <@ARGV, qq[\n]}
+my $echo = $mm->oneliner: q{print: $^STDOUT, <@ARGV, qq[\n]}
 
 # Force a short command length to make testing split_command easier.
 $mm->{_MAX_EXEC_LEN} = (length: $echo) + 15
@@ -40,7 +40,7 @@ is:  (join: '', @results), (join: '', @test_args)
 
 
 my %test_args = %:  foo => 42, bar => 23, car => 'har' 
-my $even_args = $mm->oneliner: q{print $^STDOUT, !((nelems @ARGV) % 2)}
+my $even_args = $mm->oneliner: q{print: $^STDOUT, !((nelems @ARGV) % 2)}
 @cmds = $mm->split_command: $even_args, < %test_args
 isnt:  (nelems @cmds), 0 
 

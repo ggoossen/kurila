@@ -46,7 +46,7 @@ sub init
 #--------------------------------------------------------------------------
 
 sub survey($self, @< @search_dirs)
-    $self = $self->new unless ref $self # tolerate being a class method
+    $self = ($self->new: ) unless ref $self # tolerate being a class method
 
     $self->_expand_inc:  \@search_dirs 
 
@@ -94,7 +94,7 @@ sub survey($self, @< @search_dirs)
             next
         
 
-        my $closure = $self->_make_search_callback
+        my $closure = $self->_make_search_callback: 
 
         if(-d $start_in)
             # Normal case:
@@ -115,7 +115,7 @@ sub survey($self, @< @search_dirs)
     $self->progress and $self->progress->done: 
         "Noted $self->{?'_scan_count'} Pod files total"
 
-    return $self->name2path
+    return $self->name2path: 
 
 
 
@@ -224,7 +224,7 @@ sub _path2modname($self, $file, $shortname, $modname_bits)
 
     my @m = $modname_bits->@
     my $x
-    my $verbose = $self->verbose
+    my $verbose = $self->verbose: 
 
     # Shaving off leading naughty-bits
     while((nelems @m)
@@ -279,10 +279,10 @@ sub _path2modname($self, $file, $shortname, $modname_bits)
 sub _recurse_dir($self, $startdir, $callback, $modname_bits)
 
     my $maxdepth = $self->{?'fs_recursion_maxdepth'} || 10
-    my $verbose = $self->verbose
+    my $verbose = $self->verbose: 
 
-    my $here_string = File::Spec->curdir
-    my $up_string   = File::Spec->updir
+    my $here_string = File::Spec->curdir: 
+    my $up_string   = File::Spec->updir: 
     $modname_bits ||= \$@
 
     my $recursor
@@ -405,7 +405,7 @@ sub run(?$file, ?$name)
       # End of callback!
       
 
-    $self->survey
+    $self->survey: 
 
 
 #==========================================================================
@@ -503,13 +503,13 @@ sub _limit_glob_to_limit_re
 # contribution mostly from Tim Jenness <t.jenness@jach.hawaii.edu>
 
 sub find($self, $pod, @< @search_dirs)
-    $self = $self->new unless ref $self # tolerate being a class method
+    $self = ($self->new: ) unless ref $self # tolerate being a class method
 
     # Check usage
     Carp::carp:  'Usage: \$self->find($podname, ...)'
         unless defined $pod and length $pod
 
-    my $verbose = $self->verbose
+    my $verbose = $self->verbose: 
 
     # Split on :: and then join the name together using File::Spec
     my @parts = split: m/::/, $pod
@@ -517,7 +517,7 @@ sub find($self, $pod, @< @search_dirs)
 
     #@search_dirs = File::Spec->curdir unless @search_dirs;
 
-    if( $self->inc )
+    if( ($self->inc: ) )
         if( $^OS_NAME eq 'MacOS' )
             push: @search_dirs, < $self->_mac_whammy: < $^INCLUDE_PATH
         else

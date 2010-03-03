@@ -606,11 +606,10 @@ exactly as it appeared in the input.
 
 =cut
 
-sub raw_text
-    my $self = shift
+sub raw_text($self)
     my $text = $self->{?'name'} . $self->{?'ldelim'}
-    for (  $self->{'ptree'}->children )
-        $text .= (ref $_) ?? $_->raw_text !! $_
+    for (  $self->{'ptree'}->children: )
+        $text .= (ref $_) ?? ($_->raw_text: ) !! $_
 
     $text .= $self->{?'rdelim'}
     return $text
@@ -873,7 +872,7 @@ sub raw_text
     my $self = shift
     my $text = ""
     for (  $self->@ )
-        $text .= (ref $_) ?? $_->raw_text !! $_
+        $text .= (ref $_) ?? ($_->raw_text: ) !! $_
 
     return $text
 

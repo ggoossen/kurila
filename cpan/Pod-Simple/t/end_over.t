@@ -22,25 +22,21 @@ sub nowhine
     @_[0]->{+'no_whining'} = 1
 
 
-is:  <(e: 
+is:  < e: 
          "=head2 BLOOP\n\nHoopbehwo!\n\n=over\n\n=item Stuff.  Um.\n\nBrop.\n\n=head1 SVUP\n\nMyup."
          "=head2 BLOOP\n\nHoopbehwo!\n\n=over\n\n=item Stuff.  Um.\n\nBrop.\n\n=back\n\n=head1 SVUP\n\nMyup."
-    )
 
-is:  <(e: 
+is:  < e: 
          "=head2 BLOOP\n\nHoopbehwo!\n\n=over\n\n=item Stuff.  Um.\n\nBrop.\n\n=head2 SVUP\n\nMyup."
          "=head2 BLOOP\n\nHoopbehwo!\n\n=over\n\n=item Stuff.  Um.\n\nBrop.\n\n=back\n\n=head2 SVUP\n\nMyup."
-    )
 
-is:  <(e: 
+is:  < e: 
          "=head2 BLOOP\n\nHoopbehwo!\n\n=over\n\n=item Stuff.  Um.\n\nBrop.\n\n=head3 SVUP\n\nMyup."
          "=head2 BLOOP\n\nHoopbehwo!\n\n=over\n\n=item Stuff.  Um.\n\nBrop.\n\n=back\n\n=head3 SVUP\n\nMyup."
-    )
 
-is:  <(e: 
+is:  < e: 
          "=head2 BLOOP\n\nHoopbehwo!\n\n=over\n\n=item Stuff.  Um.\n\nBrop.\n\n=head4 SVUP\n\nMyup."
          "=head2 BLOOP\n\nHoopbehwo!\n\n=over\n\n=item Stuff.  Um.\n\nBrop.\n\n=back\n\n=head4 SVUP\n\nMyup."
-    )
 
 
 __END__

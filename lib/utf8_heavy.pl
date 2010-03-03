@@ -258,14 +258,14 @@ sub SWASHNEW_real
 
     print: $^STDERR, "CLASS = $class, TYPE => $type, BITS => $bits, NONE => $none\nEXTRAS =>\n$extras\nLIST =>\n$list\n" if DEBUG: 
 
-    my $SWASH = bless: \(%:
+    my $SWASH = bless: \ %:
                              TYPE => $type
                              BITS => $bits
                              EXTRAS => $extras
                              LIST => $list
                              NONE => $none
                              < @extras
-        ) => $class
+                       $class
 
     if ($file)
         %Cache{+$class . "," . $file} = $SWASH

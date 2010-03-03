@@ -811,9 +811,9 @@ sub parse_text
                                             !! $seq
                 ## Remember the current cmd-name and left-delimiter
                 if((nelems @seq_stack) +> 1)
-                    $cmd = @seq_stack[-1]->name
-                    $ldelim = @seq_stack[-1]->ldelim
-                    $rdelim = @seq_stack[-1]->rdelim
+                    $cmd = @seq_stack[-1]->name: 
+                    $ldelim = @seq_stack[-1]->ldelim: 
+                    $rdelim = @seq_stack[-1]->rdelim: 
                 else
                     $cmd = $ldelim = $rdelim = ''
                 
@@ -832,8 +832,8 @@ sub parse_text
     ## Handle unterminated sequences
     my $errorsub = ((nelems @seq_stack) +> 1) ?? $self->errorsub !! undef
     while ((nelems @seq_stack) +> 1)
-        @: $cmd, $file, $line = @: $seq->name, < $seq->file_line
-        $ldelim  = $seq->ldelim
+        @: $cmd, $file, $line = @: ($seq->name: ), < $seq->file_line: 
+        $ldelim  = $seq->ldelim: 
         ($rdelim = $ldelim) =~ s/</>/g
         $rdelim  =~ s/^(\S+)(\s*)$/$2$1/
         pop @seq_stack

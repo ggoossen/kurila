@@ -139,7 +139,7 @@ is:  $W, 1, 'right warnings'
 
 
 # A simple object creation and attribute access test
-my $obj1 = D3->new
+my $obj1 = D3->new: 
 $obj1->{+b1} = "B2"
 my $obj2 = $obj1
 $obj2->{+b1} = "D3"
@@ -219,9 +219,8 @@ do
     sub new
         my $self = shift
         $self = (fields::new: $self) unless ref $self
-         $self->SUPER::new: 
+        $self->SUPER::new
         return $self
-    
 
 
     package Z
@@ -231,10 +230,9 @@ do
     sub new
         my $self = shift
         $self = (fields::new: $self) unless ref $self
-         $self->SUPER::new: 
+        $self->SUPER::new
         $self->{+Z1} = 'z1'
         return $self
-    
 
     package main
 

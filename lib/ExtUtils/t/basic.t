@@ -126,7 +126,6 @@ END { (unlink: 'Big-Dummy.ppd') }
         diag: $test_out
 
 
-
 my $install_out = run: "$make install"
 (is:  $^CHILD_ERROR, 0, 'install' ) || diag: $install_out
 like:  $install_out, qr/^Installing /m 
@@ -210,7 +209,6 @@ ok:  %files{?'perllocal.pod'},'  perllocal.pod created'
     rmtree: 'other'
 
 
-
 :SKIP do
     skip: 'VMS install targets do not preserve $(PREFIX)', 10 if $Is_VMS
 
@@ -230,7 +228,6 @@ ok:  %files{?'perllocal.pod'},'  perllocal.pod created'
     ok:  %files{?'.packlist'},    '  packlist created'   
     ok:  %files{?'perllocal.pod'},'  perllocal.pod created' 
     rmtree: 'other'
-
 
 
 my $dist_out = run: "$make dist"

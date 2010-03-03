@@ -114,4 +114,4 @@ $WANT = <<'EOT'
 #$6 = $a->[1]->{"c"};
 EOT
 
-TEST: q(Data::Dumper->Dump(\(@: $a,$b,$c), \(@: <qw(a b), 6)))
+TEST: q(Data::Dumper->Dump: \(@: $a,$b,$c), \(@: < qw(a b), 6))

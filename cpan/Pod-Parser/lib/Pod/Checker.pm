@@ -751,7 +751,7 @@ sub end_pod
                 $list->indent ne 'auto')
             $self->poderror: \(%:  line => 'EOF', file => $infile
                                    severity => 'ERROR', msg => "=over on line " .
-                                    $list->start . " without closing =back" ) #"
+                                       $list->start . " without closing =back" ) #"
         
     
 
@@ -801,7 +801,7 @@ sub end_pod
 
 # check a POD command directive
 sub command($self, $cmd, $paragraph, $line_num, $pod_para)
-    my @: $file, $line =  $pod_para->file_line
+    my @: $file, $line =  $pod_para->file_line: 
     ## Check the command syntax
     my $arg # this will hold the command argument
     if (! %VALID_COMMANDS{?$cmd})
@@ -907,7 +907,7 @@ sub command($self, $cmd, $paragraph, $line_num, $pod_para)
                     $self->poderror: \(%:  line => $line, file => $file
                                            severity => 'WARNING'
                                            msg => "No items in =over (at line " .
-                                            $list->start . ") / =back list") #"
+                                               $list->start . ") / =back list") #"
                 
             
         elsif($cmd =~ m/^head(\d+)/)
@@ -1183,7 +1183,7 @@ sub verbatim($self, $paragraph, $line_num, $pod_para)
 
 # process a block of regular text
 sub textblock($self, $paragraph, $line_num, $pod_para)
-    my @: $file, $line = $pod_para->file_line
+    my @: $file, $line = $pod_para->file_line: 
 
     $self->_preproc_par: $paragraph
 
@@ -1207,8 +1207,6 @@ sub _preproc_par
         $self->{+_list_item_contents}++ if(defined $self->{?_list_item_contents})
         if((nelems $self->{?_list_stack}->@) && !$self->{_list_stack}->[0]->item)
             $self->{_list_stack}->[0]->{+_has_par} = 1
-        
-    
 
 
 1

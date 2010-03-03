@@ -111,7 +111,7 @@ our $VERSION = "1.49"
 # needed for VMS-specific filename translation
 if( $^OS_NAME eq 'VMS' )
     require VMS::Filespec
-    VMS::Filespec->import
+    VMS::Filespec->import: 
 
 
 sub cwd2

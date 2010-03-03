@@ -1,7 +1,7 @@
 #!perl
 
 BEGIN 
-    unshift $^INCLUDE_PATH, 't'
+    unshift: $^INCLUDE_PATH, 't'
     require Config
 # require 'test.pl'; # now done by OptreeCheck
 
@@ -10,28 +10,28 @@ BEGIN
 use OptreeCheck # ALSO DOES @ARGV HANDLING !!!!!!
 use Config
 
-plan tests => 4
+plan: tests => 4
 
 :SKIP do
-    skip "no perlio in this build", 4 unless Config::config_value("useperlio")
+    skip: "no perlio in this build", 4 unless Config::config_value: "useperlio"
 
     $^WARN_HOOK = sub (@< @_)
         my $err = shift
-        $err->message =~ m/Subroutine re::(un)?install redefined/ and return
+        ($err->message: ) =~ m/Subroutine re::(un)?install redefined/ and return
     
 
     #################################
-    pass("CANONICAL B::Concise EXAMPLE")
+    pass: "CANONICAL B::Concise EXAMPLE"
 
     #################################
-    pass("B::Concise OPTION TESTS")
+    pass: "B::Concise OPTION TESTS"
 
-    pass("OPTIONS IN CMDLINE MODE")
+    pass: "OPTIONS IN CMDLINE MODE"
 
-    checkOptree ( name => 'cmdline invoke -basic works',
-                  prog => 'my $f',
+    checkOptree:  name => 'cmdline invoke -basic works'
+                  prog => 'my $f'
                   #bcopts       => '-basic', # default
-                  expect_nt => <<'EOT')
+                  expect_nt => <<'EOT'
 # -  <!> root[1 ref] K ->(end)
 # 4     <@> leave vKP ->(end)
 # 1        <0> enter ->2

@@ -6,7 +6,7 @@ BEGIN
 
 use Config
 BEGIN 
-    try {require Errno; Errno->import;}
+    try {require Errno; (Errno->import: );}
 
 plan: tests => 9
 

@@ -13,7 +13,7 @@ BEGIN
 use Test::More 'no_plan'
 
 require Test::Builder
-my $tb = Test::Builder->new
+my $tb = Test::Builder->new: 
 
 # These should not change;
 local $^EVAL_ERROR = 42

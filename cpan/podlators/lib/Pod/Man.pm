@@ -86,9 +86,9 @@ sub new($class, @< @args)
     $self->% = %: < $self->%, < @args
 
     # Initialize various other internal constants based on our arguments.
-    $self->init_fonts
-    $self->init_quotes
-    $self->init_page
+    $self->init_fonts: 
+    $self->init_quotes: 
+    $self->init_page: 
 
     # For right now, default to turning on all of the magic.
     $self->{+MAGIC_CPP}       = 1
@@ -243,7 +243,7 @@ sub _handle_element_start($self, $element, $attrs)
         (DEBUG: )+> 4 and print: $^STDOUT, "Pending: [", < (pretty: $self->{?PENDING}), "]\n"
     elsif (($self->can : "start_$method"))
         my $method = 'start_' . $method
-         $self->?$method : $attrs, ''
+        $self->?$method : $attrs, ''
     else
         (DEBUG: )+> 2 and print: $^STDOUT, "No $method start method, skipping\n"
 
@@ -272,7 +272,7 @@ sub _handle_element_end($self, $element)
         
     elsif (($self->can : "end_$method"))
         my $method = 'end_' . $method
-         $self->?$method : 
+        $self->?$method : 
     else
         (DEBUG: )+> 2 and print: $^STDOUT, "No $method end method, skipping\n"
 
@@ -693,7 +693,7 @@ sub start_document($self, $attrs, _)
         $name = $self->{?name}
         $section = $self->{?section} || 1
     else
-        (@: $name, $section) =  $self->devise_title
+        (@: $name, $section) =  $self->devise_title: 
     
     my $date = $self->{?date} || $self->devise_date
     $self->preamble : $name, $section, $date
@@ -714,7 +714,7 @@ sub start_document($self, $attrs, _)
 # Handle the end of the document.  This does nothing but print out a final
 # comment at the end of the document under debugging.
 sub end_document($self)
-    return if $self->bare_output
+    return if $self->bare_output: 
     return if ($self->{?CONTENTLESS} && !$self->{?ALWAYS_EMIT_SOMETHING})
     $self->output : q(.\" [End document]) . "\n" if DEBUG: 
 
@@ -723,7 +723,7 @@ sub end_document($self)
 # a list, returning an empty name and section 1 if we can't find any better
 # information.  Uses File::Basename and File::Spec as necessary.
 sub devise_title($self)
-    my $name = $self->source_filename || ''
+    my $name = ($self->source_filename: ) || ''
     my $section = $self->{?section} || 1
     $section = 3 if (!$self->{?section} && $name =~ m/\.pm\z/i)
     $name =~ s/\.p(od|[lm])\z//i
@@ -779,7 +779,7 @@ sub devise_title($self)
 # handle as the source_filename for input from a file handle, so we have to
 # deal with that as well.
 sub devise_date($self)
-    my $input = $self->source_filename
+    my $input = $self->source_filename: 
     my $time
     if ($input)
         $time = (@: stat $input)[?9] || time
@@ -821,7 +821,7 @@ sub preamble($self, $name, $section, $date)
     chomp $preamble
 
     # Get the version information.
-    my $version = $self->version_report
+    my $version = $self->version_report: 
 
     # Finally output everything.
     $self->output : <<"----END OF HEADER----"
@@ -856,7 +856,7 @@ sub cmd_para($self, $attrs, $text)
     # there's an =over without =item, SHIFTWAIT will be set, and we need to
     # handle creation of the indent here.  Add the shift to SHIFTS so that it
     # will be cleaned up on =back.
-    $self->makespace
+    $self->makespace: 
     if ($self->{?SHIFTWAIT})
         $self->output : ".RS $self->{?INDENT}\n"
         push:  $self->{SHIFTS}->@, $self->{?INDENT}
@@ -1001,7 +1001,7 @@ sub cmd_head4($self, $attrs, $text)
 sub cmd_b { return '\f(BS' . @_[2] . '\f(BE' }
 sub cmd_i { return '\f(IS' . @_[2] . '\f(IE' }
 sub cmd_f { return '\f(IS' . @_[2] . '\f(IE' }
-sub cmd_c { return @_[0]->quote_literal : @_[2]) }
+sub cmd_c { return @_[0]->quote_literal : @_[2] }
 
 # Index entries are just added to the pending entries.
 sub cmd_x($self, $attrs, $text)
@@ -1158,7 +1158,7 @@ sub cmd_item_block  { my $self = shift; ($self->item_common : 'block',  < @_) }
 # that the same object can be reused to convert multiple pages.
 sub parse_from_file
     my $self = shift
-    $self->reinit
+    $self->reinit: 
 
     # Fake the old cutting option to Pod::Parser.  This fiddings with internal
     # Pod::Simple state and is quite ugly; we need a better approach.

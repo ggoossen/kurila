@@ -61,10 +61,10 @@ my $TheEnd
 
 if ($have_fork)
     info: "I am the main process $^PID, starting the timer process..."
-    $timer_pid = fork()
+    $timer_pid = fork:
     if (defined $timer_pid)
         if ($timer_pid == 0) # We are the kid, set up the timer.
-            my $ppid = getppid()
+            my $ppid = getppid:
             info: "I am the timer process $^PID, sleeping for $waitfor seconds..."
             (sleep: $waitfor)
             warn: "\n$^PROGRAM_NAME: overall time allowed for tests ($($waitfor)s) exceeded!\n"
@@ -74,7 +74,7 @@ if ($have_fork)
             (exit: 0)
         else 
             info: "The timer process $timer_pid launched, continuing testing..."
-            $TheEnd = time() + $waitfor
+            $TheEnd = (time: ) + $waitfor
         
     else 
         warn: "$^PROGRAM_NAME: fork failed: $^OS_ERROR\n"
@@ -195,7 +195,7 @@ else
     my $s = 0
     my $n
     for my $i (1 .. 100)
-        $s += (Time::HiRes::time: ) - time()
+        $s += (Time::HiRes::time: ) - (time: )
         $n++
     
     # $s should be, at worst, equal to $n
@@ -292,20 +292,17 @@ else
             my $ratio = (abs: $ival/$exp)
             $not = "tick: $exp sleep took $ival ratio $ratio"
             $i = 0
-        
-    
 
-    if ($use_sigaction)(
-        POSIX::sigaction: (POSIX::SIGALRM: ), $oldaction)
+    if ($use_sigaction)
+        POSIX::sigaction: (POSIX::SIGALRM: ), $oldaction
     else 
         alarm: 0 # can't cancel usig %SIG
-    
 
     ok: ! $not
 
 
 :SKIP do
-    if ( (not:    exists &Time::HiRes::setitimer
+    if ( (not: exists &Time::HiRes::setitimer
                   && exists &Time::HiRes::getitimer
                   && has_symbol: 'ITIMER_VIRTUAL'
                   && (config_value: "sig_name") =~ m/\bVTALRM\b/
@@ -482,9 +479,9 @@ if ($have_ualarm)
         ;
 
     use Time::HiRes < qw(alarm); 
-    (alarm: $T, $T);(  # Arm the alarm.
+    (alarm: $T, $T);  # Arm the alarm.
 
-    $Delay->& <: 10); # Try burning CPU at least for 10T seconds.
+    $Delay->& <: 10; # Try burning CPU at least for 10T seconds.
 
     (ok: 1); # Not core dumping by now is considered to be the success.
 else
@@ -630,13 +627,11 @@ if ($^OS_NAME =~ m/^(cygwin|MSWin)/)
         
         if (@mtime[$i] +> (int: @mtime[$i]))
             $ss++
-        
     
     diag: "ai = $ai, mi = $mi, ss = $ss"
   # Need at least 75% of monotonical increase and
   # 20% of subsecond results. Yes, this is guessing.
-  :SKIP
-    do 
+    :SKIP do
         if ($ss == 0)
             (skip: "No subsecond timestamps detected", 1)
         

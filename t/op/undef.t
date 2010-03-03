@@ -85,7 +85,7 @@ sub X::DESTROY
 
 sub PVBM () { 'foo' }
 do
-    my $dummy = (index: 'foo' (PVBM: ))
+    my $dummy = (index: 'foo', (PVBM: ))
 
 my $pvbm = (PVBM: )
 undef $pvbm

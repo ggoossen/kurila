@@ -465,14 +465,14 @@ sub pod2usage
     ## options that were all uppercase words rather than ones that
     ## looked like Unix command-line options.
     ## to be uppercase keywords)
-    %opts = %+: map: 
-        sub ($_)
-            my $val = %opts{?$_};
-            s/^-//;
-            m/^msg/i   and  $_ = 'message';
-            m/^exit/i  and  $_ = 'exitval';
-            (%: (lc: $_) => $val);
-            , keys %opts
+    %opts = %+: map:
+                    sub ($_)
+                        my $val = %opts{?$_};
+                        s/^-//;
+                        m/^msg/i   and  $_ = 'message';
+                        m/^exit/i  and  $_ = 'exitval';
+                        (%: (lc: $_) => $val);
+                    keys %opts
 
     ## Now determine default exitval and verbose values to use
     if ((! defined %opts{?"exitval"}) && (! defined %opts{?"verbose"}))
@@ -561,7 +561,7 @@ sub new
 
 
 sub select($self, @< @res)
-    if (@ISA[0]->can: 'select'))
+    if (@ISA[0]->can: 'select')
         $self->SUPER::select: @res
     else
         $self->{+USAGE_SELECT} = \@res
@@ -622,7 +622,7 @@ sub start_document($self, ...)
 
 sub begin_pod
     my $self = shift
-     $self->SUPER::begin_pod:   ## Have to call superclass
+    $self->SUPER::begin_pod   ## Have to call superclass
     my $msg = $self->{USAGE_OPTIONS}->{?message}  or  return 1
     my $out_fh = $self->output_handle
     print: $out_fh, "$msg\n"
