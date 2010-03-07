@@ -3408,7 +3408,6 @@ sub const($self, $sv, $cx)
 
 sub const_dumper($self, $sv, $cx)
     my $ref = $sv->object_2svref
-    my $ref = $sv->object_2svref: 
     my $dumper = Data::Dumper->new: \(@: $ref->$), \(@: '$v')
     ((((($dumper->Purity: 1)->Terse: 1)->Deparse: 1)->Indent: 0)->Useqq: 1)->Sortkeys: 1
     my $str = $dumper->Dump
