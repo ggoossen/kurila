@@ -78,7 +78,7 @@ sub _sock_info($addr,$port,$proto)
     if(defined $proto  && $proto =~ m/\D/)
         my $num = _get_proto_number: $proto
         unless (defined $num)
-            $^EVAL_ERROR = "Bad protocol '$proto'"
+            $^EVAL_ERROR = error::create: "Bad protocol '$proto'"
             return
         
         $proto = $num
@@ -93,7 +93,7 @@ sub _sock_info($addr,$port,$proto)
 
         $port = @serv[?2] || $defport || $pnum
         unless (defined $port)
-            $^EVAL_ERROR = "Bad service '$origport'"
+            $^EVAL_ERROR = error::create: "Bad service '$origport'"
             return
         
 
@@ -112,7 +112,7 @@ sub _error
     do
         local($^OS_ERROR)
         my $title = (ref: $sock).": "
-        $^EVAL_ERROR = join: "", (@:  @_[0] =~ m/^$title/ ?? "" !! $title, < @_)
+        $^EVAL_ERROR = error::create: join: "", (@:  @_[0] =~ m/^$title/ ?? "" !! $title, < @_)
         $sock->close
             if(defined (fileno: $sock))
     
