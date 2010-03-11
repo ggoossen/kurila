@@ -30,7 +30,7 @@ sub aap
          'wim')
 ")
 
-(defun indent-test (buffer)
+(defun buffer-test (function buffer)
   (set-buffer (get-buffer-create "*kurila-indent-test*"))
   (erase-buffer)
   (kurila-mode)
@@ -52,7 +52,7 @@ sub aap
         (goto-line linenr)
         ;(message "sniff for block start: %S" (kurila-sniff-for-block-start))
         ;(message "sniff for indent: %S" (kurila-sniff-for-indent))
-        (setq got (kurila-indent-indentation-info))
+        (setq got (funcall function))
         (if (not (equal (car indents) got))
             (progn
               (message "Failed on %s - got %S - exp %S" linenr got (car indents))
@@ -62,6 +62,22 @@ sub aap
         (setq indents (cdr indents))
         )))
   )
+
+(defun indent-test (buffer)
+  (buffer-test 'kurila-indent-indentation-info buffer))
+
+(buffer-test 'kurila-sniff-for-layout-lists
+"()       |foo: bar: 3
+(10 5)    |")
+
+(buffer-test 'kurila-sniff-for-layout-lists
+"nil                 |foo: 
+(new-layout-list)    |'bar'")
+
+(buffer-test 'kurila-sniff-for-layout-lists
+"nil                  |foo: 
+(new-layout-list)     |   'bar'
+(3)                   |'bar'")
 
 (indent-test "((0) (4))|package Foo::Bar
 ((0) (4))         |
@@ -99,13 +115,13 @@ sub aap
 ((4))             |    44")
 
 (indent-test "((0) (4))|package Foo::Bar
-((0) (4))         |
-((0) (4))         |sub aap
-((4))             |    noot($a,
-((9) (13))        |         $b)
-((4) (8) (0))     |
-((4) (8) (0))     |'sub aap'
-((0) (4))         |'noot'")
+((0) (4))           |
+((0) (4))           |sub aap
+((4))               |    noot: $a
+((10) (14) (4) (0)) |          $b
+((10) (14) (4) (0)) |
+((10) (14) (4) (0)) |'sub aap'
+((0) (4))           |'noot'")
 
 ;; indentation isnside qw() construct
 (indent-test "((0) (4))|package Foo::Bar
@@ -130,6 +146,9 @@ sub aap
 )
 
 (deftest '(kt-is 4) 'kt-is)
+
+
+
 
 (etest 
  (kt-is (kt-simple-buffer)

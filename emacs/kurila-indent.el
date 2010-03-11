@@ -12,11 +12,10 @@
 
 (defun kurila-sniff-for-paren-open ()
   (save-excursion
-    (let (eol bol indents)
-      (end-of-line)
-      (setq eol (point))
+    (let ((eol (progn (end-of-line) (point)))
+          (bol (progn (beginning-of-line) (point)))
+          indents)
       (beginning-of-line)
-      (setq bol (point))
       (kurila-update-syntaxification bol eol)
       (skip-chars-forward "^(")
       (if (< (point) eol)
@@ -50,7 +49,7 @@
                                              "\\|"
                                              "\\(sub\\)"
                                              "\\|"
-                                             "\\(else\\)"
+                                              "\\(else\\)"
                                              )
                                      bol t))
         (cond 
@@ -89,7 +88,53 @@
       points
       )))
   
-(defun kurila-sniff-for-indent (&optional parse-data) ; was parse-start
+(defun kurila-sniff-preindent-point ()
+  ;; Returns the start of the line, which is the indenting of the current line.
+  (let ((pre-indent-point (point)))
+    (save-excursion		; Know we are not in POD, find appropriate pos before
+      (kurila-backward-to-noncomment nil)
+      (setq p (max (point-min) (1- (point)))
+            prop (get-text-property p 'syntax-type)
+            look-prop (or (nth 1 (assoc prop kurila-look-for-prop))
+                          'syntax-type))
+      (if (memq prop '(pod here-doc format here-doc-delim))
+          (progn
+            (goto-char (kurila-beginning-of-property p look-prop))
+            (beginning-of-line)
+            (setq pre-indent-point (point)))))
+    pre-indent-point
+    ))
+
+(defun kurila-sniff-for-layout-lists ()
+  ;; Returns a list of indentation-levels at which a new layout list
+  ;; is started.
+  (save-excursion
+    (let (indents
+          (start-line-point (line-beginning-position)))
+      (while (> (line-beginning-position) 1)
+        (forward-line -1)
+        (let
+            ((eol (line-end-position))
+             (bol (line-beginning-position)))
+          (kurila-update-syntaxification bol eol)
+          (end-of-line)
+          (while (re-search-backward ":" bol t)
+            (save-excursion
+              (forward-char)
+              (skip-syntax-forward " ")
+              (while (and (< (point) (point-max))
+                          (= (point) (line-end-position)))
+                (forward-line 1)
+                (skip-syntax-forward " "))
+              (if (>= (point) start-line-point)
+                  (setq indents (cons 'new-layout-list indents))
+                (setq indents (cons (- (point) (line-beginning-position)) indents)))
+              )))
+        )
+      (reverse indents)
+      )))
+
+(defun kurila-sniff-for-indent (&optional parse-data)
   ;; Old workhorse for calculation of indentation; the major problem
   ;; is that it mixes the sniffer logic to understand what the current line
   ;; MEANS with the logic to actually calculate where to indent it.
@@ -97,6 +142,15 @@
   ;; actually, this is mostly done now...
   ;; possible returns values:
   ;;   'cont-expr (...)
+  ;;
+  ;;   'code-start-in-block <previous-indentation-level>          
+  ;;        A new block is expected, for example
+  ;;        "if (condition)", previous-indentation-level would the
+  ;;        indentation level of the "if".
+  ;;
+  ;;   'statement (<list-of-possible-indentation-levels>)
+  ;;        A new statement is expected or possibly a continuation of
+  ;;        the previous one, all previous indentation levels are returned
   (kurila-update-syntaxification (point) (point))
   (let ((res (get-text-property (point) 'syntax-type)))
     (save-excursion
@@ -119,19 +173,8 @@
 				 (skip-chars-forward " \t")
 				 (point)))
 	       (char-after (char-after char-after-pos))
-	       (pre-indent-point (point))
+	       (pre-indent-point (kurila-sniff-preindent-point))
 	       p prop look-prop is-block delim)
-	  (save-excursion		; Know we are not in POD, find appropriate pos before
-	    (kurila-backward-to-noncomment nil)
-	    (setq p (max (point-min) (1- (point)))
-		  prop (get-text-property p 'syntax-type)
-		  look-prop (or (nth 1 (assoc prop kurila-look-for-prop))
-				'syntax-type))
-	    (if (memq prop '(pod here-doc format here-doc-delim))
-		(progn
-		  (goto-char (kurila-beginning-of-property p look-prop))
-		  (beginning-of-line)
-		  (setq pre-indent-point (point)))))
 	  (goto-char pre-indent-point)	; Orig line skipping preceeding pod/etc
           (kurila-backward-to-noncomment nil)
           (let ((blocks (kurila-sniff-for-block-start))
