@@ -1,6 +1,6 @@
 #!./perl
 
-print: $^STDOUT, "1..10\n"
+print: $^STDOUT, "1..11\n"
 
 my @x = @: 1, 2, 3
 if ((join: ':', @x) eq '1:2:3') {print: $^STDOUT, "ok 1\n";} else {print: $^STDOUT, "not ok 1\n";}
@@ -25,12 +25,17 @@ print: $^STDOUT, "ok 7\n"
 print: $^STDOUT, "ok 8\n"
 
 # 9,10 and for multiple read of undef
-do { my $s = 5;
-    local (@: $^WARNING, $^WARN_HOOK) = (@:  1, sub (@< @_) { $s+=4 } );
-    my $r = (join: ':', (@:  'a', undef, $s, 'b', undef, $s, 'c'));
-    print: $^STDOUT, "# expected '13' got '$s'\nnot " if $s != 13;
-    print: $^STDOUT, "ok 9\n";
-    my $r = (join: '', (@:  'a', undef, $s, 'b', undef, $s, 'c'));
-    print: $^STDOUT, "# expected '21' got '$s'\nnot " if $s != 21;
-    print: $^STDOUT, "ok 10\n";
-}
+do  my $s = 5
+    local (@: $^WARNING, $^WARN_HOOK) = (@:  1, sub (@< @_) { $s+=4 } )
+    my $r = (join: ':', (@:  'a', undef, $s, 'b', undef, $s, 'c'))
+    print: $^STDOUT, "# expected '13' got '$s'\nnot " if $s != 13
+    print: $^STDOUT, "ok 9\n"
+    my $r = (join: '', (@:  'a', undef, $s, 'b', undef, $s, 'c'))
+    print: $^STDOUT, "# expected '21' got '$s'\nnot " if $s != 21
+    print: $^STDOUT, "ok 10\n"
+
+eval 'join: "*", (@: 1, 2), (@: 3, 4)'
+if ($^EVAL_ERROR->message =~ m/^Too many arguments for join or string/)
+    print: $^STDOUT, "ok 11 # join with extra arguments\n"
+else
+    print: $^STDOUT, "not ok 11 # join with extra arguments\n"

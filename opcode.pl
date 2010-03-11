@@ -804,7 +804,7 @@ hslice		hash slice		ck_null		@	H A
 unpack		unpack			ck_unpack	@	S S?
 pack		pack			ck_fun		mst@	S L
 split		split			ck_split	@	S S S
-join		join or string		ck_fun		mst@	S L
+join		join or string		ck_fun		mst@	S S
 
 # List operators.
 
