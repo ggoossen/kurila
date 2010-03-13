@@ -47,9 +47,9 @@
                                              "\\|"
                                              "\\()\\)"
                                              "\\|"
-                                             "\\(sub\\)"
+                                             "\\(\\bsub\\b\\)"
                                              "\\|"
-                                              "\\(else\\)"
+                                              "\\(\belse\\b\\)"
                                              )
                                      bol t))
         (cond 
@@ -77,7 +77,7 @@
               (setq points (cons 'next-line points))))
          ;; keyword which starts a new block
          ((match-beginning 4)
-          (unless (looking-at "else [[:space:]]*{")
+          (unless (looking-at "else[[:space:]]*{")
             (if (looking-at "\\s*\\(#\\|$\\)")
                 (setq points (cons (- (point) bol) points))
               (setq points (cons 'next-line points)))))
@@ -119,19 +119,21 @@
           (kurila-update-syntaxification bol eol)
           (end-of-line)
           (while (re-search-backward ":" bol t)
-            (save-excursion
-              (forward-char)
-              (skip-syntax-forward " ")
-              (while (and (< (point) (point-max))
-                          (= (point) (line-end-position)))
-                (forward-line 1)
-                (skip-syntax-forward " "))
-              (if (>= (point) start-end-point)
-                  (setq indents (cons 'new-layout-list indents))
-                (let ((indentation (- (point) (line-beginning-position))))
-                  (if (<= indentation max-indent)
-                      (setq indents (cons indentation indents)))))
-              )))
+            (if (= (char-before) ?:)
+                (forward-char -1)
+              (save-excursion
+                (forward-char)
+                (skip-syntax-forward " ")
+                (while (and (< (point) (point-max))
+                            (= (point) (line-end-position)))
+                  (forward-line 1)
+                  (skip-syntax-forward " "))
+                (if (>= (point) start-end-point)
+                    (setq indents (cons 'new-layout-list indents))
+                  (let ((indentation (- (point) (line-beginning-position))))
+                    (if (<= indentation max-indent)
+                        (setq indents (cons indentation indents)))))
+                ))))
         (kurila-sniff-preindent-point)
         (if (> max-indent (current-indentation))
             (setq max-indent (current-indentation)))
@@ -194,19 +196,26 @@
             (if first-paren
                 (vector 'cont-expr (list first-paren (car blocks)))
               (if (eq (elt blocks (- (length blocks) 1)) 'next-line)
-                  (vector 'code-start-in-block (car blocks))
-                (progn
+                  (vector 'code-start-in-block (if (> (length blocks) 1) (car blocks) 0))
+                (let
+                    ((next-line-indent (current-indentation)))
                   (setq blocks (reverse blocks))
                   (while (and (or (not blocks) (> (car blocks) 0))
                               (= (forward-line -1) 0))
                     (let ((new-blocks (kurila-sniff-for-block-start)))
                       (while (and new-blocks 
                                   (not (eq (car new-blocks) 'next-line))
-                                  (< (car new-blocks) (car blocks)))
+                                  (or (not blocks) (< (car new-blocks) (car blocks))))
                         (setq blocks (cons (car new-blocks) blocks))
                         (setq new-blocks (cdr new-blocks))
-                        )))
-                  (setq blocks (cons 0 (reverse blocks)))
+                        )
+                      (if (and new-blocks
+                               (eq (car (reverse new-blocks)) 'next-line)
+                               (or (not blocks) (< next-line-indent (car blocks))))
+                          (setq blocks (cons next-line-indent blocks)))
+                      (setq next-line-indent (current-indentation))
+                      ))
+                  (setq blocks (reverse (cons 0 blocks)))
                   (vector 'statement blocks layout-indents)))
             ))))))))
 
@@ -262,14 +271,14 @@ We stay in the cycle as long as the TAB key is pressed."
            (last-insert-length (nth 3 kurila-indent-last-info))
            (indent-info (nth index il)))
 
-      (indent-line-to (car indent-info)) ; insert indentation
+      (indent-line-to indent-info) ; insert indentation
       (delete-char last-insert-length)
       (setq last-insert-length 0)
-      (let ((text (cdr indent-info)))
-        (if text
-            (progn
-              (insert text)
-              (setq last-insert-length (length text)))))
+      ;; (let ((text (cdr indent-info)))
+      ;;   (if text
+      ;;       (progn
+      ;;         (insert text)
+      ;;         (setq last-insert-length (length text)))))
 
       (setq kurila-indent-last-info
             (list bol il (% (1+ index) (length il)) last-insert-length))

@@ -72,6 +72,15 @@ sub aap
 (10 5)        |")
 
 (buffer-test 'kurila-sniff-for-layout-lists
+"(10)         |Foo::bar: 3")
+
+(buffer-test 'kurila-sniff-for-layout-lists
+"(15 10)         |Foo::bar: baz: 3")
+
+(buffer-test 'kurila-sniff-for-layout-lists
+"(15 5)         |baz: Foo::bar: 3")
+
+(buffer-test 'kurila-sniff-for-layout-lists
 "(new-layout-list)   |foo: 
 ()                   |'bar'")
 
@@ -90,16 +99,29 @@ sub aap
 [statement (0) (10 5)]   |     'bar'
 [statement (0) (5)]      |'bar'")
 
+(buffer-test 'kurila-sniff-for-indent
+"[toplevel ()]          |substr: 'foo'
+[statement (0) (8)]     |")
+
+(buffer-test 'kurila-sniff-for-indent
+"[toplevel ()]              |sub foo
+[code-start-in-block 0]     |")
+
+(buffer-test 'kurila-indent-indentation-info
+"(0)    |sub foo
+(4)     |")
+
 (buffer-test 'kurila-indent-indentation-info
 "(0)     |foo: bar: 'baz'
 (10 5 0) |     'bar'
 (5 0)    |'bar'")
 
-(indent-test "((0) (4))|package Foo::Bar
-((0) (4))         |
-((0) (4))         |sub foo
-((4))             |    help
-((4) (8) (0))     |    if (1)
+(buffer-test  'kurila-sniff-for-indent
+"[toplevel ()]             |package Foo::Bar
+[statement (0) nil]        |
+[statement (0) nil]        |sub foo
+[code-start-in-block 0]    |    help
+[statement (4 0) ()]       |    if (1)
 ((8))             |
 ((8))             |        my $a = $a->{?$b}
 ((8) (12) (4) (0))|
