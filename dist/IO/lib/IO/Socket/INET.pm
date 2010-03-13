@@ -78,27 +78,22 @@ sub _sock_info($addr,$port,$proto)
     if(defined $proto  && $proto =~ m/\D/)
         my $num = _get_proto_number: $proto
         unless (defined $num)
-            $^EVAL_ERROR = error::create: "Bad protocol '$proto'"
-            return
+            die: "Bad protocol '$proto'"
         
         $proto = $num
-    
 
     if(defined $port)
         my $defport = ($port =~ s,\((\d+)\)$,,) ?? $1 !! undef
-        my $pnum = (@: $port =~ m,^(\d+)$,)[0]
+        my $pnum = (@: $port =~ m,^(\d+)$,)[?0]
 
         @serv = @:  getservbyname: $port, (_get_proto_name: $proto) || "" 
             if ($port =~ m,\D,)
 
         $port = @serv[?2] || $defport || $pnum
         unless (defined $port)
-            $^EVAL_ERROR = error::create: "Bad service '$origport'"
-            return
-        
+            die: "Bad service '$origport'"
 
         $proto = (_get_proto_number: @serv[3]) if (nelems @serv) && !$proto
-    
 
     return  @: $addr || undef
                $port || undef
