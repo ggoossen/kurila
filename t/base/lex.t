@@ -184,7 +184,7 @@ EOT
 do
     my $test = 47
     our (@nosuch, @a, @example)
-    (eval: q(">$(join: ' ', < @nosuch)<" eq "><")) || print: $^STDOUT, "# $^EVAL_ERROR", "not "
+    (eval: q(">$(join: ' ', @nosuch)<" eq "><")) || print: $^STDOUT, "# $^EVAL_ERROR", "not "
     print: $^STDOUT, "ok $test\n"
     ++$test
 

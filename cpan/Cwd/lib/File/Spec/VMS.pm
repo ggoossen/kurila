@@ -303,7 +303,7 @@ Use VMS syntax when converting filespecs.
 
 =cut
 
-sub abs2rel {
+sub abs2rel
     my $self = shift;
     return vmspath(File::Spec::Unix::abs2rel( $self, < @_ ))
         if grep: { m{/} }, @_;
@@ -348,15 +348,12 @@ sub abs2rel {
 
     # @basechunks now contains the directories to climb out of,
     # @pathchunks now has the directories to descend in to.
-    if ((@basechunks +> 0) || ($basechunks != $pathchunks)) {
-      $path_directories = join: '.', ('-' x @basechunks, @pathchunks) ;
-    }
-    else {
-      $path_directories = join: '.', @pathchunks;
-    }
-    $path_directories = '['.$path_directories.']';
-    return $self->canonpath: $self->catpath: '', $path_directories, $path_file ;
-}
+    if ((@basechunks +> 0) || ($basechunks != $pathchunks))
+      $path_directories = join: '.', @: '-' x @basechunks, @pathchunks
+    else
+      $path_directories = join: '.', @pathchunks
+    $path_directories = '['.$path_directories.']'
+    return $self->canonpath: $self->catpath: '', $path_directories, $path_file
 
 
 =item rel2abs (override)

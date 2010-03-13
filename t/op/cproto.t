@@ -104,7 +104,7 @@ if undef
 index ($$;$)
 int (_)
 ioctl (*$$)
-join ($@)
+join ($$)
 keys ($)
 kill (@)
 last undef

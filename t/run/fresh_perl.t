@@ -343,7 +343,7 @@ ok
 my (@a, @b, @c, @d)
 @a = 1..9
 @b = sort: { nelems: (@c = sort: { @d = sort: { 0 }, @a; nelems: @d; }, @a ); }, @a;
-print: $^STDOUT, join: '', @a, "\n";
+print: $^STDOUT, (join: '', @a), "\n";
 EXPECT
 123456789
 ######## example from Camel 5, ch. 15, pp.406 (with my)
