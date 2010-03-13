@@ -56,7 +56,8 @@ sub aap
         (if (not (equal (car indents) got))
             (progn
               (message "Failed on %s - got %S - exp %S" linenr got (car indents))
-              (assert nil)
+              (let ((debug-on-error nil))
+                (assert nil))
               ))
         (setq linenr (+ linenr 1))
         (setq indents (cdr indents))
@@ -67,17 +68,32 @@ sub aap
   (buffer-test 'kurila-indent-indentation-info buffer))
 
 (buffer-test 'kurila-sniff-for-layout-lists
-"()       |foo: bar: 3
-(10 5)    |")
+"(10 5)       |foo: bar: 3
+(10 5)        |")
 
 (buffer-test 'kurila-sniff-for-layout-lists
-"nil                 |foo: 
-(new-layout-list)    |'bar'")
+"(new-layout-list)   |foo: 
+()                   |'bar'")
 
 (buffer-test 'kurila-sniff-for-layout-lists
-"nil                  |foo: 
-(new-layout-list)     |   'bar'
-(3)                   |'bar'")
+"(new-layout-list)    |foo: 
+(3)                   |   'bar'
+()                    |'bar'")
+
+(buffer-test 'kurila-sniff-for-layout-lists
+"(10 5)    |foo: bar: 'baz'
+(5)        |     'bar'
+()         |'bar'")
+
+(buffer-test 'kurila-sniff-for-indent
+"[toplevel ()]           |foo: bar: 'baz'
+[statement (0) (10 5)]   |     'bar'
+[statement (0) (5)]      |'bar'")
+
+(buffer-test 'kurila-indent-indentation-info
+"(0)     |foo: bar: 'baz'
+(10 5 0) |     'bar'
+(5 0)    |'bar'")
 
 (indent-test "((0) (4))|package Foo::Bar
 ((0) (4))         |

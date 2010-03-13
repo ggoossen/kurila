@@ -82,9 +82,7 @@
                 (setq points (cons (- (point) bol) points))
               (setq points (cons 'next-line points)))))
         ))
-      (and (< (+ bol (current-indentation)) eol)
-           (setq points (cons (current-indentation) points)))
-      (message (format "points - %s" points))
+      (message "points - %s" points)
       points
       )))
   
@@ -109,10 +107,12 @@
   ;; Returns a list of indentation-levels at which a new layout list
   ;; is started.
   (save-excursion
+    (end-of-line)
+    (kurila-backward-to-noncomment nil)
     (let (indents
-          (start-line-point (line-beginning-position)))
-      (while (> (line-beginning-position) 1)
-        (forward-line -1)
+          (max-indent most-positive-fixnum)
+          (start-end-point (line-end-position)))
+      (while (> max-indent 0)
         (let
             ((eol (line-end-position))
              (bol (line-beginning-position)))
@@ -126,10 +126,18 @@
                           (= (point) (line-end-position)))
                 (forward-line 1)
                 (skip-syntax-forward " "))
-              (if (>= (point) start-line-point)
+              (if (>= (point) start-end-point)
                   (setq indents (cons 'new-layout-list indents))
-                (setq indents (cons (- (point) (line-beginning-position)) indents)))
+                (let ((indentation (- (point) (line-beginning-position))))
+                  (if (<= indentation max-indent)
+                      (setq indents (cons indentation indents)))))
               )))
+        (kurila-sniff-preindent-point)
+        (if (> max-indent (current-indentation))
+            (setq max-indent (current-indentation)))
+        (if (= (line-beginning-position) 1)
+            (setq max-indent 0))
+        (forward-line -1)
         )
       (reverse indents)
       )))
@@ -166,6 +174,8 @@
 	[comment-special:at-beginning-of-line])
        ((get-text-property (point) 'in-pod)
 	[in-pod])
+       ((= (line-beginning-position) 1)
+        [toplevel nil])
        (t
 	(beginning-of-line)
 	(let* ((indent-point (point))
@@ -179,6 +189,7 @@
           (kurila-backward-to-noncomment nil)
           (let ((blocks (kurila-sniff-for-block-start))
                 (first-paren (car (reverse (kurila-sniff-for-paren-open))))
+                (layout-indents (kurila-sniff-for-layout-lists))
                 )
             (if first-paren
                 (vector 'cont-expr (list first-paren (car blocks)))
@@ -195,8 +206,8 @@
                         (setq blocks (cons (car new-blocks) blocks))
                         (setq new-blocks (cdr new-blocks))
                         )))
-                  (setq blocks (reverse blocks))
-                  (vector 'statement blocks)))
+                  (setq blocks (cons 0 (reverse blocks)))
+                  (vector 'statement blocks layout-indents)))
             ))))))))
 
 (defun kurila-indent-indentation-info (&optional start)
@@ -212,16 +223,19 @@ START if non-nil is a presumed start pos of the current definition."
     (message (format "sniff: %s" sniff))
     (cond
      ((eq (elt sniff 0) 'code-start-in-block)
-      (setq indentations (list (list (+ sniff-i 4))))
+      (setq indentations (list (+ sniff-i 4)))
       )
      ((eq (elt sniff 0) 'statement)
-      (setq indentations (append (list (list (car sniff-i))
-                                       (list (+ (car sniff-i) 4)))
-                                 (mapcar 'list (cdr sniff-i)))))
+      (setq indentations (append (elt sniff 2)
+                                 (list (car sniff-i))
+                                 (cdr sniff-i))))
      ((eq (elt sniff 0) 'cont-expr)
-      (setq indentations (list (list (car sniff-i)) (list (+ (car sniff-i) 4))))
+      (setq indentations (list (car sniff-i) (+ (car sniff-i) 4)))
       )
+     ((eq (elt sniff 0) 'toplevel)
+      (setq indentations '(0))
       )
+     )
     indentations
     ))
 
