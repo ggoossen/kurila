@@ -1,7 +1,7 @@
 #!./perl
 
 require "./test.pl"
-plan:  tests => 40 
+plan:  tests => 41
 
 my (@foo, %foo, $foo, @bar, @refary, %refhash, @list)
 
@@ -113,7 +113,7 @@ delete @refary[0][3]
 cmp_ok:  (scalar: nelems @refary[0]),'==',1,'one down'
 
 do
-    my @a = @:  33 
+    my @a = @:  33
     my $b = \@a[0]
     my $c = \delete @a['bar']
 
@@ -129,8 +129,8 @@ do
 do
     # delete on undef.
     my $h
-    is:  delete $h{?foo}, undef 
-    dies_like:  { delete $h{foo} }, qr/delete expects a HASH not UNDEF/ 
+    is:  delete $h{?foo}, undef
+    dies_like:  { delete $h{foo} }, qr/delete expects a HASH not UNDEF/
 
 
 do
@@ -140,6 +140,10 @@ do
         my @a
         @a[+0] = bless: \$@, 'X'
         my $y = delete @a[0]
-    
+
     cmp_ok: $x,'==',1,q([perl #30733] array delete didn't free returned element)
 
+
+eval_dies_like: 'delete'
+                qr/Not enough arguments for delete/
+                "No segmentation fault on delete without arguments"

@@ -4011,36 +4011,40 @@ Perl_ck_concat(pTHX_ OP *o)
 OP *
 Perl_ck_delete(pTHX_ OP *o)
 {
+    OP * kid;
     PERL_ARGS_ASSERT_CK_DELETE;
 
     o = ck_fun(o);
     o->op_private = 0;
-    if (o->op_flags & OPf_KIDS) {
-	OP * const kid = cUNOPo->op_first;
-	switch (kid->op_type) {
-	case OP_ASLICE:
-	    o->op_flags |= OPf_SPECIAL;
-	    /* FALL THROUGH */
-	case OP_HSLICE:
-	    o->op_private |= OPpSLICE;
-	    break;
-	case OP_AELEM:
-	    o->op_flags |= OPf_SPECIAL;
-	    /* FALL THROUGH */
-	case OP_HELEM:
-	    break;
-	default:
-	    yyerror(Perl_form(aTHX_ "%s argument is not a HASH or ARRAY element or slice",
-			      OP_DESC(o)));
-	}
-	o->op_private |= kid->op_private & OPpELEM_OPTIONAL;
-	op_null(kid);
+    if (!(o->op_flags & OPf_KIDS)) {
+        assert(PL_parser->error_count);
+        return o;
     }
+    kid = cUNOPo->op_first;
+    switch (kid->op_type) {
+    case OP_ASLICE:
+        o->op_flags |= OPf_SPECIAL;
+        /* FALL THROUGH */
+    case OP_HSLICE:
+        o->op_private |= OPpSLICE;
+        break;
+    case OP_AELEM:
+        o->op_flags |= OPf_SPECIAL;
+        /* FALL THROUGH */
+    case OP_HELEM:
+        break;
+    default:
+        yyerror(Perl_form(aTHX_ "%s argument is not a HASH or ARRAY element or slice",
+                OP_DESC(o)));
+        return o;
+    }
+    o->op_private |= kid->op_private & OPpELEM_OPTIONAL;
+    op_null(kid);
     o = op_mod_assign(o,
-	o->op_private & OPpSLICE
-	? &(cBINOPx(cBINOPo->op_first)->op_last)
-	: &(cBINOPx(cBINOPo->op_first)->op_first),
-	o->op_type);
+        o->op_private & OPpSLICE
+        ? &(cBINOPx(cBINOPo->op_first)->op_last)
+        : &(cBINOPx(cBINOPo->op_first)->op_first),
+        o->op_type);
     return o;
 }
 
