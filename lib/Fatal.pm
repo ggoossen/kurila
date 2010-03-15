@@ -23,7 +23,7 @@ sub fill_protos
         push: @out1,\(@: $n,< @out) if $seen_semi
         (push: @out, $1 . "\{\@_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//
         (push: @out, "\@_[$n]"), next if $proto =~ s/^\s*([_*\$&])//
-        (push: @out, " < \@_[[ $n..nelems(\@_)-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//
+        (push: @out, " < \@_[[ $n..(nelems: \@_)-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//
         ($seen_semi = 1), $n--, next if $proto =~ s/^\s*;// # XXXX ????
         die: "Unknown prototype letters: \"$proto\""
     
@@ -42,21 +42,21 @@ sub write_invocation($core, $call, $name, @< @argvs)
         while ((nelems @argvs))
             @argv = (shift @argvs)->@
             $n = shift @argv
-            push: @out, "$($else)if (nelems(\@_) == $n) \{\n"
+            push: @out, "$($else)if ((nelems: \@_) == $n) \{\n"
             $else = "    \} els"
             push: @out
                   "        return " . (one_invocation: $core, $call, $name, < @argv) . ";\n"
         
         push: @out, <<EOC
         \}
-        die "$name(\$(join ' ', map \{ dump::view(\$_) \}, \@_): Do not expect to get \$(nelems(\@_)) arguments";
+        die: "$name(\$(join: ' ', map: \{ dump::view: \$_ \}, \@_): Do not expect to get \$(nelems: \@_) arguments";
 EOC
         return join: '', @out
     
 
 
 sub one_invocation($core, $call, $name, @< @argv)
-    return qq{($call $((join: ', ', @argv))) || die "Can't $name(\$(join ', ', map \{ dump::view(\$_) \}, \@_))} .
+    return qq{($call\: $((join: ', ', @argv))) || die: "Can't $name(\$(join: ', ', map: \{ dump::view: \$_ \}, \@_))} .
         ($core ?? ': $^OS_ERROR' !! ', \$^OS_ERROR is \"$^OS_ERROR\"') . '"'
 
 
