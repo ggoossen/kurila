@@ -4687,8 +4687,6 @@ Perl_yylex(pTHX)
 		/* If followed by a colon, it's certainly a subroutine. */
 		if (*s == ':') {
 		    s++;
-		    s = skipspace(s, NULL);
-		    start_list_indent(s);
 
 #ifdef PERL_MAD
 		    if (PL_madskills) {
@@ -4712,6 +4710,9 @@ Perl_yylex(pTHX)
 			NEXTVAL_NEXTTOKE.opval = pl_yylval.opval;
 			pl_yylval.i_tkval.ival = OPf_ENTERSUB_EARLY_CV;
 		    }
+
+		    s = skipspace(s, NULL);
+		    start_list_indent(s);
 
 		    PL_expect = XTERM;
 #ifdef PERL_MAD
