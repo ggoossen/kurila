@@ -21,3 +21,15 @@ for ((@: "*$foo", "\\*$foo"))
 try Fatal->import: 'print'
 like: $^EVAL_ERROR->message
       qr{Cannot make the non-overridable builtin print fatal}
+
+sub mysub($x)
+    return $x
+
+BEGIN
+    Fatal->import: 'mysub'
+
+is: (mysub: 1), 1
+
+try mysub: 0
+like: $^EVAL_ERROR->message
+      qr{Can't mysub}

@@ -56,7 +56,7 @@ EOC
 
 
 sub one_invocation($core, $call, $name, @< @argv)
-    return qq{($call\: $((join: ', ', @argv))) || die: "Can't $name(\$(join: ', ', map: \{ dump::view: \$_ \}, \@_))} .
+    return qq{($call $((join: ', ', @argv))) || die: "Can't $name(\$(join: ', ', map: \{ dump::view: \$_ \}, \@_))} .
         ($core ?? ': $^OS_ERROR' !! ', \$^OS_ERROR is \"$^OS_ERROR\"') . '"'
 
 
@@ -81,7 +81,7 @@ sub _make_fatal($sub, $pkg)
         die: "Cannot make the non-overridable builtin $name fatal"
             if not defined $proto
         $core = 1
-        $call = "CORE::$name"
+        $call = "CORE::$name\:"
     
     if (defined $proto)
         $real_proto = " ($proto)"
