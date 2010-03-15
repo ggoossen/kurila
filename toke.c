@@ -3670,11 +3670,12 @@ Perl_yylex(pTHX)
 		PL_expect = XOPERATOR;
 		force_ident(PL_tokenbuf, '*');
 		if (!*PL_tokenbuf)
-		    Perl_croak(aTHX_ "Invalid identifier");
+		    yyerror(aTHX_ "Invalid identifier");
 		TERM('*');
 	    }
 
-	    Perl_croak(aTHX_ "Unknown term '*'");
+	    yyerror(aTHX_ "Unknown term '*'");
+	    goto retry;
 	}
 	s++;
 	if (*s == '*') {
