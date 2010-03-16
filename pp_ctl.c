@@ -1306,11 +1306,7 @@ S_doeval(pTHX_ int gimme, ROOTOP** rootopp, CV* outside, U32 seq)
     dVAR; dSP;
     OP * const saveop = PL_op;
 
-    if (PL_parser->error_count) {
-	/* were are inside an eval which already has compile errors */
-	Perl_croak(aTHX_ "%"SVf"%s compilation aborted.\n",
-	    SVfARG(ERRSV), SvPV_nolen_const(PL_parser->lex_filename));
-    }
+    assert(!PL_parser->error_count);
 
     PL_in_eval = ((saveop && saveop->op_type == OP_REQUIRE)
 		  ? (EVAL_INREQUIRE | (PL_in_eval & EVAL_INEVAL))

@@ -43,7 +43,7 @@ BEGIN
     require "./test.pl"
 
 
-plan: 1633
+plan: 1634
 
 our ($x, %XXX, @XXX, $foo, @x, $null, @words)
 our ($TODO)
@@ -789,7 +789,7 @@ sub run_tests
         ok: $x =~ m/^.$/u, "wide is extactly one ."
         my $y = qr/^.$/u
         ok: "$y" eq "(?u-xism:^.\$)", "unicode-modifier stringified."
-        eval_dies_like:  q|no utf8; $x =~ m/\x{65e5}/|
+        eval_dies_like:  q|no utf8; sub x() m/\x{65e5}/|
                          qr/\\x\{\} not allowed outside Unicode match/
     
 
@@ -3060,9 +3060,6 @@ EOFTEST
                 foreach my $str ( $ary->@)
                     ok: $str=~m/($pat)/,"$pat"
                     is: $1,$str,"$pat"
-                
-            
-        
     
     do
         local $Message = "Check that \\xDF match properly in its various forms"
@@ -3083,8 +3080,6 @@ EOFTEST
                 next if $pat eq '-'
                 ok: $ret
                     "\"$sstr\"=~m/\\x\{DF\}/i # TODO multi-char folding"
-            
-        
     
     do
         use bytes
@@ -3195,5 +3190,15 @@ EOFTEST
         use utf8;
         my $s="[a]a\{2\}"
         ok: "aaa" =~ m/$s/, "#45337"
+
+    do
+        fresh_perl_is: <<'EOC', <<'MSG', undef, "No eval called inside pat after compile error" 
+use charnames ':full';
+xx;
+m/\N{SPACE}/
+EOC
+Unknown bare word xx at - line 2, at end of line
+Bareword "xx" not allowed while "strict subs" in use at - line 2 character 1.
+MSG
 
 # end of sub pat_tests

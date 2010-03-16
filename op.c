@@ -2219,6 +2219,9 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
     PL_hints |= HINT_BLOCK_SCOPE;
     pm = (PMOP*)o;
 
+    if (PL_parser && PL_parser->error_count)
+        return pm;
+
     if (expr->op_type == OP_CONST) {
 	STRLEN plen;
 	SV * const pat = ((SVOP*)expr)->op_sv;
