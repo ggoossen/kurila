@@ -1407,6 +1407,16 @@ PP(pp_entersub)
 	    DIE(aTHX_ "No DB::sub routine defined");
     }
 
+    if ( ! cv_optassignarg_flag(cv) 
+	&& ( is_assignment != cv_assignarg_flag(cv) ) ) {
+	if (is_assignment)
+	    Perl_croak(aTHX_ "%s can not be an assignee",
+		SvPVX_const(loc_name(SvLOCATION(cv))));
+	else
+	    Perl_croak(aTHX_ "%s must be an assignee",
+		SvPVX_const(loc_name(SvLOCATION(cv))));
+    }
+
     if (!(CvISXSUB(cv))) {
 	/* This path taken at least 75% of the time   */
 	dMARK;
@@ -1438,16 +1448,6 @@ PP(pp_entersub)
 	}
 	SAVECOMPPAD();
 	pad_set_cur_nosave(padlist, CvDEPTH(cv));
-
-	if ( ! cv_optassignarg_flag(cv) 
-	    && ( is_assignment != cv_assignarg_flag(cv) ) ) {
-	    if (is_assignment)
-		Perl_croak(aTHX_ "%s can not be an assignee",
-		    SvPVX_const(loc_name(SvLOCATION(cv))));
-	    else
-		Perl_croak(aTHX_ "%s must be an assignee",
-		    SvPVX_const(loc_name(SvLOCATION(cv))));
-	}
 
 	if (CvFLAGS(cv) & CVf_BLOCK) {
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));

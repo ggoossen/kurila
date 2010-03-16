@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan: 36
+plan: 37
 
 sub foo($x)
     return $x
@@ -137,3 +137,9 @@ is:  ((varargsassign: "aap", "noot") = "mies")
 is:  $varassign, "wim*zus=jet" 
 is:  $before, "before" 
 is:  $after, "after" 
+
+do
+    *xssub = &ref::svtype
+    eval_dies_like: '(xssub: 3) = 1'
+                    qr/can not be an assignee/
+                    "XS sub also checks that assignment is possible"
