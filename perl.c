@@ -564,6 +564,8 @@ perl_destruct(pTHXx)
 	PERL_UNUSED_VAR(x);
         if (PL_endav && !PL_minus_c)
             call_list(PL_scopestack_ix, PL_endav);
+	while (PL_scopestack_ix > 1)
+	    LEAVE;
         JMPENV_POP;
     }
     LEAVE;
