@@ -61,13 +61,11 @@ Perl_runops_continue_from_jmpenv(pTHX_ int ret)
 	/* NOTREACHED */
 	break;
     case 3:
-	if (PL_restartjmpenv == PL_top_env) {
+	if (PL_restartop) {
 	    PL_restartjmpenv = NULL;
-	    if (PL_restartop) {
-		PL_op = PL_restartop;
-		PL_restartop = 0;
-		CALLRUNOPS(aTHX);
-	    }
+	    PL_op = PL_restartop;
+	    PL_restartop = 0;
+	    CALLRUNOPS(aTHX);
 	    return 0;
 	}
 	break;
