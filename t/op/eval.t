@@ -220,7 +220,7 @@ is(do {
 {
     eval {
 	eval { goto foo; };
-	like($@, qr/Can't "goto" into the middle of a foreach loop/,
+	like($@, qr/Can't "goto" into a construct/,
 	     'eval catches bad goto calls');
 	last;
 	foreach my $i (1) {

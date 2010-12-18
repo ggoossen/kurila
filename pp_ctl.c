@@ -3063,17 +3063,10 @@ PP(pp_goto)
            that we're not going to punt, otherwise the error
 	   won't be caught */
 
-	if (leaving_eval && *enterops && enterops[1]) {
-	    I32 i;
-            for (i = 1; enterops[i]; i++)
-                if (enterops[i]->op_type == OP_ENTERITER)
-                    DIE(aTHX_ "Can't \"goto\" into the middle of a foreach loop");
-	}
-
 	if (*enterops && enterops[1]) {
 	    I32 i = enterops[1]->op_type == OP_ENTER && in_block ? 2 : 1;
 	    if (enterops[i])
-		deprecate("\"goto\" to jump into a construct");
+		DIE(aTHX_ "Can't \"goto\" into a construct");
 	}
 
 	/* pop unwanted frames */
@@ -3089,21 +3082,6 @@ PP(pp_goto)
 	    LEAVE_SCOPE(oldsave);
 	}
 
-	/* push wanted frames */
-
-	if (*enterops && enterops[1]) {
-	    OP * const oldop = PL_op;
-	    ix = enterops[1]->op_type == OP_ENTER && in_block ? 2 : 1;
-	    for (; enterops[ix]; ix++) {
-		PL_op = enterops[ix];
-		/* Eventually we may want to stack the needed arguments
-		 * for each op.  For now, we punt on the hard ones. */
-		if (PL_op->op_type == OP_ENTERITER)
-		    DIE(aTHX_ "Can't \"goto\" into the middle of a foreach loop");
-		PL_op->op_ppaddr(aTHX);
-	    }
-	    PL_op = oldop;
-	}
     }
 
     if (do_dump) {

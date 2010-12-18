@@ -10,41 +10,31 @@ BEGIN {
 
 use warnings;
 use strict;
-plan tests => 77;
+plan tests => 69;
 our $TODO;
 
-my $deprecated = 0;
-local $SIG{__WARN__} = sub { if ($_[0] =~ m/jump into a construct/) { $deprecated++; } else { warn $_[0] } };
-
-our $foo;
-while ($?) {
-    $foo = 1;
-  label1:
-    is($deprecated, 1);
-    $deprecated = 0;
-    $foo = 2;
-    goto label2;
+our $foo = 0;
+label3:
+while ($foo < 2) {
+    if (!$foo) {
+        $foo = 1;
+        goto label2;
+    }
 } continue {
-    $foo = 0;
-    goto label4;
-  label3:
-    is($deprecated, 1);
-    $deprecated = 0;
-    $foo = 4;
+    $foo += 1;
     goto label4;
 }
-is($deprecated, 0);
-goto label1;
+ok(0, "while loop not escaped");
+exit;
 
 $foo = 3;
 
 label2:
-is($foo, 2, 'escape while loop');
-is($deprecated, 0);
+is($foo, 1, 'escape while loop');
 goto label3;
 
 label4:
-is($foo, 4, 'second escape while loop');
+is($foo, 2, 'second escape while loop');
 
 my $r = run_perl(prog => 'goto foo;', stderr => 1);
 like($r, qr/label/, 'cant find label');
@@ -69,7 +59,7 @@ sub bar {
 exit;
 
 FINALE:
-is(curr_test(), 20, 'FINALE');
+is(curr_test(), 16, 'FINALE');
 
 # does goto LABEL handle block contexts correctly?
 # note that this scope-hopping differs from last & next,
@@ -178,23 +168,13 @@ ok($ok, 'works correctly in a nested eval string');
     foreach(1) { goto A; A: $ok = 1 } continue { };
     ok($ok, 'goto inside /foreach () { } continue { }/ loop');
 
-    $ok = 0;
-    sub a {
-	A: { if ($false) { redo A; B: $ok = 1; redo A; } }
-	goto B unless $count++;
-    }
-    is($deprecated, 0);
-    a();
-    ok($ok, '#19061 loop label wiped away by goto');
-    is($deprecated, 1);
-    $deprecated = 0;
+    fresh_perl_is( "A: { B: 1; }; goto B",
+                   q|Can't "goto" into a construct at - line 1.|,
+                   stderr => 1 );
 
-    $ok = 0;
-    my $p;
-    for ($p=1;$p && goto A;$p=0) { A: $ok = 1 }
-    ok($ok, 'weird case of goto and for(;;) loop');
-    is($deprecated, 1);
-    $deprecated = 0;
+    fresh_perl_is( 'my $p; for ($p=1;$p && goto A;$p=0) { A: $ok = 1 }',
+                   q|Can't "goto" into a construct at - line 1.|,
+                   stderr => 1 );
 }
 
 # bug #9990 - don't prematurely free the CV we're &going to.
@@ -264,7 +244,7 @@ exit;
 
 bypass:
 
-is(curr_test(), 9, 'eval "goto $x"');
+is(curr_test(), 5, 'eval "goto $x"');
 
 # Test autoloading mechanism.
 
@@ -332,7 +312,7 @@ moretests:
 	goto L4 if $z == 10;
 	last;
     };
-    like($@, qr/Can't "goto" into the middle of a foreach loop/,
+    like($@, qr/Can't "goto" into a construct/,
 	    'catch goto middle of foreach');
 
     $z = 0;
@@ -472,8 +452,6 @@ TODO: {
          ELSE: is($global, "unmodified");
     }
 }
-
-is($deprecated, 0);
 
 #74290
 {
