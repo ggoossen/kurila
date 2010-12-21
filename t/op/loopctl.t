@@ -36,7 +36,7 @@ BEGIN {
 }
 
 require "test.pl";
-plan( tests => 54 );
+plan( tests => 56 );
 
 my $ok;
 
@@ -137,7 +137,6 @@ TEST4: {
   $ok = 1;
 }
 cmp_ok($ok,'==',1,'no label on while() last');
-
 TEST5: {
 
   $ok = 0;
@@ -259,6 +258,24 @@ TEST9: {
 }
 cmp_ok($ok,'==',1,'no label on for(@array)');
 
+TEST_REDO_UNSTACK: {
+
+  $ok = 0;
+
+  my $first_time = 1;
+  for(1) {
+    my $unintialized = 1 if $first_time;
+    if (!$first_time) {
+      $ok = not $unintialized;
+      last TEST_REDO_UNSTACK;
+    }
+    $first_time = 0;
+    redo;
+  }
+  $ok = 0;
+}
+cmp_ok($ok,'==',1,'redo on for(@array) clears lexical variables');
+
 TEST10: {
 
   $ok = 0;
@@ -281,6 +298,24 @@ TEST10: {
   $ok = 0;
 }
 cmp_ok($ok,'==',1,'no label on for(@array) successful next');
+
+TEST_NEXT_UNSTACK: {
+
+  $ok = 0;
+
+  my $first_time = 1;
+  for(1,2) {
+    my $uninitialized = 1 if $first_time;
+    if (!$first_time) {
+      $ok = not $uninitialized;
+      last TEST_NEXT_UNSTACK;
+    }
+    $first_time = 0;
+    next;
+  }
+  $ok = 0;
+}
+cmp_ok($ok,'==',1,'nexton for(@array) cleans lexical variables');
 
 TEST11: {
 
