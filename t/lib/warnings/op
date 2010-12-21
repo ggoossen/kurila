@@ -616,13 +616,14 @@ EXPECT
 Parentheses missing around "local" list at - line 3.
 Parentheses missing around "local" list at - line 4.
 ########
-# op.c
+# TODO constant folded bareword should not be interpreted as a filehandle
 use warnings 'bareword' ;
 print (ABC || 1) ;
 no warnings 'bareword' ;
 print (ABC || 1) ;
 EXPECT
 Bareword found in conditional at - line 3.
+ABCABC
 ########
 --FILE-- abc
 
