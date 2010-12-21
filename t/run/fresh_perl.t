@@ -844,3 +844,8 @@ eval {
 print "If you get here, you didn't crash\n";
 EXPECT
 If you get here, you didn't crash
+######## constant folded chr gets freed somewhere
+my %h = ( chr(65) => "OK\n" );
+print eval q[$h{chr(65)}];
+EXPECT
+OK
