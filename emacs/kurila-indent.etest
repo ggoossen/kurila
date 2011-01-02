@@ -107,6 +107,14 @@ sub aap
 "[toplevel ()]              |sub foo
 [code-start-in-block 0]     |")
 
+(buffer-test 'kurila-sniff-for-indent
+"[toplevel ()]              |do
+[code-start-in-block 0]     |")
+
+(buffer-test 'kurila-sniff-for-indent
+"[toplevel ()]              |BEGIN
+[code-start-in-block 0]     |")
+
 (buffer-test 'kurila-indent-indentation-info
 "(0)    |sub foo
 (4)     |")

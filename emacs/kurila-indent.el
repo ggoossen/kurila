@@ -47,9 +47,9 @@
                                              "\\|"
                                              "\\()\\)"
                                              "\\|"
-                                             "\\(\\bsub\\b\\)"
+                                             "\\(\\bsub\\b\\|\\bBEGIN\\b\\)"
                                              "\\|"
-                                              "\\(\belse\\b\\)"
+                                              "\\(\\belse\\b\\|\\bdo\\b\\)"
                                              )
                                      bol t))
         (cond 
@@ -77,7 +77,7 @@
               (setq points (cons 'next-line points))))
          ;; keyword which starts a new block
          ((match-beginning 4)
-          (unless (looking-at "else[[:space:]]*{")
+          (unless (looking-at "\\w+[[:space:]]*{")
             (if (looking-at "\\s*\\(#\\|$\\)")
                 (setq points (cons (- (point) bol) points))
               (setq points (cons 'next-line points)))))

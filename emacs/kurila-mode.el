@@ -1980,6 +1980,7 @@ or as help on variables `kurila-tips', `kurila-problems',
 	(make-local-hook 'after-change-functions)
 	(add-hook 'after-change-functions 'kurila-after-change-function nil t)))
   ;; After hooks since fontification will break this
+  (kurila-find-pods-heres)
   (if kurila-pod-here-scan
       (or kurila-syntaxify-by-font-lock
        (progn (or kurila-faces-init (kurila-init-faces-weak))
