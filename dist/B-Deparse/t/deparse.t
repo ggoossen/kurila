@@ -554,37 +554,85 @@ if (!GLIPP) { x() } elsif (!GLIPP) { z() } elsif (GLIPP) { t() }
 if (!GLIPP) { x() } elsif (!GLIPP) { z() } elsif (!GLIPP) { t() }
 if (!GLIPP) { x() } elsif (!GLIPP) { z() } elsif (!GLIPP) { t() }
 >>>>
-x();
-x();
-'???';
-x();
-x();
-x();
-x();
-do {
-    '???'
+x() if 1;
+x() if 'glipp';
+x() if 0;
+x() if 'glipp' and 'glipp';
+x() if 0 or 'glipp';
+x() if do {
+    'glipp'
 };
-do {
-    x()
+x() if do {
+    BEGIN {${^WARNING_BITS} = "TUUUUUUUUUUQ\001"}
+    '???';
+    'glipp'
 };
-do {
-    z()
+x() if do {
+    0
 };
-do {
-    x()
-};
-do {
-    z()
-};
-do {
-    x()
-};
-'???';
-do {
-    t()
-};
-'???';
-!1;
+if ('glipp') {
+    x();
+}
+else {
+    z();
+}
+if (0) {
+    x();
+}
+else {
+    z();
+}
+if ('glipp') {
+    x();
+}
+elsif ('glipp') {
+    z();
+}
+if (0) {
+    x();
+}
+elsif ('glipp') {
+    z();
+}
+if ('glipp') {
+    x();
+}
+elsif (0) {
+    z();
+}
+if (0) {
+    x();
+}
+elsif (0) {
+    z();
+}
+if (0) {
+    x();
+}
+elsif (0) {
+    z();
+}
+elsif ('glipp') {
+    t();
+}
+if (0) {
+    x();
+}
+elsif (0) {
+    z();
+}
+elsif (0) {
+    t();
+}
+if (0) {
+    x();
+}
+elsif (0) {
+    z();
+}
+elsif (0) {
+    t();
+}
 ####
 # TODO constant deparsing has been backed out for 5.12
 # XXXTODO ? $Config::Config{useithreads} && "doesn't work with threads"
@@ -713,13 +761,9 @@ pop();
 pop @_;
 ####
 #[perl #20444]
-"foo" =~ (1 ? /foo/ : /bar/);
-"foo" =~ (1 ? y/foo// : /bar/);
-"foo" =~ (1 ? s/foo// : /bar/);
->>>>
-'foo' =~ ($_ =~ /foo/);
-'foo' =~ ($_ =~ tr/fo//);
-'foo' =~ ($_ =~ s/foo//);
+'foo' =~ (1 ? /foo/ : /bar/);
+'foo' =~ (1 ? tr/fo// : /bar/);
+'foo' =~ (1 ? s/foo// : /bar/);
 ####
 # Test @threadsv_names under 5005threads
 foreach $' (1, 2) {

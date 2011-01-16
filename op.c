@@ -5395,32 +5395,11 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     }
     /* search for a constant op that could let us fold the test */
     if ((cstop = search_const(first))) {
-	if (cstop->op_private & OPpCONST_STRICT)
-	    no_bareword_allowed(cstop);
-	else if ((cstop->op_private & OPpCONST_BARE))
-		Perl_ck_warner(aTHX_ packWARN(WARN_BAREWORD), "Bareword found in conditional");
+	if ( (!(cstop->op_private & OPpCONST_STRICT)) && (cstop->op_private & OPpCONST_BARE))
+	    Perl_ck_warner(aTHX_ packWARN(WARN_BAREWORD), "Bareword found in conditional");
 	if ((type == OP_AND &&  SvTRUE(((SVOP*)cstop)->op_sv)) ||
 	    (type == OP_OR  && !SvTRUE(((SVOP*)cstop)->op_sv)) ||
 	    (type == OP_DOR && !SvOK(((SVOP*)cstop)->op_sv))) {
-	    *firstp = NULL;
-	    if (other->op_type == OP_CONST)
-		other->op_private |= OPpCONST_SHORTCIRCUIT;
-	    if (PL_madskills) {
-		OP *newop = newUNOP(OP_NULL, 0, other);
-		op_getmad(first, newop, '1');
-		newop->op_targ = type;	/* set "was" field */
-		return newop;
-	    }
-	    op_free(first);
-	    if (other->op_type == OP_LEAVE)
-		other = newUNOP(OP_NULL, OPf_SPECIAL, other);
-	    else if (other->op_type == OP_MATCH
-	          || other->op_type == OP_SUBST
-	          || other->op_type == OP_TRANSR
-	          || other->op_type == OP_TRANS)
-		/* Mark the op as being unbindable with =~ */
-		other->op_flags |= OPf_SPECIAL;
-	    return other;
 	}
 	else {
 	    /* check for C<my $x if 0>, or C<my($x,$y) if 0> */
@@ -5439,18 +5418,6 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
 		Perl_ck_warner_d(aTHX_ packWARN(WARN_DEPRECATED),
 				 "Deprecated use of my() in false conditional");
 	    }
-
-	    *otherp = NULL;
-	    if (first->op_type == OP_CONST)
-		first->op_private |= OPpCONST_SHORTCIRCUIT;
-	    if (PL_madskills) {
-		first = newUNOP(OP_NULL, 0, first);
-		op_getmad(other, first, '2');
-		first->op_targ = type;	/* set "was" field */
-	    }
-	    else
-		op_free(other);
-	    return first;
 	}
     }
     else if ((first->op_flags & OPf_KIDS) && type != OP_DOR
@@ -5553,32 +5520,6 @@ Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop)
 	return newLOGOP(OP_OR, 0, first, falseop);
 
     scalarboolean(first);
-    if ((cstop = search_const(first))) {
-	/* Left or right arm of the conditional?  */
-	const bool left = SvTRUE(((SVOP*)cstop)->op_sv);
-	OP *live = left ? trueop : falseop;
-	OP *const dead = left ? falseop : trueop;
-        if (cstop->op_private & OPpCONST_BARE &&
-	    cstop->op_private & OPpCONST_STRICT) {
-	    no_bareword_allowed(cstop);
-	}
-	if (PL_madskills) {
-	    /* This is all dead code when PERL_MAD is not defined.  */
-	    live = newUNOP(OP_NULL, 0, live);
-	    op_getmad(first, live, 'C');
-	    op_getmad(dead, live, left ? 'e' : 't');
-	} else {
-	    op_free(first);
-	    op_free(dead);
-	}
-	if (live->op_type == OP_LEAVE)
-	    live = newUNOP(OP_NULL, OPf_SPECIAL, live);
-	else if (live->op_type == OP_MATCH || live->op_type == OP_SUBST
-	      || live->op_type == OP_TRANS || live->op_type == OP_TRANSR)
-	    /* Mark the op as being unbindable with =~ */
-	    live->op_flags |= OPf_SPECIAL;
-	return live;
-    }
     NewOp(1101, logop, 1, LOGOP);
     logop->op_type = OP_COND_EXPR;
     logop->op_ppaddr = PL_ppaddr[OP_COND_EXPR];
