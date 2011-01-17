@@ -118,7 +118,7 @@ BEGIN { $/ = "\n"; $\ = "\n"; }
 LINE: while (defined($_ = <ARGV>)) {
     chomp $_;
     our(@F) = split(' ', $_, 0);
-    '???';
+    1;
 }
 EOF
 is($a, $b,
@@ -242,6 +242,13 @@ $test /= 2 if ++$test;
 # list x
 -((1, 2) x 2);
 ####
+{
+    my $test = sub {
+	my $x;
+    }
+    ;
+}
+####
 # lvalue sub
 {
     my $test = sub : lvalue {
@@ -302,7 +309,7 @@ my($x, @a);
 $x = 1 foreach (@a);
 ####
 # 2 arguments in a 3 argument for
-for (my $i = 0; $i < 2;) {
+for (my $i = 0; $i < 2; ) {
     my $z = 1;
 }
 ####
@@ -355,7 +362,7 @@ foreach our $i (1, 2) {
 ####
 # reverse sort
 my @x;
-print reverse sort(@x);
+print reverse(sort(@x));
 ####
 # sort with cmp
 my @x;
@@ -363,7 +370,7 @@ print((sort {$b cmp $a} @x));
 ####
 # reverse sort with block
 my @x;
-print((reverse sort {$b <=> $a} @x));
+print reverse((sort {$b <=> $a} @x));
 ####
 # foreach reverse
 our @a;
@@ -371,7 +378,7 @@ print $_ foreach (reverse @a);
 ####
 # foreach reverse (not inplace)
 our @a;
-print $_ foreach (reverse 1, 2..5);
+print $_ foreach (reverse 1, 2 .. 5);
 ####
 # bug #38684
 our @ary;
@@ -556,19 +563,19 @@ if (!GLIPP) { x() } elsif (!GLIPP) { z() } elsif (!GLIPP) { t() }
 >>>>
 x() if 1;
 x() if 'glipp';
-x() if 0;
+x() unless 'glipp';
 x() if 'glipp' and 'glipp';
-x() if 0 or 'glipp';
+x() if not 'glipp' or 'glipp';
 x() if do {
     'glipp'
 };
 x() if do {
-    BEGIN {${^WARNING_BITS} = "TUUUUUUUUUUQ\001"}
-    '???';
+    BEGIN {${^WARNING_BITS} = "TUUUUUUUUUUQU"}
+    5;
     'glipp'
 };
 x() if do {
-    0
+    not 'glipp'
 };
 if ('glipp') {
     x();
@@ -576,7 +583,7 @@ if ('glipp') {
 else {
     z();
 }
-if (0) {
+if (not 'glipp') {
     x();
 }
 else {
@@ -588,7 +595,7 @@ if ('glipp') {
 elsif ('glipp') {
     z();
 }
-if (0) {
+if (not 'glipp') {
     x();
 }
 elsif ('glipp') {
@@ -597,40 +604,40 @@ elsif ('glipp') {
 if ('glipp') {
     x();
 }
-elsif (0) {
+elsif (not 'glipp') {
     z();
 }
-if (0) {
+if (not 'glipp') {
     x();
 }
-elsif (0) {
+elsif (not 'glipp') {
     z();
 }
-if (0) {
+if (not 'glipp') {
     x();
 }
-elsif (0) {
+elsif (not 'glipp') {
     z();
 }
 elsif ('glipp') {
     t();
 }
-if (0) {
+if (not 'glipp') {
     x();
 }
-elsif (0) {
+elsif (not 'glipp') {
     z();
 }
-elsif (0) {
+elsif (not 'glipp') {
     t();
 }
-if (0) {
+if (not 'glipp') {
     x();
 }
-elsif (0) {
+elsif (not 'glipp') {
     z();
 }
-elsif (0) {
+elsif (not 'glipp') {
     t();
 }
 ####
@@ -720,15 +727,15 @@ my $pi = 4;
 # in place sort
 our @a;
 my @b;
-@a = sort @a;
-@b = sort @b;
+@a = sort(@a);
+@b = sort(@b);
 ();
 ####
 # in place reverse
 our @a;
 my @b;
-@a = reverse @a;
-@b = reverse @b;
+@a = reverse(@a);
+@b = reverse(@b);
 ();
 ####
 # #71870 Use of uninitialized value in bitwise and B::Deparse

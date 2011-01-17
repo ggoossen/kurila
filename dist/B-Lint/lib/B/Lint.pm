@@ -241,7 +241,7 @@ my %check;
 my %implies_ok_context;
 
 map( $implies_ok_context{$_}++,
-    qw(scalar av2arylen aelem aslice helem hslice
+    qw(scalar list av2arylen aelem aslice helem hslice
         keys values hslice defined undef delete) );
 
 # Lint checks turned on by default
@@ -302,12 +302,9 @@ sub inside_foreach_modifier {
     # call. If we are in the EXPR part of C<EXPR foreach ...> this
     # returns true.
     for my $ancestor ( @{ parents() } ) {
-        next unless $ancestor->name eq 'leaveloop';
+        next unless $ancestor->name eq 'foreach';
 
-        my $first = $ancestor->first;
-        next unless $first->name eq 'enteriter';
-
-        next if $first->redoop->name =~ m/\A(?:next|db|set)state\z/xms;
+        next if ($ancestor->children)[2]->name =~ m/\A(?:next|db|set)state\z/xms;
 
         return 1;
     }
@@ -493,13 +490,13 @@ IMPLICIT_FOO: {
         # Look for C<for ( ... )>.
         next
             unless ( $check{implicit_read} or $check{implicit_write} )
-            and $op->name eq "enteriter";
+            and $op->name eq "foreach";
 
-        my $last = $op->last;
+        my (undef, $iter, $block) = $op->children;
         next
-            unless $last->name         eq "gv"
-            and $last->gv_harder->NAME eq "_"
-            and $op->redoop->name =~ m/\A(?:next|db|set)state\z/xms;
+            unless $iter->name         eq "gv"
+            and $iter->gv_harder->NAME eq "_"
+            and $block->name =~ m/\A(?:lineseq)\z/xms;
 
         warning 'Implicit use of $_ in foreach';
     }
@@ -590,7 +587,8 @@ DOLLAR_UNDERSCORE: {
 
         next
             unless $check{dollar_underscore}
-            and $op->name            eq "gvsv"
+            and $op->name            eq "gv"
+            and parents()->[0]->name eq "rv2sv"
             and $op->gv_harder->NAME eq "_"
             and not( inside_grepmap
             or inside_foreach_modifier );
@@ -603,7 +601,8 @@ REGEXP_VARIABLES: {
         # Look for any uses of $`, $&, or $'.
         next
             unless $check{regexp_variables}
-            and $op->name eq "gvsv";
+            and $op->name eq "gv"
+            and parents()->[0]->name eq "rv2sv";
 
         my $name = $op->gv_harder->NAME;
         next unless $name =~ m/\A[\&\'\`]\z/xms;
@@ -618,7 +617,8 @@ UNDEFINED_SUBS: {
         next
             unless $check{undefined_subs}
             and $op->name       eq "gv"
-            and $op->next->name eq "entersub";
+            and ref(parents()->[0]->sibling) eq "B::NULL"
+            and parents()->[1]->name eq 'entersub';
 
         my $gv      = $op->gv_harder;
         my $subname = $gv->STASH->NAME . "::" . $gv->NAME;

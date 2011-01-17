@@ -26,7 +26,7 @@ our %EXPORT_TAGS =
       mech	=> [qw( concise_subref concise_cv concise_main )],  );
 
 # use #6
-use B qw(class ppname main_start main_root main_cv cstring svref_2object
+use B qw(class ppname main_root main_cv cstring svref_2object
 	 SVf_IOK SVf_NOK SVf_POK SVf_IVisUV SVf_FAKE OPf_KIDS OPf_SPECIAL
 	 CVf_ANON PAD_FAKELEX_ANON PAD_FAKELEX_MULTI SVf_ROK);
 
@@ -38,7 +38,7 @@ my %style =
     "#class pp_#name"],
    "concise" =>
    ["#hyphseq2 (*(   (x( ;)x))*)<#classsym> #exname#arg(?([#targarglife])?)"
-    . "~#flags(?(/#private)?)(?(:#hints)?)(x(;~->#next)x)\n"
+    . "~#flags(?(/#private)?)(?(:#hints)?)(x(;~)x)\n"
     , "  (*(    )*)     goto #seq\n",
     "(?(<#seq>)?)#exname#arg(?([#targarglife])?)"],
    "linenoise" =>
@@ -46,7 +46,7 @@ my %style =
     "gt_#seq ",
     "(?(#seq)?)#noise#arg(?([#targarg])?)"],
    "debug" =>
-   ["#class (#addr)\n\top_next\t\t#nextaddr\n\top_sibling\t#sibaddr\n\t"
+   ["#class (#addr)\n\top_sibling\t#sibaddr\n\t"
     . "op_ppaddr\tPL_ppaddr[OP_#NAME]\n\top_type\t\t#typenum\n" .
     ($] > 5.009 ? '' : "\top_seq\t\t#seqnum\n")
     . "\top_flags\t#flagval\n\top_private\t#privval\t#hintsval\n"
@@ -61,7 +61,7 @@ my %style =
 # Renderings, ie how Concise prints, is controlled by these vars
 # primary:
 our $stylename;		# selects current style from %style
-my $order = "basic";	# how optree is walked & printed: basic, exec, tree
+my $order = "basic";	# how optree is walked & printed: basic, postorder, tree
 
 # rendering mechanics:
 # these 'formats' are the line-rendering templates
@@ -175,28 +175,25 @@ sub concise_cv_obj {
 	print $walkHandle "$name is XS code\n";
 	return;
     }
-    if (class($cv->START) eq "NULL") {
+    if (class($cv->ROOT) eq "NULL") {
 	no strict 'refs';
 	if (ref $name eq 'CODE') {
-	    print $walkHandle "coderef $name has no START\n";
+	    print $walkHandle "coderef $name has no ROOT\n";
 	}
 	elsif (exists &$name) {
-	    print $walkHandle "$name exists in stash, but has no START\n";
+	    print $walkHandle "$name exists in stash, but has no ROOT\n";
 	}
 	else {
 	    print $walkHandle "$name not in symbol table\n";
 	}
 	return;
     }
-    sequence($cv->START);
-    if ($order eq "exec") {
-	walk_exec($cv->START);
-    }
-    elsif ($order eq "basic") {
+    sequence($cv->ROOT);
+    if ($order eq "basic" or $order eq "postorder") {
 	# walk_topdown($cv->ROOT, sub { $_[0]->concise($_[1]) }, 0);
 	my $root = $cv->ROOT;
 	unless (ref $root eq 'B::NULL') {
-	    walk_topdown($root, sub { $_[0]->concise($_[1]) }, 0);
+	    walk_tree($root, sub { $_[0]->concise($_[1]) }, 0, $order eq "postorder");
 	} else {
 	    print $walkHandle "B::NULL encountered doing ROOT on $cv. avoiding disaster\n";
 	}
@@ -207,18 +204,15 @@ sub concise_cv_obj {
 
 sub concise_main {
     my($order) = @_;
-    sequence(main_start);
+    sequence(main_root);
     $curcv = main_cv;
-    if ($order eq "exec") {
-	return if class(main_start) eq "NULL";
-	walk_exec(main_start);
-    } elsif ($order eq "tree") {
+    if ($order eq "tree") {
 	return if class(main_root) eq "NULL";
 	print $walkHandle tree(main_root, 0);
-    } elsif ($order eq "basic") {
+    } elsif ($order eq "basic" or $order eq "postorder") {
 	return if class(main_root) eq "NULL";
-	walk_topdown(main_root,
-		     sub { $_[0]->concise($_[1]) }, 0);
+	walk_tree(main_root,
+		     sub { $_[0]->concise($_[1]) }, 0, $order eq "postorder");
     }
 }
 
@@ -261,7 +255,10 @@ sub compileOpts {
 	if ($o eq "-basic") {
 	    $order = "basic";
 	} elsif ($o eq "-exec") {
-	    $order = "exec";
+	    $order = "postorder";
+            warn "'exec' order has been removed using 'postorder'";
+	} elsif ($o eq "-postorder") {
+	    $order = "postorder";
 	} elsif ($o eq "-tree") {
 	    $order = "tree";
 	}
@@ -450,16 +447,20 @@ sub reset_sequence {
 
 sub seq {
     my($op) = @_;
+    return "?" if not $$op;
     return "-" if not exists $sequence_num{$$op};
     return base_n($sequence_num{$$op});
 }
 
-sub walk_topdown {
-    my($op, $sub, $level) = @_;
-    $sub->($op, $level);
+sub walk_tree {
+    my($op, $sub, $level, $postorder) = @_;
+    $sub->($op, $level) if not $postorder;
+    my $sublevel = $postorder ? $level : $level + 1;
     if ($op->flags & OPf_KIDS) {
+        use Carp;
+        confess $op->name if not $op->can("first");
 	for (my $kid = $op->first; $$kid; $kid = $kid->sibling) {
-	    walk_topdown($kid, $sub, $level + 1);
+	    walk_tree($kid, $sub, $sublevel, $postorder);
 	}
     }
     if (class($op) eq "PMOP") {
@@ -467,9 +468,10 @@ sub walk_topdown {
 	if (ref($maybe_root) and $maybe_root->isa("B::OP")) {
 	    # It really is the root of the replacement, not something
 	    # else stored here for lack of space elsewhere
-	    walk_topdown($maybe_root, $sub, $level + 1);
+	    walk_tree($maybe_root, $sub, $sublevel, $postorder);
 	}
     }
+    $sub->($op, $level) if $postorder;
 }
 
 sub walklines {
@@ -483,74 +485,11 @@ sub walklines {
     }
 }
 
-sub walk_exec {
-    my($top, $level) = @_;
-    my %opsseen;
-    my @lines;
-    my @todo = ([$top, \@lines]);
-    while (@todo and my($op, $targ) = @{shift @todo}) {
-	for (; $$op; $op = $op->next) {
-	    last if $opsseen{$$op}++;
-	    push @$targ, $op;
-	    my $name = $op->name;
-	    if (class($op) eq "LOGOP") {
-		my $ar = [];
-		push @$targ, $ar;
-		push @todo, [$op->other, $ar];
-	    } elsif ($name eq "subst" and $ {$op->pmreplstart}) {
-		my $ar = [];
-		push @$targ, $ar;
-		push @todo, [$op->pmreplstart, $ar];
-	    } elsif ($name =~ /^enter(loop|iter)$/) {
-		if ($] > 5.009) {
-		    $labels{${$op->nextop}} = "NEXT";
-		    $labels{${$op->lastop}} = "LAST";
-		    $labels{${$op->redoop}} = "REDO";
-		} else {
-		    $labels{$op->nextop->seq} = "NEXT";
-		    $labels{$op->lastop->seq} = "LAST";
-		    $labels{$op->redoop->seq} = "REDO";		
-		}
-	    }
-	}
-    }
-    walklines(\@lines, 0);
-}
-
 # The structure of this routine is purposely modeled after op.c's peep()
 sub sequence {
     my($op) = @_;
-    my $oldop = 0;
-    return if class($op) eq "NULL" or exists $sequence_num{$$op};
-    for (; $$op; $op = $op->next) {
-	last if exists $sequence_num{$$op};
-	my $name = $op->name;
-	if ($name =~ /^(null|scalar|lineseq|scope)$/) {
-	    next if $oldop and $ {$op->next};
-	} else {
-	    $sequence_num{$$op} = $seq_max++;
-	    if (class($op) eq "LOGOP") {
-		my $other = $op->other;
-		$other = $other->next while $other->name eq "null";
-		sequence($other);
-	    } elsif (class($op) eq "LOOP") {
-		my $redoop = $op->redoop;
-		$redoop = $redoop->next while $redoop->name eq "null";
-		sequence($redoop);
-		my $nextop = $op->nextop;
-		$nextop = $nextop->next while $nextop->name eq "null";
-		sequence($nextop);
-		my $lastop = $op->lastop;
-		$lastop = $lastop->next while $lastop->name eq "null";
-		sequence($lastop);
-	    } elsif ($name eq "subst" and $ {$op->pmreplstart}) {
-		my $replstart = $op->pmreplstart;
-		$replstart = $replstart->next while $replstart->name eq "null";
-		sequence($replstart);
-	    }
-	}
-	$oldop = $op;
-    }
+
+    walk_tree($op, sub { my $x = shift; $sequence_num{$$x} ||= $seq_max++ }, 0, 1);
 }
 
 sub fmt_line {    # generate text-line for op.
@@ -580,7 +519,7 @@ sub fmt_line {    # generate text-line for op.
     # spec: #varN
     $text =~ s/\#([a-zA-Z]+)(\d+)/sprintf("%-$2s", $hr->{$1})/eg;
 
-    $text =~ s/\#([a-zA-Z]+)/$hr->{$1}/eg;	# populate #var's
+    $text =~ s/\#([a-zA-Z]+)/defined $hr->{$1} ? $hr->{$1} : warn "unknown substition var '$1'" /eg;	# populate #var's
     $text =~ s/[ \t]*~+[ \t]*/ /g;		# squeeze tildes
 
     $text = "# $hr->{src}\n$text" if $show_src and $hr->{src};
@@ -867,12 +806,8 @@ sub concise_op {
 	    $line = "-src unavailable under -e" unless defined $line;
 	    $h{src} = "$ln: $line";
 	}
-    } elsif ($h{class} eq "LOOP") {
-	$h{arg} = "(next->" . seq($op->nextop) . " last->" . seq($op->lastop)
-	  . " redo->" . seq($op->redoop) . ")";
     } elsif ($h{class} eq "LOGOP") {
 	undef $lastnext;
-	$h{arg} = "(other->" . seq($op->other) . ")";
     }
     elsif ($h{class} eq "SVOP" or $h{class} eq "PADOP") {
 	unless ($h{name} eq 'aelemfast' and $op->flags & OPf_SPECIAL) {
@@ -896,9 +831,6 @@ sub concise_op {
 	$h{seqnum} = $op->seq;
 	$h{label} = $labels{$op->seq};
     }
-    $h{next} = $op->next;
-    $h{next} = (class($h{next}) eq "NULL") ? "(end)" : seq($h{next});
-    $h{nextaddr} = sprintf("%#x", $ {$op->next});
     $h{sibaddr} = sprintf("%#x", $ {$op->sibling});
     $h{firstaddr} = sprintf("%#x", $ {$op->first}) if $op->can("first");
     $h{lastaddr} = sprintf("%#x", $ {$op->last}) if $op->can("last");
@@ -923,15 +855,6 @@ sub concise_op {
 
 sub B::OP::concise {
     my($op, $level) = @_;
-    if ($order eq "exec" and $lastnext and $$lastnext != $$op) {
-	# insert a 'goto' line
-	my $synth = {"seq" => seq($lastnext), "class" => class($lastnext),
-		     "addr" => sprintf("%#x", $$lastnext),
-		     "goto" => seq($lastnext), # simplify goto '-' removal
-	     };
-	print $walkHandle fmt_line($synth, $op, $gotofmt, $level+1);
-    }
-    $lastnext = $op->next;
     print $walkHandle concise_op($op, $level, $format);
 }
 
@@ -1034,7 +957,7 @@ sub tree {
 
 # Why is this different for MacOS?  Does it matter?
 my $cop_seq_mnum = $^O eq 'MacOS' ? 12 : 11;
-$cop_seq_base = svref_2object(eval 'sub{0;}')->START->cop_seq + $cop_seq_mnum;
+$cop_seq_base = svref_2object(eval 'sub{0;}')->ROOT->first->first->cop_seq + $cop_seq_mnum;
 
 1;
 
@@ -1590,14 +1513,6 @@ The OP's name.
 =item B<#NAME>
 
 The OP's name, in all caps.
-
-=item B<#next>
-
-The sequence number of the OP's next OP.
-
-=item B<#nextaddr>
-
-The address of the OP's next OP, in hexadecimal.
 
 =item B<#noise>
 

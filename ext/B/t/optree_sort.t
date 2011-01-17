@@ -14,6 +14,7 @@ BEGIN {
 }
 use OptreeCheck;
 use Config;
+skip_all("test not for new codegen") if $^V == v5.14;
 plan tests => 21;
 
 pass("SORT OPTIMIZATION");

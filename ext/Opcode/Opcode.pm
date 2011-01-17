@@ -304,7 +304,7 @@ invert_opset function.
 
 =item :base_core
 
-    null stub scalar pushmark wantarray const defined undef
+    null stub nothing scalar pushmark wantarray const defined undef instr_const_list instr_end
 
     rv2sv sassign
 
@@ -365,6 +365,7 @@ used to implement a resource attack (e.g., consume all available CPU time).
 
     grepstart grepwhile
     mapstart mapwhile
+    foreach while_and instr_jump instr_cond_jump
     enteriter iter
     enterloop leaveloop unstack
     last next redo

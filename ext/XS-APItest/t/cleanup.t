@@ -16,6 +16,7 @@ sub aa {
     "aa2";
 }
 
+aa();
 sub cc {
     push @events, "cc0";
     push @events, [ "cc1", aa() ];

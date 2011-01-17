@@ -24,7 +24,7 @@ $|  = 1;
 use warnings;
 use strict;
 use Config;
-use Test::More tests => 11;
+use Test::More tests => 8;
 use B;
 use B::Debug;
 use File::Spec;
@@ -36,11 +36,11 @@ my $path = join " ", map { qq["-I$_"] } (File::Spec->catfile("blib","lib"), @INC
 my $redir = $^O =~ /VMS|MSWin32|MacOS/ ? "" : "2>&1";
 
 $a = `$X $path "-MO=Debug" -e 1 $redir`;
-like($a, qr/\bLISTOP\b.*\bOP\b.*\bCOP\b.*\bOP\b/s);
+like($a, qr/\bLISTOP\b.*\bOP\b.*\bCOP\b.*\bSVOP\b/s);
 
 
 $a = `$X $path "-MO=Terse" -e 1 $redir`;
-like($a, qr/\bLISTOP\b.*leave.*\n    OP\b.*enter.*\n    COP\b.*nextstate.*\n    OP\b.*null/s);
+like($a, qr/\bLISTOP\b.*leave.*\n    OP\b.*enter.*\n    COP\b.*nextstate.*\n    SVOP\b.*const/s);
 
 $a = `$X $path "-MO=Terse" -ane "s/foo/bar/" $redir`;
 $a =~ s/\(0x[^)]+\)//g;
@@ -55,15 +55,11 @@ $a =~ s/\s+nextstate$//; # if $] < 5.008001; # 5.8.0 adds it. 5.8.8 not anymore
 my $is_thread = $Config{use5005threads} && $Config{use5005threads} eq 'define';
 if ($is_thread) {
     $b=<<EOF;
-leave enter nextstate label leaveloop enterloop null and defined null
-threadsv readline gv lineseq nextstate aassign null pushmark split pushre
-threadsv const null pushmark rvav gv nextstate subst const unstack
+leave enter nextstate label enterloop defined null rvsv gv readline gv lineseq nextstate aassign list split pushre rvsv gv const list rvav gv nextstate subst const
 EOF
 } else {
   $b=<<EOF;
-leave enter nextstate label leaveloop enterloop null and defined null null
-gvsv readline gv lineseq nextstate aassign null pushmark split pushre null
-gvsv const null pushmark rvav gv nextstate subst const unstack
+leave enter nextstate label enterloop defined null rvsv gv readline gv lineseq nextstate aassign list split pushre rvsv gv const list rvav gv nextstate subst const
 EOF
 }
 #$b .= " nextstate" if $] < 5.008001; # ??
@@ -72,12 +68,6 @@ $b =~ s/\s+$//;
 is($a, $b);
 
 like(B::Debug::_printop(B::main_root),  qr/LISTOP\s+\[OP_LEAVE\]/);
-like(B::Debug::_printop(B::main_start), qr/OP\s+\[OP_ENTER\]/);
-
-$a = `$X $path "-MO=Debug" -e "B::main_root->debug" $redir`;
-like($a, qr/op_next\s+0x0/m);
-$a = `$X $path "-MO=Debug" -e "B::main_start->debug" $redir`;
-like($a, qr/\[OP_ENTER\]/m);
 
 # pass missing FETCHSIZE, fixed with 1.06
 my $e = q(BEGIN{tie @a, __PACKAGE__;sub TIEARRAY {bless{}} sub FETCH{1}};print $a[1]);

@@ -5270,6 +5270,11 @@ STATIC SV*	S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP* o, bool list)
 #define PERL_ARGS_ASSERT_INSTR_FOLD_CONSTANTS	\
 	assert(instr); assert(o)
 
+STATIC OP*	S_is_inplace_av(pTHX_ OP* o)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_IS_INPLACE_AV	\
+	assert(o)
+
 STATIC void	S_save_branch_point(pTHX_ CODEGEN_PAD *bpp, INSTRUCTION **instrp)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);

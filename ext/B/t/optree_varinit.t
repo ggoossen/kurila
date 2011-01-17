@@ -14,6 +14,7 @@ BEGIN {
 }
 use OptreeCheck;
 use Config;
+skip_all("test not for new codegen") if $^V >= v5.13;
 plan tests	=> 42;
 
 pass("OPTIMIZER TESTS - VAR INITIALIZATION");

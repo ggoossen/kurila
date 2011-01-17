@@ -20,6 +20,7 @@ BEGIN {
 use OptreeCheck;	# ALSO DOES @ARGV HANDLING !!!!!!
 use Config;
 
+skip_all("test not for new codegen") if $^V == v5.14;
 plan tests => 13 + ($] > 5.009 ? 2 : 0);
 
 require_ok("B::Concise");

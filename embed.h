@@ -1289,6 +1289,7 @@
 #define append_allocated_data(a,b)	S_append_allocated_data(aTHX_ a,b)
 #define append_instruction(a,b,c,d,e)	S_append_instruction(aTHX_ a,b,c,d,e)
 #define instr_fold_constants(a,b,c)	S_instr_fold_constants(aTHX_ a,b,c)
+#define is_inplace_av(a)	S_is_inplace_av(aTHX_ a)
 #define save_branch_point(a,b)	S_save_branch_point(aTHX_ a,b)
 #define save_instr_from_to_pparg(a,b,c)	S_save_instr_from_to_pparg(aTHX_ a,b,c)
 #define svp_const_instruction(a,b)	S_svp_const_instruction(aTHX_ a,b)

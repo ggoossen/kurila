@@ -115,10 +115,10 @@ require_ok("B::Concise");
 
 my %matchers = 
     ( constant	=> qr{ (?-x: is a constant sub, optimized to a \w+)
-		      |(?-x: exists in stash, but has no START) }x,
+		      |(?-x: exists in stash, but has no ROOT) }x,
       XS	=> qr/ is XS code/,
       perl	=> qr/ (next|db)state/,
-      noSTART	=> qr/ exists in stash, but has no START/,
+      noSTART	=> qr/ exists in stash, but has no ROOT/,
 );
 
 my $testpkgs = {
@@ -141,7 +141,7 @@ my $testpkgs = {
 		  warnhook walkoptree_debug walkoptree threadsv_names
 		  svref_2object sv_yes sv_undef sv_no save_BEGINs
 		  regex_padav ppname perlstring opnumber minus_c
-		  main_start main_root main_cv init_av inc_gv hash
+		  main_root main_cv init_av inc_gv hash
 		  formfeed end_av dowarn diehook defstash curstash
 		  cstring comppadlist check_av cchar cast_I32 bootstrap
 		  begin_av amagic_generation sub_generation address
@@ -150,7 +150,7 @@ my $testpkgs = {
 
     B::Deparse => { dflt => 'perl',	# 236 functions
 
-	XS => [qw( svref_2object perlstring opnumber main_start
+	XS => [qw( svref_2object perlstring opnumber
 		   main_root main_cv )],
 
 	constant => [qw/ ASSIGN CVf_LVALUE

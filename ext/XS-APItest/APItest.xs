@@ -20,11 +20,6 @@ typedef struct {
     AV *cscav;
     AV *bhkav;
     bool bhk_record;
-    peep_t orig_peep;
-    peep_t orig_rpeep;
-    int peep_recording;
-    AV *peep_recorder;
-    AV *rpeep_recorder;
     AV *xop_record;
 } my_cxt_t;
 
@@ -346,48 +341,6 @@ blockhook_test_eval(pTHX_ OP *const o)
 
 STATIC BHK bhk_csc, bhk_test;
 
-STATIC void
-my_peep (pTHX_ OP *o)
-{
-    dMY_CXT;
-
-    if (!o)
-	return;
-
-    MY_CXT.orig_peep(aTHX_ o);
-
-    if (!MY_CXT.peep_recording)
-	return;
-
-    croak("FIXME");
-    /* for (; o; o = o->op_next) { */
-    /*     if (o->op_type == OP_CONST && cSVOPx_sv(o) && SvPOK(cSVOPx_sv(o))) { */
-    /*         av_push(MY_CXT.peep_recorder, newSVsv(cSVOPx_sv(o))); */
-    /*     } */
-    /* } */
-}
-
-STATIC void
-my_rpeep (pTHX_ OP *o)
-{
-    dMY_CXT;
-
-    if (!o)
-	return;
-
-    MY_CXT.orig_rpeep(aTHX_ o);
-
-    if (!MY_CXT.peep_recording)
-	return;
-
-    croak("FIXME");
-    /* for (; o; o = o->op_next) { */
-    /*     if (o->op_type == OP_CONST && cSVOPx_sv(o) && SvPOK(cSVOPx_sv(o))) { */
-    /*         av_push(MY_CXT.rpeep_recorder, newSVsv(cSVOPx_sv(o))); */
-    /*     } */
-    /* } */
-}
-
 STATIC OP *
 THX_ck_entersub_args_lists(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
@@ -402,9 +355,7 @@ THX_ck_entersub_args_scalars(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
     OP *aop = cUNOPx(entersubop)->op_first;
     PERL_UNUSED_ARG(namegv);
     PERL_UNUSED_ARG(ckobj);
-    if (!aop->op_sibling)
-	aop = cUNOPx(aop)->op_first;
-    for (aop = aop->op_sibling; aop->op_sibling; aop = aop->op_sibling) {
+    for (; aop->op_sibling; aop = aop->op_sibling) {
 	op_contextualize(aop, G_SCALAR);
     }
     return entersubop;
@@ -414,16 +365,15 @@ STATIC OP *
 THX_ck_entersub_multi_sum(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
     OP *sumop = NULL;
-    OP *pushop = cUNOPx(entersubop)->op_first;
+    OP *next_aop = cLISTOPx(entersubop)->op_first;
     PERL_UNUSED_ARG(namegv);
     PERL_UNUSED_ARG(ckobj);
-    if (!pushop->op_sibling)
-	pushop = cUNOPx(pushop)->op_first;
+    cLISTOPx(entersubop)->op_first = NULL;
     while (1) {
-	OP *aop = pushop->op_sibling;
+	OP *aop = next_aop;
 	if (!aop->op_sibling)
 	    break;
-	pushop->op_sibling = aop->op_sibling;
+        next_aop  = aop->op_sibling;
 	aop->op_sibling = NULL;
 	op_contextualize(aop, G_SCALAR);
 	if (sumop) {
@@ -434,6 +384,7 @@ THX_ck_entersub_multi_sum(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
     }
     if (!sumop)
 	sumop = newSVOP(OP_CONST, 0, newSViv(0));
+    op_free(next_aop);      
     op_free(entersubop);
     return sumop;
 }
@@ -512,23 +463,6 @@ THX_mkLISTOP(pTHX_ U32 type, OP *first, OP *sib, OP *last)
     return (OP *)listop;
 }
 
-static char *
-test_op_linklist_describe(OP *start)
-{
-    SV *rv = sv_2mortal(newSVpvs(""));
-    OP *o;
-    croak("FIXME");
-    /* o = start = LINKLIST(start); */
-    /* do { */
-    /*     sv_catpvs(rv, "."); */
-    /*     sv_catpv(rv, OP_NAME(o)); */
-    /*     if (o->op_type == OP_CONST) */
-    /*         sv_catsv(rv, cSVOPo->op_sv); */
-    /*     o = o->op_next; */
-    /* } while (o && o != start); */
-    return SvPVX(rv);
-}
-
 /** establish_cleanup operator, ripped off from Scope::Cleanup **/
 
 STATIC void
@@ -551,40 +485,30 @@ THX_pp_establish_cleanup(pTHX)
     cleanup_code_ref = newSVsv(POPs);
     SAVEFREESV(cleanup_code_ref);
     SAVEDESTRUCTOR_X(THX_run_cleanup, cleanup_code_ref);
-    if(GIMME_V != G_VOID) PUSHs(&PL_sv_undef);
+    if(GIMME_V != G_VOID) XPUSHs(&PL_sv_undef);
     RETURN;
 }
 
 STATIC OP *
 THX_ck_entersub_establish_cleanup(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
-    OP *pushop, *argop, *estop;
-    croak("FIXME");
-    /* ck_entersub_args_proto(entersubop, namegv, ckobj); */
-    /* pushop = cUNOPx(entersubop)->op_first; */
-    /* if(!pushop->op_sibling) pushop = cUNOPx(pushop)->op_first; */
-    /* argop = pushop->op_sibling; */
-    /* pushop->op_sibling = argop->op_sibling; */
-    /* argop->op_sibling = NULL; */
-    /* op_free(entersubop); */
-    /* NewOpSz(0, estop, sizeof(UNOP)); */
-    /* estop->op_type = OP_RAND; */
-    /* estop->op_ppaddr = THX_pp_establish_cleanup; */
-    /* cUNOPx(estop)->op_flags = OPf_KIDS; */
-    /* cUNOPx(estop)->op_first = argop; */
-    /* PL_hints |= HINT_BLOCK_SCOPE; */
-    return estop;
+    entersubop = ck_entersub_args_proto(entersubop, namegv, ckobj);
+    entersubop->op_type = OP_CUSTOM;
+    entersubop->op_targ = (Perl_ppaddr_t)THX_pp_establish_cleanup;
+    PL_hints |= HINT_BLOCK_SCOPE;
+    /* delete CV op */
+    op_free(cUNOPx(entersubop)->op_first->op_sibling);
+    cUNOPx(entersubop)->op_first->op_sibling = NULL;
+    return entersubop;
 }
 
 STATIC OP *
 THX_ck_entersub_postinc(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
-    OP *pushop, *argop;
+    OP *argop;
     ck_entersub_args_proto(entersubop, namegv, ckobj);
-    pushop = cUNOPx(entersubop)->op_first;
-    if(!pushop->op_sibling) pushop = cUNOPx(pushop)->op_first;
-    argop = pushop->op_sibling;
-    pushop->op_sibling = argop->op_sibling;
+    argop = cUNOPx(entersubop)->op_first;
+    cUNOPx(entersubop)->op_first = argop->op_sibling;
     argop->op_sibling = NULL;
     op_free(entersubop);
     return newUNOP(OP_POSTINC, 0,
@@ -1034,11 +958,12 @@ static int my_keyword_plugin(pTHX_
 
 static XOP my_xop;
 
+static XOP establish_cleanup_xop;
+
 static INSTRUCTION *
 pp_xop(pTHX)
 {
-    croak("FIXME");
-    /* return PL_op->op_next; */
+    return NORMAL;
 }
 
 static void
@@ -1555,7 +1480,6 @@ xop_register ()
         XopENTRY_set(&my_xop, xop_name, "my_xop");
         XopENTRY_set(&my_xop, xop_desc, "XOP for testing");
         XopENTRY_set(&my_xop, xop_class, OA_UNOP);
-        XopENTRY_set(&my_xop, xop_peep, peep_xop);
         Perl_custom_op_register(aTHX_ pp_xop, &my_xop);
 
 void
@@ -1600,12 +1524,10 @@ xop_build_optree ()
         
         NewOp(1102, unop, 1, UNOP);
         unop->op_type       = OP_CUSTOM;
-        /* unop->op_ppaddr     = pp_xop; */
+        unop->op_targ       = (PADOFFSET)pp_xop;
         unop->op_flags      = OPf_KIDS;
         unop->op_private    = 0;
         unop->op_first      = kid;
-        /* unop->op_next       = NULL; */
-        /* kid->op_next        = (OP*)unop; */
 
         av_push(MY_CXT.xop_record, newSVpvf("unop:%"UVxf, PTR2UV(unop)));
         av_push(MY_CXT.xop_record, newSVpvf("kid:%"UVxf, PTR2UV(kid)));
@@ -1614,7 +1536,7 @@ xop_build_optree ()
         av_push(MY_CXT.xop_record, newSVpvf("DESC:%s", OP_DESC((OP*)unop)));
         av_push(MY_CXT.xop_record, newSVpvf("CLASS:%d", (int)OP_CLASS((OP*)unop)));
 
-        PL_rpeepp(aTHX_ kid);
+        Perl_finish_optree(aTHX_ kid);
 
         FreeOp(kid);
         FreeOp(unop);
@@ -1647,14 +1569,6 @@ BOOT:
     BhkENTRY_set(&bhk_csc, bhk_start, blockhook_csc_start);
     BhkENTRY_set(&bhk_csc, bhk_pre_end, blockhook_csc_pre_end);
     Perl_blockhook_register(aTHX_ &bhk_csc);
-
-    MY_CXT.peep_recorder = newAV();
-    MY_CXT.rpeep_recorder = newAV();
-
-    /* MY_CXT.orig_peep = PL_peepp; */
-    /* MY_CXT.orig_rpeep = PL_rpeepp; */
-    /* PL_peepp = my_peep; */
-    /* PL_rpeepp = my_rpeep; */
 }
 
 void
@@ -1668,8 +1582,6 @@ CLONE(...)
     MY_CXT.cscav = NULL;
     MY_CXT.bhkav = get_av("XS::APItest::bhkav", GV_ADDMULTI);
     MY_CXT.bhk_record = 0;
-    MY_CXT.peep_recorder = newAV();
-    MY_CXT.rpeep_recorder = newAV();
 
 void
 print_double(val)
@@ -2179,7 +2091,7 @@ test_op_contextualize()
 	o = newSVOP(OP_CONST, 0, newSViv(0));
 	o->op_flags &= ~OPf_WANT;
 	o = op_contextualize(o, G_VOID);
-	if (o->op_type != OP_NULL) croak_fail();
+        if ((o->op_flags & OPf_WANT) != OPf_WANT_VOID) croak_fail();
 	op_free(o);
 
 void
@@ -2533,24 +2445,24 @@ test_op_list()
 	a = op_append_elem(OP_LIST, NULL, a);
 	check_op(a, "const(1).");
 	a = op_append_elem(OP_LIST, a, iv_op(2));
-	check_op(a, "list[pushmark.const(1).const(2).]");
+	check_op(a, "list[const(1).const(2).]");
 	a = op_append_elem(OP_LIST, a, iv_op(3));
-	check_op(a, "list[pushmark.const(1).const(2).const(3).]");
+	check_op(a, "list[const(1).const(2).const(3).]");
 	a = op_append_elem(OP_LIST, a, NULL);
-	check_op(a, "list[pushmark.const(1).const(2).const(3).]");
+	check_op(a, "list[const(1).const(2).const(3).]");
 	a = op_append_elem(OP_LIST, NULL, a);
-	check_op(a, "list[pushmark.const(1).const(2).const(3).]");
+	check_op(a, "list[const(1).const(2).const(3).]");
 	a = op_append_elem(OP_LIST, iv_op(4), a);
-	check_op(a, "list[pushmark.const(4)."
-		"list[pushmark.const(1).const(2).const(3).]]");
+	check_op(a, "list[const(4)."
+		"list[const(1).const(2).const(3).]]");
 	a = op_append_elem(OP_LIST, a, iv_op(5));
-	check_op(a, "list[pushmark.const(4)."
-		"list[pushmark.const(1).const(2).const(3).]const(5).]");
+	check_op(a, "list[const(4)."
+		"list[const(1).const(2).const(3).]const(5).]");
 	a = op_append_elem(OP_LIST, a, 
 		op_append_elem(OP_LIST, iv_op(7), iv_op(6)));
-	check_op(a, "list[pushmark.const(4)."
-		"list[pushmark.const(1).const(2).const(3).]const(5)."
-		"list[pushmark.const(7).const(6).]]");
+	check_op(a, "list[const(4)."
+		"list[const(1).const(2).const(3).]const(5)."
+		"list[const(7).const(6).]]");
 	op_free(a);
 	a = op_append_elem(OP_LINESEQ, iv_op(1), iv_op(2));
 	check_op(a, "lineseq[const(1).const(2).]");
@@ -2560,7 +2472,7 @@ test_op_list()
 	a = op_append_elem(OP_LINESEQ,
 		op_append_elem(OP_LIST, iv_op(1), iv_op(2)),
 		iv_op(3));
-	check_op(a, "lineseq[list[pushmark.const(1).const(2).]const(3).]");
+	check_op(a, "lineseq[list[const(1).const(2).]const(3).]");
 	op_free(a);
 	a = op_prepend_elem(OP_LIST, NULL, NULL);
 	check_op(a, "");
@@ -2569,23 +2481,23 @@ test_op_list()
 	a = op_prepend_elem(OP_LIST, a, NULL);
 	check_op(a, "const(1).");
 	a = op_prepend_elem(OP_LIST, iv_op(2), a);
-	check_op(a, "list[pushmark.const(2).const(1).]");
+	check_op(a, "list[const(2).const(1).]");
 	a = op_prepend_elem(OP_LIST, iv_op(3), a);
-	check_op(a, "list[pushmark.const(3).const(2).const(1).]");
+	check_op(a, "list[const(3).const(2).const(1).]");
 	a = op_prepend_elem(OP_LIST, NULL, a);
-	check_op(a, "list[pushmark.const(3).const(2).const(1).]");
+	check_op(a, "list[const(3).const(2).const(1).]");
 	a = op_prepend_elem(OP_LIST, a, NULL);
-	check_op(a, "list[pushmark.const(3).const(2).const(1).]");
+	check_op(a, "list[const(3).const(2).const(1).]");
 	a = op_prepend_elem(OP_LIST, a, iv_op(4));
-	check_op(a, "list[pushmark."
-		"list[pushmark.const(3).const(2).const(1).]const(4).]");
+	check_op(a, "list["
+		"list[const(3).const(2).const(1).]const(4).]");
 	a = op_prepend_elem(OP_LIST, iv_op(5), a);
-	check_op(a, "list[pushmark.const(5)."
-		"list[pushmark.const(3).const(2).const(1).]const(4).]");
+	check_op(a, "list[const(5)."
+		"list[const(3).const(2).const(1).]const(4).]");
 	a = op_prepend_elem(OP_LIST,
 		op_prepend_elem(OP_LIST, iv_op(6), iv_op(7)), a);
-	check_op(a, "list[pushmark.list[pushmark.const(6).const(7).]const(5)."
-		"list[pushmark.const(3).const(2).const(1).]const(4).]");
+	check_op(a, "list[list[const(6).const(7).]const(5)."
+		"list[const(3).const(2).const(1).]const(4).]");
 	op_free(a);
 	a = op_prepend_elem(OP_LINESEQ, iv_op(2), iv_op(1));
 	check_op(a, "lineseq[const(2).const(1).]");
@@ -2594,7 +2506,7 @@ test_op_list()
 	op_free(a);
 	a = op_prepend_elem(OP_LINESEQ, iv_op(3),
 		op_prepend_elem(OP_LIST, iv_op(2), iv_op(1)));
-	check_op(a, "lineseq[const(3).list[pushmark.const(2).const(1).]]");
+	check_op(a, "lineseq[const(3).list[const(2).const(1).]]");
 	op_free(a);
 	a = op_append_list(OP_LINESEQ, NULL, NULL);
 	check_op(a, "");
@@ -2621,103 +2533,15 @@ test_op_list()
 		op_append_list(OP_LINESEQ, iv_op(1), iv_op(2)),
 		op_append_list(OP_LIST, iv_op(3), iv_op(4)));
 	check_op(a, "lineseq[const(1).const(2)."
-		"list[pushmark.const(3).const(4).]]");
+		"list[const(3).const(4).]]");
 	op_free(a);
 	a = op_append_list(OP_LINESEQ,
 		op_append_list(OP_LIST, iv_op(1), iv_op(2)),
 		op_append_list(OP_LINESEQ, iv_op(3), iv_op(4)));
-	check_op(a, "lineseq[list[pushmark.const(1).const(2).]"
+	check_op(a, "lineseq[list[const(1).const(2).]"
 		"const(3).const(4).]");
 	op_free(a);
 #undef check_op
-
-void
-test_op_linklist ()
-    PREINIT:
-        OP *o;
-    CODE:
-#define check_ll(o, expect) \
-    STMT_START { \
-	if (strNE(test_op_linklist_describe(o), (expect))) \
-	    croak("fail %s %s", test_op_linklist_describe(o), (expect)); \
-    } STMT_END
-        o = iv_op(1);
-        check_ll(o, ".const1");
-        op_free(o);
-
-        o = mkUNOP(OP_NOT, iv_op(1));
-        check_ll(o, ".const1.not");
-        op_free(o);
-
-        o = mkUNOP(OP_NOT, mkUNOP(OP_NEGATE, iv_op(1)));
-        check_ll(o, ".const1.negate.not");
-        op_free(o);
-
-        o = mkBINOP(OP_ADD, iv_op(1), iv_op(2));
-        check_ll(o, ".const1.const2.add");
-        op_free(o);
-
-        o = mkBINOP(OP_ADD, mkUNOP(OP_NOT, iv_op(1)), iv_op(2));
-        check_ll(o, ".const1.not.const2.add");
-        op_free(o);
-
-        o = mkUNOP(OP_NOT, mkBINOP(OP_ADD, iv_op(1), iv_op(2)));
-        check_ll(o, ".const1.const2.add.not");
-        op_free(o);
-
-        o = mkLISTOP(OP_LINESEQ, iv_op(1), iv_op(2), iv_op(3));
-        check_ll(o, ".const1.const2.const3.lineseq");
-        op_free(o);
-
-        o = mkLISTOP(OP_LINESEQ,
-                mkBINOP(OP_ADD, iv_op(1), iv_op(2)),
-                mkUNOP(OP_NOT, iv_op(3)),
-                mkLISTOP(OP_SUBSTR, iv_op(4), iv_op(5), iv_op(6)));
-        check_ll(o, ".const1.const2.add.const3.not"
-                    ".const4.const5.const6.substr.lineseq");
-        op_free(o);
-
-        o = mkBINOP(OP_ADD, iv_op(1), iv_op(2));
-        /* LINKLIST(o); */
-        o = mkBINOP(OP_SUBTRACT, o, iv_op(3));
-        check_ll(o, ".const1.const2.add.const3.subtract");
-        op_free(o);
-#undef check_ll
-#undef iv_op
-
-void
-peep_enable ()
-    PREINIT:
-	dMY_CXT;
-    CODE:
-	av_clear(MY_CXT.peep_recorder);
-	av_clear(MY_CXT.rpeep_recorder);
-	MY_CXT.peep_recording = 1;
-
-void
-peep_disable ()
-    PREINIT:
-	dMY_CXT;
-    CODE:
-	MY_CXT.peep_recording = 0;
-
-SV *
-peep_record ()
-    PREINIT:
-	dMY_CXT;
-    CODE:
-	RETVAL = newRV_inc((SV *)MY_CXT.peep_recorder);
-    OUTPUT:
-	RETVAL
-
-SV *
-rpeep_record ()
-    PREINIT:
-	dMY_CXT;
-    CODE:
-	RETVAL = newRV_inc((SV *)MY_CXT.rpeep_recorder);
-    OUTPUT:
-	RETVAL
 
 =pod
 
@@ -2787,7 +2611,7 @@ CODE:
     PERL_SET_CONTEXT(interp_dup);
 
     /* continue after 'clone_with_stack' */
-    /* interp_dup->Iop = interp_dup->Iop->op_next; */
+    interp_dup->Iinstruction++;
 
     /* run with new perl */
     Perl_runops_standard(interp_dup);
@@ -2891,6 +2715,11 @@ BOOT:
 {
     CV *estcv = get_cv("XS::APItest::establish_cleanup", 0);
     cv_set_call_checker(estcv, THX_ck_entersub_establish_cleanup, (SV*)estcv);
+
+    XopENTRY_set(&establish_cleanup_xop, xop_name, "establish_cleanup_op");
+    XopENTRY_set(&establish_cleanup_xop, xop_desc, "XOP for establish_cleanup");
+    XopENTRY_set(&establish_cleanup_xop, xop_class, OA_LISTOP);
+    Perl_custom_op_register(aTHX_ THX_pp_establish_cleanup, &establish_cleanup_xop);
 }
 
 void

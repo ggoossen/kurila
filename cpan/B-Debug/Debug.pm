@@ -41,10 +41,15 @@ sub _printop {
 
 sub B::OP::debug {
     my ($op) = @_;
-    printf <<'EOT', class($op), $$op, _printop($op), _printop($op->next), _printop($op->sibling), $op->targ, $op->type, $op->name;
+    printf <<'EOT', class($op), $$op, _printop($op);
 %s (0x%lx)
-	op_ppaddr	%s
+EOT
+    if ($] < 5.013) {
+        printf <<'EOT', _printop($op->next);
 	op_next		%s
+EOT
+    }
+    printf <<'EOT', _printop($op->sibling), $op->targ, $op->type, $op->name;
 	op_sibling	%s
 	op_targ		%d
 	op_type		%d	%s
@@ -86,17 +91,11 @@ sub B::BINOP::debug {
 sub B::LOOP::debug {
     my ($op) = @_;
     $op->B::BINOP::debug();
-    printf <<'EOT', _printop($op->redoop), _printop($op->nextop), _printop($op->lastop);
-	op_redoop	%s
-	op_nextop	%s
-	op_lastop	%s
-EOT
 }
 
 sub B::LOGOP::debug {
     my ($op) = @_;
     $op->B::UNOP::debug();
-    printf "\top_other\t%s\n", _printop($op->other);
 }
 
 sub B::LISTOP::debug {
@@ -253,14 +252,12 @@ sub B::CV::debug {
     my ($sv) = @_;
     $sv->B::PVNV::debug();
     my ($stash) = $sv->STASH;
-    my ($start) = $sv->START;
     my ($root)  = $sv->ROOT;
     my ($padlist) = $sv->PADLIST;
     my ($file) = $sv->FILE;
     my ($gv) = $sv->GV;
-    printf <<'EOT', $$stash, $$start, $$root, $$gv, $file, $sv->DEPTH, $padlist, ${$sv->OUTSIDE};
+    printf <<'EOT', $$stash, $$root, $$gv, $file, $sv->DEPTH, $padlist, ${$sv->OUTSIDE};
 	STASH		0x%x
-	START		0x%x
 	ROOT		0x%x
 	GV		0x%x
 	FILE		%s
@@ -276,7 +273,6 @@ EOT
     } else {
       printf("\tCvFLAGS\t0x%x\n", $sv->CvFLAGS);
     }
-    $start->debug if $start;
     $root->debug if $root;
     $gv->debug if $gv;
     $padlist->debug if $padlist;
@@ -356,11 +352,7 @@ sub B::SPECIAL::debug {
 sub compile {
     my $order = shift;
     B::clearsym();
-    if ($order && $order eq "exec") {
-        return sub { walkoptree_exec(main_start, "debug") }
-    } else {
-        return sub { walkoptree(main_root, "debug") }
-    }
+    return sub { walkoptree(main_root, "debug") }
 }
 
 1;

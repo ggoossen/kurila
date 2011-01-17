@@ -92,7 +92,9 @@ sub bar {
 # Schwern's example of finding an RV
 my $path = join " ", map { qq["-I$_"] } @INC;
 my $items = qx{$^X $path "-MO=Terse" -le "print \\42" 2>&1};
-if( $] >= 5.011 ) {
+if( $] >= 5.013 ) {
+    like( $items, qr/IV $hex 42/, 'IV (refgen not yet done)' );
+} elsif( $] >= 5.011 ) {
     like( $items, qr/IV $hex \\42/, 'RV (but now stored in an IV)' );
 } else {
     like( $items, qr/RV $hex \\42/, 'RV' );

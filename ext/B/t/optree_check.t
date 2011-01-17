@@ -142,30 +142,24 @@ checkOptree ( name	=> 'fixup nextstate (in reftext)',
 	      bcopts	=> '-exec',
 	      code	=> sub {my $a},
 	      strip_open_hints => 1,
-	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# 1  <;> nextstate( NOTE THAT THIS CAN BE ANYTHING ) v:>,<,%
-# 2  <0> padsv[$a:54,55] M/LVINTRO
-# 3  <1> leavesub[1 ref] K/REFC,1
+	      ( map { $_ => <<'EOT_EOT' } ('expect', 'expect_nt') ) );
+# 1  <;> nextstate( NOTE THAT THIS CAN BE ANYTHING ) v 
+# 2  <0> padsv[$a:714,715] M/LVINTRO 
+# 3  <@> lineseq KP 
+# 4  <1> leavesub[1 ref] K/REFC,1 
 EOT_EOT
-# 1  <;> nextstate(main 54 optree_concise.t:84) v:>,<,%
-# 2  <0> padsv[$a:54,55] M/LVINTRO
-# 3  <1> leavesub[1 ref] K/REFC,1
-EONT_EONT
 
 checkOptree ( name	=> 'fixup opcode args',
 	      bcopts	=> '-exec',
 	      #fail	=> 1, # uncomment to see real padsv args: [$a:491,492] 
 	      code	=> sub {my $a},
 	      strip_open_hints => 1,
-	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# 1  <;> nextstate(main 56 optree_concise.t:96) v:>,<,%
-# 2  <0> padsv[$a:56,57] M/LVINTRO
-# 3  <1> leavesub[1 ref] K/REFC,1
+	      ( map { $_ => <<'EOT_EOT' } ('expect', 'expect_nt') ) );
+# 1  <;> nextstate(main 716 optree_check.t:159) v 
+# 2  <0> padsv[$a:716,717] M/LVINTRO 
+# 3  <@> lineseq KP 
+# 4  <1> leavesub[1 ref] K/REFC,1 
 EOT_EOT
-# 1  <;> nextstate(main 56 optree_concise.t:96) v:>,<,%
-# 2  <0> padsv[$a:56,57] M/LVINTRO
-# 3  <1> leavesub[1 ref] K/REFC,1
-EONT_EONT
 
 #################################
 pass("CANONICAL B::Concise EXAMPLE");
@@ -176,45 +170,51 @@ checkOptree ( name	=> 'canonical example w -basic',
 	      crossfail => 1,
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# 7  <1> leavesub[1 ref] K/REFC,1 ->(end)
-# -     <@> lineseq KP ->7
-# 1        <;> nextstate(main 380 optree_selftest.t:139) v:>,<,%,{ ->2
-# 6        <2> sassign sKS/2 ->7
-# 4           <2> add[t3] sK/2 ->5
-# -              <1> ex-rv2sv sK/1 ->3
-# 2                 <#> gvsv[*b] s ->3
-# 3              <$> const[IV 42] s ->4
-# -           <1> ex-rv2sv sKRM*/1 ->6
-# 5              <#> gvsv[*a] s ->6
+# a  <1> leavesub[1 ref] K/REFC,1 
+# 9     <@> lineseq KP 
+# 1        <;> nextstate(main 718 optree_check.t:177) v:{ 
+# 8        <2> sassign sKS/2 
+# 5           <2> add[t3] sK/2 
+# 3              <1> rv2sv sK/1 
+# 2                 <#> gv[*b] s 
+# 4              <$> const[IV 42] s 
+# 7           <1> rv2sv sKRM*/1 
+# 6              <#> gv[*a] s 
 EOT_EOT
-# 7  <1> leavesub[1 ref] K/REFC,1 ->(end)
-# -     <@> lineseq KP ->7
-# 1        <;> nextstate(main 60 optree_concise.t:122) v:>,<,%,{ ->2
-# 6        <2> sassign sKS/2 ->7
-# 4           <2> add[t1] sK/2 ->5
-# -              <1> ex-rv2sv sK/1 ->3
-# 2                 <$> gvsv(*b) s ->3
-# 3              <$> const(IV 42) s ->4
-# -           <1> ex-rv2sv sKRM*/1 ->6
-# 5              <$> gvsv(*a) s ->6
+# a  <1> leavesub[1 ref] K/REFC,1 
+# 9     <@> lineseq KP 
+# 1        <;> nextstate(main 735 optree_check.t:170) v:{ 
+# 8        <2> sassign sKS/2 
+# 5           <2> add[t1] sK/2 
+# 3              <1> rv2sv sK/1 
+# 2                 <$> gv(*b) s 
+# 4              <$> const(IV 42) s 
+# 7           <1> rv2sv sKRM*/1 
+# 6              <$> gv(*a) s 
 EONT_EONT
 
 checkOptree ( code	=> '$a=$b+42',
 	      bcopts	=> '-exec',
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# 1  <;> nextstate(main 837 (eval 24):1) v:{
-# 2  <#> gvsv[*b] s
-# 3  <$> const[IV 42] s
-# 4  <2> add[t3] sK/2
-# 5  <#> gvsv[*a] s
-# 6  <2> sassign sKS/2
-# 7  <1> leavesub[1 ref] K/REFC,1
+# 1  <;> nextstate(main 831 (eval 26):1) v:{ 
+# 2  <#> gv[*b] s 
+# 3  <1> rv2sv sK/1 
+# 4  <$> const[IV 42] s 
+# 5  <2> add[t3] sK/2 
+# 6  <#> gv[*a] s 
+# 7  <1> rv2sv sKRM*/1 
+# 8  <2> sassign sKS/2 
+# 9  <@> lineseq KP 
+# a  <1> leavesub[1 ref] K/REFC,1 
 EOT_EOT
-# 1  <;> nextstate(main 837 (eval 24):1) v:{
-# 2  <$> gvsv(*b) s
-# 3  <$> const(IV 42) s
-# 4  <2> add[t1] sK/2
-# 5  <$> gvsv(*a) s
-# 6  <2> sassign sKS/2
-# 7  <1> leavesub[1 ref] K/REFC,1
+# 1  <;> nextstate(main 851 (eval 26):1) v:{ 
+# 2  <$> gv(*b) s 
+# 3  <1> rv2sv sK/1 
+# 4  <$> const(IV 42) s 
+# 5  <2> add[t1] sK/2 
+# 6  <$> gv(*a) s 
+# 7  <1> rv2sv sKRM*/1 
+# 8  <2> sassign sKS/2 
+# 9  <@> lineseq KP 
+# a  <1> leavesub[1 ref] K/REFC,1 
 EONT_EONT

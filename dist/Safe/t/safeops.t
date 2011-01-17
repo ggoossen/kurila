@@ -66,7 +66,7 @@ __DATA__
 null		SKIP
 stub		SKIP
 scalar		scalar $x
-pushmark	print @x
+pushmark	SKIP
 wantarray	wantarray
 const		42
 gvsv		SKIP (set by optimizer) $x
@@ -221,7 +221,7 @@ mapstart	map $_ + 1, @foo
 mapwhile	SKIP (set by optimizer)
 range		SKIP
 flip		1..2
-flop		1..2
+flop		SKIP (not used anymore)
 and		$x && $y
 or		$x || $y
 xor		$x xor $y
@@ -239,7 +239,7 @@ reset		reset
 lineseq		SKIP
 nextstate	SKIP
 dbstate		SKIP (needs debugger)
-unstack		while(0){}
+unstack		for(0;0;0){}
 enter		SKIP
 leave		SKIP
 scope		SKIP

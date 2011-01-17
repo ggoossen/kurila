@@ -13,7 +13,6 @@ our @ISA = qw(ExtUtils::MM);
 
 sub DESTROY {}
 
-
 =head1 NAME
 
 ExtUtils::MY - ExtUtils::MakeMaker subclass for customization

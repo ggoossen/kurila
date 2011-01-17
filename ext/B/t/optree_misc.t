@@ -27,91 +27,89 @@ checkOptree ( name	=> 'OP_AELEMFAST opclass',
 	      code	=> sub { my @x; our @y; $x[0] + $y[0]},
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# a  <1> leavesub[1 ref] K/REFC,1 ->(end)
-# -     <@> lineseq KP ->a
-# 1        <;> nextstate(main 634 optree_misc.t:25) v:>,<,% ->2
-# 2        <0> padav[@x:634,636] vM/LVINTRO ->3
-# 3        <;> nextstate(main 635 optree_misc.t:25) v:>,<,% ->4
-# 5        <1> rv2av[t4] vK/OURINTR,1 ->6
-# 4           <#> gv[*y] s ->5
-# 6        <;> nextstate(main 636 optree_misc.t:25) v:>,<,%,{ ->7
-# 9        <2> add[t6] sK/2 ->a
-# -           <1> ex-aelem sK/2 ->8
-# 7              <0> aelemfast_lex[@x:634,636] sR ->8
-# -              <0> ex-const s ->-
-# -           <1> ex-aelem sK/2 ->9
-# -              <1> ex-rv2av sKR/1 ->-
-# 8                 <#> aelemfast[*y] s ->9
-# -              <0> ex-const s ->-
+# g  <1> leavesub[1 ref] K/REFC,1 
+# f     <@> lineseq KP 
+# 1        <;> nextstate(main 716 optree_misc.t:25) v 
+# 2        <0> padav[@x:716,718] vM/LVINTRO 
+# 3        <;> nextstate(main 717 optree_misc.t:25) v 
+# 5        <1> rv2av[t4] vK/OURINTR,1 
+# 4           <#> gv[*y] s 
+# 6        <;> nextstate(main 718 optree_misc.t:25) v:{ 
+# e        <2> add[t6] sK/2 
+# 9           <2> aelem sK/2 
+# 7              <0> padav[@x:716,718] sR 
+# 8              <$> const[IV 0] s 
+# d           <2> aelem sK/2 
+# b              <1> rv2av sKR/1 
+# a                 <#> gv[*y] s 
+# c              <$> const[IV 0] s 
 EOT_EOT
-# a  <1> leavesub[1 ref] K/REFC,1 ->(end)
-# -     <@> lineseq KP ->a
-# 1        <;> nextstate(main 634 optree_misc.t:27) v:>,<,% ->2
-# 2        <0> padav[@x:634,636] vM/LVINTRO ->3
-# 3        <;> nextstate(main 635 optree_misc.t:27) v:>,<,% ->4
-# 5        <1> rv2av[t3] vK/OURINTR,1 ->6
-# 4           <$> gv(*y) s ->5
-# 6        <;> nextstate(main 636 optree_misc.t:27) v:>,<,%,{ ->7
-# 9        <2> add[t4] sK/2 ->a
-# -           <1> ex-aelem sK/2 ->8
-# 7              <0> aelemfast_lex[@x:634,636] sR ->8
-# -              <0> ex-const s ->-
-# -           <1> ex-aelem sK/2 ->9
-# -              <1> ex-rv2av sKR/1 ->-
-# 8                 <$> aelemfast(*y) s ->9
-# -              <0> ex-const s ->-
+# g  <1> leavesub[1 ref] K/REFC,1 
+# f     <@> lineseq KP 
+# 1        <;> nextstate(main 716 optree_misc.t:25) v 
+# 2        <0> padav[@x:716,718] vM/LVINTRO 
+# 3        <;> nextstate(main 717 optree_misc.t:25) v 
+# 5        <1> rv2av[t3] vK/OURINTR,1 
+# 4           <$> gv(*y) s 
+# 6        <;> nextstate(main 718 optree_misc.t:25) v:{ 
+# e        <2> add[t4] sK/2 
+# 9           <2> aelem sK/2 
+# 7              <0> padav[@x:716,718] sR 
+# 8              <$> const(IV 0) s 
+# d           <2> aelem sK/2 
+# b              <1> rv2av sKR/1 
+# a                 <$> gv(*y) s 
+# c              <$> const(IV 0) s 
 EONT_EONT
 
 checkOptree ( name	=> 'PMOP children',
 	      code	=> sub { $foo =~ s/(a)/$1/ },
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# 6  <1> leavesub[1 ref] K/REFC,1 ->(end)
-# -     <@> lineseq KP ->6
-# 1        <;> nextstate(main 1 -e:1) v:>,<,%,{ ->2
-# 3        </> subst(/"(a)"/ replstart->4) KS ->6
-# -           <1> ex-rv2sv sKRM/1 ->3
-# 2              <#> gvsv[*foo] s ->3
-# 5           <|> substcont(other->3) sK/1 ->(end)
-# -              <1> ex-rv2sv sK/1 ->5
-# 4                 <#> gvsv[*1] s ->5
+# 9  <1> leavesub[1 ref] K/REFC,1 
+# 8     <@> lineseq KP 
+# 1        <;> nextstate(main 829 optree_misc.t:64) v:{ 
+# 7        </> subst(/"(a)"/) KS 
+# 3           <1> rv2sv sKRM/1 
+# 2              <#> gv[*foo] s 
+# 6           <|> substcont sK/1 
+# 5              <1> rv2sv sK/1 
+# 4                 <#> gv[*1] s 
 EOT_EOT
-# 6  <1> leavesub[1 ref] K/REFC,1 ->(end)
-# -     <@> lineseq KP ->6
-# 1        <;> nextstate(main 1 -e:1) v:>,<,%,{ ->2
-# 3        </> subst(/"(a)"/ replstart->4) KS ->6
-# -           <1> ex-rv2sv sKRM/1 ->3
-# 2              <$> gvsv(*foo) s ->3
-# 5           <|> substcont(other->3) sK/1 ->(end)
-# -              <1> ex-rv2sv sK/1 ->5
-# 4                 <$> gvsv(*1) s ->5
+# 9  <1> leavesub[1 ref] K/REFC,1 
+# 8     <@> lineseq KP 
+# 1        <;> nextstate(main 829 optree_misc.t:64) v:{ 
+# 7        </> subst(/"(a)"/) KS 
+# 3           <1> rv2sv sKRM/1 
+# 2              <$> gv(*foo) s 
+# 6           <|> substcont sK/1 
+# 5              <1> rv2sv sK/1 
+# 4                 <$> gv(*1) s 
 EONT_EONT
 
 } #skip
 
 my $t = <<'EOT_EOT';
-# 8  <@> leave[1 ref] vKP/REFC ->(end)
-# 1     <0> enter ->2
-# 2     <;> nextstate(main 1 -e:1) v:>,<,%,{ ->3
-# 7     <2> sassign vKS/2 ->8
-# 5        <@> index[t2] sK/2 ->6
-# -           <0> ex-pushmark s ->3
-# 3           <$> const[PV "foo"] s ->4
-# 4           <$> const[PVMG "foo"] s ->5
-# -        <1> ex-rv2sv sKRM*/1 ->7
-# 6           <#> gvsv[*_] s ->7
+# 9  <@> leave[1 ref] vKP/REFC 
+# 1     <0> enter 
+# 2     <;> nextstate(main 1 -e:1) v:{ 
+# 8     <2> sassign vKS/2 
+# 5        <@> index[t2] sK/2 
+# 3           <$> const[PV "foo"] s 
+# 4           <$> const[GV "foo"] s 
+# 7        <1> rv2sv sKRM*/1 
+# 6           <#> gv[*_] s 
 EOT_EOT
 my $nt = <<'EONT_EONT';
-# 8  <@> leave[1 ref] vKP/REFC ->(end)
-# 1     <0> enter ->2
-# 2     <;> nextstate(main 1 -e:1) v:>,<,%,{ ->3
-# 7     <2> sassign vKS/2 ->8
-# 5        <@> index[t1] sK/2 ->6
-# -           <0> ex-pushmark s ->3
-# 3           <$> const(PV "foo") s ->4
-# 4           <$> const(PVMG "foo") s ->5
-# -        <1> ex-rv2sv sKRM*/1 ->7
-# 6           <$> gvsv(*_) s ->7
+# 9  <@> leave[1 ref] vKP/REFC 
+# 1     <0> enter 
+# 2     <;> nextstate(main 1 -e:1) v:{ 
+# 8     <2> sassign vKS/2 
+# 5        <@> index[t1] sK/2 
+# 3           <$> const(PV "foo") s 
+# 4           <$> const(GV "foo") s 
+# 7        <1> rv2sv sKRM*/1 
+# 6           <$> gv(*_) s 
 EONT_EONT
 
 if ($] < 5.009) {

@@ -189,8 +189,8 @@ SKIP: {
 
 	sub declared_only;
 	($res,$err) = render('-basic', \&declared_only);
-	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no START/,
-	      "'sub decl_only' seen as having no START");
+	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no ROOT/,
+	      "'sub decl_only' seen as having no ROOT");
 
 	sub defd_empty {};
 	($res,$err) = render('-basic', \&defd_empty);
@@ -202,8 +202,8 @@ SKIP: {
 	   "'sub defd_empty {}' seen as 2 ops: leavesub,nextstate");
 
 	($res,$err) = render('-basic', \&not_even_declared);
-	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no START/,
-	      "'\&not_even_declared' seen as having no START");
+	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no ROOT/,
+	      "'\&not_even_declared' seen as having no ROOT");
 
 	{
 	    package Bar;
@@ -215,8 +215,8 @@ SKIP: {
 	      "Bar::auto_func seen as unknown function");
 
 	($res,$err) = render('-basic', \&Bar::auto_func);
-	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no START/,
-	      "'\&Bar::auto_func' seen as having no START");
+	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no ROOT/,
+	      "'\&Bar::auto_func' seen as having no ROOT");
 
 	($res,$err) = render('-basic', \&Bar::AUTOLOAD);
 	like ($res, qr/in AUTOLOAD body: /, "found body of Bar::AUTOLOAD");
@@ -235,11 +235,11 @@ SKIP: {
     my $walker = B::Concise::compile('-basic', $func);
     walk_output(\$sample);
     $walker->('-exec');
-    like($sample, qr/goto/m, "post-compile -exec");
+    like($sample, qr/^3  </m, "post-compile -exec");
 
     walk_output(\$sample);
     $walker->('-basic');
-    unlike($sample, qr/goto/m, "post-compile -basic");
+    unlike($sample, qr/^3  </m, "post-compile -basic");
 
 
     # bang at it combinatorically
@@ -370,14 +370,14 @@ $out = runperl ( switches => ["-MO=Concise,Config::AUTOLOAD"],
 		 prog => 'use Config; BEGIN { $Config{awk} }',
 		 stderr => 1 );
 
-like($out, qr/Config::AUTOLOAD exists in stash, but has no START/,
+like($out, qr/Config::AUTOLOAD exists in stash, but has no ROOT/,
     "coderef properly undefined");
 
 $out = runperl ( switches => ["-MO=Concise,Config::AUTOLOAD"],
 		 prog => 'use Config; CHECK { $Config{awk} }',
 		 stderr => 1 );
 
-like($out, qr/Config::AUTOLOAD exists in stash, but has no START/,
+like($out, qr/Config::AUTOLOAD exists in stash, but has no ROOT/,
     "coderef properly undefined");
 
 # test -stash and -src rendering
@@ -441,11 +441,10 @@ $out =
  runperl(
   switches => ["-MO=Concise,-tree"], prog => 'print', stderr => 1
  );
-ok index $out=~s/\r\n/\n/gr=~s/gvsv\(\*_\)/gvsv[*_]/r, <<'end'=~s/\r\n/\n/gr =>>= 0, '-tree output';
+ok index $out=~s/\r\n/\n/gr=~s/gv\(\*_\)/gv[*_]/r, <<'end'=~s/\r\n/\n/gr =>>= 0, '-tree output';
 <6>leave[1 ref]-+-<1>enter
                 |-<2>nextstate(main 1 -e:1)
-                `-<5>print-+-<3>pushmark
-                           `-ex-rv2sv---<4>gvsv[*_]
+                `-<5>print---<4>rv2sv---<3>gv[*_]
 end
 
 __END__

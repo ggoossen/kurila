@@ -479,10 +479,6 @@ CLASSES"> and L<"OP-RELATED CLASSES">.
 Returns the root op (i.e. an object in the appropriate B::OP-derived
 class) of the main part of the Perl program.
 
-=item main_start
-
-Returns the starting op of the main part of the Perl program.
-
 =item walkoptree(OP, METHOD)
 
 Does a tree-walk of the syntax tree based at OP and calls METHOD on

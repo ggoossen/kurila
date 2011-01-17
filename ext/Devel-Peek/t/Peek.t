@@ -271,7 +271,6 @@ do_test('reference to anon sub with empty prototype',
     NV = 0					# $] < 5.009
     PROTOTYPE = ""
     COMP_STASH = $ADDR\\t"main"
-    START = $ADDR ===> \\d+
     ROOT = $ADDR
     XSUB = 0x0					# $] < 5.009
     XSUBANY = 0					# $] < 5.009
@@ -301,7 +300,6 @@ do_test('reference to named subroutine without prototype',
     IV = 0					# $] < 5.009
     NV = 0					# $] < 5.009
     COMP_STASH = $ADDR\\t"main"
-    START = $ADDR ===> \\d+
     ROOT = $ADDR
     XSUB = 0x0					# $] < 5.009
     XSUBANY = 0					# $] < 5.009
@@ -682,7 +680,6 @@ do_test('FORMAT',
     NV = 0					# $] < 5.009
 (?:    PV = 0
 )?    COMP_STASH = 0x0
-    START = $ADDR ===> \\d+
     ROOT = $ADDR
     XSUB = 0x0					# $] < 5.009
     XSUBANY = 0					# $] < 5.009
