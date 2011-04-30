@@ -7561,21 +7561,22 @@ Perl_ck_glob(pTHX_ OP *o)
 	 *     glob
 	 *       \ const(wildcard)
 	 * into
-	 *     null
-	 *       \ enter
-	 *             \ glob - rv2cv
-	 *                      |        \ gv(CORE::GLOBAL::glob)
-	 *                      |
-	 *                      \ const(wildcard) - const(ix)
+	 *     glob
+	 *       \ const(wildcard)
+	 *       \ const(ix)
+	 *       \ entersub
+	 *           \ rv2cv
+	 *               \ gv(CORE::GLOBAL::glob)
 	 */
 	o->op_flags |= OPf_SPECIAL;
 	o->op_targ = pad_alloc(OP_GLOB, SVs_PADTMP);
 	op_append_elem(OP_GLOB, o,
 		    newSVOP(OP_CONST, 0, newSViv(PL_glob_index++)));
 	op_append_elem(OP_GLOB, o,
-	    newUNOP(OP_ENTERSUB, OPf_STACKED,
+	    convert(OP_ENTERSUB, OPf_STACKED,
+		op_append_elem(OP_LIST,
 		    scalar(newUNOP(OP_RV2CV, 0,
-			    newGVOP(OP_GV, 0, gv)))));
+			    newGVOP(OP_GV, 0, gv))), NULL)));
 	return o;
     }
     gv = newGVgen("main");
