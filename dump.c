@@ -2835,7 +2835,7 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
     sequence(o);
     seq = sequence_num(o);
     Perl_xmldump_indent(aTHX_ level, file,
-	"<op_%s seq=\"%"UVuf" -> ",
+	"<op_%s seq=\"%"UVuf"\"",
 	     OP_NAME(o),
 	              seq);
     level++;
