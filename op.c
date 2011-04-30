@@ -7499,7 +7499,11 @@ Perl_ck_fun(pTHX_ OP *o)
     }
     else if (PL_opargs[type] & OA_DEFGV) {
 #ifdef PERL_MAD
-	OP *newop = newUNOP(type, 0, newDEFSVOP());
+	OP *newop;
+	if (PL_opargs[type] & OA_LISTOP)
+	    newop = newLISTOP(type, 0, newDEFSVOP(), NULL);
+	else
+	    newop = newUNOP(type, 0, newDEFSVOP());
 	op_getmad(o,newop,'O');
 	return newop;
 #else
