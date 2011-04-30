@@ -6694,6 +6694,14 @@ Perl_yylex(pTHX)
 			while (SPACE_OR_TAB(*d))
 			    d++;
 			if (*d == ')' && (sv = cv_const_sv(cv))) {
+#ifdef PERL_MAD
+			    if (PL_madskills) {
+				curmad('(', newSVpvn(s, d-s+1));
+				curmad('X', PL_thistoken);
+				curmad('_', PL_thiswhite);
+				/* PL_thistoken = newSVpvs(""); */
+			    }
+#endif /* PERL_MAD */
 			    s = d + 1;
 			    goto its_constant;
 			}
