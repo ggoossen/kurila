@@ -54,7 +54,7 @@ use bytes;
 for my $prog (@prgs) {
     my $msg = ($prog =~ s/^#(.*)\n//) && $1;
     local $TODO = ($msg =~ /TODO/) ? 1 : 0;
-    p55($prog, $msg);
+    p55($prog, $msg) or $TODO or die;
 }
 
 # Files
@@ -62,19 +62,22 @@ use File::Find;
 use Test::Differences;
 
 our %failing = map { $_, 1 } qw|
-../t/comp/require.t
-
-../t/op/switch.t
-
-../t/op/attrhand.t
-
-../t/op/symbolcache.t
-
-../t/op/exec.t
-
-../t/op/state.t
-../t/op/each_array.t
+../t/run/switchd-78586.t
+../t/run/switchp.t
 ../t/lib/cygwin.t
+../t/comp/final_line_num.t
+../t/comp/require.t
+../t/re/regexp_unicode_prop.t
+../t/op/exec.t
+../t/op/symbolcache.t
+../t/op/tie_fetch_count.t
+../t/op/sub_lval.t
+../t/op/attrhand.t
+../t/op/smartkve.t
+../t/op/magic.t
+../t/op/tr.t
+../t/op/state.t
+../t/op/switch.t
 |;
 
 my @files;
@@ -176,3 +179,124 @@ BEGIN {
     exit 0;
 }
 use foobar;
+########
+# if modifier
+"foo" if $x
+########
+# 'and' operator
+$x and "foo"
+########
+# if statement
+if ($x) { "foo" }
+########
+# unless modifier
+"foo" unless $x
+########
+# 'or' operator
+$x or "foo"
+########
+# qw-list
+qw[a b c]
+########
+# range
+3..5
+########
+# block
+1;
+{
+   3;
+}
+########
+# block with continue
+1;
+{
+   3;
+}
+continue {
+   1;
+}
+########
+# double semi-colon
+;;
+########
+# for loop
+for my $i (1..3) {
+    print $_;
+}
+########
+# for loop while 'continue' block
+for my $i (1..3) {
+    print $_;
+}
+continue {
+    1;
+}
+########
+# for loop with non-lexical loop variable
+for $i (1..3) {
+    print $_;
+}
+########
+# while
+while (1) {
+    print $_;
+}
+########
+# while without cond
+while () {
+    print $_;
+}
+########
+# while modifie
+1 while $x;
+########
+# if else
+if ($x) {
+    3;
+}
+else {
+    4;
+}
+########
+# ? : operator
+$x ? 1 : 2
+########
+package Foo;
+########
+package Foo {
+    1;
+}
+########
+# // operator
+$x // $y
+########
+# ||= operator
+$x ||= $y
+########
+# sub declaration
+sub foo;
+########
+# glob
+<*>
+########
+# hash element statement (removed ';')
+$x{X};
+########
+# hash expression with ';
+$x{x()  };
+########
+# TODO require version followed by whitespace/comment
+require 5.005 # comment
+;
+########
+# constant called with ()
+use constant FOO => 1;
+ FOO();
+########
+# smartmatch
+$y ~~ $x
+########
+# aeach/akeys/avalues
+each @a;
+keys @a;
+values @a;

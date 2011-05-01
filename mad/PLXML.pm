@@ -4145,7 +4145,33 @@ sub check { 'ck_null' }
 sub flags { 's|' }
 sub args { '' }
 
+package PLXML::op_foreach;
 
+our @ISA = ('PLXML::loop');
+
+package PLXML::op_entergiven;
+
+our @ISA = ('PLXML::logop');
+
+package PLXML::op_nothing;
+
+our @ISA = ('PLXML::baseop');
+
+package PLXML::op_smartmatch;
+
+our @ISA = ('PLXML::binop');
+
+package PLXML::op_aeach;
+
+our @ISA = ('PLXML::baseop_unop');
+
+package PLXML::op_akeys;
+
+our @ISA = ('PLXML::baseop_unop');
+
+package PLXML::op_avalues;
+
+our @ISA = ('PLXML::baseop_unop');
 
 # Add new ops before this, the custom operator.
 

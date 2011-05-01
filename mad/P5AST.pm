@@ -514,6 +514,13 @@ package P5AST::op_setstate; 	@ISA = 'P5AST::cop';
 package P5AST::op_method_named; @ISA = 'P5AST::padop_svop';
 package P5AST::op_dor; 		@ISA = 'P5AST::logop';
 package P5AST::op_dorassign; 	@ISA = 'P5AST::logop';
+package P5AST::op_foreach;	@ISA = 'P5AST::loop';
+package P5AST::op_entergiven;	@ISA = 'P5AST::logop';
+package P5AST::op_nothing;	@ISA = 'P5AST::baseop';
+package P5AST::op_smartmatch;	@ISA = 'P5AST::binop';
+package P5AST::op_aeach;	@ISA = 'P5AST::baseop_unop';
+package P5AST::op_akeys;	@ISA = 'P5AST::baseop_unop';
+package P5AST::op_avalues;	@ISA = 'P5AST::baseop_unop';
 package P5AST::op_custom; 	@ISA = 'P5AST::baseop';
 
 # New node types (implicit types within perl)
