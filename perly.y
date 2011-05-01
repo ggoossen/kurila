@@ -505,7 +505,7 @@ barestmt:	PLUGSTMT
 	|	';'
 			{
 			  PL_parser->expect = XSTATE;
-			  $$ = IF_MAD(newOP(OP_NULL, 0), (OP*)NULL);
+			  $$ = IF_MAD(newOP(OP_STUB, 0), (OP*)NULL);
 			  TOKEN_GETMAD($1,$$,';');
 			  PL_parser->copline = NOLINE;
 			}
