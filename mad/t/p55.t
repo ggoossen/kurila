@@ -73,7 +73,6 @@ our %failing = map { $_, 1 } qw|
 ../t/op/sub_lval.t
 ../t/op/attrhand.t
 ../t/op/magic.t
-../t/op/tr.t
 ../t/op/state.t
 ../t/op/switch.t
 |;
@@ -303,3 +302,6 @@ values @a;
 each $x;
 keys $x;
 values $x;
+########
+# tr///r
+tr/x/y/r;

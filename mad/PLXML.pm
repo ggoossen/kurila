@@ -4185,6 +4185,12 @@ package PLXML::op_rvalues;
 
 our @ISA = ('PLXML::baseop_unop');
 
+package PLXML::op_transr;
+
+our @ISA = ('PLXML::pvop_svop');
+
+sub key { 'transr' }
+
 # Add new ops before this, the custom operator.
 
 package PLXML::op_custom;

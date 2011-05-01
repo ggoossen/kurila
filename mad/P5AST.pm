@@ -524,6 +524,7 @@ package P5AST::op_avalues;	@ISA = 'P5AST::baseop_unop';
 package P5AST::op_reach;	@ISA = 'P5AST::baseop_unop';
 package P5AST::op_rkeys;	@ISA = 'P5AST::baseop_unop';
 package P5AST::op_rvalues;	@ISA = 'P5AST::baseop_unop';
+package P5AST::op_transr;	@ISA = 'P5AST::pvop_svop';
 package P5AST::op_custom; 	@ISA = 'P5AST::baseop';
 
 # New node types (implicit types within perl)

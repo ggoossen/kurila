@@ -1702,6 +1702,13 @@ sub ast {
     return $res;
 }
 
+package PLXML::op_transr;
+
+sub ast {
+    my $self = shift;
+    return PLXML::op_trans::ast($self, @_);
+}
+
 package PLXML::op_sassign;
 
 sub ast {
