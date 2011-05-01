@@ -792,7 +792,7 @@ sub innerpmop {
 	}
 	if (ref $really eq 'PLXML::op_scope' and
 	    @{$$really{Kids}} == 1 and
-	    ref $$really{Kids}[0] eq 'PLXML::op_null' and
+	    ref $$really{Kids}[0] eq 'PLXML::op_stub' and
 	    not @{$$really{Kids}[0]{Kids}})
 	{
 	    $bits->{repl} = '';
@@ -985,7 +985,7 @@ BEGIN {
 	'&' => sub {			# subroutine
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('d n s a : { & }');
+	    push @newkids, $self->madness('d n s a : { & ( ) }');
 	    $::curstate = 0;
 	    return P5AST::sub->new(Kids => [@newkids])
 	},
@@ -1176,7 +1176,7 @@ package PLXML::op_stub;
 
 sub ast {
     my $self = shift;
-    return $self->newtype->new(Kids => [$self->madness(', x ( ) q = Q')]);
+    return $self->newtype->new(Kids => [$self->madness(', x { ( ) q = Q }')]);
 }
 
 package PLXML::op_scalar;
@@ -2457,7 +2457,7 @@ sub ast {
     if (ref $$self{Kids}[0] eq "PLXML::op_null") {
 	return $$self{Kids}[0]->ast(@_);
     }
-    return $$self{Kids}[0]->blockast($self, @_);
+    return $$self{Kids}[0]->ast($self, @_);
 }
 
 package PLXML::op_leavesublv;
@@ -2465,7 +2465,7 @@ package PLXML::op_leavesublv;
 sub ast {
     my $self = shift;
 
-    return $$self{Kids}[0]->blockast($self, @_);
+    return $$self{Kids}[0]->ast($self, @_);
 }
 
 package PLXML::op_caller;
@@ -2548,7 +2548,7 @@ sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $self->madness('L');
+    push @newkids, $self->madness('L B');
     $::curstate = $self;
     return $self->newtype->new(Kids => [@newkids]);
 }

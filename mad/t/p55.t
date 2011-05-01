@@ -72,7 +72,6 @@ our %failing = map { $_, 1 } qw|
 ../t/op/symbolcache.t
 ../t/op/sub_lval.t
 ../t/op/attrhand.t
-../t/op/magic.t
 ../t/op/state.t
 ../t/op/switch.t
 |;
@@ -305,3 +304,15 @@ values $x;
 ########
 # tr///r
 tr/x/y/r;
+########
+# empty anon sub
+sub {};
+########
+# anon sub with empty list
+sub { () };
+########
+# sub with empty list
+sub foo { () }
+########
+# s///e with empty eval.
+s/x//ge

@@ -249,7 +249,12 @@ stmtseq	:	/* NULL */
 fullstmt:	barestmt
 			{
 			  if($1) {
-			      $$ = newSTATEOP(0, NULL, $1);
+#ifdef PERL_MAD
+                              if ($1->op_type == OP_STUB)
+                                  $$ = $1;
+                              else
+#endif
+                                  $$ = newSTATEOP(0, NULL, $1);
 			  } else {
 			      $$ = IF_MAD(newOP(OP_NULL, 0), NULL);
 			  }
