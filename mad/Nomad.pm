@@ -985,7 +985,7 @@ BEGIN {
 	'&' => sub {			# subroutine
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('d n s a : { & ( ) }');
+	    push @newkids, $self->madness('d n s a : { B ( ) }');
 	    $::curstate = 0;
 	    return P5AST::sub->new(Kids => [@newkids])
 	},
@@ -1176,6 +1176,11 @@ package PLXML::op_stub;
 
 sub ast {
     my $self = shift;
+    if ($self->{mp}{'&'}) {
+        my @newkids;
+        push @newkids, $self->madness('d n s a : { B ( ) }');
+        return P5AST::sub->new(Kids => [@newkids])
+    }
     return $self->newtype->new(Kids => [$self->madness(', x { ( ) q = Q }')]);
 }
 
@@ -1471,7 +1476,7 @@ sub ast {
     if (defined $arg) {
 	return $arg->ast(@_);
     }
-    return ';';  # XXX literal ; should come through somewhere
+    return '';  # XXX literal ; should come through somewhere
 }
 
 package PLXML::op_prototype;

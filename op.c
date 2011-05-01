@@ -6293,7 +6293,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	}
     }
  install_block:
-    if (!block)
+    if (!block || (PL_madskills && block->op_type == OP_NULL) )
 	goto done;
 
     /* If we assign an optree to a PVCV, then we've defined a subroutine that

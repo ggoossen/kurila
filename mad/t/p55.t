@@ -69,7 +69,6 @@ our %failing = map { $_, 1 } qw|
 ../t/comp/require.t
 ../t/op/exec.t
 ../t/op/symbolcache.t
-../t/op/sub_lval.t
 ../t/op/attrhand.t
 |;
 
@@ -324,3 +323,9 @@ given ($x) { $y }
 # once
 use feature ":5.10";
 state $x = 3;
+########
+# lvalue forward declaration
+sub x : lvalue;
+sub y ;
+sub x { $x }
+x = 3;
