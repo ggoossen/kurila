@@ -528,6 +528,7 @@ package P5AST::op_transr;	@ISA = 'P5AST::pvop_svop';
 package P5AST::op_continue;	@ISA = 'P5AST::baseop';
 package P5AST::op_break;	@ISA = 'P5AST::baseop';
 package P5AST::op_enterwhen;	@ISA = 'P5AST::logop';
+package P5AST::op_once;		@ISA = 'P5AST::logop';
 package P5AST::op_custom; 	@ISA = 'P5AST::baseop';
 
 # New node types (implicit types within perl)

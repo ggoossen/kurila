@@ -3004,8 +3004,21 @@ sub ast {
 }
 
 package PLXML::op_dorassign;
+
 sub ast {
     PLXML::op_and::ast(@_);
 }
+
+package PLXML::op_once;
+
+sub ast {
+    my $self = shift;
+
+    my ($rhs, $lhs) = @{$self->{Kids}[0]{Kids}};
+    my @retval = ( $lhs->ast($self, @_), $self->madness("o"), $rhs->ast($self, @_) );
+
+    return $self->newtype->new(Kids => [@retval]);
+}
+
 package PLXML::op_custom;
 

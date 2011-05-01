@@ -71,7 +71,6 @@ our %failing = map { $_, 1 } qw|
 ../t/op/symbolcache.t
 ../t/op/sub_lval.t
 ../t/op/attrhand.t
-../t/op/state.t
 |;
 
 my @files;
@@ -321,3 +320,7 @@ when ($x) { };
 $y when $x;
 default { };
 given ($x) { $y }
+########
+# once
+use feature ":5.10";
+state $x = 3;

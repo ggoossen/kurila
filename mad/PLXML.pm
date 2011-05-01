@@ -4203,6 +4203,10 @@ package PLXML::op_enterwhen;
 
 our @ISA = ('PLXML::logop');
 
+package PLXML::op_once;
+
+our @ISA = ('PLXML::logop');
+
 # Add new ops before this, the custom operator.
 
 package PLXML::op_custom;
