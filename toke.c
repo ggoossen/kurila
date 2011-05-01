@@ -2234,8 +2234,7 @@ S_force_strict_version(pTHX_ char *s)
 
     PERL_ARGS_ASSERT_FORCE_STRICT_VERSION;
 
-    while (isSPACE(*s)) /* leading whitespace */
-	s++;
+    s = SKIPSPACE1(s); /* leading whitespace */
 
     if (is_STRICT_VERSION(s,&errstr)) {
 	SV *ver = newSV(0);
