@@ -482,9 +482,15 @@ barestmt:	PLUGSTMT
 			  /* a block is a loop that happens once */
 			  $$ = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
 				  (OP*)NULL, block_end($5, $7), (OP*)NULL, 0);
+#ifdef PERL_MAD
+			  OP_GETMAD($3,$$,'P');
+			  OP_GETMAD($2,$$,'V');
+#else
 			  op_free($3);
 			  if ($2)
 			      op_free($2);
+#endif
+			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($4,$$,'{');
 			  TOKEN_GETMAD($8,$$,'}');
 			  if (PL_parser->copline > (line_t)IVAL($4))
