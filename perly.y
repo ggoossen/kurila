@@ -799,7 +799,6 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} */
 			{ $$ = newBINOP(OP_GELEM, 0, $1, scalar($3));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,';');
 			  TOKEN_GETMAD($5,$$,'}');
 			}
 	|	scalar '[' expr ']'          /* $array[$element] */
@@ -826,7 +825,6 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} */
 			{ $$ = newBINOP(OP_HELEM, 0, oopsHV($1), jmaybe($3));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,';');
 			  TOKEN_GETMAD($5,$$,'}');
 			}
 	|	term ARROW '{' expr ';' '}' /* somehref->{bar();} */
@@ -836,7 +834,6 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} */
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'{');
-			  TOKEN_GETMAD($5,$$,';');
 			  TOKEN_GETMAD($6,$$,'}');
 			}
 	|	subscripted '{' expr ';' '}' /* $foo->[bar]->{baz;} */
@@ -845,7 +842,6 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} */
 					jmaybe($3));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,';');
 			  TOKEN_GETMAD($5,$$,'}');
 			}
 	|	term ARROW '(' ')'          /* $subref->() */
@@ -1027,13 +1023,11 @@ anonymous:	'[' expr ']'
 	|	HASHBRACK expr ';' '}'	%prec '(' /* { foo => "Bar" } */
 			{ $$ = newANONHASH($2);
 			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($3,$$,';');
 			  TOKEN_GETMAD($4,$$,'}');
 			}
 	|	HASHBRACK ';' '}'	%prec '(' /* { } (';' by tokener) */
 			{ $$ = newANONHASH((OP*)NULL);
 			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($2,$$,';');
 			  TOKEN_GETMAD($3,$$,'}');
 			}
 	|	ANONSUB startanonsub proto subattrlist block	%prec '('
@@ -1156,7 +1150,6 @@ term	:	termbinop
 					ref(oopsHV($1), OP_HSLICE));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,';');
 			  TOKEN_GETMAD($5,$$,'}');
 			}
 	|	THING	%prec '('
