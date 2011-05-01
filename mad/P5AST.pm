@@ -521,6 +521,9 @@ package P5AST::op_smartmatch;	@ISA = 'P5AST::binop';
 package P5AST::op_aeach;	@ISA = 'P5AST::baseop_unop';
 package P5AST::op_akeys;	@ISA = 'P5AST::baseop_unop';
 package P5AST::op_avalues;	@ISA = 'P5AST::baseop_unop';
+package P5AST::op_reach;	@ISA = 'P5AST::baseop_unop';
+package P5AST::op_rkeys;	@ISA = 'P5AST::baseop_unop';
+package P5AST::op_rvalues;	@ISA = 'P5AST::baseop_unop';
 package P5AST::op_custom; 	@ISA = 'P5AST::baseop';
 
 # New node types (implicit types within perl)

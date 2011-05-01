@@ -70,10 +70,8 @@ our %failing = map { $_, 1 } qw|
 ../t/re/regexp_unicode_prop.t
 ../t/op/exec.t
 ../t/op/symbolcache.t
-../t/op/tie_fetch_count.t
 ../t/op/sub_lval.t
 ../t/op/attrhand.t
-../t/op/smartkve.t
 ../t/op/magic.t
 ../t/op/tr.t
 ../t/op/state.t
@@ -300,3 +298,8 @@ $y ~~ $x
 each @a;
 keys @a;
 values @a;
+########
+# reach/rkeys/rvalues
+each $x;
+keys $x;
+values $x;

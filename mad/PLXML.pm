@@ -4173,6 +4173,18 @@ package PLXML::op_avalues;
 
 our @ISA = ('PLXML::baseop_unop');
 
+package PLXML::op_reach;
+
+our @ISA = ('PLXML::baseop_unop');
+
+package PLXML::op_rkeys;
+
+our @ISA = ('PLXML::baseop_unop');
+
+package PLXML::op_rvalues;
+
+our @ISA = ('PLXML::baseop_unop');
+
 # Add new ops before this, the custom operator.
 
 package PLXML::op_custom;
