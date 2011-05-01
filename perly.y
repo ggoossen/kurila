@@ -936,14 +936,7 @@ termbinop:	term ASSIGNOP term                     /* $x = $y */
 	|	term DOTDOT term                       /* $x..$y, $x...$y */
 			{
 			  $$ = newRANGE(IVAL($2), scalar($1), scalar($3));
-			  DO_MAD({
-			      UNOP *op;
-			      op = (UNOP*)$$;
-			      op = (UNOP*)op->op_first;	/* get to flop */
-			      op = (UNOP*)op->op_first;	/* get to flip */
-			      op = (UNOP*)op->op_first;	/* get to range */
-			      token_getmad($2,(OP*)op,'o');
-			    })
+                          TOKEN_GETMAD($2,$$,'o');
 			}
 	|	term ANDAND term                       /* $x && $y */
 			{ $$ = newLOGOP(OP_AND, 0, $1, $3);
