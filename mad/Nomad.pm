@@ -2685,6 +2685,43 @@ sub ast {
     return $self->newtype->new(Kids => [@retval]);
 }
 
+package PLXML::op_enterwhen;
+
+sub ast {
+    my $self = shift;
+
+    my @retval;
+    my ($cond, $block) = @{$$self{Kids}};
+
+    if ($self->madness('w')) {
+        @retval = ( $block->ast($self, @_), $self->madness("w"), $cond->ast($self, @_) );
+    }
+    elsif ($self->{flags} =~ /SPECIAL/) {
+        @retval = ( $self->madness("W"), $cond->ast($self, @_) );
+    }
+    else {
+        @retval = ( $self->madness("W ("), $cond->ast($self, @_),
+                    $self->madness(')'),
+                    $block->ast($self, @_),
+                );
+    }
+
+    return $self->newtype->new(Kids => [@retval]);
+}
+
+package PLXML::op_entergiven;
+
+sub ast {
+    my $self = shift;
+
+    my @retval;
+    my ($expr, $block) = @{$$self{Kids}};
+
+    @retval = ( $self->madness("W ("), $expr->ast($self, @_), $self->madness(")"), $block->ast($self, @_) );
+
+    return $self->newtype->new(Kids => [@retval]);
+}
+
 package PLXML::op_foreach;
 
 sub ast {

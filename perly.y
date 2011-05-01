@@ -390,11 +390,22 @@ barestmt:	PLUGSTMT
 			  $$ = block_end($3,
 				  newGIVENOP($5, op_scope($7), (PADOFFSET)$4));
 			  PL_parser->copline = (line_t)IVAL($1);
+                          TOKEN_GETMAD($1, $$,'W');
+                          TOKEN_GETMAD($2, $$,'(');
+                          TOKEN_GETMAD($6, $$,')');
 			}
 	|	WHEN lpar_or_qw remember mexpr ')' mblock
-			{ $$ = block_end($3, newWHENOP($4, op_scope($6))); }
+			{ 
+                          $$ = block_end($3, newWHENOP($4, op_scope($6)));
+                          TOKEN_GETMAD($1, $$,'W');
+                          TOKEN_GETMAD($2, $$,'(');
+                          TOKEN_GETMAD($5, $$,')');
+                        }
 	|	DEFAULT block
-			{ $$ = newWHENOP(0, op_scope($2)); }
+			{ 
+                          $$ = newWHENOP(0, op_scope($2));
+                          TOKEN_GETMAD($1, $$,'W');
+                        }
 	|	WHILE lpar_or_qw remember texpr ')' mintro mblock cont
 			{
 			  $$ = block_end($3,
@@ -543,7 +554,10 @@ sideff	:	error
 			  PL_parser->copline = (line_t)IVAL($2);
 			}
 	|	expr WHEN expr
-			{ $$ = newWHENOP($3, op_scope($1)); }
+			{ 
+                          $$ = newWHENOP($3, op_scope($1));
+			  TOKEN_GETMAD($2,$$,'w');
+                        }
 	;
 
 /* else and elsif blocks */

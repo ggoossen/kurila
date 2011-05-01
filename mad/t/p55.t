@@ -67,13 +67,11 @@ our %failing = map { $_, 1 } qw|
 ../t/lib/cygwin.t
 ../t/comp/final_line_num.t
 ../t/comp/require.t
-../t/re/regexp_unicode_prop.t
 ../t/op/exec.t
 ../t/op/symbolcache.t
 ../t/op/sub_lval.t
 ../t/op/attrhand.t
 ../t/op/state.t
-../t/op/switch.t
 |;
 
 my @files;
@@ -152,7 +150,6 @@ $x = 1 for ($[) = 0;
 # from t/op/getppid.t
 pipe my ($r, $w)
 ########
-# TODO switch
 use feature 'switch';
 given(my $x = "bar") { }
 ########
@@ -316,3 +313,11 @@ sub foo { () }
 ########
 # s///e with empty eval.
 s/x//ge
+########
+use feature 'switch';
+continue;
+break;
+when ($x) { };
+$y when $x;
+default { };
+given ($x) { $y }

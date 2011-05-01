@@ -4191,6 +4191,18 @@ our @ISA = ('PLXML::pvop_svop');
 
 sub key { 'transr' }
 
+package PLXML::op_continue;
+
+our @ISA = ('PLXML::baseop');
+
+package PLXML::op_break;
+
+our @ISA = ('PLXML::baseop');
+
+package PLXML::op_enterwhen;
+
+our @ISA = ('PLXML::logop');
+
 # Add new ops before this, the custom operator.
 
 package PLXML::op_custom;
