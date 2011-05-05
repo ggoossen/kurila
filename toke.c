@@ -7758,10 +7758,10 @@ Perl_yylex(pTHX)
 	    else 
 		pl_yylval.ival = 0;
 	    PL_expect = XTERM;
-	    PL_bufptr = s;
 	    PL_last_uni = PL_oldbufptr;
 	    PL_last_lop_op = OP_REQUIRE;
-	    s = skipspace(s);
+	    s = SKIPSPACE1(s);
+	    PL_bufptr = s;
 	    return REPORT( (int)REQUIRE );
 
 	case KEY_reset:

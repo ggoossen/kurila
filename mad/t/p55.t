@@ -66,7 +66,6 @@ our %failing = map { $_, 1 } (
 "../t/run/switchp.t",
 "../t/lib/cygwin.t",
 "../t/comp/final_line_num.t", # does horrible things with catching compile error
-"../t/comp/require.t", # see below
 "../t/op/symbolcache.t",
 );
 
@@ -274,7 +273,7 @@ $x{X};
 # hash expression with ';
 $x{x()  };
 ########
-# TODO require version followed by whitespace/comment (from comp/require.t)
+# require version followed by whitespace/comment (from comp/require.t)
 require 5.005 # comment
 ;
 ########
