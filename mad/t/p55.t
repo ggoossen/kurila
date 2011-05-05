@@ -69,7 +69,6 @@ our %failing = map { $_, 1 } qw|
 ../t/comp/require.t
 ../t/op/exec.t
 ../t/op/symbolcache.t
-../t/op/attrhand.t
 |;
 
 my @files;
@@ -329,3 +328,17 @@ sub x : lvalue;
 sub y ;
 sub x { $x }
 x = 3;
+########
+# custom attributes, with arguments across multiple lines
+package Antler;
+use Attribute::Handlers;
+sub TypeCheck :ATTR(CODE,RAWDATA) { }
+
+package Deer;
+use base 'Antler';
+sub something : TypeCheck(
+    QNET::Util::Object,
+    QNET::Util::Object,
+    QNET::Util::Object
+) # some comment
+  { }

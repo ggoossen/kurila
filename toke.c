@@ -5334,7 +5334,7 @@ Perl_yylex(pTHX)
 	switch (PL_expect) {
 	    OP *attrs;
 #ifdef PERL_MAD
-	    I32 stuffstart;
+	    SV* space;
 #endif
 	case XOPERATOR:
 	    if (!PL_in_my || PL_lex_state != LEX_NORMAL)
@@ -5352,9 +5352,15 @@ Perl_yylex(pTHX)
 	    PL_expect = XTERMBLOCK;
 	 grabattrs:
 #ifdef PERL_MAD
-	    stuffstart = s - SvPVX(PL_linestr) - 1;
+	    space = NULL;
 #endif
-	    s = PEEKSPACE(s);
+	    s = SKIPSPACE2(s, space);
+#ifdef PERL_MAD
+	    PL_thistoken = newSVpvs(":");
+	    sv_catsv(PL_thistoken, space);
+	    sv_free(space);
+	    space = NULL;
+#endif
 	    attrs = NULL;
 	    while (isIDFIRST_lazy_if(s,UTF)) {
 		I32 tmp;
@@ -5377,6 +5383,9 @@ Perl_yylex(pTHX)
 		    }
 		}
 		sv = newSVpvn(s, len);
+#ifdef PERL_MAD
+		sv_catsv(PL_thistoken, sv);
+#endif
 		if (*d == '(') {
 		    d = scan_str(d,TRUE,TRUE);
 		    if (!d) {
@@ -5393,6 +5402,9 @@ Perl_yylex(pTHX)
 		}
 		if (PL_lex_stuff) {
 		    sv_catsv(sv, PL_lex_stuff);
+#ifdef PERL_MAD
+		    sv_catsv(PL_thistoken, PL_lex_stuff);
+#endif
 		    attrs = op_append_elem(OP_LIST, attrs,
 					newSVOP(OP_CONST, 0, sv));
 		    SvREFCNT_dec(PL_lex_stuff);
@@ -5437,7 +5449,12 @@ Perl_yylex(pTHX)
 					    newSVOP(OP_CONST, 0,
 					      	    sv));
 		}
-		s = PEEKSPACE(d);
+		s = SKIPSPACE2(d, space);
+#ifdef PERL_MAD
+		sv_catsv(PL_thistoken, space);
+		sv_free(space);
+		space = NULL;
+#endif
 		if (*s == ':' && s[1] != ':')
 		    s = PEEKSPACE(s+1);
 		else if (s == d)
@@ -5477,12 +5494,6 @@ Perl_yylex(pTHX)
 		CURMAD('_', PL_nextwhite);
 		force_next(THING);
 	    }
-#ifdef PERL_MAD
-	    if (PL_madskills) {
-		PL_thistoken = newSVpvn(SvPVX(PL_linestr) + stuffstart,
-				     (s - SvPVX(PL_linestr)) - stuffstart);
-	    }
-#endif
 	    TOKEN(COLONATTR);
 	}
 	if (!PL_lex_allbrackets && PL_lex_fakeeof >= LEX_FAKEEOF_CLOSING) {
