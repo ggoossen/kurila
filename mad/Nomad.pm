@@ -26,7 +26,6 @@ sub xml_to_p5 {
 
     local $SIG{__DIE__} = sub {
         my $e = shift;
-        $e =~ s/\n$/\n    [NODE $filename line $::prevstate->{line}]/ if $::prevstate;
         confess $e;
     };
 
@@ -56,8 +55,6 @@ sub xml_to_p5 {
     return $text;
 }
 
-$::curstate = 0;
-$::prevstate = 0;
 $::curenc = 1;		# start in iso-8859-1, sigh...
 
 $::H = "HeredocHere000";
@@ -893,7 +890,6 @@ BEGIN {
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('p px');
-	    $::curstate = 0;
 	    return P5AST::peg->new(Kids => [@newkids])
 	},
 	'(' => sub {		# extra parens around the whole thing
@@ -918,7 +914,6 @@ BEGIN {
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('{ }');
-	    $::curstate = 0;
 	    return P5AST::nothing->new(Kids => [@newkids])
 	},
 	'I' => sub {		# if or unless statement keyword
@@ -968,7 +963,6 @@ BEGIN {
 	    push @newkids, $self->madness('V');
 	    push @newkids, @args;
 	    push @newkids, $self->madness('S }');
-	    $::curstate = 0;
 	    return P5AST::use->new(Kids => [@newkids])
 	},
 	'?' => sub {			# ternary
@@ -986,7 +980,6 @@ BEGIN {
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('d n s a : { B ( ) }');
-	    $::curstate = 0;
 	    return P5AST::sub->new(Kids => [@newkids])
 	},
 	'i' => sub {			# modifier if
@@ -1007,13 +1000,11 @@ BEGIN {
 	    my @newkids;
 	    push @newkids, $self->madness('o');
 	    push @newkids, $self->madness('P');
-	    $::curstate = 0;
 	    return P5AST::package->new(Kids => [@newkids])
 	},
 	'F' => sub {				# format
 	    my $self = shift;
 	    my @newkids = $self->madness('F n b');
-	    $::curstate = 0;
 	    return P5AST::format->new(Kids => [@newkids])
 	},
 	'x' => sub {				# qw literal
@@ -1105,7 +1096,6 @@ BEGIN {
 	    }
 	    push @newkids, $self->madness(')');
 	    push @newkids, $block->blockast($self,@_);
-	    $::curstate = 0;
 	    return P5AST::cfor->new(Kids => [@newkids])
 	},
 	'o' => sub {			# random useless operator
@@ -1167,7 +1157,6 @@ sub ast {
 
 sub blockast {
     my $self = shift;
-    local $::curstate;
     local $::curenc = $::curenc;
     return $self->madness('{ ; }');
 }
@@ -1334,7 +1323,6 @@ package PLXML::op_gelem;
 sub ast {
     my $self = shift;
 
-    local $::curstate;	# in case there are statements in subscript
     local $::curenc = $::curenc;
     my @newkids;
     push @newkids, $self->madness('dx d');
@@ -1478,7 +1466,6 @@ package PLXML::op_anoncode;
 sub ast {
     my $self = shift;
     my $arg = $$self{Kids}[0];
-    local $::curstate;		# hide nested statements in sub
     local $::curenc = $::curenc;
     if (defined $arg) {
 	return $arg->ast(@_);
@@ -1508,7 +1495,6 @@ sub ast {
     my @newkids;
     my $self = shift;
     if ($self->{mp}{FIRST} and $$self{mp}{FIRST} eq '{') {
-	local $::curstate;	# this is officially a block, so hide it
 	local $::curenc = $::curenc;
 	push @newkids, $self->madness('{');
 	for my $kid (@{$$self{Kids}}) {
@@ -2133,7 +2119,6 @@ package PLXML::op_helem;
 
 sub astnull {
     my $self = shift;
-    local $::curstate;	# hash subscript potentially a lineseq
     local $::curenc = $::curenc;
 
     my @newkids;
@@ -2148,7 +2133,6 @@ sub astnull {
 
 sub ast {
     my $self = shift;
-    local $::curstate;	# hash subscript potentially a lineseq
     local $::curenc = $::curenc;
 
     my @before = $self->madness('dx d');
@@ -2492,8 +2476,6 @@ package PLXML::op_lineseq;
 sub lineseq {
     my $self = shift;
     my @kids = @{$$self{Kids}};
-    local $::curstate = 0;	# (probably redundant, but that's okay)
-    local $::prevstate = 0;
     local $::curenc = $::curenc;
     my @retval;
     my @newstuff;
@@ -2502,35 +2484,13 @@ sub lineseq {
 	my $kid = shift @kids;
 	my $thing = $kid->ast($self, @_);
 	next unless defined $thing;
-	# if ($::curstate ne $::prevstate) {
-	#     if ($::prevstate) {
-	# 	push @newstuff, $::prevstate->madness(';');
-	# 	push @{$newprev->{Kids}}, @newstuff if $newprev;
-	# 	@newstuff = ();
-	#     }
-	#     $::prevstate = $::curstate;
-	#     $newprev = $thing;
-	#     push @retval, $thing;
-	# }
-	# elsif ($::prevstate) {
-	#     push @newstuff, $thing;
-	# }
-	# else {
-	    push @retval, $thing, $kid->madness(';');
-	# }
+        push @retval, $thing, $kid->madness(';');
     }
-    # if ($::prevstate) {
-    #     push @newstuff, $::prevstate->madness(';');
-    #     push @{$newprev->{Kids}}, @newstuff if $newprev;
-    #     @newstuff = ();
-    #     $::prevstate = 0;
-    # }
     return @retval;
 }
 
 sub blockast {
     my $self = shift;
-    local $::curstate;
 
     my @retval;
     push @retval, $self->madness('{');
@@ -2555,7 +2515,6 @@ sub astnull {
     my $self = shift;
     my @newkids;
     push @newkids, $self->madness('L');
-    $::curstate = $self;
     return P5AST::statement->new(Kids => [@newkids]);
 }
 
@@ -2564,7 +2523,6 @@ sub ast {
 
     my @newkids;
     push @newkids, $self->madness('L B');
-    $::curstate = $self;
     return $self->newtype->new(Kids => [@newkids]);
 }
 
@@ -2600,7 +2558,6 @@ sub ast {
 	return $self->newtype->new(Kids => [@newkids]);
     }
 
-    local $::curstate;
     push @retval, $self->madness('o {');
 
     my @newkids = $self->PLXML::op_lineseq::lineseq(@_);
@@ -2629,7 +2586,6 @@ package PLXML::op_scope;
 
 sub ast {
     my $self = shift;
-    local $::curstate;
 
     my @newkids;
     push @newkids, $self->madness('o');
@@ -2952,13 +2908,6 @@ package PLXML::op_semop;
 package PLXML::op_require;
 package PLXML::op_dofile;
 package PLXML::op_entereval;
-
-sub ast {
-    my $self = shift;
-    local $::curstate;		# eval {} has own statement sequence
-    return $self->SUPER::ast(@_);
-}
-
 package PLXML::op_leaveeval;
 package PLXML::op_entertry;
 package PLXML::op_leavetry;
