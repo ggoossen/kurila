@@ -1241,6 +1241,10 @@ S_add_op(pTHX_ CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
 	}
 	goto compile_default;
 
+    case OP_NOTHING:
+	/* do nothing */
+	break;
+
     case OP_CUSTOM:
 	if (PL_opargs[o->op_type] & OA_MARK)
 	    append_instruction(bpp, NULL, OP_PUSHMARK, 0, NULL);

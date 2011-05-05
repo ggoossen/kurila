@@ -909,7 +909,7 @@ Perl_scalar(pTHX_ OP *o)
 	while (kid) {
 	    OP *sib = kid->op_sibling;
 	    if (PL_madskills)
-		while (sib && sib->op_type == OP_STUB)
+		while (sib && sib->op_type == OP_NOTHING)
 		    sib = sib->op_sibling;
 	    if (sib && kid->op_type != OP_ENTERWHEN)
 		scalarvoid(kid);
@@ -1349,7 +1349,7 @@ Perl_list(pTHX_ OP *o)
 	while (kid) {
 	    OP *sib = kid->op_sibling;
 	    if (PL_madskills)
-		while (sib && sib->op_type == OP_STUB)
+		while (sib && sib->op_type == OP_NOTHING)
 		    sib = sib->op_sibling;
 	    if (sib && kid->op_type != OP_ENTERWHEN)
 		scalarvoid(kid);
@@ -1382,7 +1382,7 @@ S_scalarseq(pTHX_ OP *o)
 	    for (kid = cLISTOPo->op_first; kid; kid = sib) {
 		sib = kid->op_sibling;
 		if (PL_madskills)
-		    while (sib && sib->op_type == OP_STUB)
+		    while (sib && sib->op_type == OP_NOTHING)
 			sib = sib->op_sibling;
 		if (sib && kid->op_type != OP_ENTERWHEN) {
 		    scalarvoid(kid);
@@ -1724,9 +1724,11 @@ Perl_op_lvalue_flags(pTHX_ OP *o, I32 type, U32 flags)
 	    Perl_croak(aTHX_ "That use of $[ is unsupported");
 	break;
     case OP_STUB:
-	if ((o->op_flags & OPf_PARENS) || PL_madskills)
+	if (o->op_flags & OPf_PARENS)
 	    break;
 	goto nomod;
+    case OP_NOTHING:
+	break;
     case OP_ENTERSUB:
 	if ((type == OP_UNDEF || type == OP_REFGEN || type == OP_LOCK) &&
 	    !(o->op_flags & OPf_STACKED)) {
@@ -2396,7 +2398,7 @@ S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
 	    my_kid(kid, attrs, imopsp);
     } else if (type == OP_UNDEF
 #ifdef PERL_MAD
-	       || type == OP_STUB
+	       || type == OP_NOTHING
 #endif
 	       ) {
 	return o;
@@ -7284,9 +7286,10 @@ Perl_ck_fun(pTHX_ OP *o)
 	    numargs++;
 	    sibl = kid->op_sibling;
 #ifdef PERL_MAD
-	    if (!sibl && kid->op_type == OP_STUB) {
+	    if (kid->op_type == OP_NOTHING) {
 		numargs--;
-		break;
+		kid = sibl;
+		continue;
 	    }
 #endif
 	    switch (oa & 7) {
@@ -7497,7 +7500,7 @@ Perl_ck_fun(pTHX_ OP *o)
 	    kid = kid->op_sibling;
 	}
 #ifdef PERL_MAD
-	if (kid && kid->op_type != OP_STUB)
+	if (kid && kid->op_type != OP_NOTHING)
 	    return too_many_arguments(o,OP_DESC(o));
 	o->op_private |= numargs;
 #else
@@ -8448,7 +8451,7 @@ Perl_ck_entersub_args_list(pTHX_ OP *entersubop)
     PERL_ARGS_ASSERT_CK_ENTERSUB_ARGS_LIST;
     aop = cUNOPx(entersubop)->op_first;
     for ( ; aop->op_sibling; aop = aop->op_sibling) {
-	if (!(PL_madskills && aop->op_type == OP_STUB)) {
+	if (!(PL_madskills && aop->op_type == OP_NOTHING)) {
 	    list(aop);
 	    op_lvalue(aop, OP_ENTERSUB);
 	}
@@ -8504,7 +8507,7 @@ Perl_ck_entersub_args_proto(pTHX_ OP *entersubop, GV *namegv, SV *protosv)
     for (cvop = aop; cvop->op_sibling; cvop = cvop->op_sibling) ;
     while (aop != cvop) {
 	OP* o3;
-	if (PL_madskills && aop->op_type == OP_STUB) {
+	if (PL_madskills && aop->op_type == OP_NOTHING) {
 	    aop = aop->op_sibling;
 	    continue;
 	}

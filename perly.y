@@ -250,7 +250,7 @@ fullstmt:	barestmt
 			{
 			  if($1) {
 #ifdef PERL_MAD
-                              if ($1->op_type == OP_STUB)
+                              if ($1->op_type == OP_NOTHING)
                                   $$ = $1;
                               else
 #endif
@@ -309,7 +309,7 @@ barestmt:	PLUGSTMT
 			  {
 			      OP* o = newSVOP(OP_GVSV, 0,
 				(SV*)newATTRSUB($2, $3, $4, $5, $6));
-			      $$ = newOP(OP_STUB,0);
+			      $$ = newOP(OP_NOTHING,0);
 			      op_getmad(o,$$,'&');
 			      op_getmad($3,$$,'n');
 			      op_getmad($4,$$,'s');
@@ -522,7 +522,7 @@ barestmt:	PLUGSTMT
 	|	';'
 			{
 			  PL_parser->expect = XSTATE;
-			  $$ = IF_MAD(newOP(OP_STUB, 0), (OP*)NULL);
+			  $$ = IF_MAD(newOP(OP_NOTHING, 0), (OP*)NULL);
 			  TOKEN_GETMAD($1,$$,';');
 			  PL_parser->copline = NOLINE;
 			}
@@ -726,7 +726,7 @@ expr	:	expr ANDOP expr
 listexpr:	listexpr ','
 			{
 #ifdef MAD
-			  OP* op = newNULLLIST();
+                          OP* op = newOP(OP_NOTHING, 0);
 			  token_getmad($2,op,',');
 			  $$ = op_append_elem(OP_LIST, $1, op);
 #else

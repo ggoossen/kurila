@@ -157,7 +157,7 @@ case 2:
     {
 			  if((ps[(1) - (1)].val.opval)) {
 #ifdef PERL_MAD
-                              if ((ps[(1) - (1)].val.opval)->op_type == OP_STUB)
+                              if ((ps[(1) - (1)].val.opval)->op_type == OP_NOTHING)
                                   (yyval.opval) = (ps[(1) - (1)].val.opval);
                               else
 #endif
@@ -232,7 +232,7 @@ case 2:
 			  {
 			      OP* o = newSVOP(OP_GVSV, 0,
 				(SV*)newATTRSUB((ps[(2) - (6)].val.ival), (ps[(3) - (6)].val.opval), (ps[(4) - (6)].val.opval), (ps[(5) - (6)].val.opval), (ps[(6) - (6)].val.opval)));
-			      (yyval.opval) = newOP(OP_STUB,0);
+			      (yyval.opval) = newOP(OP_NOTHING,0);
 			      op_getmad(o,(yyval.opval),'&');
 			      op_getmad((ps[(3) - (6)].val.opval),(yyval.opval),'n');
 			      op_getmad((ps[(4) - (6)].val.opval),(yyval.opval),'s');
@@ -504,7 +504,7 @@ case 2:
 #line 523 "perly.y"
     {
 			  PL_parser->expect = XSTATE;
-			  (yyval.opval) = IF_MAD(newOP(OP_STUB, 0), (OP*)NULL);
+			  (yyval.opval) = IF_MAD(newOP(OP_NOTHING, 0), (OP*)NULL);
 			  TOKEN_GETMAD((ps[(1) - (1)].val.i_tkval),(yyval.opval),';');
 			  PL_parser->copline = NOLINE;
 			;}
@@ -766,7 +766,7 @@ case 2:
 #line 727 "perly.y"
     {
 #ifdef MAD
-			  OP* op = newNULLLIST();
+                          OP* op = newOP(OP_NOTHING, 0);
 			  token_getmad((ps[(2) - (2)].val.i_tkval),op,',');
 			  (yyval.opval) = op_append_elem(OP_LIST, (ps[(1) - (2)].val.opval), op);
 #else
@@ -1727,6 +1727,6 @@ case 2:
     
 
 /* Generated from:
- * 009dd0fa67406bccc536de8f5ec39b63906e4b23b29bec9c87d0e81ff89d74b8 perly.y
+ * 33d751bba7d2c6cbca35e95eb1e204cc3be0f7731fc3fe95a2243d45713faae1 perly.y
  * 738ca60a0b4cb075902435e976a2f393d438e8e6e32ba81e037dd773b75c87b5 regen_perly.pl
  * ex: set ro: */

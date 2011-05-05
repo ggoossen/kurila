@@ -792,7 +792,7 @@ sub innerpmop {
 	}
 	if (ref $really eq 'PLXML::op_scope' and
 	    @{$$really{Kids}} == 1 and
-	    ref $$really{Kids}[0] eq 'PLXML::op_stub' and
+	    ref $$really{Kids}[0] eq 'PLXML::op_nothing' and
 	    not @{$$really{Kids}[0]{Kids}})
 	{
 	    $bits->{repl} = '';
@@ -1173,6 +1173,13 @@ sub blockast {
 }
 
 package PLXML::op_stub;
+
+sub ast {
+    my $self = shift;
+    return $self->newtype->new(Kids => [$self->madness(', x { ( ) q = Q }')]);
+}
+
+package PLXML::op_nothing;
 
 sub ast {
     my $self = shift;
