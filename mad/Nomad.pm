@@ -1539,6 +1539,9 @@ sub ast {
 	    push @args, $self->madness('= Q');
 	}
     }
+    else {
+        push @args, $self->madness("o");
+    }
     return $self->newtype->new(Kids => [@args]);
 }
 

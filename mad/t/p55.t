@@ -61,15 +61,14 @@ for my $prog (@prgs) {
 use File::Find;
 use Test::Differences;
 
-our %failing = map { $_, 1 } qw|
-../t/run/switchd-78586.t
-../t/run/switchp.t
-../t/lib/cygwin.t
-../t/comp/final_line_num.t
-../t/comp/require.t
-../t/op/exec.t
-../t/op/symbolcache.t
-|;
+our %failing = map { $_, 1 } (
+"../t/run/switchd-78586.t",
+"../t/run/switchp.t",
+"../t/lib/cygwin.t",
+"../t/comp/final_line_num.t", # does horrible things with catching compile error
+"../t/comp/require.t", # see below
+"../t/op/symbolcache.t",
+);
 
 my @files;
 find( sub { push @files, $File::Find::name if m/[.]t$/ }, '../t/');
@@ -275,7 +274,7 @@ $x{X};
 # hash expression with ';
 $x{x()  };
 ########
-# TODO require version followed by whitespace/comment
+# TODO require version followed by whitespace/comment (from comp/require.t)
 require 5.005 # comment
 ;
 ########
@@ -342,3 +341,5 @@ sub something : TypeCheck(
     QNET::Util::Object
 ) # some comment
   { }
+########
+readpipe
