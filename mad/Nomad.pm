@@ -916,22 +916,6 @@ BEGIN {
 	    push @newkids, $self->madness('{ }');
 	    return P5AST::nothing->new(Kids => [@newkids])
 	},
-	'I' => sub {		# if or unless statement keyword
-	    my $self = shift;
-	    my @newkids;
-	    push @newkids, $self->madness('L I (');
-	    my @subkids;
-	    for my $kid (@{$$self{Kids}}) {
-		push @subkids, $kid->ast($self, @_);
-	    }
-	    die "oops in op_null->new" unless @subkids == 1;
-	    my $newself = $subkids[0];
-	    @subkids = @{$$newself{Kids}};
-	    
-	    unshift @{$subkids[0]{Kids}}, @newkids;
-	    push @{$subkids[0]{Kids}}, $self->madness(')');
-	    return bless($newself, 'P5AST::condstate');
-	},
 	'U' => sub {			# use
 	    my $self = shift;
 	    my @newkids;
@@ -965,35 +949,11 @@ BEGIN {
 	    push @newkids, $self->madness('S }');
 	    return P5AST::use->new(Kids => [@newkids])
 	},
-	'?' => sub {			# ternary
-	    my $self = shift;
-	    my @newkids;
-	    my @subkids;
-	    my @condkids = @{$$self{Kids}[0]{Kids}};
-	    
-	    push @newkids, $condkids[0]->ast($self,@_), $self->madness('?');
-	    push @newkids, $condkids[1]->ast($self,@_), $self->madness(':');
-	    push @newkids, $condkids[2]->ast($self,@_);
-	    return P5AST::ternary->new(Kids => [@newkids])
-	},
 	'&' => sub {			# subroutine
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('d n s a : { B ( ) }');
 	    return P5AST::sub->new(Kids => [@newkids])
-	},
-	'i' => sub {			# modifier if
-	    my $self = shift;
-	    my @newkids;
-	    push @newkids, $self->madness('i');
-	    my $cond = $$self{Kids}[0];
-	    my @subkids;
-	    for my $kid (@{$$cond{Kids}}) {
-		push @subkids, $kid->ast($self, @_);
-	    }
-	    push @newkids, shift @subkids;
-	    unshift @newkids, @subkids;
-	    return P5AST::condmod->new(Kids => [@newkids])
 	},
 	'P' => sub {				# package declaration
 	    my $self = shift;
@@ -2732,45 +2692,6 @@ sub ast {
         push @retval, $self->madness('L');
         push @retval, $self->madness('W d ('), @$expr, $self->madness(')');
     }
-
-    # my $andor;
-
-    # if (ref $nextthing eq 'PLXML::op_null') {
-    #     if ($$nextthing{mp}{'1'}) {
-    #         push @newkids, $nextthing->madness('1');
-    #         push @newkids, $self->madness(')');
-    #         push @newkids, $$nextthing{Kids}[0]->blockast($self,@_);
-    #     }
-    #     elsif ($$nextthing{mp}{'2'}) {
-    #         push @newkids, $$nextthing{Kids}[0]->ast($self,@_);
-    #         push @newkids, $self->madness(')');
-    #         push @newkids, $$nextthing{mp}{'2'}->blockast($self,@_);
-    #     }
-    #     elsif ($$nextthing{mp}{'U'}) {
-    #         push @newkids, $nextthing->ast($self,@_);
-    #     }
-    #     else {
-    #         # bypass the op_null
-    #         $andor = $nextthing->{Kids}[0];
-    #         eval {
-    #     	push @newkids, $$andor{Kids}[0]->ast($self, @_);
-    #         };
-    #         push @newkids, $self->madness(')');
-    #         eval {
-    #     	push @newkids, $$andor{Kids}[1]->blockast($self, @_);
-    #         };
-    #     }
-    # }
-    # else {
-    #     $andor = $nextthing;
-    #     push @newkids, $nextthing->madness('O');
-    #     push @newkids, $self->madness(')');
-    #     push @newkids, $nextthing->blockast($self, @_);
-    # }
-    # if ($$self{mp}{w}) {
-    #     push @newkids, $self->madness('w');
-    #     push @newkids, $enterloop->ast($self,@_);
-    # }
 
     push @retval, @$block, $cont ? @$cont :();
 
