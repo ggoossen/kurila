@@ -443,12 +443,7 @@ sub madness {
 	my $madprop = $self->{mp}{$key};
 	next unless defined $madprop;
 	if (ref $madprop eq 'PLXML::mad_op') {
-	    if ($key eq 'b') {
-		push @vals, $madprop->blockast($self, @_);
-	    }
-	    else {
-		push @vals, $madprop->ast($self, @_);
-	    }
+            push @vals, $madprop->ast($self, @_);
 	    next;
 	}
 	my $white;
@@ -462,11 +457,6 @@ sub madness {
 	}
     }
     @vals;
-}
-
-sub blockast {
-    my $self = shift;
-    $self->ast(@_);
 }
 
 sub ast {
@@ -546,21 +536,6 @@ sub ast {
     }
     else {
 	return P5AST::op_list->new(Kids => [@vals]);
-    }
-}
-
-sub blockast {
-    my $self = shift;
-    $self->prepreproc(@_);
-    my @vals;
-    for my $kid (@{$$self{Kids}}) {
-        push @vals, $kid->blockast($self, @_);
-    }
-    if (@vals == 1) {
-	return @vals;
-    }
-    else {
-	return P5AST::op_lineseq->new(Kids => [@vals]);
     }
 }
 
@@ -1055,7 +1030,7 @@ BEGIN {
 		push @newkids, $cont->ast($self,@_);
 	    }
 	    push @newkids, $self->madness(')');
-	    push @newkids, $block->blockast($self,@_);
+	    push @newkids, $block->ast($self,@_);
 	    return P5AST::cfor->new(Kids => [@newkids])
 	},
 	'o' => sub {			# random useless operator
@@ -1113,12 +1088,6 @@ sub ast {
 	push @newkids, $kid->ast($self, @_);
     }
     return $self->newtype->new(Kids => [@newkids]);
-}
-
-sub blockast {
-    my $self = shift;
-    local $::curenc = $::curenc;
-    return $self->madness('{ ; }');
 }
 
 package PLXML::op_stub;
@@ -2449,7 +2418,7 @@ sub lineseq {
     return @retval;
 }
 
-sub blockast {
+sub ast {
     my $self = shift;
 
     my @retval;
@@ -2460,11 +2429,6 @@ sub blockast {
 
     push @retval, $self->madness('; }');
     return $self->newtype->new(Kids => [@retval]);
-}
-
-sub ast {
-    my $self = shift;
-    return $self->blockast(@_);
 }
 
 package PLXML::op_nextstate;
