@@ -2457,7 +2457,7 @@ sub pp_syscall { listop(@_, "syscall") }
 sub pp_glob {
     my $self = shift;
     my($op, $cx) = @_;
-    my $text = $self->dq($op->first->sibling);  # skip pushmark
+    my $text = $self->dq(skip_pushmark($op->first));
     if ($text =~ /^\$?(\w|::|\`)+$/ # could look like a readline
 	or $text =~ /[<>]/) {
 	return 'glob(' . single_delim('qq', '"', $text) . ')';
@@ -2475,7 +2475,7 @@ sub pp_truncate {
     my($op, $cx) = @_;
     my(@exprs);
     my $parens = ($cx >= 5) || $self->{'parens'};
-    my $kid = $op->first->sibling;
+    my $kid = skip_pushmark($op->first);
     my $fh;
     if ($op->flags & OPf_SPECIAL) {
 	# $kid is an OP_CONST
