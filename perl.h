@@ -2420,6 +2420,8 @@ typedef struct block_hooks BHK;
 typedef struct custom_op XOP;
 
 typedef struct op INSTRUCTION;
+typedef struct codeseq CODESEQ;
+#include "instruction.h"
 
 typedef struct interpreter PerlInterpreter;
 
@@ -4599,7 +4601,6 @@ EXTCONST unsigned char PL_freq[] = {	/* letter frequencies for mixed English/C *
 EXTCONST unsigned char PL_freq[];
 #endif
 
-#ifdef DEBUGGING
 #ifdef DOINIT
 EXTCONST char* const PL_block_type[] = {
 	"NULL",
@@ -4617,7 +4618,6 @@ EXTCONST char* const PL_block_type[] = {
 };
 #else
 EXTCONST char* PL_block_type[];
-#endif
 #endif
 
 /* These are all the compile time options that affect binary compatibility.

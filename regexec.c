@@ -4197,7 +4197,12 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		PAD *old_comppad;
 		char *saved_regeol = PL_regeol;
 		struct re_save_state saved_state;
-
+		CODESEQ* codeseq;
+		PERL_CONTEXT *cx;
+		I32 gimme = G_SCALAR;
+		PMOP *newpm;
+		SV ** newsp;
+	    
 		/* To not corrupt the existing regex state while executing the
 		 * eval we would normally put it on the save stack, like with
 		 * save_re_context. However, re-evals have a weird scoping so we
@@ -4215,7 +4220,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		Copy(&PL_reg_state, &saved_state, 1, struct re_save_state);
 
 		n = ARG(scan);
-		PL_op = (OP_4tree*)rexi->data->data[n];
+		PL_op = (OP_4tree*)rexi->data->data[n+1];
 		DEBUG_STATE_r( PerlIO_printf(Perl_debug_log, 
 		    "  re_eval 0x%"UVxf"\n", PTR2UV(PL_op)) );
 		/* wrap the call in two SAVECOMPPADs. This ensures that
@@ -4225,6 +4230,15 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		 * are cleared in the right pad */
 		SAVECOMPPAD();
 		PAD_SAVE_LOCAL(old_comppad, (PAD*)rexi->data->data[n + 2]);
+
+		if(!rexi->data->data[n+3]) {
+		    codeseq = new_codeseq();
+		    rexi->data->data[n+3] = (void*)codeseq;
+		    compile_op(PL_op, codeseq);
+		}
+		else
+		    codeseq = (CODESEQ*)rexi->data->data[n+3];
+
 		PL_regoffs[0].end = PL_reg_magic->mg_len = locinput - PL_bostr;
 
                 if (sv_yes_mark) {
@@ -4232,7 +4246,13 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
                     sv_setsv(sv_mrk, sv_yes_mark);
                 }
 
-		CALLRUNOPS(aTHX);			/* Scalar context. */
+		PUSHBLOCK(cx, CXt_BLOCK, SP);
+
+		run_exec_codeseq(codeseq);
+
+		POPBLOCK(cx, newpm);
+		PL_curpm = newpm;
+
 		SPAGAIN;
 		if (SP == before)
 		    ret = &PL_sv_undef;   /* protect against empty (?{}) blocks. */

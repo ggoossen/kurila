@@ -6244,9 +6244,9 @@ S_curse(pTHX_ SV * const sv, const bool check_refcnt) {
 		&& !CvCONST(destructor)
 		/* Don't bother calling an empty destructor */
 		&& (CvISXSUB(destructor)
-		|| (CvSTART(destructor)
-		    && (CvSTART(destructor)->op_next->op_type
-					!= OP_LEAVESUB))))
+		|| (CvROOT(destructor)
+		    && (cUNOPx(CvROOT(destructor))->op_first->op_type
+					!= OP_NEXTSTATE))))
 	    {
 		SV* const tmpref = newRV(sv);
 		SvREADONLY_on(tmpref); /* DESTROY() could be naughty */
@@ -12039,6 +12039,7 @@ S_sv_dup_common(pTHX_ const SV *const sstr, CLONE_PARAMS *const param)
 		    CvWEAKOUTSIDE(sstr)
 		    ? cv_dup(    CvOUTSIDE(dstr), param)
 		    : cv_dup_inc(CvOUTSIDE(dstr), param);
+		CvCODESEQ(dstr) = NULL;
 		break;
 	    }
 	}
@@ -12126,11 +12127,17 @@ Perl_cx_dup(pTHX_ PERL_CONTEXT *cxs, I32 ix, I32 max, CLONE_PARAMS* param)
 						     param);
 		ncx->blk_sub.oldcomppad = (PAD*)ptr_table_fetch(PL_ptr_table,
 					   ncx->blk_sub.oldcomppad);
+		ncx->blk_sub.codeseq = codeseq_dup_inc( ncx->blk_sub.codeseq, param );
+		ncx->blk_sub.ret_instr = ncx->blk_sub.ret_instr;
 		break;
 	    case CXt_EVAL:
 		ncx->blk_eval.old_namesv = sv_dup_inc(ncx->blk_eval.old_namesv,
 						      param);
 		ncx->blk_eval.cur_text	= sv_dup(ncx->blk_eval.cur_text, param);
+		if (ncx->blk_eval.codeseq) {
+		    ncx->blk_eval.codeseq	= codeseq_dup_inc(ncx->blk_eval.codeseq, param);
+		}
+		ncx->blk_eval.ret_instr = ncx->blk_sub.ret_instr;
 		break;
 	    case CXt_LOOP_LAZYSV:
 		ncx->blk_loop.state_u.lazysv.end
@@ -12157,6 +12164,8 @@ Perl_cx_dup(pTHX_ PERL_CONTEXT *cxs, I32 ix, I32 max, CLONE_PARAMS* param)
 		}
 		break;
 	    case CXt_FORMAT:
+		ncx->blk_format.codeseq	= codeseq_dup_inc(ncx->blk_format.codeseq, param);
+		ncx->blk_format.ret_instr = ncx->blk_format.ret_instr;
 		ncx->blk_format.cv	= cv_dup(ncx->blk_format.cv, param);
 		ncx->blk_format.gv	= gv_dup(ncx->blk_format.gv, param);
 		ncx->blk_format.dfoutgv	= gv_dup_inc(ncx->blk_format.dfoutgv,
@@ -12834,9 +12843,7 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     /* internal state */
     PL_maxo		= proto_perl->Imaxo;
 
-    PL_main_start	= proto_perl->Imain_start;
     PL_eval_root	= proto_perl->Ieval_root;
-    PL_eval_start	= proto_perl->Ieval_start;
 
     PL_filemode		= proto_perl->Ifilemode;
     PL_lastfd		= proto_perl->Ilastfd;
@@ -13294,6 +13301,10 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 	 * NOTE: unlike the others! */
 	Newxz(PL_scopestack, PL_scopestack_max, I32);
 	Copy(proto_perl->Iscopestack, PL_scopestack, PL_scopestack_ix, I32);
+
+	if (proto_perl->Imain_cv && CvCODESEQ(proto_perl->Imain_cv)) {
+	    CvCODESEQ(PL_main_cv)	= codeseq_dup_inc(CvCODESEQ(proto_perl->Imain_cv), param);
+	}
 
 #ifdef DEBUGGING
 	Newxz(PL_scopestack_name, PL_scopestack_max, const char *);

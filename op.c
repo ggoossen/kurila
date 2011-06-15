@@ -1736,10 +1736,10 @@ Perl_op_lvalue_flags(pTHX_ OP *o, I32 type, U32 flags)
 	if (!(o->op_private & OPpCONST_ARYBASE))
 	    goto nomod;
 	localize = 0;
-	if (PL_eval_start && PL_eval_start->op_type == OP_CONST) {
+	if (PL_eval_root && PL_eval_root->op_type == OP_CONST) {
 	    CopARYBASE_set(&PL_compiling,
-			   (I32)SvIV(cSVOPx(PL_eval_start)->op_sv));
-	    PL_eval_start = 0;
+			   (I32)SvIV(cSVOPx(PL_eval_root)->op_sv));
+	    PL_eval_root = 0;
 	}
 	else if (!type) {
 	    SAVECOPARYBASE(&PL_compiling);
@@ -2761,6 +2761,7 @@ Perl_newPROG(pTHX_ OP *o)
 
     if (PL_in_eval) {
 	PERL_CONTEXT *cx;
+	OP* eval_start;
 	if (PL_eval_root)
 		return;
 	PL_eval_root = newUNOP(OP_LEAVEEVAL,
@@ -2780,15 +2781,16 @@ Perl_newPROG(pTHX_ OP *o)
 	/* don't use LINKLIST, since PL_eval_root might indirect through
 	 * a rather expensive function call and LINKLIST evaluates its
 	 * argument more than once */
-	PL_eval_start = op_linklist(PL_eval_root);
+	eval_start = op_linklist(PL_eval_root);
 	PL_eval_root->op_private |= OPpREFCOUNTED;
 	OpREFCNT_set(PL_eval_root, 1);
 	PL_eval_root->op_next = 0;
-	CALL_PEEP(PL_eval_start);
+	CALL_PEEP(eval_start);
 	finalize_optree(PL_eval_root);
-
+	PL_eval_root->op_next = eval_start;
     }
     else {
+	OP* main_start;
 	if (o->op_type == OP_STUB) {
 	    PL_comppad_name = 0;
 	    PL_compcv = 0;
@@ -2797,12 +2799,13 @@ Perl_newPROG(pTHX_ OP *o)
 	}
 	PL_main_root = op_scope(sawparens(scalarvoid(o)));
 	PL_curcop = &PL_compiling;
-	PL_main_start = LINKLIST(PL_main_root);
+	main_start = LINKLIST(PL_main_root);
 	PL_main_root->op_private |= OPpREFCOUNTED;
 	OpREFCNT_set(PL_main_root, 1);
 	PL_main_root->op_next = 0;
-	CALL_PEEP(PL_main_start);
+	CALL_PEEP(main_start);
 	finalize_optree(PL_main_root);
+	PL_main_root->op_next = main_start;
 	PL_compcv = 0;
 
 	/* Register with debugger */
@@ -5029,10 +5032,10 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 	PL_modcount = 0;
 	/* Grandfathering $[ assignment here.  Bletch.*/
 	/* Only simple assignments like C<< ($[) = 1 >> are allowed */
-	PL_eval_start = (left->op_type == OP_CONST) ? right : NULL;
+	PL_eval_root = (left->op_type == OP_CONST) ? right : NULL;
 	left = op_lvalue(left, OP_AASSIGN);
-	if (PL_eval_start)
-	    PL_eval_start = 0;
+	if (PL_eval_root)
+	    PL_eval_root = 0;
 	else if (left->op_type == OP_CONST) {
 	    deprecate("assignment to $[");
 	    /* FIXME for MAD */
@@ -5180,11 +5183,11 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 		scalar(right));
     }
     else {
-	PL_eval_start = right;	/* Grandfathering $[ assignment here.  Bletch.*/
+	PL_eval_root = right;	/* Grandfathering $[ assignment here.  Bletch.*/
 	o = newBINOP(OP_SASSIGN, flags,
 	    scalar(right), op_lvalue(scalar(left), OP_SASSIGN) );
-	if (PL_eval_start)
-	    PL_eval_start = 0;
+	if (PL_eval_root)
+	    PL_eval_root = 0;
 	else {
 	    if (!PL_madskills) { /* assignment to $[ is ignored when making a mad dump */
 		deprecate("assignment to $[");
@@ -6791,7 +6794,7 @@ S_process_special_blocks(pTHX_ const char *const fullname, GV *const gv,
 		return;
 	} else if (*name == 'C') {
 	    if (strEQ(name, "CHECK")) {
-		if (PL_main_start)
+		if (PL_main_root)
 		    Perl_ck_warner(aTHX_ packWARN(WARN_VOID),
 				   "Too late to run CHECK block");
 		Perl_av_create_and_unshift_one(aTHX_ &PL_checkav, MUTABLE_SV(cv));
@@ -6800,7 +6803,7 @@ S_process_special_blocks(pTHX_ const char *const fullname, GV *const gv,
 		return;
 	} else if (*name == 'I') {
 	    if (strEQ(name, "INIT")) {
-		if (PL_main_start)
+		if (PL_main_root)
 		    Perl_ck_warner(aTHX_ packWARN(WARN_VOID),
 				   "Too late to run INIT block");
 		Perl_av_create_and_push(aTHX_ &PL_initav, MUTABLE_SV(cv));

@@ -744,7 +744,6 @@ perl_destruct(pTHXx)
 	op_free(PL_main_root);
 	PL_main_root = NULL;
     }
-    PL_main_start = NULL;
     /* note that  PL_main_cv isn't usually actually freed at this point,
      * due to the CvOUTSIDE refs from subs compiled within it. It will
      * get freed once all the subs are freed in sv_clean_all(), for
@@ -1585,7 +1584,6 @@ perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 	op_free(PL_main_root);
 	PL_main_root = NULL;
     }
-    PL_main_start = NULL;
     SvREFCNT_dec(PL_main_cv);
     PL_main_cv = NULL;
 
@@ -2339,9 +2337,14 @@ S_run_body(pTHX_ I32 oldscope)
 	PL_restart_instr = 0;
 	CALLRUNOPS(aTHX);
     }
-    else if (PL_main_start) {
+    else if (PL_main_root) {
+	/* FIXME codeseq refcount */
 	CvDEPTH(PL_main_cv) = 1;
-	PL_op = PL_main_start;
+	if (! CvCODESEQ(PL_main_cv)) {
+	    CvCODESEQ(PL_main_cv) = new_codeseq();
+	    compile_op(PL_main_root, CvCODESEQ(PL_main_cv));
+	}
+	PL_op = codeseq_start_instruction(CvCODESEQ(PL_main_cv));
 	CALLRUNOPS(aTHX);
     }
     my_exit(0);

@@ -1539,9 +1539,13 @@ PP(pp_sort)
 	    }
 
 	    if (is_xsub)
-		PL_sortcop = (OP*)cv;
-	    else
-		PL_sortcop = CvSTART(cv);
+		PL_sortcop = (INSTRUCTION*)cv;
+	    else {
+		if (!CvCODESEQ(cv)) {
+		    compile_cv(cv);
+		}
+		PL_sortcop = codeseq_start_instruction(CvCODESEQ(cv));
+	    }
 	}
     }
     else {

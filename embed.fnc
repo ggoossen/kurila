@@ -1078,6 +1078,7 @@ Apmb	|void	|save_freesv	|NULLOK SV* sv
 : Used in SAVEFREOP(), used in op.c, pp_ctl.c
 Apmb	|void	|save_freeop	|NULLOK OP* o
 Apmb	|void	|save_freepv	|NULLOK char* pv
+pm	|void	|save_freecodeseq	|NULLOK CODESEQ* codeseq
 Ap	|void	|save_generic_svref|NN SV** sptr
 Ap	|void	|save_generic_pvref|NN char** str
 Ap	|void	|save_shared_pvref|NN char** str
@@ -2496,5 +2497,23 @@ op	|void	|populate_isa	|NN const char *name|STRLEN len|...
 
 : Used in keywords.c and toke.c
 op	|bool	|feature_is_enabled|NN const char *const name|STRLEN namelen
+
+Xp	|INSTRUCTION*	|codeseq_start_instruction|NN const CODESEQ* codeseq
+XEp	|void	|compile_op|NN OP* rootop|NN CODESEQ* codeseq
+XEp	|void	|compile_cv|NN CV* cv
+XEap	|CODESEQ*	|new_codeseq
+XEp	|void	|codeseq_refcnt_inc|NN CODESEQ* codeseq
+XEp	|void	|codeseq_refcnt_dec|NULLOK CODESEQ* codeseq
+#if defined(USE_ITHREADS)
+Ep	|CODESEQ*	|codeseq_dup|NN CODESEQ* codeseq|NN CLONE_PARAMS* param
+Ep	|CODESEQ*	|codeseq_dup_inc|NN CODESEQ* codeseq|NN CLONE_PARAMS* param
+#endif
+
+#if defined(PERL_IN_INSTRUCTION_C)
+s	|void	|free_codeseq|NULLOK CODESEQ* codeseq
+#endif
+
+Xp	|INSTRUCTION*	|run_get_next_instruction
+XEp	|void	|run_exec_codeseq|NN const CODESEQ* codeseq
 
 : ex: set ts=8 sts=4 sw=4 noet:

@@ -8,6 +8,7 @@ beos/beosish.h		BeOS port
 beos/nm.c		BeOS port
 cflags.SH		A script that emits C compilation flags per file
 Changes			Describe how to peruse changes between releases
+codegen.c			Code generation code
 config_h.SH		Produces config.h
 configpm		Produces lib/Config.pm
 Configure		Portability tool
@@ -3939,6 +3940,8 @@ installhtml			Perl script to install html files for pods
 install_lib.pl			functions shared between install* scripts
 installman			Perl script to install man pages for pods
 installperl			Perl script to do "make install" dirty work
+instruction.c			Instruction code
+instruction.h			Instruction header
 INTERN.h			Included before domestic .h files
 intrpvar.h			Variables held in each interpreter instance
 iperlsys.h			Perl's interface to the system

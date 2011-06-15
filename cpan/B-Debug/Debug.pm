@@ -5,7 +5,7 @@ our $VERSION = '1.16';
 use strict;
 require 5.006;
 use B qw(peekop class walkoptree walkoptree_exec
-         main_start main_root cstring sv_undef SVf_NOK SVf_IOK);
+         main_root cstring sv_undef SVf_NOK SVf_IOK);
 use Config;
 my (@optype, @specialsv_name);
 require B;

@@ -45,6 +45,26 @@ Perl_runops_standard(pTHX)
     return 0;
 }
 
+void
+Perl_run_exec_codeseq(pTHX_ const CODESEQ* codeseq)
+{
+    INSTRUCTION* old_instruction;
+    PERL_ARGS_ASSERT_RUN_EXEC_CODESEQ;
+    old_instruction = PL_op;
+    PL_op = codeseq_start_instruction(codeseq);
+
+    CALLRUNOPS(aTHX);
+
+    PL_op = old_instruction;
+}
+
+INSTRUCTION*
+Perl_run_get_next_instruction(pTHX)
+{
+    OP* nextop = PL_op->op_next;
+    return nextop;
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

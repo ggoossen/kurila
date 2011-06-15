@@ -59,6 +59,7 @@
 #define SAVEt_INT_SMALL		48
 #define SAVEt_GVSV		49
 #define SAVEt_FREECOPHH		50
+#define SAVEt_FREECODESEQ	51
 
 #define SAVEf_SETMAGIC		1
 #define SAVEf_KEEPOLDELEM	2
@@ -275,6 +276,7 @@ scope has the given name. Name must be a literal string.
 #define save_mortalizesv(op)	save_pushptr((void *)(op), SAVEt_MORTALIZESV)
 #define save_freeop(op)		save_pushptr((void *)(op), SAVEt_FREEOP)
 #define save_freepv(pv)		save_pushptr((void *)(pv), SAVEt_FREEPV)
+#define save_freecodeseq(codeseq)		save_pushptr((void *)(codeseq), SAVEt_FREECODESEQ)
 #define save_op()		save_pushptr((void *)(PL_op), SAVEt_OP)
 
 /*

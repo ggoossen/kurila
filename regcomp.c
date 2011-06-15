@@ -7169,10 +7169,11 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 		    OpREFCNT_set(sop, 1);
 		    LEAVE;
 
-		    n = add_data(pRExC_state, 3, "nop");
+		    n = add_data(pRExC_state, 4, "nopg");
 		    RExC_rxi->data->data[n] = (void*)rop;
 		    RExC_rxi->data->data[n+1] = (void*)sop;
 		    RExC_rxi->data->data[n+2] = (void*)pad;
+		    RExC_rxi->data->data[n+3] = NULL;
 		    SvREFCNT_dec(sv);
 		}
 		else {						/* First pass */
@@ -11811,6 +11812,9 @@ Perl_regfree_internal(pTHX_ REGEXP * const rx)
 	    case 'f':
 		Safefree(ri->data->data[n]);
 		break;
+	    case 'g':
+		codeseq_refcnt_dec((CODESEQ*)ri->data->data[n]);
+		break;
 	    case 'p':
 		new_comppad = MUTABLE_AV(ri->data->data[n]);
 		break;
@@ -12072,6 +12076,9 @@ Perl_regdupe_internal(pTHX_ REGEXP * const rx, CLONE_PARAMS *param)
 		/* Fall through */
 	    case 'n':
 		d->data[i] = ri->data->data[i];
+		break;
+	    case 'g':
+		d->data[i] = NULL;
 		break;
             default:
 		Perl_croak(aTHX_ "panic: re_dup unknown data code '%c'", ri->data->what[i]);

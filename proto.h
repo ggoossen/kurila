@@ -564,6 +564,28 @@ PERL_CALLCONV void	Perl_ck_warner_d(pTHX_ U32 err, const char* pat, ...)
 
 PERL_CALLCONV bool	Perl_ckwarn(pTHX_ U32 w);
 PERL_CALLCONV bool	Perl_ckwarn_d(pTHX_ U32 w);
+PERL_CALLCONV void	Perl_codeseq_refcnt_dec(pTHX_ CODESEQ* codeseq);
+PERL_CALLCONV void	Perl_codeseq_refcnt_inc(pTHX_ CODESEQ* codeseq)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_CODESEQ_REFCNT_INC	\
+	assert(codeseq)
+
+PERL_CALLCONV INSTRUCTION*	Perl_codeseq_start_instruction(pTHX_ const CODESEQ* codeseq)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_CODESEQ_START_INSTRUCTION	\
+	assert(codeseq)
+
+PERL_CALLCONV void	Perl_compile_cv(pTHX_ CV* cv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_COMPILE_CV	\
+	assert(cv)
+
+PERL_CALLCONV void	Perl_compile_op(pTHX_ OP* rootop, CODESEQ* codeseq)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_COMPILE_OP	\
+	assert(rootop); assert(codeseq)
+
 PERL_CALLCONV OP*	Perl_convert(pTHX_ I32 optype, I32 flags, OP* o)
 			__attribute__warn_unused_result__;
 
@@ -2695,6 +2717,10 @@ PERL_CALLCONV CV *	Perl_newXS_flags(pTHX_ const char *name, XSUBADDR_t subaddr, 
 #define PERL_ARGS_ASSERT_NEWXS_FLAGS	\
 	assert(subaddr); assert(filename)
 
+PERL_CALLCONV CODESEQ*	Perl_new_codeseq(pTHX)
+			__attribute__malloc__
+			__attribute__warn_unused_result__;
+
 PERL_CALLCONV void	Perl_new_collate(pTHX_ const char* newcoll);
 PERL_CALLCONV void	Perl_new_ctype(pTHX_ const char* newctype)
 			__attribute__nonnull__(pTHX_1);
@@ -3202,6 +3228,12 @@ PERL_CALLCONV int	Perl_rsignal_save(pTHX_ int i, Sighandler_t t1, Sigsave_t* sav
 	assert(save)
 
 PERL_CALLCONV Sighandler_t	Perl_rsignal_state(pTHX_ int i);
+PERL_CALLCONV void	Perl_run_exec_codeseq(pTHX_ const CODESEQ* codeseq)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_RUN_EXEC_CODESEQ	\
+	assert(codeseq)
+
+PERL_CALLCONV INSTRUCTION*	Perl_run_get_next_instruction(pTHX);
 PERL_CALLCONV int	Perl_runops_debug(pTHX);
 PERL_CALLCONV int	Perl_runops_standard(pTHX);
 PERL_CALLCONV CV*	Perl_rv2cv_op_cv(pTHX_ OP *cvop, U32 flags)
@@ -3291,6 +3323,7 @@ PERL_CALLCONV void	Perl_save_destructor(pTHX_ DESTRUCTORFUNC_NOCONTEXT_t f, void
 	assert(p)
 
 PERL_CALLCONV void	Perl_save_destructor_x(pTHX_ DESTRUCTORFUNC_t f, void* p);
+/* PERL_CALLCONV void	Perl_save_freecodeseq(pTHX_ CODESEQ* codeseq); */
 /* PERL_CALLCONV void	Perl_save_freeop(pTHX_ OP* o); */
 /* PERL_CALLCONV void	Perl_save_freepv(pTHX_ char* pv); */
 /* PERL_CALLCONV void	Perl_save_freesv(pTHX_ SV* sv); */
@@ -5414,6 +5447,9 @@ PERL_CALLCONV SV*	Perl_hfree_next_entry(pTHX_ HV *hv, STRLEN *indexp)
 	assert(hv); assert(indexp)
 
 #endif
+#if defined(PERL_IN_INSTRUCTION_C)
+STATIC void	S_free_codeseq(pTHX_ CODESEQ* codeseq);
+#endif
 #if defined(PERL_IN_LOCALE_C)
 #  if defined(USE_LOCALE_NUMERIC) || defined(USE_LOCALE_COLLATE)
 STATIC char*	S_stdize_locale(pTHX_ char* locs)
@@ -7134,6 +7170,18 @@ PERL_CALLCONV CLONE_PARAMS *	Perl_clone_params_new(PerlInterpreter *const from, 
 			__attribute__nonnull__(2);
 #define PERL_ARGS_ASSERT_CLONE_PARAMS_NEW	\
 	assert(from); assert(to)
+
+PERL_CALLCONV CODESEQ*	Perl_codeseq_dup(pTHX_ CODESEQ* codeseq, CLONE_PARAMS* param)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_CODESEQ_DUP	\
+	assert(codeseq); assert(param)
+
+PERL_CALLCONV CODESEQ*	Perl_codeseq_dup_inc(pTHX_ CODESEQ* codeseq, CLONE_PARAMS* param)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_CODESEQ_DUP_INC	\
+	assert(codeseq); assert(param)
 
 PERL_CALLCONV PERL_CONTEXT*	Perl_cx_dup(pTHX_ PERL_CONTEXT* cx, I32 ix, I32 max, CLONE_PARAMS* param)
 			__attribute__warn_unused_result__

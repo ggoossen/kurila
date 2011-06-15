@@ -619,11 +619,13 @@ DEL		= del
 MICROCORE_SRC	=		\
 		..\av.c		\
 		..\deb.c	\
+		..\codegen.c	\
 		..\doio.c	\
 		..\doop.c	\
 		..\dump.c	\
 		..\globals.c	\
 		..\gv.c		\
+		..\instruction.c		\
 		..\mro.c	\
 		..\hv.c		\
 		..\locale.c	\

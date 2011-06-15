@@ -713,11 +713,14 @@ sv_undef()
 
 void
 main_root()
-    ALIAS:
-	main_start = 1
     PPCODE:
-	PUSHs(make_op_object(aTHX_ ix ? PL_main_start : PL_main_root));
+	PUSHs(make_op_object(aTHX_ PL_main_root));
 
+void
+main_start()
+    PPCODE:
+	PUSHs(make_op_object(aTHX_ PL_main_root->op_next ? PL_main_root->op_next : NULL ));
+        
 UV
 sub_generation()
     ALIAS:

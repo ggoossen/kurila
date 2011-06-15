@@ -830,6 +830,10 @@
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define av_reify(a)		Perl_av_reify(aTHX_ a)
+#define codeseq_refcnt_dec(a)	Perl_codeseq_refcnt_dec(aTHX_ a)
+#define codeseq_refcnt_inc(a)	Perl_codeseq_refcnt_inc(aTHX_ a)
+#define compile_cv(a)		Perl_compile_cv(aTHX_ a)
+#define compile_op(a,b)		Perl_compile_op(aTHX_ a,b)
 #define is_utf8_X_L(a)		Perl_is_utf8_X_L(aTHX_ a)
 #define is_utf8_X_LV(a)		Perl_is_utf8_X_LV(aTHX_ a)
 #define is_utf8_X_LVT(a)	Perl_is_utf8_X_LVT(aTHX_ a)
@@ -840,6 +844,7 @@
 #define is_utf8_X_extend(a)	Perl_is_utf8_X_extend(aTHX_ a)
 #define is_utf8_X_non_hangul(a)	Perl_is_utf8_X_non_hangul(aTHX_ a)
 #define is_utf8_X_prepend(a)	Perl_is_utf8_X_prepend(aTHX_ a)
+#define new_codeseq()		Perl_new_codeseq(aTHX)
 #define op_clear(a)		Perl_op_clear(aTHX_ a)
 #define qerror(a)		Perl_qerror(aTHX_ a)
 #define reg_named_buff(a,b,c,d)	Perl_reg_named_buff(aTHX_ a,b,c,d)
@@ -851,6 +856,7 @@
 #define reg_temp_copy(a,b)	Perl_reg_temp_copy(aTHX_ a,b)
 #define regprop(a,b,c)		Perl_regprop(aTHX_ a,b,c)
 #define report_uninit(a)	Perl_report_uninit(aTHX_ a)
+#define run_exec_codeseq(a)	Perl_run_exec_codeseq(aTHX_ a)
 #define vivify_defelem(a)	Perl_vivify_defelem(aTHX_ a)
 #define yylex()			Perl_yylex(aTHX)
 #  if defined(DEBUGGING)
@@ -952,6 +958,10 @@
 #  if defined(PERL_OLD_COPY_ON_WRITE)
 #define sv_setsv_cow(a,b)	Perl_sv_setsv_cow(aTHX_ a,b)
 #  endif
+#  if defined(USE_ITHREADS)
+#define codeseq_dup(a,b)	Perl_codeseq_dup(aTHX_ a,b)
+#define codeseq_dup_inc(a,b)	Perl_codeseq_dup_inc(aTHX_ a,b)
+#  endif
 #endif
 #ifdef PERL_CORE
 #define allocmy(a,b,c)		Perl_allocmy(aTHX_ a,b,c)
@@ -1007,6 +1017,7 @@
 #define ck_substr(a)		Perl_ck_substr(aTHX_ a)
 #define ck_svconst(a)		Perl_ck_svconst(aTHX_ a)
 #define ck_trunc(a)		Perl_ck_trunc(aTHX_ a)
+#define codeseq_start_instruction(a)	Perl_codeseq_start_instruction(aTHX_ a)
 #define convert(a,b,c)		Perl_convert(aTHX_ a,b,c)
 #define core_prototype(a,b,c,d)	Perl_core_prototype(aTHX_ a,b,c,d)
 #define coresub_op(a,b,c)	Perl_coresub_op(aTHX_ a,b,c)
@@ -1144,6 +1155,7 @@
 #define rpeep(a)		Perl_rpeep(aTHX_ a)
 #define rsignal_restore(a,b)	Perl_rsignal_restore(aTHX_ a,b)
 #define rsignal_save(a,b,c)	Perl_rsignal_save(aTHX_ a,b,c)
+#define run_get_next_instruction()	Perl_run_get_next_instruction(aTHX)
 #define rxres_save(a,b)		Perl_rxres_save(aTHX_ a,b)
 #define sawparens(a)		Perl_sawparens(aTHX_ a)
 #define scalar(a)		Perl_scalar(aTHX_ a)
@@ -1310,6 +1322,9 @@
 #define save_hek_flags		S_save_hek_flags
 #define share_hek_flags(a,b,c,d)	S_share_hek_flags(aTHX_ a,b,c,d)
 #define unshare_hek_or_pvn(a,b,c,d)	S_unshare_hek_or_pvn(aTHX_ a,b,c,d)
+#  endif
+#  if defined(PERL_IN_INSTRUCTION_C)
+#define free_codeseq(a)		S_free_codeseq(aTHX_ a)
 #  endif
 #  if defined(PERL_IN_LOCALE_C)
 #    if defined(USE_LOCALE_NUMERIC) || defined(USE_LOCALE_COLLATE)

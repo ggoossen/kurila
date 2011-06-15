@@ -2062,13 +2062,16 @@ PP(pp_dbstate)
 	    return NORMAL;
 	}
 	else {
+	    if (!CvCODESEQ(cv)) {
+		compile_cv(cv);
+	    }
 	    PUSHBLOCK(cx, CXt_SUB, SP);
 	    PUSHSUB_DB(cx);
 	    cx->blk_sub.ret_instr = PL_op->op_next;
 	    CvDEPTH(cv)++;
 	    SAVECOMPPAD();
 	    PAD_SET_CUR_NOSAVE(CvPADLIST(cv), 1);
-	    RETURNINSTR(CvSTART(cv));
+	    RETURNINSTR(codeseq_start_instruction(CvCODESEQ(cv)));
 	}
     }
     else
@@ -2874,6 +2877,7 @@ PP(pp_goto)
 	    if (CxTYPE(cx) == CXt_SUB &&
 		!(CvDEPTH(cx->blk_sub.cv) = cx->blk_sub.olddepth))
 		SvREFCNT_dec(cx->blk_sub.cv);
+	    codeseq_refcnt_dec(cx->blk_sub.codeseq);
 	    oldsave = PL_scopestack[PL_scopestack_ix - 1];
 	    LEAVE_SCOPE(oldsave);
 
@@ -2906,6 +2910,11 @@ PP(pp_goto)
 		    PL_eval_root = cx->blk_eval.old_eval_root;
 		    cx->cx_type = CXt_SUB;
 		}
+		if (!CvCODESEQ(cv)) {
+		    compile_cv(cv);
+		}
+		codeseq_refcnt_inc(CvCODESEQ(cv));
+		cx->blk_sub.codeseq = CvCODESEQ(cv);
 		cx->blk_sub.cv = cv;
 		cx->blk_sub.olddepth = CvDEPTH(cv);
 
@@ -2967,7 +2976,7 @@ PP(pp_goto)
 			}
 		    }
 		}
-		RETURNINSTR(CvSTART(cv));
+		RETURNINSTR(codeseq_start_instruction(CvCODESEQ(cv)));
 	    }
 	}
 	else {
@@ -3347,7 +3356,7 @@ Perl_sv_compile_2op_is_broken(pTHX_ SV *sv, OP **startop, const char *code,
     PERL_UNUSED_VAR(newsp);
     PERL_UNUSED_VAR(optype);
 
-    return PL_eval_start;
+    return PL_main_root;
 }
 
 
@@ -3582,9 +3591,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     }
 
     if (PL_unitcheckav) {
-	INSTRUCTION *es = PL_eval_start;
 	call_list(PL_scopestack_ix, PL_unitcheckav);
-	PL_eval_start = es;
     }
 
     /* compiled okay, so do it */
@@ -4062,10 +4069,14 @@ PP(pp_require)
     encoding = PL_encoding;
     PL_encoding = NULL;
 
-    if (doeval(gimme, NULL, NULL, PL_curcop->cop_seq))
-	next_instr = DOCATCH(PL_eval_start);
+    if (doeval(gimme, NULL, NULL, PL_curcop->cop_seq)) {
+	CODESEQ* codeseq = new_codeseq();
+	cx->blk_eval.codeseq = codeseq;
+	compile_op(PL_eval_root, codeseq);
+	next_instr = DOCATCH(codeseq_start_instruction(codeseq));
+    }
     else
-	next_instr = PL_op->op_next;
+	next_instr = run_get_next_instruction();
 
     /* Restore encoding. */
     PL_encoding = encoding;
@@ -4173,7 +4184,7 @@ PP(pp_entereval)
 
     PUSHBLOCK(cx, (CXt_EVAL|CXp_REAL), SP);
     PUSHEVAL(cx, 0);
-    cx->blk_eval.ret_instr = PL_op->op_next;
+    cx->blk_eval.ret_instr = run_get_next_instruction();
 
     /* prepare to compile string */
 
@@ -4188,6 +4199,7 @@ PP(pp_entereval)
     PUTBACK;
 
     if (doeval(gimme, NULL, runcv, seq)) {
+	CODESEQ* codeseq;
 	if (was != PL_breakable_sub_gen /* Some subs defined here. */
 	    ? (PERLDB_LINE || PERLDB_SAVESRC)
 	    :  PERLDB_SAVESRC_NOSUBS) {
@@ -4196,7 +4208,10 @@ PP(pp_entereval)
 	    char *const safestr = savepvn(tmpbuf, len);
 	    SAVEDELETE(PL_defstash, safestr, len);
 	}
-	return DOCATCH(PL_eval_start);
+	codeseq = new_codeseq();
+	cx->blk_eval.codeseq = codeseq;
+	compile_op(PL_eval_root, codeseq);
+	return DOCATCH(codeseq_start_instruction(codeseq));
     } else {
 	/* We have already left the scope set up earlier thanks to the LEAVE
 	   in doeval().  */

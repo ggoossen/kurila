@@ -511,6 +511,7 @@ typedef U16 cv_flags_t;
     U32		xcv_outside_seq; /* the COP sequence (at the point of our	\
 				  * compilation) in the lexically enclosing	\
 				  * sub */					\
+    CODESEQ *	xcv_codeseq;							\
     cv_flags_t	xcv_flags
 
 struct xpvfm {

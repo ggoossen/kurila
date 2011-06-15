@@ -1311,13 +1311,17 @@ S_doform(pTHX_ CV *cv, GV *gv, INSTRUCTION *ret_instr)
     ENTER;
     SAVETMPS;
 
+    if(!CvCODESEQ(cv)) {
+	compile_cv(cv);
+    }
     PUSHBLOCK(cx, CXt_FORMAT, PL_stack_sp);
     PUSHFORMAT(cx, ret_instr);
     SAVECOMPPAD();
     PAD_SET_CUR_NOSAVE(CvPADLIST(cv), 1);
 
     setdefout(gv);	    /* locally select filehandle so $% et al work */
-    return CvSTART(cv);
+
+    return codeseq_start_instruction(CvCODESEQ(cv));
 }
 
 PP(pp_enterwrite)

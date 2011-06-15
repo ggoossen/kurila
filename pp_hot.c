@@ -2659,7 +2659,7 @@ try_autoload:
              cv = GvCV(PL_DBsub);
          }
 
-	if (!cv || (!CvXSUB(cv) && !CvSTART(cv)))
+	if (!cv || (!CvXSUB(cv) && !CvROOT(cv)))
 	    DIE(aTHX_ "No DB::sub routine defined");
     }
 
@@ -2668,6 +2668,11 @@ try_autoload:
 	dMARK;
 	register I32 items = SP - MARK;
 	AV* const padlist = CvPADLIST(cv);
+	if (!CvCODESEQ(cv)) {
+	    PUTBACK;
+	    compile_cv(cv);
+	    SPAGAIN;
+	}
 	PUSHBLOCK(cx, CXt_SUB, MARK);
 	PUSHSUB(cx);
 	cx->blk_sub.ret_instr = PL_op->op_next;
@@ -2727,7 +2732,7 @@ try_autoload:
 	if (CvDEPTH(cv) == PERL_SUB_DEPTH_WARN && ckWARN(WARN_RECURSION)
 	    && !(PERLDB_SUB && cv == GvCV(PL_DBsub)))
 	    sub_crush_depth(cv);
-	RETURNINSTR(CvSTART(cv));
+	RETURNINSTR(codeseq_start_instruction(CvCODESEQ(cv)));
     }
     else {
 	I32 markix = TOPMARK;
