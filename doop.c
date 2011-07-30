@@ -1219,7 +1219,7 @@ finish:
     SvTAINT(sv);
 }
 
-OP *
+INSTRUCTION *
 Perl_do_kv(pTHX)
 {
     dVAR;

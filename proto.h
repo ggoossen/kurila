@@ -709,10 +709,10 @@ PERL_CALLCONV char*	Perl_delimcpy(char* to, const char* toend, const char* from,
 	assert(to); assert(toend); assert(from); assert(fromend); assert(retlen)
 
 PERL_CALLCONV void	Perl_despatch_signals(pTHX);
-PERL_CALLCONV OP*	Perl_die(pTHX_ const char* pat, ...)
+PERL_CALLCONV INSTRUCTION*	Perl_die(pTHX_ const char* pat, ...)
 			__attribute__format__null_ok__(__printf__,pTHX_1,pTHX_2);
 
-PERL_CALLCONV OP*	Perl_die_sv(pTHX_ SV *baseex)
+PERL_CALLCONV INSTRUCTION*	Perl_die_sv(pTHX_ SV *baseex)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_DIE_SV	\
 	assert(baseex)
@@ -825,7 +825,7 @@ PERL_CALLCONV bool	Perl_do_print(pTHX_ SV* sv, PerlIO* fp)
 #define PERL_ARGS_ASSERT_DO_PRINT	\
 	assert(fp)
 
-PERL_CALLCONV OP*	Perl_do_readline(pTHX)
+PERL_CALLCONV INSTRUCTION*	Perl_do_readline(pTHX)
 			__attribute__warn_unused_result__;
 
 PERL_CALLCONV bool	Perl_do_seek(pTHX_ GV* gv, Off_t pos, int whence);
@@ -4239,7 +4239,7 @@ PERL_CALLCONV void	Perl_taint_proper(pTHX_ const char* f, const char *const s)
 #define PERL_ARGS_ASSERT_TAINT_PROPER	\
 	assert(s)
 
-PERL_CALLCONV OP *	Perl_tied_method(pTHX_ const char *const methname, SV **sp, SV *const sv, const MAGIC *const mg, const U32 flags, U32 argc, ...)
+PERL_CALLCONV INSTRUCTION *	Perl_tied_method(pTHX_ const char *const methname, SV **sp, SV *const sv, const MAGIC *const mg, const U32 flags, U32 argc, ...)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3)
@@ -5070,7 +5070,7 @@ PERL_CALLCONV void	Perl_deb_nocontext(const char* pat, ...)
 #define PERL_ARGS_ASSERT_DEB_NOCONTEXT	\
 	assert(pat)
 
-PERL_CALLCONV OP*	Perl_die_nocontext(const char* pat, ...)
+PERL_CALLCONV INSTRUCTION*	Perl_die_nocontext(const char* pat, ...)
 			__attribute__format__null_ok__(__printf__,1,2);
 
 PERL_CALLCONV char*	Perl_form_nocontext(const char* pat, ...)
@@ -5731,7 +5731,7 @@ STATIC void	S_do_chomp(pTHX_ SV *retval, SV *sv, bool chomping)
 #define PERL_ARGS_ASSERT_DO_CHOMP	\
 	assert(retval); assert(sv)
 
-STATIC OP*	S_do_delete_local(pTHX);
+STATIC INSTRUCTION*	S_do_delete_local(pTHX);
 STATIC SV*	S_refto(pTHX_ SV* sv)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
@@ -5768,8 +5768,8 @@ STATIC void	S_destroy_matcher(pTHX_ PMOP* matcher)
 #define PERL_ARGS_ASSERT_DESTROY_MATCHER	\
 	assert(matcher)
 
-STATIC OP*	S_do_smartmatch(pTHX_ HV* seen_this, HV* seen_other);
-STATIC OP*	S_docatch(pTHX_ OP *o)
+STATIC INSTRUCTION*	S_do_smartmatch(pTHX_ HV* seen_this, HV* seen_other);
+STATIC INSTRUCTION*	S_docatch(pTHX_ INSTRUCTION *instr)
 			__attribute__warn_unused_result__;
 
 STATIC bool	S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq);
@@ -6016,12 +6016,12 @@ STATIC I32	S_sv_ncmp(pTHX_ SV *const a, SV *const b)
 
 #endif
 #if defined(PERL_IN_PP_SYS_C)
-STATIC OP*	S_doform(pTHX_ CV *cv, GV *gv, OP *retop)
+STATIC INSTRUCTION*	S_doform(pTHX_ CV *cv, GV *gv, INSTRUCTION *ret_instr)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 #define PERL_ARGS_ASSERT_DOFORM	\
-	assert(cv); assert(gv); assert(retop)
+	assert(cv); assert(gv); assert(ret_instr)
 
 STATIC SV *	S_space_join_names_mortal(pTHX_ char *const *array)
 			__attribute__nonnull__(pTHX_1);

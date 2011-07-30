@@ -8,7 +8,7 @@
  *
  */
 
-#define PP(s) OP * Perl_##s(pTHX)
+#define PP(s) INSTRUCTION * Perl_##s(pTHX)
 
 /*
 =head1 Stack Manipulation Macros
@@ -119,7 +119,7 @@ Pops a long off the stack.
 
 #define PUTBACK		PL_stack_sp = sp
 #define RETURN		return (PUTBACK, NORMAL)
-#define RETURNOP(o)	return (PUTBACK, o)
+#define RETURNINSTR(o)	return (PUTBACK, o)
 #define RETURNX(x)	return (x, PUTBACK, NORMAL)
 
 #define POPs		(*sp--)

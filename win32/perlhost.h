@@ -1778,10 +1778,10 @@ restart:
 	    status = STATUS_EXIT;
 	    break;
 	case 3:
-	    if (PL_restartop) {
+	    if (PL_restart_instr) {
 		POPSTACK_TO(PL_mainstack);
-		PL_op = PL_restartop;
-		PL_restartop = (OP*)NULL;
+		PL_op = PL_restart_instr;
+		PL_restart_instr = (OP*)NULL;
 		goto restart;
 	    }
 	    PerlIO_printf(Perl_error_log, "panic: restartop\n");

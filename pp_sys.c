@@ -357,7 +357,7 @@ PP(pp_backtick)
 PP(pp_glob)
 {
     dVAR;
-    OP *result;
+    INSTRUCTION *result;
     dSP;
     /* make a copy of the pattern, to ensure that magic is called once
      * and only once */
@@ -507,7 +507,7 @@ PP(pp_die)
 
 /* I/O. */
 
-OP *
+INSTRUCTION *
 Perl_tied_method(pTHX_ const char *const methname, SV **sp, SV *const sv,
 		 const MAGIC *const mg, const U32 flags, U32 argc, ...)
 {
@@ -1296,8 +1296,8 @@ PP(pp_getc)
     RETURN;
 }
 
-STATIC OP *
-S_doform(pTHX_ CV *cv, GV *gv, OP *retop)
+STATIC INSTRUCTION *
+S_doform(pTHX_ CV *cv, GV *gv, INSTRUCTION *ret_instr)
 {
     dVAR;
     register PERL_CONTEXT *cx;
@@ -1312,7 +1312,7 @@ S_doform(pTHX_ CV *cv, GV *gv, OP *retop)
     SAVETMPS;
 
     PUSHBLOCK(cx, CXt_FORMAT, PL_stack_sp);
-    PUSHFORMAT(cx, retop);
+    PUSHFORMAT(cx, ret_instr);
     SAVECOMPPAD();
     PAD_SET_CUR_NOSAVE(CvPADLIST(cv), 1);
 
@@ -1377,7 +1377,7 @@ PP(pp_leavewrite)
     SV **newsp;
     I32 gimme;
     register PERL_CONTEXT *cx;
-    OP *retop;
+    INSTRUCTION *ret_instr;
 
     if (!io || !(ofp = IoOFP(io)))
         goto forget_top;
@@ -1458,7 +1458,7 @@ PP(pp_leavewrite)
   forget_top:
     POPBLOCK(cx,PL_curpm);
     POPFORMAT(cx);
-    retop = cx->blk_sub.retop;
+    ret_instr = cx->blk_sub.ret_instr;
     LEAVE;
 
     fp = IoOFP(io);
@@ -1489,7 +1489,7 @@ PP(pp_leavewrite)
     PUTBACK;
     PERL_UNUSED_VAR(newsp);
     PERL_UNUSED_VAR(gimme);
-    return retop;
+    return ret_instr;
 }
 
 PP(pp_prtf)

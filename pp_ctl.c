@@ -382,7 +382,7 @@ PP(pp_substcont)
 	    TAINT_NOT;
 	    LEAVE_SCOPE(cx->sb_oldsave);
 	    POPSUBST(cx);
-	    RETURNOP(pm->op_next);
+	    RETURNINSTR(pm->op_next);
 	    /* NOTREACHED */
 	}
 	cx->sb_iters = saviters;
@@ -440,7 +440,7 @@ PP(pp_substcont)
     }
     rxres_save(&cx->sb_rxres, rx);
     PL_curpm = pm;
-    RETURNOP(pm->op_pmstashstartu.op_pmreplstart);
+    RETURNINSTR(pm->op_pmstashstartu.op_pmreplstart);
 }
 
 void
@@ -1041,7 +1041,7 @@ PP(pp_formline)
 	    FmLINES(PL_formtarget) += lines;
 	    SP = ORIGMARK;
 	    if (fpc[-1] == FF_BLANK)
-		RETURNOP(cLISTOP->op_first);
+		RETURNINSTR(cLISTOP->op_first);
 	    else
 		RETPUSHYES;
 	}
@@ -1057,7 +1057,7 @@ PP(pp_grepstart)
 	(void)POPMARK;
 	if (GIMME_V == G_SCALAR)
 	    mXPUSHi(0);
-	RETURNOP(PL_op->op_next->op_next);
+	RETURNINSTR(PL_op->op_next->op_next);
     }
     PL_stack_sp = PL_stack_base + *PL_markstack_ptr + 1;
     Perl_pp_pushmark(aTHX);				/* push dst */
@@ -1227,7 +1227,7 @@ PP(pp_mapwhile)
 	else
 	    DEFSV_set(src);
 
-	RETURNOP(cLOGOP->op_other);
+	RETURNINSTR(cLOGOP->op_other);
     }
 }
 
@@ -1250,7 +1250,7 @@ PP(pp_flip)
     dSP;
 
     if (GIMME == G_ARRAY) {
-	RETURNOP(((LOGOP*)cUNOP->op_first)->op_other);
+	RETURNINSTR(((LOGOP*)cUNOP->op_first)->op_other);
     }
     else {
 	dTOPss;
@@ -1279,7 +1279,7 @@ PP(pp_flip)
 	    else {
 		sv_setiv(targ, 0);
 		SP--;
-		RETURNOP(((LOGOP*)cUNOP->op_first)->op_other);
+		RETURNINSTR(((LOGOP*)cUNOP->op_first)->op_other);
 	    }
 	}
 	sv_setpvs(TARG, "");
@@ -1731,7 +1731,7 @@ Perl_die_unwind(pTHX_ SV *msv)
 	    SV **newsp;
 	    COP *oldcop;
 	    JMPENV *restartjmpenv;
-	    OP *restartop;
+	    INSTRUCTION *restart_instr;
 
 	    if (cxix < cxstack_ix)
 		dounwind(cxix);
@@ -1748,7 +1748,7 @@ Perl_die_unwind(pTHX_ SV *msv)
 	    namesv = cx->blk_eval.old_namesv;
 	    oldcop = cx->blk_oldcop;
 	    restartjmpenv = cx->blk_eval.cur_top_env;
-	    restartop = cx->blk_eval.retop;
+	    restart_instr = cx->blk_eval.ret_instr;
 
 	    if (gimme == G_SCALAR)
 		*++newsp = &PL_sv_undef;
@@ -1782,7 +1782,7 @@ Perl_die_unwind(pTHX_ SV *msv)
 		sv_setsv(ERRSV, exceptsv);
 	    }
 	    PL_restartjmpenv = restartjmpenv;
-	    PL_restartop = restartop;
+	    PL_restart_instr = restart_instr;
 	    JMPENV_JUMP(3);
 	    /* NOTREACHED */
 	}
@@ -2064,11 +2064,11 @@ PP(pp_dbstate)
 	else {
 	    PUSHBLOCK(cx, CXt_SUB, SP);
 	    PUSHSUB_DB(cx);
-	    cx->blk_sub.retop = PL_op->op_next;
+	    cx->blk_sub.ret_instr = PL_op->op_next;
 	    CvDEPTH(cv)++;
 	    SAVECOMPPAD();
 	    PAD_SET_CUR_NOSAVE(CvPADLIST(cv), 1);
-	    RETURNOP(CvSTART(cv));
+	    RETURNINSTR(CvSTART(cv));
 	}
     }
     else
@@ -2424,7 +2424,7 @@ PP(pp_return)
     I32 optype = 0;
     SV *namesv;
     SV *sv;
-    OP *retop = NULL;
+    INSTRUCTION *ret_instr = NULL;
 
     const I32 cxix = dopoptosub(cxstack_ix);
 
@@ -2459,7 +2459,7 @@ PP(pp_return)
     case CXt_SUB:
 	popsub2 = TRUE;
 	lval = !!CvLVALUE(cx->blk_sub.cv);
-	retop = cx->blk_sub.retop;
+	ret_instr = cx->blk_sub.ret_instr;
 	cxstack_ix++; /* preserve cx entry on stack for use by POPSUB */
 	break;
     case CXt_EVAL:
@@ -2467,7 +2467,7 @@ PP(pp_return)
 	    clear_errsv = TRUE;
 	POPEVAL(cx);
 	namesv = cx->blk_eval.old_namesv;
-	retop = cx->blk_eval.retop;
+	ret_instr = cx->blk_eval.ret_instr;
 	if (CxTRYBLOCK(cx))
 	    break;
 	if (optype == OP_REQUIRE &&
@@ -2482,7 +2482,7 @@ PP(pp_return)
 	break;
     case CXt_FORMAT:
 	POPFORMAT(cx);
-	retop = cx->blk_sub.retop;
+	ret_instr = cx->blk_sub.ret_instr;
 	break;
     default:
 	DIE(aTHX_ "panic: return");
@@ -2543,7 +2543,7 @@ PP(pp_return)
     if (clear_errsv) {
 	CLEAR_ERRSV();
     }
-    return retop;
+    return ret_instr;
 }
 
 /* This duplicates parts of pp_leavesub, so that it can share code with
@@ -2573,7 +2573,7 @@ PP(pp_leavesublv)
     PL_curpm = newpm;	/* ... and pop $1 et al */
 
     LEAVESUB(sv);
-    return cx->blk_sub.retop;
+    return cx->blk_sub.ret_instr;
 }
 
 PP(pp_last)
@@ -2584,7 +2584,7 @@ PP(pp_last)
     I32 pop2 = 0;
     I32 gimme;
     I32 optype;
-    OP *nextop = NULL;
+    INSTRUCTION *next_instr = NULL;
     SV **newsp;
     PMOP *newpm;
     SV **mark;
@@ -2614,19 +2614,19 @@ PP(pp_last)
     case CXt_LOOP_PLAIN:
 	pop2 = CxTYPE(cx);
 	newsp = PL_stack_base + cx->blk_loop.resetsp;
-	nextop = cx->blk_loop.my_op->op_lastop->op_next;
+	next_instr = cx->blk_loop.my_op->op_lastop->op_next;
 	break;
     case CXt_SUB:
 	pop2 = CXt_SUB;
-	nextop = cx->blk_sub.retop;
+	next_instr = cx->blk_sub.ret_instr;
 	break;
     case CXt_EVAL:
 	POPEVAL(cx);
-	nextop = cx->blk_eval.retop;
+	next_instr = cx->blk_eval.ret_instr;
 	break;
     case CXt_FORMAT:
 	POPFORMAT(cx);
-	nextop = cx->blk_sub.retop;
+	next_instr = cx->blk_sub.ret_instr;
 	break;
     default:
 	DIE(aTHX_ "panic: last");
@@ -2657,7 +2657,7 @@ PP(pp_last)
     LEAVESUB(sv);
     PERL_UNUSED_VAR(optype);
     PERL_UNUSED_VAR(gimme);
-    return nextop;
+    return next_instr;
 }
 
 PP(pp_next)
@@ -2696,7 +2696,7 @@ PP(pp_redo)
     I32 cxix;
     register PERL_CONTEXT *cx;
     I32 oldsave;
-    OP* redo_op;
+    INSTRUCTION* redo_instr;
 
     if (PL_op->op_flags & OPf_SPECIAL) {
 	cxix = dopoptoloop(cxstack_ix);
@@ -2711,12 +2711,12 @@ PP(pp_redo)
     if (cxix < cxstack_ix)
 	dounwind(cxix);
 
-    redo_op = cxstack[cxix].blk_loop.my_op->op_redoop;
-    if (redo_op->op_type == OP_ENTER) {
+    redo_instr = cxstack[cxix].blk_loop.my_op->op_redoop;
+    if (redo_instr->op_type == OP_ENTER) {
 	/* pop one less context to avoid $x being freed in while (my $x..) */
 	cxstack_ix++;
 	assert(CxTYPE(&cxstack[cxstack_ix]) == CXt_BLOCK);
-	redo_op = redo_op->op_next;
+	redo_instr = redo_instr->op_next;
     }
 
     TOPBLOCK(cx);
@@ -2724,7 +2724,7 @@ PP(pp_redo)
     LEAVE_SCOPE(oldsave);
     FREETMPS;
     PL_curcop = cx->blk_oldcop;
-    return redo_op;
+    return redo_instr;
 }
 
 STATIC OP *
@@ -2881,7 +2881,7 @@ PP(pp_goto)
 	    SAVETMPS;
 	    SAVEFREESV(cv); /* later, undo the 'avoid premature free' hack */
 	    if (CvISXSUB(cv)) {
-		OP* const retop = cx->blk_sub.retop;
+		INSTRUCTION* const ret_instr = cx->blk_sub.ret_instr;
 		SV **newsp __attribute__unused__;
 		I32 gimme __attribute__unused__;
 		if (reified) {
@@ -2897,7 +2897,7 @@ PP(pp_goto)
 		PUTBACK;
 		(void)(*CvXSUB(cv))(aTHX_ cv);
 		LEAVE;
-		return retop;
+		return ret_instr;
 	    }
 	    else {
 		AV* const padlist = CvPADLIST(cv);
@@ -2967,7 +2967,7 @@ PP(pp_goto)
 			}
 		    }
 		}
-		RETURNOP(CvSTART(cv));
+		RETURNINSTR(CvSTART(cv));
 	    }
 	}
 	else {
@@ -3088,16 +3088,16 @@ PP(pp_goto)
 #ifdef VMS
 	if (!retop) retop = PL_main_start;
 #endif
-	PL_restartop = retop;
+	PL_restart_instr = retop;
 	PL_do_undump = TRUE;
 
 	my_unexec();
 
-	PL_restartop = 0;		/* hmm, must be GNU unexec().. */
+	PL_restart_instr = NULL;		/* hmm, must be GNU unexec().. */
 	PL_do_undump = FALSE;
     }
 
-    RETURNOP(retop);
+    RETURNINSTR(retop);
 }
 
 PP(pp_exit)
@@ -3172,18 +3172,18 @@ establish a local jmpenv to handle exception traps.
 
 =cut
 */
-STATIC OP *
-S_docatch(pTHX_ OP *o)
+STATIC INSTRUCTION *
+S_docatch(pTHX_ INSTRUCTION *instr)
 {
     dVAR;
     int ret;
-    OP * const oldop = PL_op;
+    OP * const old_instr = PL_op;
     dJMPENV;
 
 #ifdef DEBUGGING
     assert(CATCH_GET == TRUE);
 #endif
-    PL_op = o;
+    PL_op = instr;
 
     JMPENV_PUSH(ret);
     switch (ret) {
@@ -3196,21 +3196,21 @@ S_docatch(pTHX_ OP *o)
 	break;
     case 3:
 	/* die caught by an inner eval - continue inner loop */
-	if (PL_restartop && PL_restartjmpenv == PL_top_env) {
+	if (PL_restart_instr && PL_restartjmpenv == PL_top_env) {
 	    PL_restartjmpenv = NULL;
-	    PL_op = PL_restartop;
-	    PL_restartop = 0;
+	    PL_op = PL_restart_instr;
+	    PL_restart_instr = 0;
 	    goto redo_body;
 	}
 	/* FALL THROUGH */
     default:
 	JMPENV_POP;
-	PL_op = oldop;
+	PL_op = old_instr;
 	JMPENV_JUMP(ret);
 	/* NOTREACHED */
     }
     JMPENV_POP;
-    PL_op = oldop;
+    PL_op = old_instr;
     return NULL;
 }
 
@@ -3582,7 +3582,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     }
 
     if (PL_unitcheckav) {
-	OP *es = PL_eval_start;
+	INSTRUCTION *es = PL_eval_start;
 	call_list(PL_scopestack_ix, PL_unitcheckav);
 	PL_eval_start = es;
     }
@@ -3665,7 +3665,7 @@ PP(pp_require)
     SV *filter_sub = NULL;
     SV *hook_sv = NULL;
     SV *encoding;
-    OP *op;
+    INSTRUCTION *next_instr;
 
     sv = POPs;
     if ( (SvNIOKp(sv) || SvVOK(sv)) && PL_op->op_type != OP_DOFILE) {
@@ -4051,7 +4051,7 @@ PP(pp_require)
     /* switch to eval mode */
     PUSHBLOCK(cx, CXt_EVAL, SP);
     PUSHEVAL(cx, name);
-    cx->blk_eval.retop = PL_op->op_next;
+    cx->blk_eval.ret_instr = PL_op->op_next;
 
     SAVECOPLINE(&PL_compiling);
     CopLINE_set(&PL_compiling, 0);
@@ -4063,14 +4063,14 @@ PP(pp_require)
     PL_encoding = NULL;
 
     if (doeval(gimme, NULL, NULL, PL_curcop->cop_seq))
-	op = DOCATCH(PL_eval_start);
+	next_instr = DOCATCH(PL_eval_start);
     else
-	op = PL_op->op_next;
+	next_instr = PL_op->op_next;
 
     /* Restore encoding. */
     PL_encoding = encoding;
 
-    return op;
+    return next_instr;
 }
 
 /* This is a op added to hold the hints hash for
@@ -4173,7 +4173,7 @@ PP(pp_entereval)
 
     PUSHBLOCK(cx, (CXt_EVAL|CXp_REAL), SP);
     PUSHEVAL(cx, 0);
-    cx->blk_eval.retop = PL_op->op_next;
+    cx->blk_eval.ret_instr = PL_op->op_next;
 
     /* prepare to compile string */
 
@@ -4218,7 +4218,7 @@ PP(pp_leaveeval)
     PMOP *newpm;
     I32 gimme;
     register PERL_CONTEXT *cx;
-    OP *retop;
+    INSTRUCTION *ret_instr;
     const U8 save_flags = PL_op -> op_flags;
     I32 optype;
     SV *namesv;
@@ -4227,7 +4227,7 @@ PP(pp_leaveeval)
     POPBLOCK(cx,newpm);
     POPEVAL(cx);
     namesv = cx->blk_eval.old_namesv;
-    retop = cx->blk_eval.retop;
+    ret_instr = cx->blk_eval.ret_instr;
 
     TAINT_NOT;
     SP = adjust_stack_on_leave((gimme == G_VOID) ? SP : newsp, SP, newsp,
@@ -4246,7 +4246,7 @@ PP(pp_leaveeval)
 	(void)hv_delete(GvHVn(PL_incgv),
 			SvPVX_const(namesv), SvCUR(namesv),
 			G_DISCARD);
-	retop = Perl_die(aTHX_ "%"SVf" did not return a true value",
+	ret_instr = Perl_die(aTHX_ "%"SVf" did not return a true value",
 			       SVfARG(namesv));
 	/* die_unwind() did LEAVE, or we won't be here */
     }
@@ -4257,7 +4257,7 @@ PP(pp_leaveeval)
 	}
     }
 
-    RETURNOP(retop);
+    RETURNINSTR(ret_instr);
 }
 
 /* Common code for Perl_call_sv and Perl_fold_constants, put here to keep it
@@ -4309,7 +4309,7 @@ PP(pp_entertry)
 {
     dVAR;
     PERL_CONTEXT * const cx = create_eval_scope(0);
-    cx->blk_eval.retop = cLOGOP->op_other->op_next;
+    cx->blk_eval.ret_instr = cLOGOP->op_other->op_next;
     return DOCATCH(PL_op->op_next);
 }
 
@@ -4429,7 +4429,7 @@ PP(pp_smartmatch)
 /* This version of do_smartmatch() implements the
  * table of smart matches that is found in perlsyn.
  */
-STATIC OP *
+STATIC INSTRUCTION *
 S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 {
     dVAR;
@@ -4912,10 +4912,10 @@ PP(pp_enterwhen)
        fails, we don't want to push a context and then
        pop it again right away, so we skip straight
        to the op that follows the leavewhen.
-       RETURNOP calls PUTBACK which restores the stack pointer after the POPs.
+       RETURNINSTR calls PUTBACK which restores the stack pointer after the POPs.
     */
     if ((0 == (PL_op->op_flags & OPf_SPECIAL)) && !SvTRUEx(POPs))
-	RETURNOP(cLOGOP->op_other->op_next);
+	RETURNINSTR(cLOGOP->op_other->op_next);
 
     ENTER_with_name("when");
     SAVETMPS;
@@ -4965,7 +4965,7 @@ PP(pp_leavewhen)
 	return cx->blk_loop.my_op->op_nextop;
     }
     else
-	RETURNOP(cx->blk_givwhen.leave_op);
+	RETURNINSTR(cx->blk_givwhen.leave_instr);
 }
 
 PP(pp_continue)
@@ -4993,7 +4993,7 @@ PP(pp_continue)
     PL_curpm = newpm;   /* pop $1 et al */
 
     LEAVE_with_name("when");
-    RETURNOP(cx->blk_givwhen.leave_op->op_next);
+    RETURNINSTR(cx->blk_givwhen.leave_instr->op_next);
 }
 
 PP(pp_break)
@@ -5016,7 +5016,7 @@ PP(pp_break)
     /* Restore the sp at the time we entered the given block */
     TOPBLOCK(cx);
 
-    return cx->blk_givwhen.leave_op;
+    return cx->blk_givwhen.leave_instr;
 }
 
 static MAGIC *

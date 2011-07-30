@@ -188,9 +188,9 @@ cleanup still occurs during an C<exit>.
 
 If a C<die> can find a C<CxEVAL> block on the context stack, then the
 stack is popped to that level and the return op in that block is
-assigned to C<PL_restartop>; then a C<JMPENV_JUMP(3)> is performed.
+assigned to C<PL_restart_instr>; then a C<JMPENV_JUMP(3)> is performed.
 This normally passes control back to the guard. In the case of
-C<perl_run> and C<call_sv>, a non-null C<PL_restartop> triggers
+C<perl_run> and C<call_sv>, a non-null C<PL_restart_instr> triggers
 re-entry to the runops loop. The is the normal way that C<die> or
 C<croak> is handled within an C<eval>.
 
@@ -252,15 +252,15 @@ and the context and data stacks, as shown by C<-Dstv>, look like:
     STACK 0: MAIN
       CX 0: BLOCK  =>
       CX 1: EVAL   => AV()  PV("A"\0)
-      retop=leave
+      ret_instr=leave
     STACK 1: MAGIC
       CX 0: SUB    =>
-      retop=(null)
+      ret_instr=(null)
       CX 1: EVAL   => *
-    retop=nextstate
+    ret_instr=nextstate
 
 The die pops the first C<CxEVAL> off the context stack, sets
-C<PL_restartop> from it, does a C<JMPENV_JUMP(3)>, and control returns
+C<PL_restart_instr> from it, does a C<JMPENV_JUMP(3)>, and control returns
 to the top C<docatch>. This then starts another third-level runops
 level, which executes the nextstate, pushmark and die ops on line 4. At
 the point that the second C<pp_die> is called, the C call stack looks
@@ -271,10 +271,10 @@ the context stack now looks like this, ie with the top CxEVAL popped:
     STACK 0: MAIN
       CX 0: BLOCK  =>
       CX 1: EVAL   => AV()  PV("A"\0)
-      retop=leave
+      ret_instr=leave
     STACK 1: MAGIC
       CX 0: SUB    =>
-      retop=(null)
+      ret_instr=(null)
 
 The die on line 4 pops the context stack back down to the CxEVAL,
 leaving it as:
@@ -282,7 +282,7 @@ leaving it as:
     STACK 0: MAIN
       CX 0: BLOCK  =>
 
-As usual, C<PL_restartop> is extracted from the C<CxEVAL>, and a
+As usual, C<PL_restart_instr> is extracted from the C<CxEVAL>, and a
 C<JMPENV_JUMP(3)> done, which pops the C stack back to the docatch:
 
     S_docatch
@@ -303,7 +303,7 @@ and the C stack unwinds to:
     perl_run
     main
 
-Because C<PL_restartop> is non-null, C<run_body> starts a new runops
+Because C<PL_restart_instr> is non-null, C<run_body> starts a new runops
 loop and execution continues.
 
 =head2 INTERNAL VARIABLE TYPES

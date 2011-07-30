@@ -1594,16 +1594,16 @@ S_invoke_exception_hook(pTHX_ SV *ex, bool warn)
 }
 
 /*
-=for apidoc Am|OP *|die_sv|SV *baseex
+=for apidoc Am|INSTRUCTION *|die_sv|SV *baseex
 
 Behaves the same as L</croak_sv>, except for the return type.
-It should be used only where the C<OP *> return type is required.
+It should be used only where the C<INSTRUCTION *> return type is required.
 The function never actually returns.
 
 =cut
 */
 
-OP *
+INSTRUCTION *
 Perl_die_sv(pTHX_ SV *baseex)
 {
     PERL_ARGS_ASSERT_DIE_SV;
@@ -1613,17 +1613,17 @@ Perl_die_sv(pTHX_ SV *baseex)
 }
 
 /*
-=for apidoc Am|OP *|die|const char *pat|...
+=for apidoc Am|INSTRUCTION *|die|const char *pat|...
 
 Behaves the same as L</croak>, except for the return type.
-It should be used only where the C<OP *> return type is required.
+It should be used only where the C<INSTRUCTION *> return type is required.
 The function never actually returns.
 
 =cut
 */
 
 #if defined(PERL_IMPLICIT_CONTEXT)
-OP *
+INSTRUCTION *
 Perl_die_nocontext(const char* pat, ...)
 {
     dTHX;
@@ -1636,7 +1636,7 @@ Perl_die_nocontext(const char* pat, ...)
 }
 #endif /* PERL_IMPLICIT_CONTEXT */
 
-OP *
+INSTRUCTION *
 Perl_die(pTHX_ const char* pat, ...)
 {
     va_list args;

@@ -2419,6 +2419,8 @@ typedef struct loop LOOP;
 typedef struct block_hooks BHK;
 typedef struct custom_op XOP;
 
+typedef struct op INSTRUCTION;
+
 typedef struct interpreter PerlInterpreter;
 
 /* Amdahl's <ksync.h> has struct sv */
@@ -4169,7 +4171,7 @@ struct perl_memory_debug_header {
 typedef int (*runops_proc_t)(pTHX);
 typedef void (*share_proc_t) (pTHX_ SV *sv);
 typedef int  (*thrhook_proc_t) (pTHX);
-typedef OP* (*PPADDR_t[]) (pTHX);
+typedef INSTRUCTION* (*PPADDR_t[]) (pTHX);
 typedef bool (*destroyable_proc_t) (pTHX_ SV *sv);
 typedef void (*despatch_signals_proc_t) (pTHX);
 
@@ -4899,7 +4901,7 @@ typedef void (*XSINIT_t) (pTHX);
 typedef void (*ATEXIT_t) (pTHX_ void*);
 typedef void (*XSUBADDR_t) (pTHX_ CV *);
 
-typedef OP* (*Perl_ppaddr_t)(pTHX);
+typedef INSTRUCTION* (*Perl_ppaddr_t)(pTHX);
 typedef OP* (*Perl_check_t) (pTHX_ OP*);
 typedef void(*Perl_ophook_t)(pTHX_ OP*);
 typedef int (*Perl_keyword_plugin_t)(pTHX_ char*, STRLEN, OP**);
@@ -5014,7 +5016,7 @@ struct tempsym; /* defined in pp_pack.c */
 #undef PERL_CKDEF
 #undef PERL_PPDEF
 #define PERL_CKDEF(s)	PERL_CALLCONV OP *s (pTHX_ OP *o);
-#define PERL_PPDEF(s)	PERL_CALLCONV OP *s (pTHX);
+#define PERL_PPDEF(s)	PERL_CALLCONV INSTRUCTION *s (pTHX);
 
 #ifdef MYMALLOC
 #  include "malloc_ctl.h"

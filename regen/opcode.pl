@@ -451,7 +451,7 @@ my $pp = open_new('pp_proto.h', '>',
 	my $name = $alias{$_} ? $alias{$_}[0] : "Perl_pp_$_";
 	++$funcs{$name};
     }
-    print $pp "PERL_CALLCONV OP *$_(pTHX);\n" foreach sort keys %funcs;
+    print $pp "PERL_CALLCONV INSTRUCTION *$_(pTHX);\n" foreach sort keys %funcs;
 }
 foreach ($oc, $on, $pp) {
     read_only_bottom_close_and_rename($_);

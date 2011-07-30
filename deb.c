@@ -302,10 +302,10 @@ Perl_deb_stack_all(pTHX)
 		if (CxTYPE(cx) == CXt_EVAL || CxTYPE(cx) == CXt_SUB
 			|| CxTYPE(cx) == CXt_FORMAT)
 		{
-		    const OP * const retop = cx->blk_sub.retop;
+		    const INSTRUCTION * const ret_instr = cx->blk_sub.ret_instr;
 
-		    PerlIO_printf(Perl_debug_log, "  retop=%s\n",
-			    retop ? OP_NAME(retop) : "(null)"
+		    PerlIO_printf(Perl_debug_log, "  ret_instr=%s\n",
+			    ret_instr ? OP_NAME(ret_instr) : "(null)"
 		    );
 		}
 	    }

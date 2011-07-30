@@ -54,7 +54,7 @@ typedef PERL_BITFIELD16 Optype;
 #define BASEOP				\
     OP*		op_next;		\
     OP*		op_sibling;		\
-    OP*		(*op_ppaddr)(pTHX);	\
+    INSTRUCTION*		(*op_ppaddr)(pTHX);	\
     MADPROP_IN_BASEOP			\
     PADOFFSET	op_targ;		\
     PERL_BITFIELD16 op_type:9;		\

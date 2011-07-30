@@ -127,7 +127,7 @@ PP(pp_padhv)
     }
     gimme = GIMME_V;
     if (gimme == G_ARRAY) {
-	RETURNOP(Perl_do_kv(aTHX));
+	RETURNINSTR(Perl_do_kv(aTHX));
     }
     else if (gimme == G_SCALAR) {
 	SV* const sv = Perl_hv_scalar(aTHX_ MUTABLE_HV(TARG));
@@ -4587,7 +4587,7 @@ PP(pp_each)
     RETURN;
 }
 
-STATIC OP *
+STATIC INSTRUCTION *
 S_do_delete_local(pTHX)
 {
     dVAR;
@@ -5911,9 +5911,9 @@ PP(pp_once)
     if (SvPADSTALE(sv)) {
 	/* First time. */
 	SvPADSTALE_off(sv);
-	RETURNOP(cLOGOP->op_other);
+	RETURNINSTR(cLOGOP->op_other);
     }
-    RETURNOP(cLOGOP->op_next);
+    RETURNINSTR(cLOGOP->op_next);
 }
 
 PP(pp_lock)

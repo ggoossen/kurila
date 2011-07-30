@@ -590,7 +590,7 @@ be zero.
 
 /* subroutine context */
 struct block_sub {
-    OP *	retop;	/* op to execute on exit from sub */
+    INSTRUCTION *	ret_instr;	/* instruction to execute on exit from sub */
     /* Above here is the same for sub, format and eval.  */
     CV *	cv;
     /* Above here is the same for sub and format.  */
@@ -603,7 +603,7 @@ struct block_sub {
 
 /* format context */
 struct block_format {
-    OP *	retop;	/* op to execute on exit from sub */
+    INSTRUCTION *	ret_instr;	/* instruction to execute on exit from sub */
     /* Above here is the same for sub, format and eval.  */
     CV *	cv;
     /* Above here is the same for sub and format.  */
@@ -624,7 +624,7 @@ struct block_format {
 	cx->blk_sub.cv = cv;						\
 	cx->blk_sub.olddepth = CvDEPTH(cv);				\
 	cx->cx_type |= (hasargs) ? CXp_HASARGS : 0;			\
-	cx->blk_sub.retop = NULL;					\
+	cx->blk_sub.ret_instr = NULL;					\
 	if (!CvDEPTH(cv)) {						\
 	    SvREFCNT_inc_simple_void_NN(cv);				\
 	    SvREFCNT_inc_simple_void_NN(cv);				\
@@ -652,10 +652,10 @@ struct block_format {
 	cx->blk_u16 = 0;
 
 
-#define PUSHFORMAT(cx, retop)						\
+#define PUSHFORMAT(cx, ret_instr)						\
 	cx->blk_format.cv = cv;						\
 	cx->blk_format.gv = gv;						\
-	cx->blk_format.retop = (retop);					\
+	cx->blk_format.ret_instr = (ret_instr);					\
 	cx->blk_format.dfoutgv = PL_defoutgv;				\
 	SvREFCNT_inc_void(cx->blk_format.dfoutgv)
 
@@ -713,7 +713,7 @@ struct block_format {
 
 /* eval context */
 struct block_eval {
-    OP *	retop;	/* op to execute on exit from eval */
+    INSTRUCTION *	ret_instr;	/* instruction to execute on exit from eval */
     /* Above here is the same for sub, format and eval.  */
     SV *	old_namesv;
     OP *	old_eval_root;
@@ -738,7 +738,7 @@ struct block_eval {
 	cx->blk_eval.old_eval_root = PL_eval_root;			\
 	cx->blk_eval.cur_text = PL_parser ? PL_parser->linestr : NULL;	\
 	cx->blk_eval.cv = NULL; /* set by doeval(), as applicable */	\
-	cx->blk_eval.retop = NULL;					\
+	cx->blk_eval.ret_instr = NULL;					\
 	cx->blk_eval.cur_top_env = PL_top_env; 				\
     } STMT_END
 
@@ -818,11 +818,11 @@ struct block_loop {
 
 /* given/when context */
 struct block_givwhen {
-	OP *leave_op;
+	INSTRUCTION *leave_instr;
 };
 
 #define PUSHGIVEN(cx)							\
-	cx->blk_givwhen.leave_op = cLOGOP->op_other;
+	cx->blk_givwhen.leave_instr = cLOGOP->op_other;
 
 #define PUSHWHEN PUSHGIVEN
 
@@ -1203,7 +1203,7 @@ See L<perlcall/LIGHTWEIGHT CALLBACKS>.
     SV **newsp;			/* set by POPBLOCK */			\
     PERL_CONTEXT *cx;							\
     CV *multicall_cv;							\
-    OP *multicall_cop;							\
+    INSTRUCTION *multicall_instr;					\
     bool multicall_oldcatch; 						\
     U8 hasargs = 0		/* used by PUSHSUB */
 
@@ -1226,12 +1226,12 @@ See L<perlcall/LIGHTWEIGHT CALLBACKS>.
 	SAVECOMPPAD();							\
 	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));			\
 	multicall_cv = cv;						\
-	multicall_cop = CvSTART(cv);					\
+	multicall_instr = CvSTART(cv);					\
     } STMT_END
 
 #define MULTICALL \
     STMT_START {							\
-	PL_op = multicall_cop;						\
+	PL_op = multicall_instr;					\
 	CALLRUNOPS(aTHX);						\
     } STMT_END
 

@@ -540,7 +540,7 @@ THX_run_cleanup(pTHX_ void *cleanup_code_ref)
     LEAVE;
 }
 
-STATIC OP *
+STATIC INSTRUCTION *
 THX_pp_establish_cleanup(pTHX)
 {
     dSP;
@@ -1030,7 +1030,7 @@ static int my_keyword_plugin(pTHX_
 
 static XOP my_xop;
 
-static OP *
+static INSTRUCTION *
 pp_xop(pTHX)
 {
     return PL_op->op_next;

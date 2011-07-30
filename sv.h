@@ -497,7 +497,7 @@ typedef U16 cv_flags_t;
 #define _XPVCV_COMMON								\
     HV *	xcv_stash;							\
     union {									\
-	OP *	xcv_start;							\
+	INSTRUCTION *	xcv_start;							\
 	ANY	xcv_xsubany;							\
     }		xcv_start_u;					    		\
     union {									\

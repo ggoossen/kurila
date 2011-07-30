@@ -12974,7 +12974,7 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_chopset		= proto_perl->Ichopset;	/* XXX never deallocated */
 
     PL_restartjmpenv	= proto_perl->Irestartjmpenv;
-    PL_restartop	= proto_perl->Irestartop;
+    PL_restart_instr	= proto_perl->Irestart_instr;
     PL_in_eval		= proto_perl->Iin_eval;
     PL_delaymagic	= proto_perl->Idelaymagic;
     PL_phase		= proto_perl->Iphase;
@@ -13332,7 +13332,7 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 
     PL_errors		= sv_dup_inc(proto_perl->Ierrors, param);
 
-    PL_sortcop		= (OP*)any_dup(proto_perl->Isortcop, proto_perl);
+    PL_sortcop		= (INSTRUCTION*)any_dup(proto_perl->Isortcop, proto_perl);
     PL_sortstash	= hv_dup(proto_perl->Isortstash, param);
     PL_firstgv		= gv_dup(proto_perl->Ifirstgv, param);
     PL_secondgv		= gv_dup(proto_perl->Isecondgv, param);
