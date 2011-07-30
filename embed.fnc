@@ -174,8 +174,8 @@ npR	|MEM_SIZE|malloc_good_size	|size_t nbytes
 AnpR	|void*	|get_context
 Anp	|void	|set_context	|NN void *t
 
-XEop	|bool	|try_amagic_bin	|int method|int flags
-XEop	|bool	|try_amagic_un	|int method|int flags
+XEop	|bool	|try_amagic_bin	|int method|int flags|NULLOK SV* targ
+XEop	|bool	|try_amagic_un	|int method|int flags|NULLOK SV* targ
 Ap	|SV*	|amagic_call	|NN SV* left|NN SV* right|int method|int dir
 Ap	|SV *	|amagic_deref_call|NN SV *ref|int method
 Ap	|int	|Gv_AMupdate	|NN HV* stash|bool destructing

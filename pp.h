@@ -414,14 +414,14 @@ Does not use C<TARG>.  See also C<XPUSHu>, C<mPUSHu> and C<PUSHu>.
 
 /* do SvGETMAGIC on the stack args before checking for overload */
 
-#define tryAMAGICun_MG(method, flags) STMT_START { \
+#define tryAMAGICun_MG(method, flags, targ) STMT_START {	\
 	if ( (SvFLAGS(TOPs) & (SVf_ROK|SVs_GMG)) \
-		&& Perl_try_amagic_un(aTHX_ method, flags)) \
+	        && Perl_try_amagic_un(aTHX_ method, flags, targ))	\
 	    return NORMAL; \
     } STMT_END
-#define tryAMAGICbin_MG(method, flags) STMT_START { \
+#define tryAMAGICbin_MG(method, flags, targ) STMT_START {		   \
 	if ( ((SvFLAGS(TOPm1s)|SvFLAGS(TOPs)) & (SVf_ROK|SVs_GMG)) \
-		&& Perl_try_amagic_bin(aTHX_ method, flags)) \
+	        && Perl_try_amagic_bin(aTHX_ method, flags, targ))	   \
 	    return NORMAL; \
     } STMT_END
 

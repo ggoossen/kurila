@@ -1140,7 +1140,7 @@ PP(pp_pow)
 #ifdef PERL_PRESERVE_IVUV
     bool is_int = 0;
 #endif
-    tryAMAGICbin_MG(pow_amg, AMGf_assign|AMGf_numeric);
+    tryAMAGICbin_MG(pow_amg, AMGf_assign|AMGf_numeric, TARG);
     svr = TOPs;
     svl = TOPm1s;
 #ifdef PERL_PRESERVE_IVUV
@@ -1310,7 +1310,7 @@ PP(pp_pow)
 PP(pp_multiply)
 {
     dVAR; dSP; dATARGET; SV *svl, *svr;
-    tryAMAGICbin_MG(mult_amg, AMGf_assign|AMGf_numeric);
+    tryAMAGICbin_MG(mult_amg, AMGf_assign|AMGf_numeric, TARG);
     svr = TOPs;
     svl = TOPm1s;
 #ifdef PERL_PRESERVE_IVUV
@@ -1434,7 +1434,7 @@ PP(pp_multiply)
 PP(pp_divide)
 {
     dVAR; dSP; dATARGET; SV *svl, *svr;
-    tryAMAGICbin_MG(div_amg, AMGf_assign|AMGf_numeric);
+    tryAMAGICbin_MG(div_amg, AMGf_assign|AMGf_numeric, TARG);
     svr = TOPs;
     svl = TOPm1s;
     /* Only try to do UV divide first
@@ -1558,7 +1558,7 @@ PP(pp_divide)
 PP(pp_modulo)
 {
     dVAR; dSP; dATARGET;
-    tryAMAGICbin_MG(modulo_amg, AMGf_assign|AMGf_numeric);
+    tryAMAGICbin_MG(modulo_amg, AMGf_assign|AMGf_numeric, TARG);
     {
 	UV left  = 0;
 	UV right = 0;
@@ -1698,7 +1698,7 @@ PP(pp_repeat)
 	SvGETMAGIC(sv);
     }
     else {
-	tryAMAGICbin_MG(repeat_amg, AMGf_assign);
+	tryAMAGICbin_MG(repeat_amg, AMGf_assign, TARG);
 	sv = POPs;
     }
 
@@ -1824,7 +1824,7 @@ PP(pp_repeat)
 PP(pp_subtract)
 {
     dVAR; dSP; dATARGET; bool useleft; SV *svl, *svr;
-    tryAMAGICbin_MG(subtr_amg, AMGf_assign|AMGf_numeric);
+    tryAMAGICbin_MG(subtr_amg, AMGf_assign|AMGf_numeric, TARG);
     svr = TOPs;
     svl = TOPm1s;
     useleft = USE_LEFT(svl);
@@ -1945,7 +1945,7 @@ PP(pp_subtract)
 PP(pp_left_shift)
 {
     dVAR; dSP; dATARGET; SV *svl, *svr;
-    tryAMAGICbin_MG(lshift_amg, AMGf_assign|AMGf_numeric);
+    tryAMAGICbin_MG(lshift_amg, AMGf_assign|AMGf_numeric, TARG);
     svr = POPs;
     svl = TOPs;
     {
@@ -1965,7 +1965,7 @@ PP(pp_left_shift)
 PP(pp_right_shift)
 {
     dVAR; dSP; dATARGET; SV *svl, *svr;
-    tryAMAGICbin_MG(rshift_amg, AMGf_assign|AMGf_numeric);
+    tryAMAGICbin_MG(rshift_amg, AMGf_assign|AMGf_numeric, TARG);
     svr = POPs;
     svl = TOPs;
     {
@@ -1987,7 +1987,7 @@ PP(pp_lt)
     dVAR; dSP;
     SV *left, *right;
 
-    tryAMAGICbin_MG(lt_amg, AMGf_set|AMGf_numeric);
+    tryAMAGICbin_MG(lt_amg, AMGf_set|AMGf_numeric, NULL);
     right = POPs;
     left  = TOPs;
     SETs(boolSV(
@@ -2003,7 +2003,7 @@ PP(pp_gt)
     dVAR; dSP;
     SV *left, *right;
 
-    tryAMAGICbin_MG(gt_amg, AMGf_set|AMGf_numeric);
+    tryAMAGICbin_MG(gt_amg, AMGf_set|AMGf_numeric, NULL);
     right = POPs;
     left  = TOPs;
     SETs(boolSV(
@@ -2019,7 +2019,7 @@ PP(pp_le)
     dVAR; dSP;
     SV *left, *right;
 
-    tryAMAGICbin_MG(le_amg, AMGf_set|AMGf_numeric);
+    tryAMAGICbin_MG(le_amg, AMGf_set|AMGf_numeric, NULL);
     right = POPs;
     left  = TOPs;
     SETs(boolSV(
@@ -2035,7 +2035,7 @@ PP(pp_ge)
     dVAR; dSP;
     SV *left, *right;
 
-    tryAMAGICbin_MG(ge_amg, AMGf_set|AMGf_numeric);
+    tryAMAGICbin_MG(ge_amg, AMGf_set|AMGf_numeric, NULL);
     right = POPs;
     left  = TOPs;
     SETs(boolSV(
@@ -2051,7 +2051,7 @@ PP(pp_ne)
     dVAR; dSP;
     SV *left, *right;
 
-    tryAMAGICbin_MG(ne_amg, AMGf_set|AMGf_numeric);
+    tryAMAGICbin_MG(ne_amg, AMGf_set|AMGf_numeric, NULL);
     right = POPs;
     left  = TOPs;
     SETs(boolSV(
@@ -2145,7 +2145,8 @@ PP(pp_ncmp)
     dVAR; dSP;
     SV *left, *right;
     I32 value;
-    tryAMAGICbin_MG(ncmp_amg, AMGf_numeric);
+    dTARGET;
+    tryAMAGICbin_MG(ncmp_amg, AMGf_numeric, TARG);
     right = POPs;
     left  = TOPs;
     value = do_ncmp(left, right);
@@ -2153,7 +2154,6 @@ PP(pp_ncmp)
 	SETs(&PL_sv_undef);
     }
     else {
-	dTARGET;
 	SETi(value);
     }
     RETURN;
@@ -2186,7 +2186,7 @@ PP(pp_sle)
 	break;
     }
 
-    tryAMAGICbin_MG(amg_type, AMGf_set);
+    tryAMAGICbin_MG(amg_type, AMGf_set, NULL);
     {
       dPOPTOPssrl;
       const int cmp = (IN_LOCALE_RUNTIME
@@ -2200,7 +2200,7 @@ PP(pp_sle)
 PP(pp_seq)
 {
     dVAR; dSP;
-    tryAMAGICbin_MG(seq_amg, AMGf_set);
+    tryAMAGICbin_MG(seq_amg, AMGf_set, NULL);
     {
       dPOPTOPssrl;
       SETs(boolSV(sv_eq_flags(left, right, 0)));
@@ -2211,7 +2211,7 @@ PP(pp_seq)
 PP(pp_sne)
 {
     dVAR; dSP;
-    tryAMAGICbin_MG(sne_amg, AMGf_set);
+    tryAMAGICbin_MG(sne_amg, AMGf_set, NULL);
     {
       dPOPTOPssrl;
       SETs(boolSV(!sv_eq_flags(left, right, 0)));
@@ -2222,7 +2222,7 @@ PP(pp_sne)
 PP(pp_scmp)
 {
     dVAR; dSP; dTARGET;
-    tryAMAGICbin_MG(scmp_amg, 0);
+    tryAMAGICbin_MG(scmp_amg, 0, TARG);
     {
       dPOPTOPssrl;
       const int cmp = (IN_LOCALE_RUNTIME
@@ -2236,7 +2236,7 @@ PP(pp_scmp)
 PP(pp_bit_and)
 {
     dVAR; dSP; dATARGET;
-    tryAMAGICbin_MG(band_amg, AMGf_assign);
+    tryAMAGICbin_MG(band_amg, AMGf_assign, TARG);
     {
       dPOPTOPssrl;
       if (SvNIOKp(left) || SvNIOKp(right)) {
@@ -2266,7 +2266,7 @@ PP(pp_bit_or)
     dVAR; dSP; dATARGET;
     const int op_type = PL_op->op_type;
 
-    tryAMAGICbin_MG((op_type == OP_BIT_OR ? bor_amg : bxor_amg), AMGf_assign);
+    tryAMAGICbin_MG((op_type == OP_BIT_OR ? bor_amg : bxor_amg), AMGf_assign, TARG);
     {
       dPOPTOPssrl;
       if (SvNIOKp(left) || SvNIOKp(right)) {
@@ -2298,7 +2298,7 @@ PP(pp_bit_or)
 PP(pp_negate)
 {
     dVAR; dSP; dTARGET;
-    tryAMAGICun_MG(neg_amg, AMGf_numeric);
+    tryAMAGICun_MG(neg_amg, AMGf_numeric, TARG);
     {
 	SV * const sv = TOPs;
 	const int flags = SvFLAGS(sv);
@@ -2373,7 +2373,7 @@ PP(pp_negate)
 PP(pp_not)
 {
     dVAR; dSP;
-    tryAMAGICun_MG(not_amg, AMGf_set);
+    tryAMAGICun_MG(not_amg, AMGf_set, NULL);
     *PL_stack_sp = boolSV(!SvTRUE_nomg(*PL_stack_sp));
     return NORMAL;
 }
@@ -2381,7 +2381,7 @@ PP(pp_not)
 PP(pp_complement)
 {
     dVAR; dSP; dTARGET;
-    tryAMAGICun_MG(compl_amg, AMGf_numeric);
+    tryAMAGICun_MG(compl_amg, AMGf_numeric, TARG);
     {
       dTOPss;
       if (SvNIOKp(sv)) {
@@ -2483,7 +2483,7 @@ PP(pp_complement)
 PP(pp_i_multiply)
 {
     dVAR; dSP; dATARGET;
-    tryAMAGICbin_MG(mult_amg, AMGf_assign);
+    tryAMAGICbin_MG(mult_amg, AMGf_assign, TARG);
     {
       dPOPTOPiirl_nomg;
       SETi( left * right );
@@ -2495,7 +2495,7 @@ PP(pp_i_divide)
 {
     IV num;
     dVAR; dSP; dATARGET;
-    tryAMAGICbin_MG(div_amg, AMGf_assign);
+    tryAMAGICbin_MG(div_amg, AMGf_assign, TARG);
     {
       dPOPTOPssrl;
       IV value = SvIV_nomg(right);
@@ -2522,7 +2522,7 @@ PP(pp_i_modulo)
 {
      /* This is the vanilla old i_modulo. */
      dVAR; dSP; dATARGET;
-     tryAMAGICbin_MG(modulo_amg, AMGf_assign);
+     tryAMAGICbin_MG(modulo_amg, AMGf_assign, TARG);
      {
 	  dPOPTOPiirl_nomg;
 	  if (!right)
@@ -2545,7 +2545,7 @@ PP(pp_i_modulo_1)
       * in (at least) glibc 2.2.5 (the PERL_ABS() the workaround).
       * See below for pp_i_modulo. */
      dVAR; dSP; dATARGET;
-     tryAMAGICbin_MG(modulo_amg, AMGf_assign);
+     tryAMAGICbin_MG(modulo_amg, AMGf_assign, TARG);
      {
 	  dPOPTOPiirl_nomg;
 	  if (!right)
@@ -2562,7 +2562,7 @@ PP(pp_i_modulo_1)
 PP(pp_i_modulo)
 {
      dVAR; dSP; dATARGET;
-     tryAMAGICbin_MG(modulo_amg, AMGf_assign);
+     tryAMAGICbin_MG(modulo_amg, AMGf_assign, TARG);
      {
 	  dPOPTOPiirl_nomg;
 	  if (!right)
@@ -2606,7 +2606,7 @@ PP(pp_i_modulo)
 PP(pp_i_add)
 {
     dVAR; dSP; dATARGET;
-    tryAMAGICbin_MG(add_amg, AMGf_assign);
+    tryAMAGICbin_MG(add_amg, AMGf_assign, TARG);
     {
       dPOPTOPiirl_ul_nomg;
       SETi( left + right );
@@ -2617,7 +2617,7 @@ PP(pp_i_add)
 PP(pp_i_subtract)
 {
     dVAR; dSP; dATARGET;
-    tryAMAGICbin_MG(subtr_amg, AMGf_assign);
+    tryAMAGICbin_MG(subtr_amg, AMGf_assign, TARG);
     {
       dPOPTOPiirl_ul_nomg;
       SETi( left - right );
@@ -2628,7 +2628,7 @@ PP(pp_i_subtract)
 PP(pp_i_lt)
 {
     dVAR; dSP;
-    tryAMAGICbin_MG(lt_amg, AMGf_set);
+    tryAMAGICbin_MG(lt_amg, AMGf_set, NULL);
     {
       dPOPTOPiirl_nomg;
       SETs(boolSV(left < right));
@@ -2639,7 +2639,7 @@ PP(pp_i_lt)
 PP(pp_i_gt)
 {
     dVAR; dSP;
-    tryAMAGICbin_MG(gt_amg, AMGf_set);
+    tryAMAGICbin_MG(gt_amg, AMGf_set, NULL);
     {
       dPOPTOPiirl_nomg;
       SETs(boolSV(left > right));
@@ -2650,7 +2650,7 @@ PP(pp_i_gt)
 PP(pp_i_le)
 {
     dVAR; dSP;
-    tryAMAGICbin_MG(le_amg, AMGf_set);
+    tryAMAGICbin_MG(le_amg, AMGf_set, NULL);
     {
       dPOPTOPiirl_nomg;
       SETs(boolSV(left <= right));
@@ -2661,7 +2661,7 @@ PP(pp_i_le)
 PP(pp_i_ge)
 {
     dVAR; dSP;
-    tryAMAGICbin_MG(ge_amg, AMGf_set);
+    tryAMAGICbin_MG(ge_amg, AMGf_set, NULL);
     {
       dPOPTOPiirl_nomg;
       SETs(boolSV(left >= right));
@@ -2672,7 +2672,7 @@ PP(pp_i_ge)
 PP(pp_i_eq)
 {
     dVAR; dSP;
-    tryAMAGICbin_MG(eq_amg, AMGf_set);
+    tryAMAGICbin_MG(eq_amg, AMGf_set, NULL);
     {
       dPOPTOPiirl_nomg;
       SETs(boolSV(left == right));
@@ -2683,7 +2683,7 @@ PP(pp_i_eq)
 PP(pp_i_ne)
 {
     dVAR; dSP;
-    tryAMAGICbin_MG(ne_amg, AMGf_set);
+    tryAMAGICbin_MG(ne_amg, AMGf_set, NULL);
     {
       dPOPTOPiirl_nomg;
       SETs(boolSV(left != right));
@@ -2694,7 +2694,7 @@ PP(pp_i_ne)
 PP(pp_i_ncmp)
 {
     dVAR; dSP; dTARGET;
-    tryAMAGICbin_MG(ncmp_amg, 0);
+    tryAMAGICbin_MG(ncmp_amg, 0, TARG);
     {
       dPOPTOPiirl_nomg;
       I32 value;
@@ -2713,7 +2713,7 @@ PP(pp_i_ncmp)
 PP(pp_i_negate)
 {
     dVAR; dSP; dTARGET;
-    tryAMAGICun_MG(neg_amg, 0);
+    tryAMAGICun_MG(neg_amg, 0, TARG);
     {
 	SV * const sv = TOPs;
 	IV const i = SvIV_nomg(sv);
@@ -2727,7 +2727,7 @@ PP(pp_i_negate)
 PP(pp_atan2)
 {
     dVAR; dSP; dTARGET;
-    tryAMAGICbin_MG(atan2_amg, 0);
+    tryAMAGICbin_MG(atan2_amg, 0, TARG);
     {
       dPOPTOPnnrl_nomg;
       SETn(Perl_atan2(left, right));
@@ -2765,7 +2765,7 @@ PP(pp_sin)
     }
 
 
-    tryAMAGICun_MG(amg_type, 0);
+    tryAMAGICun_MG(amg_type, 0, TARG);
     {
       SV * const arg = POPs;
       const NV value = SvNV_nomg(arg);
@@ -2837,7 +2837,7 @@ PP(pp_srand)
 PP(pp_int)
 {
     dVAR; dSP; dTARGET;
-    tryAMAGICun_MG(int_amg, AMGf_numeric);
+    tryAMAGICun_MG(int_amg, AMGf_numeric, TARG);
     {
       SV * const sv = TOPs;
       const IV iv = SvIV_nomg(sv);
@@ -2879,7 +2879,7 @@ PP(pp_int)
 PP(pp_abs)
 {
     dVAR; dSP; dTARGET;
-    tryAMAGICun_MG(abs_amg, AMGf_numeric);
+    tryAMAGICun_MG(abs_amg, AMGf_numeric, TARG);
     {
       SV * const sv = TOPs;
       /* This will cache the NV value if string isn't actually integer  */

@@ -242,7 +242,7 @@ PP(pp_unstack)
 
 PP(pp_concat)
 {
-  dVAR; dSP; dATARGET; tryAMAGICbin_MG(concat_amg, AMGf_assign);
+    dVAR; dSP; dATARGET; tryAMAGICbin_MG(concat_amg, AMGf_assign, TARG);
   {
     dPOPTOPssrl;
     bool lbyte;
@@ -354,7 +354,7 @@ PP(pp_eq)
     dVAR; dSP;
     SV *left, *right;
 
-    tryAMAGICbin_MG(eq_amg, AMGf_set|AMGf_numeric);
+    tryAMAGICbin_MG(eq_amg, AMGf_set|AMGf_numeric, NULL);
     right = POPs;
     left  = TOPs;
     SETs(boolSV(
@@ -456,7 +456,7 @@ PP(pp_defined)
 PP(pp_add)
 {
     dVAR; dSP; dATARGET; bool useleft; SV *svl, *svr;
-    tryAMAGICbin_MG(add_amg, AMGf_assign|AMGf_numeric);
+    tryAMAGICbin_MG(add_amg, AMGf_assign|AMGf_numeric, TARG);
     svr = TOPs;
     svl = TOPm1s;
 
