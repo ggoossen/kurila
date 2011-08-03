@@ -1480,7 +1480,7 @@ PP(pp_sort)
     GV *gv;
     CV *cv = NULL;
     I32 gimme = GIMME;
-    INSTRUCTION* const next_instr = PL_op->op_next;
+    INSTRUCTION* const next_instr = run_get_next_instruction();
     I32 overloading = 0;
     bool hasargs = FALSE;
     I32 is_xsub = 0;
@@ -1491,6 +1491,7 @@ PP(pp_sort)
     void (*sortsvp)(pTHX_ SV **array, size_t nmemb, SVCOMPARE_t cmp, U32 flags)
       = Perl_sortsv_flags;
     I32 all_SIVs = 1;
+    INSTRUCTION *sortcop_instr = (INSTRUCTION*)PL_instruction->instr_arg;
 
     if ((priv & OPpSORT_DESCEND) != 0)
 	sort_flags |= SORTf_DESC;
@@ -1506,13 +1507,12 @@ PP(pp_sort)
     }
 
     ENTER;
+    SAVEVPTR(PL_instruction);
     SAVEVPTR(PL_sortcop);
+
     if (flags & OPf_STACKED) {
 	if (flags & OPf_SPECIAL) {
-	    OP *kid = cLISTOP->op_first->op_sibling;	/* pass pushmark */
-	    kid = kUNOP->op_first;			/* pass rv2gv */
-	    kid = kUNOP->op_first;			/* pass leave */
-	    PL_sortcop = kid->op_next;
+	    PL_sortcop = sortcop_instr;
 	    stash = CopSTASH(PL_curcop);
 	}
 	else {
@@ -1556,7 +1556,7 @@ PP(pp_sort)
     /* optimiser converts "@a = sort @a" to "sort \@a";
      * in case of tied @a, pessimise: push (@a) onto stack, then assign
      * result back to @a at the end of this function */
-    if (priv & OPpSORT_INPLACE) {
+    if (PL_instruction->instr_flags & INSTRf_SORT_INPLACE) {
 	assert( MARK+1 == SP && *SP && SvTYPE(*SP) == SVt_PVAV);
 	(void)POPMARK; /* remove mark associated with ex-OP_AASSIGN */
 	av = MUTABLE_AV((*SP));
@@ -1756,8 +1756,10 @@ S_sortcv(pTHX_ SV *const a, SV *const b)
     GvSV(PL_firstgv) = a;
     GvSV(PL_secondgv) = b;
     PL_stack_sp = PL_stack_base;
-    PL_op = PL_sortcop;
+
+    PL_instruction = (INSTRUCTION*)PL_sortcop;
     CALLRUNOPS(aTHX);
+
     if (PL_stack_sp != PL_stack_base + 1)
 	Perl_croak(aTHX_ "Sort subroutine didn't return single value");
     result = SvIV(*PL_stack_sp);
@@ -1804,8 +1806,10 @@ S_sortcv_stacked(pTHX_ SV *const a, SV *const b)
     AvARRAY(av)[0] = a;
     AvARRAY(av)[1] = b;
     PL_stack_sp = PL_stack_base;
-    PL_op = PL_sortcop;
+
+    PL_instruction = (INSTRUCTION *)PL_sortcop;
     CALLRUNOPS(aTHX);
+
     if (PL_stack_sp != PL_stack_base + 1)
 	Perl_croak(aTHX_ "Sort subroutine didn't return single value");
     result = SvIV(*PL_stack_sp);

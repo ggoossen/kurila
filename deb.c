@@ -193,7 +193,8 @@ static const char * const si_names[] = {
     "DESTROY",
     "WARNHOOK",
     "DIEHOOK",
-    "REQUIRE"
+    "REQUIRE",
+    "COMPILE"
 };
 #endif
 
@@ -305,7 +306,7 @@ Perl_deb_stack_all(pTHX)
 		    const INSTRUCTION * const ret_instr = cx->blk_sub.ret_instr;
 
 		    PerlIO_printf(Perl_debug_log, "  ret_instr=%s\n",
-			    ret_instr ? OP_NAME(ret_instr) : "(null)"
+			    ret_instr ? instruction_name(ret_instr) : "(null)"
 		    );
 		}
 	    }

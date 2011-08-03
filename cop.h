@@ -763,10 +763,19 @@ struct block_eval {
 	    sv_2mortal(cx->blk_eval.old_namesv);			\
     } STMT_END
 
+
 /* loop context */
+
+struct loop_instructions {
+    INSTRUCTION* next_instr;
+    INSTRUCTION* last_instr;
+    INSTRUCTION* redo_instr;
+};
+
 struct block_loop {
     I32		resetsp;
     LOOP *	my_op;	/* My op, that contains redo, next and last ops.  */
+    const LOOP_INSTRUCTIONS* loop_instrs;
     union {	/* different ways of locating the iteration variable */
 	SV      **svp;
 	GV      *gv;
@@ -806,18 +815,20 @@ struct block_loop {
 #define CxHASARGS(c)	(((c)->cx_type & CXp_HASARGS) == CXp_HASARGS)
 #define CxLVAL(c)	(0 + (c)->blk_u16)
 
-#define PUSHLOOP_PLAIN(cx, s)						\
+#define PUSHLOOP_PLAIN(cx, s, loop_instrs)						\
 	cx->blk_loop.resetsp = s - PL_stack_base;			\
 	cx->blk_loop.my_op = cLOOP;					\
 	cx->blk_loop.state_u.ary.ary = NULL;				\
 	cx->blk_loop.state_u.ary.ix = 0;				\
+	cx->blk_loop.loop_instrs = loop_instrs;				\
 	cx->blk_loop.itervar_u.svp = NULL;
 
-#define PUSHLOOP_FOR(cx, ivar, s)					\
+#define PUSHLOOP_FOR(cx, ivar, s, loop_instrs)				\
 	cx->blk_loop.resetsp = s - PL_stack_base;			\
 	cx->blk_loop.my_op = cLOOP;					\
 	cx->blk_loop.state_u.ary.ary = NULL;				\
 	cx->blk_loop.state_u.ary.ix = 0;				\
+	cx->blk_loop.loop_instrs = loop_instrs;				\
 	cx->blk_loop.itervar_u.svp = (SV**)(ivar);
 
 #define POPLOOP(cx)							\
@@ -833,8 +844,8 @@ struct block_givwhen {
 	INSTRUCTION *leave_instr;
 };
 
-#define PUSHGIVEN(cx)							\
-	cx->blk_givwhen.leave_instr = cLOGOP->op_other;
+#define PUSHGIVEN(cx, instr)							\
+	cx->blk_givwhen.leave_instr = instr;
 
 #define PUSHWHEN PUSHGIVEN
 
@@ -912,6 +923,13 @@ struct block {
 	PL_curpm         = cx->blk_oldpm;
 
 /* substitution context */
+
+struct substcont_instructions {
+    INSTRUCTION* pmreplstart_instr;
+    INSTRUCTION* subst_next_instr;
+    PMOP * pm;
+};
+
 struct subst {
     U8		sbu_type;	/* what kind of context this is */
     U8		sbu_rflags;
@@ -1110,6 +1128,7 @@ L<perlcall>.
 #define PERLSI_WARNHOOK		7
 #define PERLSI_DIEHOOK		8
 #define PERLSI_REQUIRE		9
+#define PERLSI_COMPILE		0xa
 
 struct stackinfo {
     AV *		si_stack;	/* stack for current runlevel */
@@ -1226,7 +1245,7 @@ See L<perlcall/LIGHTWEIGHT CALLBACKS>.
 	AV * const padlist = CvPADLIST(cv);				\
 	ENTER;								\
  	multicall_oldcatch = CATCH_GET;					\
-	SAVETMPS; SAVEVPTR(PL_op);					\
+	SAVETMPS; SAVEVPTR(PL_instruction);				\
 	CATCH_SET(TRUE);						\
 	PUSHSTACKi(PERLSI_SORT);					\
 	if (!CvCODESEQ(cv)) {						\
@@ -1246,7 +1265,7 @@ See L<perlcall/LIGHTWEIGHT CALLBACKS>.
 
 #define MULTICALL \
     STMT_START {							\
-	PL_op = multicall_instr;					\
+	PL_instruction = multicall_instr;				\
 	CALLRUNOPS(aTHX);						\
     } STMT_END
 

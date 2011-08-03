@@ -122,6 +122,9 @@ Perl_dump_all_perl(pTHX_ bool justperl)
     PerlIO_setlinebuf(Perl_debug_log);
     if (PL_main_root)
 	op_dump(PL_main_root);
+    if (PL_main_cv && CvCODESEQ(PL_main_cv)) {
+	codeseq_dump(CvCODESEQ(PL_main_cv));
+    }
     dump_packsubs_perl(PL_defstash, justperl);
 }
 
@@ -675,103 +678,30 @@ Perl_pmop_dump(pTHX_ PMOP *pm)
     do_pmop_dump(0, Perl_debug_log, pm);
 }
 
-/* An op sequencer.  We visit the ops in the order they're to execute. */
+/* An op sequencer.  We visit the ops in the order of the tree. */
 
 STATIC void
 S_sequence(pTHX_ register const OP *o)
 {
     dVAR;
-    const OP *oldop = NULL;
 
     if (!o)
 	return;
 
-#ifdef PERL_MAD
-    if (o->op_next == 0)
- 	return;
-#endif
-
     if (!Sequence)
 	Sequence = newHV();
 
-    for (; o; o = o->op_next) {
+    for (; o; o = o->op_sibling) {
 	STRLEN len;
 	SV * const op = newSVuv(PTR2UV(o));
 	const char * const key = SvPV_const(op, len);
 
-	if (hv_exists(Sequence, key, len))
-	    break;
-
-	switch (o->op_type) {
-	case OP_STUB:
-	    if ((o->op_flags & OPf_WANT) != OPf_WANT_LIST) {
-		(void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-		break;
-	    }
-	    goto nothin;
-	case OP_NULL:
-#ifdef PERL_MAD
-	    if (o == o->op_next)
-		return;
-#endif
-	    if (oldop && o->op_next)
-		continue;
-	    break;
-	case OP_SCALAR:
-	case OP_LINESEQ:
-	case OP_SCOPE:
-	  nothin:
-	    if (oldop && o->op_next)
-		continue;
+	if (! hv_exists(Sequence, key, len))
 	    (void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-	    break;
 
-	case OP_MAPWHILE:
-	case OP_GREPWHILE:
-	case OP_AND:
-	case OP_OR:
-	case OP_DOR:
-	case OP_ANDASSIGN:
-	case OP_ORASSIGN:
-	case OP_DORASSIGN:
-	case OP_COND_EXPR:
-	case OP_RANGE:
-	    (void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-	    sequence_tail(cLOGOPo->op_other);
-	    break;
-
-	case OP_ENTERLOOP:
-	case OP_ENTERITER:
-	    (void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-	    sequence_tail(cLOOPo->op_redoop);
-	    sequence_tail(cLOOPo->op_nextop);
-	    sequence_tail(cLOOPo->op_lastop);
-	    break;
-
-	case OP_SUBST:
-	    (void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-	    sequence_tail(cPMOPo->op_pmstashstartu.op_pmreplstart);
-	    break;
-
-	case OP_QR:
-	case OP_MATCH:
-	case OP_HELEM:
-	    break;
-
-	default:
-	    (void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-	    break;
-	}
-	oldop = o;
+	if (o->op_flags & OPf_KIDS)
+	    sequence(cUNOPo->op_first);
     }
-}
-
-static void
-S_sequence_tail(pTHX_ const OP *o)
-{
-    while (o && (o->op_type == OP_NULL))
-	o = o->op_next;
-    sequence(o);
 }
 
 STATIC UV
@@ -915,6 +845,15 @@ S_op_private_to_names(pTHX_ SV *tmpsv, U32 optype, U32 op_private) {
 }
 
 void
+Perl_dump_op_short(pTHX_ const OP *o)
+{
+    PERL_ARGS_ASSERT_DUMP_OP_SHORT;
+    sequence(o);
+    PerlIO_printf(Perl_debug_log,
+	"op %"UVuf" %s", sequence_num(o), PL_op_name[o->op_type]);
+}
+
+void
 Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 {
     dVAR;
@@ -932,13 +871,8 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     else
 	PerlIO_printf(file, "    ");
     PerlIO_printf(file,
-		  "%*sTYPE = %s  ===> ",
+		  "%*sTYPE = %s\n",
 		  (int)(PL_dumpindent*level-4), "", OP_NAME(o));
-    if (o->op_next)
-	PerlIO_printf(file, seq ? "%"UVuf"\n" : "(%"UVuf")\n",
-				sequence_num(o->op_next));
-    else
-	PerlIO_printf(file, "DONE\n");
     if (o->op_targ) {
 	if (optype == OP_NULL) {
 	    Perl_dump_indent(aTHX_ level, file, "  (was %s)\n", PL_op_name[o->op_targ]);
@@ -1138,33 +1072,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 			     CopLABEL(cCOPo));
 	break;
     case OP_ENTERLOOP:
-	Perl_dump_indent(aTHX_ level, file, "REDO ===> ");
-	if (cLOOPo->op_redoop)
-	    PerlIO_printf(file, "%"UVuf"\n", sequence_num(cLOOPo->op_redoop));
-	else
-	    PerlIO_printf(file, "DONE\n");
-	Perl_dump_indent(aTHX_ level, file, "NEXT ===> ");
-	if (cLOOPo->op_nextop)
-	    PerlIO_printf(file, "%"UVuf"\n", sequence_num(cLOOPo->op_nextop));
-	else
-	    PerlIO_printf(file, "DONE\n");
-	Perl_dump_indent(aTHX_ level, file, "LAST ===> ");
-	if (cLOOPo->op_lastop)
-	    PerlIO_printf(file, "%"UVuf"\n", sequence_num(cLOOPo->op_lastop));
-	else
-	    PerlIO_printf(file, "DONE\n");
-	break;
-    case OP_COND_EXPR:
-    case OP_RANGE:
-    case OP_MAPWHILE:
-    case OP_GREPWHILE:
-    case OP_OR:
-    case OP_AND:
-	Perl_dump_indent(aTHX_ level, file, "OTHER ===> ");
-	if (cLOGOPo->op_other)
-	    PerlIO_printf(file, "%"UVuf"\n", sequence_num(cLOGOPo->op_other));
-	else
-	    PerlIO_printf(file, "DONE\n");
+    case OP_FOREACH:
 	break;
     case OP_PUSHRE:
     case OP_MATCH:
@@ -1197,6 +1105,114 @@ Perl_op_dump(pTHX_ const OP *o)
 {
     PERL_ARGS_ASSERT_OP_DUMP;
     do_op_dump(0, Perl_debug_log, o);
+}
+
+/*
+   returns the index of the label of the given instruction or 0 if
+   there is no label for the instruction
+*/
+UV
+S_instr_label(pTHX_ HV* labels, const INSTRUCTION* instr) {
+    const char *key;
+    STRLEN  len;
+    SV* instr_sv = newSVuv(PTR2UV(instr));
+    SV** label;
+    if (!instr)
+	return 666;
+    key = SvPV_const(instr_sv, len);
+    label = hv_fetch(labels, key, len, 0);
+    SvREFCNT_dec(instr_sv);
+    return label ? SvUV(*label) : 0;
+}
+
+void
+S_add_label(pTHX_ HV* labels, const INSTRUCTION* instr, UV* index) {
+    STRLEN len;
+    SV * const instrsv = sv_2mortal(newSVuv(PTR2UV(instr)));
+    const char * const key = SvPV_const(instrsv, len);
+
+    if (!instr)
+	return;
+
+    if (hv_exists(labels, key, len))
+	return;
+
+    (void)hv_store(labels, key, len, newSVuv(++(*index)), 0);
+}
+
+void
+Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
+{
+    const INSTRUCTION *instr;
+    HV* jump_points;
+    UV jump_point_idx = 0;
+    PERL_ARGS_ASSERT_CODESEQ_DUMP;
+
+    jump_points = newHV(); /* memory leak */
+
+    /* Search for labels */
+    for( instr = codeseq_start_instruction(codeseq) ;
+	 instr < codeseq_start_instruction(codeseq) + codeseq->xcodeseq_size ;
+	 instr++ ) {
+	if (instr->instr_ppaddr == PL_ppaddr[OP_INSTR_JUMP]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_INSTR_COND_JUMP]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_OR]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_AND]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_DOR]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_COND_EXPR]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_ONCE]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_ENTERTRY]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_RANGE]
+	    ) {
+	    const INSTRUCTION* target = (const INSTRUCTION*)instr->instr_arg;
+	    S_add_label(aTHX_ jump_points, target, &jump_point_idx);
+	}
+	else if (instr->instr_ppaddr == PL_ppaddr[OP_ENTERLOOP]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_ENTERITER]) {
+	    LOOP_INSTRUCTIONS* loop_instrs = (LOOP_INSTRUCTIONS*)instr->instr_arg;
+	    S_add_label(aTHX_ jump_points, loop_instrs->redo_instr, &jump_point_idx);
+	    S_add_label(aTHX_ jump_points, loop_instrs->next_instr, &jump_point_idx);
+	    S_add_label(aTHX_ jump_points, loop_instrs->last_instr, &jump_point_idx);
+	}
+    }
+
+    PerlIO_printf(Perl_debug_log, "Instructions of codeseq (0x%"UVxf"):\n", PTR2UV(codeseq));
+    for( instr = codeseq_start_instruction(codeseq) ;
+	 instr < codeseq_start_instruction(codeseq) + codeseq->xcodeseq_size ;
+	 instr++ ) {
+	UV label = S_instr_label(aTHX_ jump_points, instr);
+	if (label) {
+	    PerlIO_printf(Perl_debug_log, "label%"UVuf":\n", label);
+	}
+	PerlIO_printf(Perl_debug_log, "0x%"UVxf": %s\t", PTR2UV(instr), instruction_name(instr));
+
+	if (instr->instr_ppaddr == PL_ppaddr[OP_INSTR_JUMP]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_INSTR_COND_JUMP]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_OR]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_AND]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_DOR]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_COND_EXPR]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_ONCE]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_ENTERTRY]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_RANGE]
+	    ) {
+	    const INSTRUCTION* target = (const INSTRUCTION *)instr->instr_arg;
+	    PerlIO_printf(Perl_debug_log, "label%"UVuf"\t", S_instr_label(aTHX_ jump_points, target));
+	}
+	else if (instr->instr_ppaddr == PL_ppaddr[OP_ENTERLOOP]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_ENTERITER]) {
+	    LOOP_INSTRUCTIONS* loop_instrs = (LOOP_INSTRUCTIONS*)instr->instr_arg;
+	    PerlIO_printf(Perl_debug_log, "redo=label%"UVuf"\t",
+		S_instr_label(aTHX_ jump_points, loop_instrs->redo_instr));
+	    PerlIO_printf(Perl_debug_log, "next=label%"UVuf"\t",
+		S_instr_label(aTHX_ jump_points, loop_instrs->next_instr));
+	    PerlIO_printf(Perl_debug_log, "last=label%"UVuf"\t",
+		S_instr_label(aTHX_ jump_points, loop_instrs->last_instr));
+	}
+
+	PerlIO_printf(Perl_debug_log, "\n");
+    }
+    PerlIO_printf(Perl_debug_log, "\n");
 }
 
 void
@@ -1963,12 +1979,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
     case SVt_PVFM:
 	do_hv_dump(level, file, "  COMP_STASH", CvSTASH(sv));
 	if (!CvISXSUB(sv)) {
-	    if (CvSTART(sv)) {
-		Perl_dump_indent(aTHX_ level, file,
-				 "  START = 0x%"UVxf" ===> %"IVdf"\n",
-				 PTR2UV(CvSTART(sv)),
-				 (IV)sequence_num(CvSTART(sv)));
-	    }
 	    Perl_dump_indent(aTHX_ level, file, "  ROOT = 0x%"UVxf"\n",
 			     PTR2UV(CvROOT(sv)));
 	    if (CvROOT(sv) && dumpops) {
@@ -2168,106 +2178,72 @@ Perl_sv_dump(pTHX_ SV *sv)
 	do_sv_dump(0, Perl_debug_log, sv, 0, 0, 0, 0);
 }
 
-int
-Perl_runops_debug(pTHX)
+void
+Perl_debug_instruction(pTHX_ const INSTRUCTION *instr)
 {
     dVAR;
-    if (!PL_op) {
-	Perl_ck_warner_d(aTHX_ packWARN(WARN_DEBUGGING), "NULL OP IN RUN");
-	return 0;
-    }
+    OP* o = instr->instr_op;
 
-    DEBUG_l(Perl_deb(aTHX_ "Entering new RUNOPS level\n"));
-    do {
-	if (PL_debug) {
-	    if (PL_watchaddr && (*PL_watchaddr != PL_watchok))
-		PerlIO_printf(Perl_debug_log,
-			      "WARNING: %"UVxf" changed from %"UVxf" to %"UVxf"\n",
-			      PTR2UV(PL_watchaddr), PTR2UV(PL_watchok),
-			      PTR2UV(*PL_watchaddr));
-	    if (DEBUG_s_TEST_) {
-		if (DEBUG_v_TEST_) {
-		    PerlIO_printf(Perl_debug_log, "\n");
-		    deb_stack_all();
-		}
-		else
-		    debstack();
-	    }
-
-
-	    if (DEBUG_t_TEST_) debop(PL_op);
-	    if (DEBUG_P_TEST_) debprof(PL_op);
-	}
-    } while ((PL_op = PL_op->op_ppaddr(aTHX)));
-    DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));
-
-    TAINT_NOT;
-    return 0;
-}
-
-I32
-Perl_debop(pTHX_ const OP *o)
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_DEBOP;
+    PERL_ARGS_ASSERT_DEBUG_INSTRUCTION;
 
     if (CopSTASH_eq(PL_curcop, PL_debstash) && !DEBUG_J_TEST_)
-	return 0;
+	return;
 
-    Perl_deb(aTHX_ "%s", OP_NAME(o));
-    switch (o->op_type) {
-    case OP_CONST:
-    case OP_HINTSEVAL:
-	/* With ITHREADS, consts are stored in the pad, and the right pad
-	 * may not be active here, so check.
-	 * Looks like only during compiling the pads are illegal.
-	 */
+    Perl_deb(aTHX_ "0x%"UVxf": %s", PTR2UV(instr), instruction_name(instr));
+    if (instr->instr_ppaddr == PL_ppaddr[OP_CONST])
+	PerlIO_printf(Perl_debug_log, "(%s)", SvPEEK(MUTABLE_SV(instr->instr_arg)));
+    if (o) {
+	switch (o->op_type) {
+	case OP_HINTSEVAL:
+	    /* With ITHREADS, consts are stored in the pad, and the right pad
+	     * may not be active here, so check.
+	     * Looks like only during compiling the pads are illegal.
+	     */
 #ifdef USE_ITHREADS
-	if ((((SVOP*)o)->op_sv) || !IN_PERL_COMPILETIME)
+	    if ((((SVOP*)o)->op_sv) || !IN_PERL_COMPILETIME)
 #endif
-	    PerlIO_printf(Perl_debug_log, "(%s)", SvPEEK(cSVOPo_sv));
-	break;
-    case OP_GVSV:
-    case OP_GV:
-	if (cGVOPo_gv) {
-	    SV * const sv = newSV(0);
+		PerlIO_printf(Perl_debug_log, "(%s)", SvPEEK(cSVOPo_sv));
+	    break;
+	case OP_GV:
+	    if (cGVOPo_gv) {
+		SV * const sv = newSV(0);
 #ifdef PERL_MAD
-	    /* FIXME - is this making unwarranted assumptions about the
-	       UTF-8 cleanliness of the dump file handle?  */
-	    SvUTF8_on(sv);
+		/* FIXME - is this making unwarranted assumptions about the
+		   UTF-8 cleanliness of the dump file handle?  */
+		SvUTF8_on(sv);
 #endif
-	    gv_fullname3(sv, cGVOPo_gv, NULL);
-	    PerlIO_printf(Perl_debug_log, "(%s)", SvPV_nolen_const(sv));
-	    SvREFCNT_dec(sv);
-	}
-	else
-	    PerlIO_printf(Perl_debug_log, "(NULL)");
-	break;
-    case OP_PADSV:
-    case OP_PADAV:
-    case OP_PADHV:
+		gv_fullname3(sv, cGVOPo_gv, NULL);
+		PerlIO_printf(Perl_debug_log, "(%s)", SvPV_nolen_const(sv));
+		SvREFCNT_dec(sv);
+	    }
+	    else
+		PerlIO_printf(Perl_debug_log, "(NULL)");
+	    break;
+	case OP_PADSV:
+	case OP_PADAV:
+	case OP_PADHV:
 	{
-	/* print the lexical's name */
-	CV * const cv = deb_curcv(cxstack_ix);
-	SV *sv;
-        if (cv) {
-	    AV * const padlist = CvPADLIST(cv);
-            AV * const comppad = MUTABLE_AV(*av_fetch(padlist, 0, FALSE));
-            sv = *av_fetch(comppad, o->op_targ, FALSE);
-        } else
-            sv = NULL;
-        if (sv)
-	    PerlIO_printf(Perl_debug_log, "(%s)", SvPV_nolen_const(sv));
-        else
-	    PerlIO_printf(Perl_debug_log, "[%"UVuf"]", (UV)o->op_targ);
+	    /* print the lexical's name */
+	    CV * const cv = deb_curcv(cxstack_ix);
+	    SV *sv;
+	    if (cv) {
+		AV * const padlist = CvPADLIST(cv);
+		AV * const comppad = MUTABLE_AV(*av_fetch(padlist, 0, FALSE));
+		sv = *av_fetch(comppad, o->op_targ, FALSE);
+	    } else
+		sv = NULL;
+	    if (sv)
+		PerlIO_printf(Perl_debug_log, "(%s)", SvPV_nolen_const(sv));
+	    else
+		PerlIO_printf(Perl_debug_log, "[%"UVuf"]", (UV)o->op_targ);
 	}
         break;
-    default:
-	break;
+	default:
+	    break;
+	}
     }
     PerlIO_printf(Perl_debug_log, "\n");
-    return 0;
+    return;
 }
 
 STATIC CV*
@@ -2298,6 +2274,27 @@ Perl_watch(pTHX_ char **addr)
     PL_watchok = *addr;
     PerlIO_printf(Perl_debug_log, "WATCHING, %"UVxf" is currently %"UVxf"\n",
 	PTR2UV(PL_watchaddr), PTR2UV(PL_watchok));
+}
+
+void
+Perl_runop_debug(pTHX)
+{
+    if (PL_watchaddr && (*PL_watchaddr != PL_watchok))
+	PerlIO_printf(Perl_debug_log,
+	    "WARNING: %"UVxf" changed from %"UVxf" to %"UVxf"\n",
+	    PTR2UV(PL_watchaddr), PTR2UV(PL_watchok),
+	    PTR2UV(*PL_watchaddr));
+    if (DEBUG_s_TEST_) {
+	if (DEBUG_v_TEST_) {
+	    PerlIO_printf(Perl_debug_log, "\n");
+	    deb_stack_all();
+	}
+	else
+	    debstack();
+    }
+
+    if (DEBUG_t_TEST_) debug_instruction(PL_instruction);
+    if (DEBUG_P_TEST_) debprof(PL_op);
 }
 
 STATIC void
@@ -2842,11 +2839,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	     OP_NAME(o),
 	              seq);
     level++;
-    if (o->op_next)
-	PerlIO_printf(file, seq ? "%"UVuf"\"" : "(%"UVuf")\"",
-		      sequence_num(o->op_next));
-    else
-	PerlIO_printf(file, "DONE\"");
 
     if (o->op_targ) {
 	if (o->op_type == OP_NULL)
@@ -2869,7 +2861,7 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	    PerlIO_printf(file, " targ=\"%ld\"", (long)o->op_targ);
     }
 #ifdef DUMPADDR
-    PerlIO_printf(file, " addr=\"0x%"UVxf" => 0x%"UVxf"\"", (UV)o, (UV)o->op_next);
+    PerlIO_printf(file, " addr=\"0x%"UVxf"\"", (UV)o);
 #endif
     if (o->op_flags) {
 	SV * const tmpsv = newSVpvs("");
@@ -3124,21 +3116,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 			     CopLABEL(cCOPo));
 	break;
     case OP_ENTERLOOP:
-	S_xmldump_attr(aTHX_ level, file, "redo=\"");
-	if (cLOOPo->op_redoop)
-	    PerlIO_printf(file, "%"UVuf"\"", sequence_num(cLOOPo->op_redoop));
-	else
-	    PerlIO_printf(file, "DONE\"");
-	S_xmldump_attr(aTHX_ level, file, "next=\"");
-	if (cLOOPo->op_nextop)
-	    PerlIO_printf(file, "%"UVuf"\"", sequence_num(cLOOPo->op_nextop));
-	else
-	    PerlIO_printf(file, "DONE\"");
-	S_xmldump_attr(aTHX_ level, file, "last=\"");
-	if (cLOOPo->op_lastop)
-	    PerlIO_printf(file, "%"UVuf"\"", sequence_num(cLOOPo->op_lastop));
-	else
-	    PerlIO_printf(file, "DONE\"");
 	break;
     case OP_COND_EXPR:
     case OP_RANGE:
@@ -3146,12 +3123,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
     case OP_GREPWHILE:
     case OP_OR:
     case OP_AND:
-	S_xmldump_attr(aTHX_ level, file, "other=\"");
-	if (cLOGOPo->op_other)
-	    PerlIO_printf(file, "%"UVuf"\"", sequence_num(cLOGOPo->op_other));
-	else
-	    PerlIO_printf(file, "DONE\"");
-	break;
     case OP_LEAVE:
     case OP_LEAVEEVAL:
     case OP_LEAVESUB:

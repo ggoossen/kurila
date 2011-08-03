@@ -77,15 +77,16 @@ Refetch the stack pointer.  Used after a callback.  See L<perlcall>.
 #define GETTARGETSTACKED targ = (PL_op->op_flags & OPf_STACKED ? POPs : PAD_SV(PL_op->op_targ))
 #define dTARGETSTACKED SV * GETTARGETSTACKED
 
-#define GETTARGET targ = PAD_SV(PL_op->op_targ)
+#define GETTARGET targ = PAD_SV((PL_instruction->instr_flags & INSTRf_TARG_IN_ARG2) ? (PADOFFSET)PL_instruction->instr_arg : PL_op->op_targ)
 #define dTARGET SV * GETTARGET
 
-#define GETATARGET targ = (PL_op->op_flags & OPf_STACKED ? sp[-1] : PAD_SV(PL_op->op_targ))
+#define GETATARGET targ = (PL_instruction->instr_flags & INSTRf_TARG_IN_ARG2 ? PAD_SV((PADOFFSET)PL_instruction->instr_arg) \
+	: PL_op->op_flags & OPf_STACKED ? sp[-1] : PAD_SV(PL_op->op_targ))
 #define dATARGET SV * GETATARGET
 
 #define dTARG SV *targ
 
-#define NORMAL PL_op->op_next
+#define NORMAL (Perl_run_get_next_instruction(aTHX))
 #define DIE return Perl_die
 
 /*
@@ -119,7 +120,7 @@ Pops a long off the stack.
 
 #define PUTBACK		PL_stack_sp = sp
 #define RETURN		return (PUTBACK, NORMAL)
-#define RETURNINSTR(o)	return (PUTBACK, o)
+#define RETURNINSTR(instr)	return (PUTBACK, instr)
 #define RETURNX(x)	return (x, PUTBACK, NORMAL)
 
 #define POPs		(*sp--)
@@ -448,12 +449,8 @@ Does not use C<TARG>.  See also C<XPUSHu>, C<mPUSHu> and C<PUSHu>.
 	    SETTARG;						\
 	    PUTBACK;						\
 	    if (jump) {						\
-	        OP *jump_o = NORMAL->op_next;                   \
-		while (jump_o->op_type == OP_NULL)		\
-		    jump_o = jump_o->op_next;			\
-		assert(jump_o->op_type == OP_ENTERSUB);		\
 		PL_markstack_ptr--;				\
-		return jump_o->op_next;				\
+		return jump;					\
 	    }							\
 	    return NORMAL;					\
 	}							\

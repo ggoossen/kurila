@@ -10,12 +10,6 @@
 
 /*
  * The fields of BASEOP are:
- *	op_next		Pointer to next ppcode to execute after this one.
- *			(Top level pre-grafted op points to first op,
- *			but this is replaced when op is grafted in, when
- *			this op will point to the real next op, and the new
- *			parent takes over role of remembering starting op.)
- *	op_ppaddr	Pointer to current ppcode's function.
  *	op_type		The type of the operation.
  *	op_opt		Whether or not the op has been optimised by the
  *			peephole optimiser.
@@ -52,9 +46,7 @@ typedef PERL_BITFIELD16 Optype;
 #define BASEOP BASEOP_DEFINITION
 #else
 #define BASEOP				\
-    OP*		op_next;		\
     OP*		op_sibling;		\
-    INSTRUCTION*		(*op_ppaddr)(pTHX);	\
     MADPROP_IN_BASEOP			\
     PADOFFSET	op_targ;		\
     PERL_BITFIELD16 op_type:9;		\
@@ -296,6 +288,8 @@ Deprecated.  Use C<GIMME_V> instead.
     
 /* Private for OP_CALLER and OP_WANTARRAY */
 #define OPpOFFBYONE		128	/* Treat caller(1) as caller(2) */
+/* Private for OP_WHILE_AND */
+#define OPpWHILE_AND_ONCE		2	/* Loop is executed at least once */
 
 /* Private for OP_COREARGS */
 /* These must not conflict with OPpDONT_INIT_GV.  See pp.c:S_rv2gv. */
@@ -322,7 +316,6 @@ struct binop {
 struct logop {
     BASEOP
     OP *	op_first;
-    OP *	op_other;
 };
 
 struct listop {
@@ -475,9 +468,6 @@ struct loop {
     BASEOP
     OP *	op_first;
     OP *	op_last;
-    OP *	op_redoop;
-    OP *	op_nextop;
-    OP *	op_lastop;
 };
 
 #define cUNOPx(o)	((UNOP*)o)
@@ -815,6 +805,7 @@ struct custom_op {
     const char	   *xop_desc;
     U32		    xop_class;
     void	  (*xop_peep)(pTHX_ OP *o, OP *oldop);
+    U32		    xop_opflags;
 };
 
 #define XopFLAGS(xop) ((xop)->xop_flags)
@@ -823,11 +814,13 @@ struct custom_op {
 #define XOPf_xop_desc	0x02
 #define XOPf_xop_class	0x04
 #define XOPf_xop_peep	0x08
+#define XOPf_xop_opflags	0x10
 
 #define XOPd_xop_name	PL_op_name[OP_CUSTOM]
 #define XOPd_xop_desc	PL_op_desc[OP_CUSTOM]
 #define XOPd_xop_class	OA_BASEOP
 #define XOPd_xop_peep	((Perl_cpeep_t)0)
+#define XOPd_xop_opflags	0
 
 #define XopENTRY_set(xop, which, to) \
     STMT_START { \
@@ -875,6 +868,9 @@ one of the OA_* constants from op.h.
 #define OP_CLASS(o) ((o)->op_type == OP_CUSTOM \
 		     ? XopENTRY(Perl_custom_op_xop(aTHX_ o), xop_class) \
 		     : (PL_opargs[(o)->op_type] & OA_CLASS_MASK))
+#define OP_OPFLAGS(o) ((o)->op_type == OP_CUSTOM \
+		     ? XopENTRY(Perl_custom_op_xop(aTHX_ o), xop_opflags) \
+		     : (PL_opargs[(o)->op_type]))
 
 #define newSUB(f, o, p, b)	Perl_newATTRSUB(aTHX_ (f), (o), (p), NULL, (b))
 

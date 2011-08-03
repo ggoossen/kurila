@@ -356,14 +356,14 @@ PP(pp_backtick)
 
 PP(pp_glob)
 {
-    dVAR;
+    dVAR; dSP; dTARG;
     INSTRUCTION *result;
-    dSP;
+    INSTRUCTION *jump = (INSTRUCTION*)PL_instruction->instr_arg;
     /* make a copy of the pattern, to ensure that magic is called once
      * and only once */
     TOPm1s = sv_2mortal(newSVsv(TOPm1s));
 
-    tryAMAGICunTARGET(iter_amg, -1, (PL_op->op_flags & OPf_SPECIAL));
+    tryAMAGICunTARGET(iter_amg, -1, jump);
 
     if (PL_op->op_flags & OPf_SPECIAL) {
 	/* call Perl-level glob function instead. Stack args are:
@@ -393,7 +393,7 @@ PP(pp_glob)
 #endif /* !VMS */
 
     SAVESPTR(PL_last_in_gv);	/* We don't want this to be permanent. */
-    PL_last_in_gv = MUTABLE_GV(*PL_stack_sp--);
+    PL_last_in_gv = MUTABLE_GV(POPs);
 
     SAVESPTR(PL_rs);		/* This is not permanent, either. */
     PL_rs = newSVpvs_flags("\000", SVs_TEMP);
@@ -402,17 +402,22 @@ PP(pp_glob)
     *SvPVX(PL_rs) = '\n';
 #endif	/* !CSH */
 #endif	/* !DOSISH */
-
-    result = do_readline();
+    GETTARGETSTACKED;
+    PUTBACK;
+    result = do_readline(PL_op->op_type, TARG);
     LEAVE_with_name("glob");
     return result;
 }
 
 PP(pp_rcatline)
 {
+    dSP;
     dVAR;
-    PL_last_in_gv = cGVOP_gv;
-    return do_readline();
+    dTARG;
+    PL_last_in_gv = (GV*)POPs;
+    TARG = POPs;
+    PUTBACK;
+    return do_readline(OP_RCATLINE, targ);
 }
 
 PP(pp_warn)
@@ -502,7 +507,8 @@ PP(pp_die)
     else {
 	exsv = newSVpvs_flags("Died", SVs_TEMP);
     }
-    return die_sv(exsv);
+    die_sv(exsv);
+    return NORMAL;
 }
 
 /* I/O. */
@@ -1368,7 +1374,7 @@ PP(pp_enterwrite)
 	DIE(aTHX_ "Not a format reference");
     }
     IoFLAGS(io) &= ~IOf_DIDTOP;
-    return doform(cv,gv,PL_op->op_next);
+    return doform(cv,gv,run_get_next_instruction());
 }
 
 PP(pp_leavewrite)
@@ -1456,7 +1462,7 @@ PP(pp_leavewrite)
 	    else
 		DIE(aTHX_ "Undefined top format called");
 	}
-	return doform(cv, gv, PL_op);
+	return doform(cv, gv, run_get_next_instruction() - 1 );
     }
 
   forget_top:

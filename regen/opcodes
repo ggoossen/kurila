@@ -36,9 +36,10 @@
 
 # Nothing.
 
-null		null operation		ck_null		0	
+null		null operation		ck_null		%	
 stub		stub			ck_null		0
 scalar		scalar			ck_fun		s%	S
+nothing		nothing			ck_null		0
 
 # Pushy stuff.
 
@@ -94,7 +95,7 @@ transr		transliteration (tr///)	ck_match	is"	S
 # Lvalue operators.
 # sassign is special-cased for op class
 
-sassign		scalar assignment	ck_sassign	s0
+sassign		scalar assignment	ck_sassign	s1
 aassign		list assignment		ck_null		t2	L L
 
 chop		chop			ck_spair	mts%	L
@@ -131,7 +132,7 @@ add		addition (+)		ck_null		IfsT2	S S
 i_add		integer addition (+)	ck_null		ifsT2	S S
 subtract	subtraction (-)		ck_null		IfsT2	S S
 i_subtract	integer subtraction (-)	ck_null		ifsT2	S S
-concat		concatenation (.) or string	ck_concat	fsT2	S S
+concat		concatenation (.) or string	ck_null	fsT2	S S
 stringify	string			ck_fun		fsT@	S
 
 left_shift	left bitshift (<<)	ck_bitop	fsT2	S S
@@ -199,7 +200,7 @@ index		index			ck_index	isT@	S S S?
 rindex		rindex			ck_index	isT@	S S S?
 
 sprintf		sprintf			ck_fun		fmst@	S L
-formline	formline		ck_fun		ms@	S L
+formline	formline		ck_formline		ms@	S L
 ord		ord			ck_fun		ifsTu%	S?
 chr		chr			ck_fun		fsTu%	S?
 crypt		crypt			ck_fun		fsT@	S S
@@ -255,21 +256,22 @@ unshift		unshift			ck_fun		imsT@	A L
 sort		sort			ck_sort		dm@	C? L
 reverse		reverse			ck_fun		mt@	L
 
-grepstart	grep			ck_grep		dm@	C L
+grepstart	grep			ck_grep		dt@	C L
 grepwhile	grep iterator		ck_null		dt|	
 
-mapstart	map			ck_grep		dm@	C L
+mapstart	map			ck_grep		dt@	C L
 mapwhile	map iterator		ck_null		dt|
 
 # Range stuff.
 
-range		flipflop		ck_null		|	S S
+range		range (or flop)		ck_null		|	S S
 flip		range (or flip)		ck_null		1	S S
-flop		range (or flop)		ck_null		1
+flop		range (or flop) instruction		ck_null		1
 
 # Control.
 
 and		logical and (&&)		ck_null		|	
+while_and	while				ck_null		|	
 or		logical or (||)			ck_null		|	
 xor		logical xor			ck_null		fs2	S S	
 dor		defined or (//)			ck_null		|
@@ -294,6 +296,7 @@ unstack		iteration finalizer	ck_null		s0
 enter		block entry		ck_null		0	
 leave		block exit		ck_null		@	
 scope		block			ck_null		@	
+foreach		foreach loop		ck_null		d{
 enteriter	foreach loop entry	ck_null		d{	
 iter		foreach loop iterator	ck_null		0	
 enterloop	loop entry		ck_null		d{	
@@ -532,6 +535,11 @@ lock		lock			ck_rfun		s%	R
 # For state support
 
 once		once			ck_null		|	
+
+instr_jump		instruction jump		ck_null		0	
+instr_cond_jump		instruction conditional jump	ck_null		0	
+instr_const_list	instruction constant list	ck_null		0	
+instr_end		instruction end			ck_null		0	
 
 custom		unknown custom operator		ck_null		0
 

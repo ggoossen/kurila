@@ -2419,9 +2419,12 @@ typedef struct loop LOOP;
 typedef struct block_hooks BHK;
 typedef struct custom_op XOP;
 
-typedef struct op INSTRUCTION;
+typedef void* INSTR_ARG;
+typedef struct instruction INSTRUCTION;
 typedef struct codeseq CODESEQ;
-#include "instruction.h"
+typedef struct codegen_pad CODEGEN_PAD;
+typedef struct loop_instructions LOOP_INSTRUCTIONS;
+typedef struct substcont_instructions SUBSTCONT_INSTRUCTIONS;
 
 typedef struct interpreter PerlInterpreter;
 
@@ -3676,7 +3679,9 @@ Gid_t getegid (void);
 #define DEBUG_q_FLAG		0x00800000 /*8388608 */
 #define DEBUG_M_FLAG		0x01000000 /*16777216*/
 #define DEBUG_B_FLAG		0x02000000 /*33554432*/
-#define DEBUG_MASK		0x03FEEFFF /* mask of all the standard flags */
+#define DEBUG_g_FLAG		0x04000000
+#define DEBUG_G_FLAG		0x08000000
+#define DEBUG_MASK		0x0FFEEFFF /* mask of all the standard flags */
 
 #define DEBUG_DB_RECURSE_FLAG	0x40000000
 #define DEBUG_TOP_FLAG		0x80000000 /* XXX what's this for ??? Signal
@@ -3707,6 +3712,8 @@ Gid_t getegid (void);
 #  define DEBUG_q_TEST_ (PL_debug & DEBUG_q_FLAG)
 #  define DEBUG_M_TEST_ (PL_debug & DEBUG_M_FLAG)
 #  define DEBUG_B_TEST_ (PL_debug & DEBUG_B_FLAG)
+#  define DEBUG_g_TEST_ (PL_debug & DEBUG_g_FLAG)
+#  define DEBUG_G_TEST_ (PL_debug & DEBUG_G_FLAG)
 #  define DEBUG_Xv_TEST_ (DEBUG_X_TEST_ && DEBUG_v_TEST_)
 #  define DEBUG_Uv_TEST_ (DEBUG_U_TEST_ && DEBUG_v_TEST_)
 #  define DEBUG_Pv_TEST_ (DEBUG_P_TEST_ && DEBUG_v_TEST_)
@@ -3738,6 +3745,8 @@ Gid_t getegid (void);
 #  define DEBUG_q_TEST DEBUG_q_TEST_
 #  define DEBUG_M_TEST DEBUG_M_TEST_
 #  define DEBUG_B_TEST DEBUG_B_TEST_
+#  define DEBUG_g_TEST DEBUG_g_TEST_
+#  define DEBUG_G_TEST DEBUG_G_TEST_
 #  define DEBUG_Xv_TEST DEBUG_Xv_TEST_
 #  define DEBUG_Uv_TEST DEBUG_Uv_TEST_
 #  define DEBUG_Pv_TEST DEBUG_Pv_TEST_
@@ -3788,6 +3797,8 @@ Gid_t getegid (void);
 #  define DEBUG_q(a) DEBUG__(DEBUG_q_TEST, a)
 #  define DEBUG_M(a) DEBUG__(DEBUG_M_TEST, a)
 #  define DEBUG_B(a) DEBUG__(DEBUG_B_TEST, a)
+#  define DEBUG_g(a) DEBUG__(DEBUG_g_TEST, a)
+#  define DEBUG_G(a) DEBUG__(DEBUG_G_TEST, a)
 
 #else /* DEBUGGING */
 
@@ -3816,6 +3827,8 @@ Gid_t getegid (void);
 #  define DEBUG_q_TEST (0)
 #  define DEBUG_M_TEST (0)
 #  define DEBUG_B_TEST (0)
+#  define DEBUG_g_TEST (0)
+#  define DEBUG_G_TEST (0)
 #  define DEBUG_Xv_TEST (0)
 #  define DEBUG_Uv_TEST (0)
 #  define DEBUG_Pv_TEST (0)
@@ -3846,6 +3859,8 @@ Gid_t getegid (void);
 #  define DEBUG_q(a)
 #  define DEBUG_M(a)
 #  define DEBUG_B(a)
+#  define DEBUG_g(a)
+#  define DEBUG_G(a)
 #  define DEBUG_Xv(a)
 #  define DEBUG_Uv(a)
 #  define DEBUG_Pv(a)
@@ -4169,6 +4184,8 @@ struct perl_memory_debug_header {
 #	define Perl_malloc_good_size(how_much)	(how_much)
 #  endif
 #endif
+
+typedef I32 INSTR_FLAGS;
 
 typedef int (*runops_proc_t)(pTHX);
 typedef void (*share_proc_t) (pTHX_ SV *sv);
@@ -5005,6 +5022,8 @@ struct tempsym; /* defined in pp_pack.c */
 
 #include "thread.h"
 #include "pp.h"
+
+#include "instruction.h"
 
 #ifndef PERL_CALLCONV
 #  ifdef __cplusplus

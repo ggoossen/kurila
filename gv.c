@@ -2588,17 +2588,18 @@ Perl_amagic_call(pTHX_ SV *left, SV *right, int method, int flags)
     BINOP myop;
     SV* res;
     const bool oldcatch = CATCH_GET;
+    INSTRUCTION* oldinstr = PL_instruction;
 
     CATCH_SET(TRUE);
     Zero(&myop, 1, BINOP);
     myop.op_last = (OP *) &myop;
-    myop.op_next = NULL;
     myop.op_flags = OPf_WANT_SCALAR | OPf_STACKED;
 
     PUSHSTACKi(PERLSI_OVERLOAD);
     ENTER;
     SAVEOP();
     PL_op = (OP *) &myop;
+    PL_instruction = (INSTRUCTION*)NULL -1;
     if (PERLDB_SUB && PL_curstash != PL_debstash)
 	PL_op->op_private |= OPpENTERSUB_DB;
     PUTBACK;
@@ -2615,8 +2616,9 @@ Perl_amagic_call(pTHX_ SV *left, SV *right, int method, int flags)
     PUSHs(MUTABLE_SV(cv));
     PUTBACK;
 
-    if ((PL_op = PL_ppaddr[OP_ENTERSUB](aTHX)))
-      CALLRUNOPS(aTHX);
+    if ((PL_instruction = PL_ppaddr[OP_ENTERSUB](aTHX))) {
+	CALLRUNOPS(aTHX);
+    }
     LEAVE;
     SPAGAIN;
 
@@ -2624,6 +2626,8 @@ Perl_amagic_call(pTHX_ SV *left, SV *right, int method, int flags)
     PUTBACK;
     POPSTACK;
     CATCH_SET(oldcatch);
+
+    PL_instruction = oldinstr;
 
     if (postpr) {
       int ans;

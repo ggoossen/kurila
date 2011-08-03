@@ -182,7 +182,6 @@ Ap	|int	|Gv_AMupdate	|NN HV* stash|bool destructing
 ApR	|CV*	|gv_handler	|NULLOK HV* stash|I32 id
 Apd	|OP*	|op_append_elem	|I32 optype|NULLOK OP* first|NULLOK OP* last
 Apd	|OP*	|op_append_list	|I32 optype|NULLOK OP* first|NULLOK OP* last
-Apd	|OP*	|op_linklist	|NN OP *o
 Apd	|OP*	|op_prepend_elem|I32 optype|NULLOK OP* first|NULLOK OP* last
 : FIXME - this is only called by pp_chown. They should be merged.
 p	|I32	|apply		|I32 type|NN SV** mark|NN SV** sp
@@ -294,7 +293,7 @@ ApR	|I32	|cxinc
 Afp	|void	|deb		|NN const char* pat|...
 Ap	|void	|vdeb		|NN const char* pat|NULLOK va_list* args
 Ap	|void	|debprofdump
-Ap	|I32	|debop		|NN const OP* o
+p	|void	|debug_instruction		|NN const INSTRUCTION* instr
 Ap	|I32	|debstack
 Ap	|I32	|debstackptrs
 Anp	|char*	|delimcpy	|NN char* to|NN const char* toend|NN const char* from \
@@ -365,7 +364,7 @@ Ap	|bool	|do_openn	|NN GV *gv|NN const char *oname|I32 len \
 : Used in pp_hot.c and pp_sys.c
 p	|bool	|do_print	|NULLOK SV* sv|NN PerlIO* fp
 : Used in pp_sys.c
-pR	|INSTRUCTION*	|do_readline
+pR	|INSTRUCTION*	|do_readline    |const I32 op_type|NN SV* targ
 : Defined in doio.c, used only in pp_sys.c
 p	|bool	|do_seek	|NULLOK GV* gv|Off_t pos|int whence
 Ap	|void	|do_sprintf	|NN SV* sv|I32 len|NN SV** sarg
@@ -393,6 +392,7 @@ Ap	|void	|dump_fds	|NN char* s
 Ap	|void	|dump_form	|NN const GV* gv
 Ap	|void	|gv_dump	|NN GV* gv
 Ap	|void	|op_dump	|NN const OP *o
+p	|void	|codeseq_dump	|NN const CODESEQ *codeseq
 Ap	|void	|pmop_dump	|NULLOK PMOP* pm
 Ap	|void	|dump_packsubs	|NN const HV* stash
 p	|void	|dump_packsubs_perl	|NN const HV* stash|bool justperl
@@ -414,9 +414,6 @@ s	|OP*	|fold_constants	|NN OP *o
 Afpd	|char*	|form		|NN const char* pat|...
 Ap	|char*	|vform		|NN const char* pat|NULLOK va_list* args
 Ap	|void	|free_tmps
-#if defined(PERL_IN_OP_C)
-s	|OP*	|gen_constant_list|NULLOK OP* o
-#endif
 #if !defined(HAS_GETENV_LEN)
 : Used in hv.c
 p	|char*	|getenv_len	|NN const char *env_elem|NN unsigned long *len
@@ -627,7 +624,6 @@ p	|OP*	|jmaybe		|NN OP *o
 : Used in pp.c 
 pP	|I32	|keyword	|NN const char *name|I32 len|bool all_keywords
 #if defined(PERL_IN_OP_C)
-s	|OP*	|opt_scalarhv	|NN OP* rep_op
 s	|void	|inplace_aassign	|NN OP* o
 #endif
 Ap	|void	|leave_scope	|I32 base
@@ -661,6 +657,7 @@ Ap	|void	|op_null	|NN OP* o
 EXp	|void	|op_clear	|NN OP* o
 Ap	|void	|op_refcnt_lock
 Ap	|void	|op_refcnt_unlock
+p	|OP*	|sequence_op	|NULLOK OP *o
 #if defined(PERL_IN_OP_C)
 s	|OP*	|listkids	|NULLOK OP* o
 #endif
@@ -922,10 +919,6 @@ p	|PADOFFSET|allocmy	|NN const char *const name|const STRLEN len\
 pR	|OP*	|oopsAV		|NN OP* o
 : Used in perly.y
 pR	|OP*	|oopsHV		|NN OP* o
-
-: peephole optimiser
-p	|void	|peep		|NULLOK OP* o
-p	|void	|rpeep		|NULLOK OP* o
 : Defined in doio.c, used only in pp_hot.c
 dopM	|PerlIO*|start_glob	|NN SV *tmpglob|NN IO *io
 #if defined(USE_REENTRANT_API)
@@ -968,7 +961,7 @@ s	|void	|pidgone	|Pid_t pid|int status
 : Used in perly.y
 p	|OP*	|pmruntime	|NN OP *o|NN OP *expr|bool isreg
 #if defined(PERL_IN_OP_C)
-s	|bool	|repl_is_constant	|NN OP* repl|NN bool* repl_has_varsp
+s	|bool	|repl_is_constant	|NN OP* o|NN bool* const repl_has_varsp
 s	|OP*	|pmtrans	|NN OP* o|NN OP* expr|NN OP* repl
 #endif
 Ap	|void	|pop_scope
@@ -1656,7 +1649,7 @@ sR	|OP*	|too_few_arguments|NN OP *o|NN const char* name
 s	|OP*	|too_many_arguments|NN OP *o|NN const char* name
 s	|bool	|looks_like_bool|NN const OP* o
 s	|OP*	|newGIVWHENOP	|NULLOK OP* cond|NN OP *block \
-				|I32 enter_opcode|I32 leave_opcode \
+				|I32 enter_opcode \
 				|PADOFFSET entertarg
 s	|OP*	|ref_array_or_hash|NULLOK OP* cond
 s	|void	|process_special_blocks	|NN const char *const fullname\
@@ -1714,7 +1707,7 @@ sR	|SV*	|refto		|NN SV* sv
 #if defined(PERL_IN_PP_C) || defined(PERL_IN_PP_HOT_C)
 : Used in pp_hot.c
 pRxo	|GV*	|softref2xv	|NN SV *const sv|NN const char *const what \
-				|const svtype type|NN SV ***spp
+				|const svtype type|NN SV ***spp|const bool boolkeys
 #endif
 
 #if defined(PERL_IN_PP_PACK_C)
@@ -1737,6 +1730,7 @@ snR	|char *	|bytes_to_uni	|NN const U8 *start|STRLEN len|NN char *dest
 
 #if defined(PERL_IN_PP_CTL_C)
 sR	|INSTRUCTION*	|docatch	|NULLOK INSTRUCTION *instr
+sR	|INSTRUCTION*	|dofindinstruction	|NN OP *o|I32 top_ix
 sR	|OP*	|dofindlabel	|NN OP *o|NN const char *label|NN OP **opstack|NN OP **oplimit
 s	|MAGIC *|doparseform	|NN SV *sv
 snR	|bool	|num_overflow	|NV value|I32 fldsize|I32 frcsize
@@ -1902,11 +1896,11 @@ Es	|void	|debug_start_match|NN const REGEXP *prog|const bool do_utf8\
 #  endif
 #endif
 
+p	|void	|runop_debug
 #if defined(PERL_IN_DUMP_C)
 s	|CV*	|deb_curcv	|const I32 ix
 s	|void	|debprof	|NN const OP *o
 s	|void	|sequence	|NULLOK const OP *o
-s	|void	|sequence_tail	|NULLOK const OP *o
 s	|UV	|sequence_num	|NULLOK const OP *o
 s	|SV*	|pm_description	|NN const PMOP *pm
 #endif
@@ -2498,6 +2492,18 @@ op	|void	|populate_isa	|NN const char *name|STRLEN len|...
 : Used in keywords.c and toke.c
 op	|bool	|feature_is_enabled|NN const char *const name|STRLEN namelen
 
+#if defined(PERL_IN_CODEGEN_C)
+s	|SV**	|svp_const_instruction	|NN CODEGEN_PAD *bpp|int instr_index
+s	|void	|add_op	|NN CODEGEN_PAD *bpp|NN OP* o|NN bool *may_constant_fold|int flags
+s	|void	|add_kids	|NN CODEGEN_PAD *bpp|NN OP* o|NN bool *may_constant_fold
+s	|void	|add_regcomp_op	|NN CODEGEN_PAD *bpp|NN OP* op_regcomp|NN OP* pm|NN bool *kid_may_constant_fold
+s	|void	|append_instruction	|NN CODEGEN_PAD *bpp|NULLOK OP* o|Optype optype|NULLOK INSTR_FLAGS instr_flags|NULLOK void* instr_arg
+s	|void	|save_branch_point	|NN CODEGEN_PAD *bpp|NN INSTRUCTION **instrp
+s	|void	|save_instr_from_to_pparg	|NN CODEGEN_PAD *codegen_pad|int instr_from_index|int instr_to_index
+s	|SV*	|instr_fold_constants	|NN INSTRUCTION* instr|NN OP* o|bool list
+s	|void	|append_allocated_data	|NN CODEGEN_PAD *bpp|NN void *data
+#endif
+
 Xp	|INSTRUCTION*	|codeseq_start_instruction|NN const CODESEQ* codeseq
 XEp	|void	|compile_op|NN OP* rootop|NN CODESEQ* codeseq
 XEp	|void	|compile_cv|NN CV* cv
@@ -2505,15 +2511,23 @@ XEap	|CODESEQ*	|new_codeseq
 XEp	|void	|codeseq_refcnt_inc|NN CODESEQ* codeseq
 XEp	|void	|codeseq_refcnt_dec|NULLOK CODESEQ* codeseq
 #if defined(USE_ITHREADS)
+#  if defined(PERL_IN_CODEGEN_C)
+s       |CODESEQ*       |find_codeseq_with_instruction|NN const INSTRUCTION* instr|NN CLONE_PARAMS *param
+#  endif
 Ep	|CODESEQ*	|codeseq_dup|NN CODESEQ* codeseq|NN CLONE_PARAMS* param
 Ep	|CODESEQ*	|codeseq_dup_inc|NN CODESEQ* codeseq|NN CLONE_PARAMS* param
+Ep	|INSTRUCTION*	|instruction_dup|NULLOK const INSTRUCTION* instr|NN CLONE_PARAMS *param
+Ep	|LOOP_INSTRUCTIONS*	|loop_instructions_dup|NN const LOOP_INSTRUCTIONS* loop_instrs|NN CLONE_PARAMS *param
 #endif
 
 #if defined(PERL_IN_INSTRUCTION_C)
 s	|void	|free_codeseq|NULLOK CODESEQ* codeseq
 #endif
+p	|const char*	|instruction_name|NULLOK const INSTRUCTION* instr
 
 Xp	|INSTRUCTION*	|run_get_next_instruction
 XEp	|void	|run_exec_codeseq|NN const CODESEQ* codeseq
+
+p	|void	|dump_op_short|NN const OP* o
 
 : ex: set ts=8 sts=4 sw=4 noet:

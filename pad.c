@@ -355,7 +355,6 @@ Perl_cv_undef(pTHX_ CV *cv)
 
 	op_free(CvROOT(cv));
 	CvROOT(cv) = NULL;
-	CvSTART(cv) = NULL;
 	LEAVE;
     }
     SvPOK_off(MUTABLE_SV(cv));		/* forget prototype */
@@ -1903,7 +1902,7 @@ Perl_cv_clone(pTHX_ CV *proto)
     OP_REFCNT_LOCK;
     CvROOT(cv)		= OpREFCNT_inc(CvROOT(proto));
     OP_REFCNT_UNLOCK;
-    CvSTART(cv)		= CvSTART(proto);
+    CvXSUBANY(cv)		= CvXSUBANY(proto);
     CvOUTSIDE(cv)	= MUTABLE_CV(SvREFCNT_inc_simple(outside));
     CvOUTSIDE_SEQ(cv) = CvOUTSIDE_SEQ(proto);
 
@@ -1987,7 +1986,7 @@ Perl_cv_clone(pTHX_ CV *proto)
 	 * so try to grab the current const value, and if successful,
 	 * turn into a const sub:
 	 */
-	SV* const const_sv = op_const_sv(CvSTART(cv), cv);
+	SV* const const_sv = op_const_sv(CvROOT(cv), cv);
 	if (const_sv) {
 	    SvREFCNT_dec(cv);
 	    cv = newCONSTSUB(CvSTASH(proto), NULL, const_sv);

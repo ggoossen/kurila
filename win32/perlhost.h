@@ -1739,22 +1739,21 @@ win32_start_child(LPVOID arg)
     /* push a zero on the stack (we are the child) */
     {
 	dSP;
-	dTARGET;
-	PUSHi(0);
+	mXPUSHi(0);
 	PUTBACK;
     }
 
-    /* continue from next op */
-    PL_op = PL_op->op_next;
+    /* continue from next instruction */
+    PL_instruction = run_get_next_instruction();
 
     {
 	dJMPENV;
 	volatile int oldscope = 1; /* We are responsible for all scopes */
 
-restart:
 	JMPENV_PUSH(status);
 	switch (status) {
 	case 0:
+	restart:
 	    CALLRUNOPS(aTHX);
             /* We may have additional unclosed scopes if fork() was called
              * from within a BEGIN block.  See perlfork.pod for more details.
@@ -1780,8 +1779,8 @@ restart:
 	case 3:
 	    if (PL_restart_instr) {
 		POPSTACK_TO(PL_mainstack);
-		PL_op = PL_restart_instr;
-		PL_restart_instr = (OP*)NULL;
+		PL_instruction = PL_restart_instr;
+		PL_restart_instr = NULL;
 		goto restart;
 	    }
 	    PerlIO_printf(Perl_error_log, "panic: restartop\n");

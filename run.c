@@ -37,9 +37,40 @@ int
 Perl_runops_standard(pTHX)
 {
     dVAR;
-    register OP *op = PL_op;
-    while ((PL_op = op = op->op_ppaddr(aTHX))) {
-    }
+    OP* oldop = PL_op;
+    INSTRUCTION* instr = PL_instruction;
+    assert(PL_instruction);
+
+    do {
+	PL_op = instr->instr_op;
+    } while ((PL_instruction = instr = instr->instr_ppaddr(aTHX)));
+
+    PL_op = oldop;
+
+    TAINT_NOT;
+    return 0;
+}
+
+int
+Perl_runops_debug(pTHX)
+{
+    dVAR;
+    OP* oldop = PL_op;
+    INSTRUCTION* instr = PL_instruction;
+    assert(PL_instruction);
+
+    DEBUG_l(Perl_deb(aTHX_ "Entering new RUNOPS level\n"));
+    do {
+	assert(PL_stack_base[0] == &PL_sv_undef);
+	assert(PL_stack_sp >= PL_stack_base);
+	if (PL_debug) {
+	    Perl_runop_debug(aTHX);
+	}
+	PL_op = instr->instr_op;
+    } while ((PL_instruction = instr = instr->instr_ppaddr(aTHX)));
+    DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));
+
+    PL_op = oldop;
 
     TAINT_NOT;
     return 0;
@@ -50,19 +81,18 @@ Perl_run_exec_codeseq(pTHX_ const CODESEQ* codeseq)
 {
     INSTRUCTION* old_instruction;
     PERL_ARGS_ASSERT_RUN_EXEC_CODESEQ;
-    old_instruction = PL_op;
-    PL_op = codeseq_start_instruction(codeseq);
+    old_instruction = PL_instruction;
+    PL_instruction = codeseq_start_instruction(codeseq);
 
     CALLRUNOPS(aTHX);
 
-    PL_op = old_instruction;
+    PL_instruction = old_instruction;
 }
 
 INSTRUCTION*
 Perl_run_get_next_instruction(pTHX)
 {
-    OP* nextop = PL_op->op_next;
-    return nextop;
+    return PL_instruction + 1;
 }
 
 /*

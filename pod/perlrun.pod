@@ -412,6 +412,8 @@ B<-D14> is equivalent to B<-Dtls>):
  16777216  M  trace smart match resolution
  33554432  B  dump suBroutine definitions, including special Blocks
               like BEGIN
+           g  trace code generation
+           G  dump generated code
 
 All these flags require B<-DDEBUGGING> when you compile the Perl
 executable (but see C<:opd> in L<Devel::Peek> or L<re/'debug' mode>

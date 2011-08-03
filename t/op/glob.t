@@ -25,7 +25,6 @@ else {
 ok( !(keys(%files)),'leftover op/* files' ) or diag(join(' ',sort keys %files));
 
 cmp_ok($/,'eq',"\n",'sane input record separator');
-
 $not = '';
 while (<jskdfjskdfj* op/* jskdjfjkosvk*>) {
     $not = "not " unless $_ eq shift @ops;

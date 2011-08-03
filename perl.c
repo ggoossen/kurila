@@ -2333,8 +2333,8 @@ S_run_body(pTHX_ I32 oldscope)
 
     if (PL_restart_instr) {
 	PL_restartjmpenv = NULL;
-	PL_op = PL_restart_instr;
-	PL_restart_instr = 0;
+	PL_instruction = PL_restart_instr;
+	PL_restart_instr = NULL;
 	CALLRUNOPS(aTHX);
     }
     else if (PL_main_root) {
@@ -2344,7 +2344,7 @@ S_run_body(pTHX_ I32 oldscope)
 	    CvCODESEQ(PL_main_cv) = new_codeseq();
 	    compile_op(PL_main_root, CvCODESEQ(PL_main_cv));
 	}
-	PL_op = codeseq_start_instruction(CvCODESEQ(PL_main_cv));
+	PL_instruction = codeseq_start_instruction(CvCODESEQ(PL_main_cv));
 	CALLRUNOPS(aTHX);
     }
     my_exit(0);
@@ -2578,6 +2578,9 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 {
     dVAR; dSP;
     LOGOP myop;		/* fake syntax tree node */
+    INSTRUCTION myinstr[4];
+    const INSTRUCTION* oldinstr;
+    int instr_idx = 0;
     UNOP method_op;
     I32 oldmark;
     VOL I32 retval = 0;
@@ -2585,6 +2588,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     bool oldcatch = CATCH_GET;
     int ret;
     OP* const oldop = PL_op;
+    INSTRUCTION* const old_instr = PL_instruction;
     dJMPENV;
 
     PERL_ARGS_ASSERT_CALL_SV;
@@ -2600,11 +2604,10 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     }
 
     Zero(&myop, 1, LOGOP);
-    myop.op_next = NULL;
     if (!(flags & G_NOARGS))
 	myop.op_flags |= OPf_STACKED;
     myop.op_flags |= OP_GIMME_REVERSE(flags);
-    myop.op_ppaddr = PL_ppaddr[OP_ENTERSUB];
+    myop.op_type = OP_ENTERSUB;
     SAVEOP();
     PL_op = (OP*)&myop;
 
@@ -2624,13 +2627,26 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 
     if (flags & G_METHOD) {
 	Zero(&method_op, 1, UNOP);
-	method_op.op_next = PL_op;
-	method_op.op_ppaddr = PL_ppaddr[OP_METHOD];
 	method_op.op_type = OP_METHOD;
-	myop.op_ppaddr = PL_ppaddr[OP_ENTERSUB];
 	myop.op_type = OP_ENTERSUB;
-	PL_op = (OP*)&method_op;
+	myinstr[instr_idx].instr_op = (OP*)&method_op;
+	myinstr[instr_idx].instr_ppaddr = PL_ppaddr[method_op.op_type];
+	myinstr[instr_idx].instr_flags = 0;
+	myinstr[instr_idx].instr_arg = NULL;
+	instr_idx++;
     }
+
+    myinstr[instr_idx].instr_op = (OP*)&myop;
+    myinstr[instr_idx].instr_ppaddr = PL_ppaddr[myop.op_type];
+    myinstr[instr_idx].instr_flags = 0;
+    myinstr[instr_idx].instr_arg = NULL;
+    myinstr[instr_idx+1].instr_ppaddr = PL_ppaddr[OP_INSTR_END];
+    myinstr[instr_idx+1].instr_op = NULL;
+    myinstr[instr_idx+1].instr_flags = 0;
+    myinstr[instr_idx+1].instr_arg = NULL;
+    myinstr[instr_idx+2].instr_ppaddr = NULL;
+    oldinstr = run_get_next_instruction();
+    PL_instruction = &myinstr[0];
 
     if (!(flags & G_EVAL)) {
 	CATCH_SET(TRUE);
@@ -2639,7 +2655,6 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	CATCH_SET(oldcatch);
     }
     else {
-	myop.op_other = (OP*)&myop;
 	PL_markstack_ptr--;
 	create_eval_scope(flags|G_FAKINGEVAL);
 	PL_markstack_ptr++;
@@ -2668,8 +2683,8 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	case 3:
 	    if (PL_restart_instr) {
 		PL_restartjmpenv = NULL;
-		PL_op = PL_restart_instr;
-		PL_restart_instr = 0;
+		PL_instruction = PL_restart_instr;
+		PL_restart_instr = NULL;
 		goto redo_body;
 	    }
 	    PL_stack_sp = PL_stack_base + oldmark;
@@ -2694,6 +2709,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	LEAVE;
     }
     PL_op = oldop;
+    PL_instruction = old_instr;
     return retval;
 }
 
@@ -2719,7 +2735,7 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
     VOL I32 oldmark = SP - PL_stack_base;
     VOL I32 retval = 0;
     int ret;
-    OP* const oldop = PL_op;
+    INSTRUCTION* const old_instr = PL_instruction;
     dJMPENV;
 
     PERL_ARGS_ASSERT_EVAL_SV;
@@ -2737,7 +2753,6 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
 
     if (!(flags & G_NOARGS))
 	myop.op_flags = OPf_STACKED;
-    myop.op_next = NULL;
     myop.op_type = OP_ENTEREVAL;
     myop.op_flags |= OP_GIMME_REVERSE(flags);
     if (flags & G_KEEPERR)
@@ -2750,12 +2765,11 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
     JMPENV_PUSH(ret);
     switch (ret) {
     case 0:
+	PL_instruction = ((INSTRUCTION*)NULL) -1;
+	PL_instruction = PL_ppaddr[OP_ENTEREVAL](aTHX);
+	if (!PL_instruction)
+	    goto fail;
  redo_body:
-	if (PL_op == (OP*)(&myop)) {
-	    PL_op = PL_ppaddr[OP_ENTEREVAL](aTHX);
-	    if (!PL_op)
-		goto fail; /* failed in compilation */
-	}
 	CALLRUNOPS(aTHX);
 	retval = PL_stack_sp - (PL_stack_base + oldmark);
 	if (!(flags & G_KEEPERR)) {
@@ -2775,8 +2789,8 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
     case 3:
 	if (PL_restart_instr) {
 	    PL_restartjmpenv = NULL;
-	    PL_op = PL_restart_instr;
-	    PL_restart_instr = 0;
+	    PL_instruction = PL_restart_instr;
+	    PL_restart_instr = NULL;
 	    goto redo_body;
 	}
       fail:
@@ -2797,7 +2811,7 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
 	FREETMPS;
 	LEAVE;
     }
-    PL_op = oldop;
+    PL_instruction = old_instr;
     return retval;
 }
 
@@ -2948,6 +2962,8 @@ Perl_get_debug_opts(pTHX_ const char **s, bool givehelp)
       "  q  quiet - currently only suppresses the 'EXECUTING' message\n"
       "  M  trace smart match resolution\n"
       "  B  dump suBroutine definitions, including special Blocks like BEGIN\n",
+      "  g  trace code generation\n",
+      "  G  dump generated code\n",
       NULL
     };
     int i = 0;
@@ -2956,7 +2972,7 @@ Perl_get_debug_opts(pTHX_ const char **s, bool givehelp)
 
     if (isALPHA(**s)) {
 	/* if adding extra options, remember to update DEBUG_MASK */
-	static const char debopts[] = "psltocPmfrxuUHXDSTRJvCAqMB";
+	static const char debopts[] = "psltocPmfrxuUHXDSTRJvCAqMBgG";
 
 	for (; isALNUM(**s); (*s)++) {
 	    const char * const d = strchr(debopts,**s);
@@ -4779,6 +4795,7 @@ Perl_my_exit(pTHX_ U32 status)
 	STATUS_EXIT_SET(status);
 	break;
     }
+    PL_instruction = NULL;
     my_exit_jump();
 }
 

@@ -65,10 +65,11 @@ my %alias;
 # Format is "this function" => "does these op names"
 my @raw_alias = (
 		 Perl_do_kv => [qw( keys values )],
-		 Perl_unimplemented_op => [qw(padany mapstart custom)],
+		 Perl_unimplemented_op => [qw(padany custom foreach nothing)],
 		 # All the ops with a body of { return NORMAL; }
 		 Perl_pp_null => [qw(scalar regcmaybe lineseq scope)],
 
+		 Perl_pp_grepstart => ['mapstart'],
 		 Perl_pp_goto => ['dump'],
 		 Perl_pp_require => ['dofile'],
 		 Perl_pp_untie => ['dbmclose'],
@@ -99,7 +100,7 @@ my @raw_alias = (
 		 Perl_pp_shmwrite => [qw(shmread msgsnd msgrcv semop)],
 		 Perl_pp_syswrite => {send => '#ifdef HAS_SOCKET'},
 		 Perl_pp_defined => [qw(dor dorassign)],
-                 Perl_pp_and => ['andassign'],
+                 Perl_pp_and => [qw(andassign while_and)],
 		 Perl_pp_or => ['orassign'],
 		 Perl_pp_ucfirst => ['lcfirst'],
 		 Perl_pp_sle => [qw(slt sgt sge)],

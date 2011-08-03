@@ -2792,7 +2792,7 @@ responsible for adding stack marks if necessary.
 You should also "register" your op with the Perl interpreter so that it
 can produce sensible error and warning messages. Since it is possible to
 have multiple custom ops within the one "logical" op type C<OP_CUSTOM>,
-Perl uses the value of C<< o->op_ppaddr >> to determine which custom op
+Perl uses the value of C<< o->op_targ >> to determine which custom op
 it is dealing with. You should create an C<XOP> structure for each
 ppaddr you use, set the properties of the custom op with
 C<XopENTRY_set>, and register the structure against the ppaddr using

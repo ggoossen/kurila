@@ -2380,7 +2380,7 @@ S_sublex_start(pTHX)
     }
     else if (op_type == OP_BACKTICK && PL_lex_op) {
 	/* readpipe() vas overriden */
-	cSVOPx(cLISTOPx(cUNOPx(PL_lex_op)->op_first)->op_first->op_sibling)->op_sv = tokeq(PL_lex_stuff);
+	cSVOPx(cLISTOPx(PL_lex_op)->op_first)->op_sv = tokeq(PL_lex_stuff);
 	pl_yylval.opval = PL_lex_op;
 	PL_lex_op = NULL;
 	PL_lex_stuff = NULL;
@@ -4020,7 +4020,7 @@ S_readpipe_override(pTHX)
 	     && (gv_readpipe = *gvp) && isGV_with_GP(gv_readpipe)
 	     && GvCVu(gv_readpipe) && GvIMPORTED_CV(gv_readpipe)))
     {
-	PL_lex_op = (OP*)newUNOP(OP_ENTERSUB, OPf_STACKED,
+	PL_lex_op = (OP*)convert(OP_ENTERSUB, OPf_STACKED,
 	    op_append_elem(OP_LIST,
 		newSVOP(OP_CONST, 0, &PL_sv_undef), /* value will be read later */
 		newCVREF(0, newGVOP(OP_GV, 0, gv_readpipe))));
@@ -9585,7 +9585,7 @@ S_scan_inputsymbol(pTHX_ char *start)
 		    OP * const o = newOP(OP_PADSV, 0);
 		    o->op_targ = tmp;
 		    PL_lex_op = readline_overriden
-			? (OP*)newUNOP(OP_ENTERSUB, OPf_STACKED,
+			? (OP*)convert(OP_ENTERSUB, OPf_STACKED,
 				op_append_elem(OP_LIST, o,
 				    newCVREF(0, newGVOP(OP_GV,0,gv_readline))))
 			: (OP*)newUNOP(OP_READLINE, 0, o);
@@ -9601,7 +9601,7 @@ intro_sym:
 				 : GV_ADDMULTI),
 				SVt_PV);
 		PL_lex_op = readline_overriden
-		    ? (OP*)newUNOP(OP_ENTERSUB, OPf_STACKED,
+		    ? (OP*)convert(OP_ENTERSUB, OPf_STACKED,
 			    op_append_elem(OP_LIST,
 				newUNOP(OP_RV2SV, 0, newGVOP(OP_GV, 0, gv)),
 				newCVREF(0, newGVOP(OP_GV, 0, gv_readline))))
@@ -9620,7 +9620,7 @@ intro_sym:
 	else {
 	    GV * const gv = gv_fetchpv(d, GV_ADD, SVt_PVIO);
 	    PL_lex_op = readline_overriden
-		? (OP*)newUNOP(OP_ENTERSUB, OPf_STACKED,
+		? (OP*)convert(OP_ENTERSUB, OPf_STACKED,
 			op_append_elem(OP_LIST,
 			    newGVOP(OP_GV, 0, gv),
 			    newCVREF(0, newGVOP(OP_GV, 0, gv_readline))))

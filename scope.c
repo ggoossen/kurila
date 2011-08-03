@@ -878,6 +878,10 @@ Perl_leave_scope(pTHX_ I32 base)
 	    ptr = SSPOPPTR;
 	    Safefree(ptr);
 	    break;
+	case SAVEt_FREECODESEQ:
+	    ptr = SSPOPPTR;
+	    codeseq_refcnt_dec((CODESEQ*)ptr);
+	    break;
 	case SAVEt_CLEARSV:
 	    ptr = (void*)&PL_curpad[uv >> SAVE_TIGHT_SHIFT];
 	    sv = *(SV**)ptr;
