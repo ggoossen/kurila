@@ -359,11 +359,12 @@ my_peep (pTHX_ OP *o)
     if (!MY_CXT.peep_recording)
 	return;
 
-    for (; o; o = o->op_next) {
-	if (o->op_type == OP_CONST && cSVOPx_sv(o) && SvPOK(cSVOPx_sv(o))) {
-	    av_push(MY_CXT.peep_recorder, newSVsv(cSVOPx_sv(o)));
-	}
-    }
+    croak("FIXME");
+    /* for (; o; o = o->op_next) { */
+    /*     if (o->op_type == OP_CONST && cSVOPx_sv(o) && SvPOK(cSVOPx_sv(o))) { */
+    /*         av_push(MY_CXT.peep_recorder, newSVsv(cSVOPx_sv(o))); */
+    /*     } */
+    /* } */
 }
 
 STATIC void
@@ -379,11 +380,12 @@ my_rpeep (pTHX_ OP *o)
     if (!MY_CXT.peep_recording)
 	return;
 
-    for (; o; o = o->op_next) {
-	if (o->op_type == OP_CONST && cSVOPx_sv(o) && SvPOK(cSVOPx_sv(o))) {
-	    av_push(MY_CXT.rpeep_recorder, newSVsv(cSVOPx_sv(o)));
-	}
-    }
+    croak("FIXME");
+    /* for (; o; o = o->op_next) { */
+    /*     if (o->op_type == OP_CONST && cSVOPx_sv(o) && SvPOK(cSVOPx_sv(o))) { */
+    /*         av_push(MY_CXT.rpeep_recorder, newSVsv(cSVOPx_sv(o))); */
+    /*     } */
+    /* } */
 }
 
 STATIC OP *
@@ -515,14 +517,15 @@ test_op_linklist_describe(OP *start)
 {
     SV *rv = sv_2mortal(newSVpvs(""));
     OP *o;
-    o = start = LINKLIST(start);
-    do {
-        sv_catpvs(rv, ".");
-        sv_catpv(rv, OP_NAME(o));
-        if (o->op_type == OP_CONST)
-            sv_catsv(rv, cSVOPo->op_sv);
-        o = o->op_next;
-    } while (o && o != start);
+    croak("FIXME");
+    /* o = start = LINKLIST(start); */
+    /* do { */
+    /*     sv_catpvs(rv, "."); */
+    /*     sv_catpv(rv, OP_NAME(o)); */
+    /*     if (o->op_type == OP_CONST) */
+    /*         sv_catsv(rv, cSVOPo->op_sv); */
+    /*     o = o->op_next; */
+    /* } while (o && o != start); */
     return SvPVX(rv);
 }
 
@@ -556,19 +559,20 @@ STATIC OP *
 THX_ck_entersub_establish_cleanup(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
     OP *pushop, *argop, *estop;
-    ck_entersub_args_proto(entersubop, namegv, ckobj);
-    pushop = cUNOPx(entersubop)->op_first;
-    if(!pushop->op_sibling) pushop = cUNOPx(pushop)->op_first;
-    argop = pushop->op_sibling;
-    pushop->op_sibling = argop->op_sibling;
-    argop->op_sibling = NULL;
-    op_free(entersubop);
-    NewOpSz(0, estop, sizeof(UNOP));
-    estop->op_type = OP_RAND;
-    estop->op_ppaddr = THX_pp_establish_cleanup;
-    cUNOPx(estop)->op_flags = OPf_KIDS;
-    cUNOPx(estop)->op_first = argop;
-    PL_hints |= HINT_BLOCK_SCOPE;
+    croak("FIXME");
+    /* ck_entersub_args_proto(entersubop, namegv, ckobj); */
+    /* pushop = cUNOPx(entersubop)->op_first; */
+    /* if(!pushop->op_sibling) pushop = cUNOPx(pushop)->op_first; */
+    /* argop = pushop->op_sibling; */
+    /* pushop->op_sibling = argop->op_sibling; */
+    /* argop->op_sibling = NULL; */
+    /* op_free(entersubop); */
+    /* NewOpSz(0, estop, sizeof(UNOP)); */
+    /* estop->op_type = OP_RAND; */
+    /* estop->op_ppaddr = THX_pp_establish_cleanup; */
+    /* cUNOPx(estop)->op_flags = OPf_KIDS; */
+    /* cUNOPx(estop)->op_first = argop; */
+    /* PL_hints |= HINT_BLOCK_SCOPE; */
     return estop;
 }
 
@@ -1033,7 +1037,8 @@ static XOP my_xop;
 static INSTRUCTION *
 pp_xop(pTHX)
 {
-    return PL_op->op_next;
+    croak("FIXME");
+    /* return PL_op->op_next; */
 }
 
 static void
@@ -1595,12 +1600,12 @@ xop_build_optree ()
         
         NewOp(1102, unop, 1, UNOP);
         unop->op_type       = OP_CUSTOM;
-        unop->op_ppaddr     = pp_xop;
+        /* unop->op_ppaddr     = pp_xop; */
         unop->op_flags      = OPf_KIDS;
         unop->op_private    = 0;
         unop->op_first      = kid;
-        unop->op_next       = NULL;
-        kid->op_next        = (OP*)unop;
+        /* unop->op_next       = NULL; */
+        /* kid->op_next        = (OP*)unop; */
 
         av_push(MY_CXT.xop_record, newSVpvf("unop:%"UVxf, PTR2UV(unop)));
         av_push(MY_CXT.xop_record, newSVpvf("kid:%"UVxf, PTR2UV(kid)));
@@ -1646,10 +1651,10 @@ BOOT:
     MY_CXT.peep_recorder = newAV();
     MY_CXT.rpeep_recorder = newAV();
 
-    MY_CXT.orig_peep = PL_peepp;
-    MY_CXT.orig_rpeep = PL_rpeepp;
-    PL_peepp = my_peep;
-    PL_rpeepp = my_rpeep;
+    /* MY_CXT.orig_peep = PL_peepp; */
+    /* MY_CXT.orig_rpeep = PL_rpeepp; */
+    /* PL_peepp = my_peep; */
+    /* PL_rpeepp = my_rpeep; */
 }
 
 void
@@ -2673,7 +2678,7 @@ test_op_linklist ()
         op_free(o);
 
         o = mkBINOP(OP_ADD, iv_op(1), iv_op(2));
-        LINKLIST(o);
+        /* LINKLIST(o); */
         o = mkBINOP(OP_SUBTRACT, o, iv_op(3));
         check_ll(o, ".const1.const2.add.const3.subtract");
         op_free(o);
@@ -2782,7 +2787,7 @@ CODE:
     PERL_SET_CONTEXT(interp_dup);
 
     /* continue after 'clone_with_stack' */
-    interp_dup->Iop = interp_dup->Iop->op_next;
+    /* interp_dup->Iop = interp_dup->Iop->op_next; */
 
     /* run with new perl */
     Perl_runops_standard(interp_dup);

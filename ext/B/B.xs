@@ -534,6 +534,7 @@ walkoptree(pTHX_ OP *o, const char *method, SV *ref)
 static SV **
 oplist(pTHX_ OP *o, SV **SP)
 {
+#ifdef FIXME
     for(; o; o = o->op_next) {
 #if PERL_VERSION >= 9
 	if (o->op_opt == 0)
@@ -569,6 +570,7 @@ oplist(pTHX_ OP *o, SV **SP)
 	    break;
 	}
     }
+#endif FIXME
     return SP;
 }
 
@@ -719,7 +721,9 @@ main_root()
 void
 main_start()
     PPCODE:
+#ifdef FIXME
 	PUSHs(make_op_object(aTHX_ PL_main_root->op_next ? PL_main_root->op_next : NULL ));
+#endif
         
 UV
 sub_generation()
@@ -913,18 +917,13 @@ void
 next(o)
 	B::OP		o
     ALIAS:
-	B::OP::next = OP_next_ix
 	B::OP::sibling = OP_sibling_ix
 	B::OP::targ = OP_targ_ix
 	B::OP::flags = OP_flags_ix
 	B::OP::private = OP_private_ix
 	B::UNOP::first = UNOP_first_ix
 	B::BINOP::last = BINOP_last_ix
-	B::LOGOP::other = LOGOP_other_ix
 	B::PMOP::pmreplstart = PMOP_pmreplstart_ix
-	B::LOOP::redoop = LOOP_redoop_ix
-	B::LOOP::nextop = LOOP_nextop_ix
-	B::LOOP::lastop = LOOP_lastop_ix
 	B::PMOP::pmflags = PMOP_pmflags_ix
 	B::SVOP::sv = SVOP_sv_ix
 	B::SVOP::gv = SVOP_gv_ix
