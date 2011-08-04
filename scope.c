@@ -33,6 +33,7 @@ Perl_stack_grow(pTHX_ SV **sp, SV **p, int n)
 
     PERL_ARGS_ASSERT_STACK_GROW;
 
+    assert(sp >= PL_stack_base && sp <= PL_stack_max);
     PL_stack_sp = sp;
 #ifndef STRESS_REALLOC
     av_extend(PL_curstack, (p - PL_stack_base) + (n) + 128);
