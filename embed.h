@@ -1363,6 +1363,7 @@
 #define process_special_blocks(a,b,c)	S_process_special_blocks(aTHX_ a,b,c)
 #define ref_array_or_hash(a)	S_ref_array_or_hash(aTHX_ a)
 #define refkids(a,b)		S_refkids(aTHX_ a,b)
+#define repl_is_constant(a,b)	S_repl_is_constant(aTHX_ a,b)
 #define scalar_mod_type		S_scalar_mod_type
 #define scalarboolean(a)	S_scalarboolean(aTHX_ a)
 #define scalarkids(a)		S_scalarkids(aTHX_ a)

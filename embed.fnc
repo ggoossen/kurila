@@ -968,6 +968,7 @@ s	|void	|pidgone	|Pid_t pid|int status
 : Used in perly.y
 p	|OP*	|pmruntime	|NN OP *o|NN OP *expr|bool isreg
 #if defined(PERL_IN_OP_C)
+s	|bool	|repl_is_constant	|NN OP* repl|NN bool* repl_has_varsp
 s	|OP*	|pmtrans	|NN OP* o|NN OP* expr|NN OP* repl
 #endif
 Ap	|void	|pop_scope

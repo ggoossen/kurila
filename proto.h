@@ -5606,6 +5606,12 @@ STATIC void	S_process_special_blocks(pTHX_ const char *const fullname, GV *const
 
 STATIC OP*	S_ref_array_or_hash(pTHX_ OP* cond);
 STATIC OP*	S_refkids(pTHX_ OP* o, I32 type);
+STATIC bool	S_repl_is_constant(pTHX_ OP* repl, bool* repl_has_varsp)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_REPL_IS_CONSTANT	\
+	assert(repl); assert(repl_has_varsp)
+
 STATIC bool	S_scalar_mod_type(const OP *o, I32 type)
 			__attribute__warn_unused_result__;
 
