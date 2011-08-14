@@ -6392,21 +6392,17 @@ Perl_op_const_sv(pTHX_ const OP *o, CV *cv)
     if (o->op_type == OP_LINESEQ && cLISTOPo->op_first)
 	o = cLISTOPo->op_first->op_sibling;
 
-    for (; o; o = o->op_next) {
+    for (; o; o = o->op_sibling) {
 	const OPCODE type = o->op_type;
 
-	if (sv && o->op_next == o)
-	    return sv;
-	if (o->op_next != o) {
-	    if (type == OP_NEXTSTATE
-	     || (type == OP_NULL && !(o->op_flags & OPf_KIDS))
-	     || type == OP_PUSHMARK)
-		continue;
-	    if (type == OP_DBSTATE)
-		continue;
-	}
-	if (type == OP_LEAVESUB || type == OP_RETURN)
-	    break;
+	if (type == OP_NEXTSTATE
+	   || (type == OP_NULL && !(o->op_flags & OPf_KIDS))
+	   || type == OP_PUSHMARK)
+	    continue;
+	if (type == OP_DBSTATE)
+	    continue;
+	if (type == OP_RETURN && (o->op_flags & OPf_KIDS))
+	    return op_const_sv(cUNOPo->op_first, cv);
 	if (sv)
 	    return NULL;
 	if (type == OP_CONST && cSVOPo->op_sv)
