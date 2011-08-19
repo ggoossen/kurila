@@ -1127,6 +1127,40 @@ S_add_op(pTHX_ CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
 	OP* op_right = cBINOPo->op_first;
 	OP* op_left = op_right->op_sibling;
 
+	OP* inplace_av_op = is_inplace_av(o);
+	if (inplace_av_op) {
+	    if (inplace_av_op->op_type == OP_SORT) {
+		append_instruction(bpp, NULL, OP_PUSHMARK, 0, NULL);
+		append_instruction(bpp, NULL, OP_PUSHMARK, 0, NULL);
+		if (inplace_av_op->op_flags & OPf_STACKED && !(inplace_av_op->op_flags & OPf_SPECIAL))
+		    add_op(bpp, cLISTOPx(inplace_av_op)->op_first, &kid_may_constant_fold, 0);
+		add_op(bpp, op_left, &kid_may_constant_fold, 0);
+
+		o = inplace_av_op;
+		{
+		    int start_idx, sort_idx;
+		    bool has_block = (o->op_flags & OPf_STACKED && o->op_flags & OPf_SPECIAL);
+
+		    sort_idx = bpp->idx;
+		    append_instruction(bpp, o, OP_SORT, INSTRf_SORT_INPLACE, NULL);
+		    start_idx = bpp->idx;
+		    append_instruction(bpp, NULL, OP_INSTR_JUMP, 0, NULL);
+		    if (has_block) {
+			save_instr_from_to_pparg(bpp, sort_idx, bpp->idx);
+			add_op(bpp, cUNOPo->op_first, &kid_may_constant_fold, 0);
+			append_instruction(bpp, NULL, OP_INSTR_END, 0, NULL);
+		    }
+		    save_instr_from_to_pparg(bpp, start_idx, bpp->idx);
+		}
+		break;
+	    }
+	    assert(inplace_av_op->op_type == OP_REVERSE);
+	    append_instruction(bpp, NULL, OP_PUSHMARK, 0, NULL);
+	    append_instruction(bpp, NULL, OP_PUSHMARK, 0, NULL);
+	    add_op(bpp, op_left, &kid_may_constant_fold, 0);
+	    append_instruction(bpp, inplace_av_op, OP_REVERSE, INSTRf_REVERSE_INPLACE, NULL);
+	    break;
+	}
 	append_instruction(bpp, NULL, OP_PUSHMARK, 0, NULL);
 	add_op(bpp, op_right, &kid_may_constant_fold, 0);
 	append_instruction(bpp, NULL, OP_PUSHMARK, 0, NULL);
@@ -1360,6 +1394,74 @@ Perl_compile_op(pTHX_ OP* rootop, CODESEQ* codeseq)
     FREETMPS ;
     LEAVE ;
     POPSTACK;
+}
+
+/* Checks if o acts as an in-place operator on an array. o points to the
+ * assign op. Returns the the in-place operator if available or NULL otherwise */
+
+OP *
+S_is_inplace_av(pTHX_ OP *o) {
+    OP *oright = cBINOPo->op_first;
+    OP *oleft = cBINOPo->op_first->op_sibling;
+    OP *sortop;
+
+    PERL_ARGS_ASSERT_IS_INPLACE_AV;
+
+    /* Only do inplace sort in void context */
+    assert(o->op_type == OP_AASSIGN);
+
+    if ((o->op_flags & OPf_WANT) != OPf_WANT_VOID)
+	return NULL;
+
+    /* check that the sort is the first arg on RHS of assign */
+
+    assert(oright->op_type == OP_LIST);
+    oright = cLISTOPx(oright)->op_first;
+    if (!oright || oright->op_sibling)
+	return NULL;
+    if (oright->op_type != OP_SORT && oright->op_type != OP_REVERSE)
+	return NULL;
+    sortop = oright;
+    oright = cLISTOPx(oright)->op_first;
+    if (sortop->op_flags & OPf_STACKED)
+	oright = oright->op_sibling; /* skip block */
+
+    if (!oright || oright->op_sibling)
+	return NULL;
+
+    /* Check that the LHS and RHS are both assignments to a variable */
+    if (!oright ||
+	(oright->op_type != OP_RV2AV && oright->op_type != OP_PADAV)
+	|| (oright->op_private & OPpLVAL_INTRO)
+    )
+	return NULL;
+
+    assert(oleft->op_type == OP_LIST);
+    oleft = cLISTOPx(oleft)->op_first;
+    if (!oleft || oleft->op_sibling)
+	return NULL;
+
+    if ((oleft->op_type != OP_PADAV && oleft->op_type != OP_RV2AV)
+	|| (oleft->op_private & OPpLVAL_INTRO)
+	)
+	return NULL;
+
+    /* check the array is the same on both sides */
+    if (oleft->op_type == OP_RV2AV) {
+	if (oright->op_type != OP_RV2AV
+	    || !cUNOPx(oright)->op_first
+	    || cUNOPx(oright)->op_first->op_type != OP_GV
+	    || cGVOPx_gv(cUNOPx(oleft)->op_first) !=
+	       cGVOPx_gv(cUNOPx(oright)->op_first)
+	)
+	    return NULL;
+    }
+    else if (oright->op_type != OP_PADAV
+	|| oright->op_targ != oleft->op_targ
+    )
+	return NULL;
+
+    return sortop;
 }
 
 SV**

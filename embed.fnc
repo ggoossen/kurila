@@ -2493,6 +2493,7 @@ op	|void	|populate_isa	|NN const char *name|STRLEN len|...
 op	|bool	|feature_is_enabled|NN const char *const name|STRLEN namelen
 
 #if defined(PERL_IN_CODEGEN_C)
+s	|OP*	|is_inplace_av	|NN OP* o
 s	|SV**	|svp_const_instruction	|NN CODEGEN_PAD *bpp|int instr_index
 s	|void	|add_op	|NN CODEGEN_PAD *bpp|NN OP* o|NN bool *may_constant_fold|int flags
 s	|void	|add_kids	|NN CODEGEN_PAD *bpp|NN OP* o|NN bool *may_constant_fold
