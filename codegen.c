@@ -392,6 +392,13 @@ S_add_op(pTHX_ CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
 
 	add_op(bpp, op_first, &cond_may_constant_fold, 0);
 
+	if (cond_may_constant_fold) {
+	    SV* const constsv = *(svp_const_instruction(bpp, bpp->idx-1));
+	    bpp->idx--;
+	    add_op(bpp, SvTRUE(constsv) ? op_true : op_false , &kid_may_constant_fold, 0);
+	    break;
+	}
+
 	cond_expr_idx = bpp->idx;
 	append_instruction(bpp, o, o->op_type, 0, NULL);
 
@@ -617,6 +624,19 @@ S_add_op(pTHX_ CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
 	    addop_cond_flags |= ADDOPf_BOOLEANCONTEXT;
 	add_op(bpp, op_first, &cond_may_constant_fold, addop_cond_flags);
 
+	if (cond_may_constant_fold) {
+	    SV* const constsv = *(svp_const_instruction(bpp, bpp->idx-1));
+	    bool const cond_true = ((o->op_type == OP_AND &&  SvTRUE(constsv)) ||
+		(o->op_type == OP_OR  && !SvTRUE(constsv)) ||
+		(o->op_type == OP_DOR && !SvOK(constsv)));
+
+	    if (cond_true) {
+		bpp->idx--;
+		add_op(bpp, op_other, &kid_may_constant_fold, 0);
+	    }
+	    break;
+	}
+
 	or_idx = bpp->idx;
 	append_instruction(bpp, o, o->op_type, 0, NULL);
 	add_op(bpp, op_other, &kid_may_constant_fold, 0);
@@ -708,6 +728,22 @@ S_add_op(pTHX_ CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
 	    add_op(bpp, flip->op_first, &kid_may_constant_fold, 0);
 	    add_op(bpp, flip->op_first->op_sibling, &kid_may_constant_fold, 0);
 	    append_instruction(bpp, o, OP_FLOP, 0, NULL);
+
+	    if (kid_may_constant_fold) {
+		/* replace instructions with constant list instruction */
+		SV* constsv;
+		append_instruction(bpp, NULL, OP_INSTR_END, 0, NULL);
+		bpp->codeseq.xcodeseq_instructions[bpp->idx].instr_ppaddr = NULL;
+		constsv = instr_fold_constants(&(bpp->codeseq.xcodeseq_instructions[start_idx]), o, TRUE);
+		if (constsv) {
+		    bpp->idx = start_idx; /* backtrack to start of constant instructions */
+		    append_instruction(bpp, NULL, OP_INSTR_CONST_LIST, 0, (void*)constsv);
+		    Perl_av_create_and_push(aTHX_ &bpp->codeseq.xcodeseq_svs, constsv);
+		}
+		else {
+		    bpp->idx--; /* remove OP_INSTR_END */
+		}
+	    }
 
 	    break;
 	}
@@ -926,6 +962,82 @@ S_add_op(pTHX_ CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
 	save_instr_from_to_pparg(bpp, bpp->idx -1, restart_idx);
 	break;
     }
+    case OP_RV2SV: {
+	if (cUNOPo->op_first->op_type == OP_GV &&
+	    !(cUNOPo->op_private & OPpDEREF)) {
+	    GV* gv = cGVOPx_gv(cUNOPo->op_first);
+	    append_instruction(bpp, o, OP_GVSV, 0, (void*)gv);
+	    break;
+	}
+	add_kids(bpp, o, &kid_may_constant_fold);
+	append_instruction(bpp, o, o->op_type, 0, NULL);
+	break;
+    }
+    case OP_AELEM: {
+	/*
+	  [op_av]
+	  [op_index]
+	  o->op_type
+	*/
+	OP* op_av = cUNOPo->op_first;
+	OP* op_index = op_av->op_sibling;
+	bool index_is_constant = TRUE;
+	int start_idx;
+	start_idx = bpp->idx;
+	add_op(bpp, op_av, &kid_may_constant_fold, 0);
+	add_op(bpp, op_index, &index_is_constant, 0);
+	kid_may_constant_fold = kid_may_constant_fold && index_is_constant;
+	if (index_is_constant) {
+	    if ((op_av->op_type == OP_PADAV ||
+		    (op_av->op_type == OP_RV2AV && cUNOPx(op_av)->op_first->op_type == OP_GV)) &&
+		!(o->op_private & (OPpLVAL_INTRO|OPpLVAL_DEFER|OPpDEREF|OPpMAYBE_LVSUB))
+		) {
+		/* Convert to AELEMFAST */
+		SV* const constsv = *(svp_const_instruction(bpp, bpp->idx-1));
+		SvIV_please(constsv);
+		if (SvIOKp(constsv)) {
+		    IV i = SvIV(constsv) - CopARYBASE_get(PL_curcop);
+		    OP* op_arg = op_av->op_type == OP_PADAV ? op_av : cUNOPx(op_av)->op_first;
+		    op_arg->op_flags |= o->op_flags & OPf_MOD;
+		    bpp->idx = start_idx;
+		    append_instruction(bpp, op_arg,
+			OP_AELEMFAST, 0, INT2PTR(void*, i));
+		    break;
+		}
+	    }
+	}
+	append_instruction(bpp, o, o->op_type, 0, NULL);
+	break;
+    }
+    case OP_HELEM: {
+	/*
+	  [op_hv]
+	  [op_index]
+	  o->op_type
+	*/
+	OP* op_hv = cUNOPo->op_first;
+	OP* op_key = op_hv->op_sibling;
+	bool key_is_constant = TRUE;
+	int start_idx;
+
+	start_idx = bpp->idx;
+	add_op(bpp, op_hv, &kid_may_constant_fold, 0);
+	add_op(bpp, op_key, &key_is_constant, 0);
+	kid_may_constant_fold = kid_may_constant_fold && key_is_constant;
+	if (key_is_constant) {
+	    SV ** const keysvp = svp_const_instruction(bpp, bpp->idx-1);
+	    if (SvOK(*keysvp) && !SvROK(*keysvp)) {
+		STRLEN keylen;
+		const char* key = SvPV_const(*keysvp, keylen);
+		SV* shared_keysv = newSVpvn_share(key,
+		    SvUTF8(*keysvp) ? -(I32)keylen : (I32)keylen,
+		    0);
+		*keysvp = shared_keysv;
+	    }
+	}
+	append_instruction(bpp, o, o->op_type, 0, NULL);
+	break;
+    }
     case OP_DELETE: {
 	if (o->op_private & OPpSLICE)
 	    append_instruction(bpp, NULL, OP_PUSHMARK, 0, NULL);
@@ -950,6 +1062,15 @@ S_add_op(pTHX_ CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
 	append_instruction(bpp, o, OP_LSLICE, 0, NULL);
 	break;
     }
+    case OP_RV2HV: {
+	if (boolean_context) {
+	    add_kids(bpp, o, &kid_may_constant_fold);
+	    append_instruction(bpp, o, OP_RV2HV, INSTRf_REF | INSTRf_RV2AV_BOOLKEYS, NULL);
+	    append_instruction(bpp, NULL, OP_BOOLKEYS, 0, NULL);
+	    break;
+	}
+	goto compile_default;
+    }
     case OP_REPEAT: {
 	if (o->op_private & OPpREPEAT_DOLIST)
 	    append_instruction(bpp, NULL, OP_PUSHMARK, 0, NULL);
@@ -966,6 +1087,13 @@ S_add_op(pTHX_ CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
     }
     case OP_NEXTSTATE:
     {
+	/* Two NEXTSTATEs in a row serve no purpose. Except if they happen
+	   to carry two labels. For now, take the easier option, and skip
+	   this optimisation if the first NEXTSTATE has a label.  */
+	if (o->op_sibling && o->op_sibling->op_type == OP_NEXTSTATE
+	     && !CopLABEL((COP*)o)
+	    )
+	    break;
 	append_instruction(bpp, o, o->op_type, 0, NULL);
 	PL_curcop = ((COP*)o);
 	break;
@@ -975,6 +1103,24 @@ S_add_op(pTHX_ CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
 	append_instruction(bpp, o, o->op_type, 0, NULL);
 	PL_curcop = ((COP*)o);
 	break;
+    }
+    case OP_SASSIGN: {
+	OP* op_right = cUNOPo->op_first;
+	OP* op_left = op_right->op_sibling;
+	if (op_left && op_left->op_type == OP_PADSV
+	    && !(op_left->op_private & OPpLVAL_INTRO)
+	    && (PL_opargs[op_right->op_type] & OA_TARGLEX)
+	    && (!(op_right->op_flags & OPf_STACKED))
+	    ) {
+	    assert(!(op_left->op_flags & OPf_STACKED));
+	    if (PL_opargs[op_right->op_type] & OA_MARK)
+		append_instruction(bpp, NULL, OP_PUSHMARK, 0, NULL);
+	    add_kids(bpp, op_right, &kid_may_constant_fold);
+	    append_instruction(bpp, op_right, op_right->op_type,
+		INSTRf_TARG_IN_ARG2, (void*)op_left->op_targ);
+	    break;
+	}
+	goto compile_default;
     }
     case OP_AASSIGN:
     {
@@ -987,6 +1133,37 @@ S_add_op(pTHX_ CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
 	add_op(bpp, op_left, &kid_may_constant_fold, 0);
 	append_instruction(bpp, o, OP_AASSIGN, 0, NULL);
 	break;
+    }
+    case OP_STRINGIFY:
+    {
+	if (cUNOPo->op_first->op_type == OP_CONCAT) {
+	    add_op(bpp, cUNOPo->op_first, &kid_may_constant_fold, 0);
+	    break;
+	}
+	goto compile_default;
+    }
+    case OP_CONCAT:
+    {
+	if ((o->op_flags & OPf_STACKED) && cBINOPo->op_last->op_type == OP_READLINE
+	    /* RCATLINE does not do overloading, so make sure it isn't requried */
+	    && cUNOPx(cBINOPo->op_last)->op_first->op_type == OP_GV
+	    ) {
+	    /*	/\* Turn "$a .= <FH>" into an OP_RCATLINE. AMS 20010917 *\/ */
+	    add_op(bpp, cBINOPo->op_first, &kid_may_constant_fold, 0);
+	    add_kids(bpp, cBINOPo->op_last, &kid_may_constant_fold);
+	    append_instruction(bpp, cBINOPo->op_last, OP_RCATLINE, 0, NULL);
+	    kid_may_constant_fold = FALSE;
+	    break;
+	}
+	goto compile_default;
+    }
+    case OP_LIST: {
+	if ((o->op_flags & OPf_WANT) == OPf_WANT_LIST) {
+	    /* don't bother with the pushmark and the pp_list instruction in list context */
+	    add_kids(bpp, o, &kid_may_constant_fold);
+	    break;
+	}
+	goto compile_default;
     }
 
     case OP_GLOB: {
@@ -1023,6 +1200,12 @@ S_add_op(pTHX_ CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
     case OP_CONST:
 	append_instruction(bpp, NULL, OP_CONST, 0, (void*)cSVOPx_sv(o));
 	break;
+
+    case OP_STUB:
+	if ((o->op_flags & OPf_WANT) == OPf_WANT_LIST) {
+	    break; /* Scalar stub must produce undef.  List stub is noop */
+	}
+	goto compile_default;
 
     case OP_CUSTOM:
 	if (PL_opargs[o->op_type] & OA_MARK)
